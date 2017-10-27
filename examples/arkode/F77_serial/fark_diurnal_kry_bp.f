@@ -40,7 +40,10 @@ C
 C     The PDE system is treated by central differences on a uniform
 C     10 x 10 mesh, with simple polynomial initial profiles.
 C     The problem is solved with ARKODE, with the DIRK/GMRES method and
-C     using the FARKBP banded preconditioner
+C     using the FARKBP banded preconditioner.
+C
+C     Note that this problem should only work with SUNDIALS configured
+C     to use 'realtype' as 'double' and 'sunindextype' as '64bit'
 C
 C     The second and third dimensions of U here must match the values of
 C     MX and MY, for consistency with the output statements below.
@@ -91,6 +94,20 @@ C     Initialize vector specification
          STOP
       ENDIF
 C
+C     initialize SPGMR linear solver module
+      call FSUNSPGMRINIT(4, JPRETYPE, MAXL, IER)
+      IF (IER .NE. 0) THEN
+        WRITE(6,25) IER
+ 25     FORMAT(///' SUNDIALS_ERROR: FSUNSPGMRINIT IER = ', I5)
+        STOP
+      ENDIF
+      call FSUNSPGMRSETGSTYPE(4, IGSTYPE, IER)
+      IF (IER .NE. 0) THEN
+        WRITE(6,27) IER
+ 27     FORMAT(///' SUNDIALS_ERROR: FSUNSPGMRSETGSTYPE IER = ', I5)
+        STOP
+      ENDIF
+C
 C     Initialize ARKODE
       CALL FARKMALLOC(T, U, METH, IATOL, RTOL, ATOL,
      1               IOUT, ROUT, IPAR, RPAR, IER)
@@ -107,13 +124,13 @@ C
         STOP
       ENDIF
 C
-C     Initialize SPGMR solver
-      CALL FARKSPGMR(JPRETYPE, IGSTYPE, MAXL, DELT, IER)
+C     attach matrix and linear solver modules to ARKSpils interface
+      CALL FARKSPILSINIT(IER)
       IF (IER .NE. 0) THEN
-         WRITE(6,45) IER
- 45      FORMAT(///' SUNDIALS_ERROR: FARKSPGMR returned IER = ', I5)
-         CALL FARKFREE
-         STOP
+        WRITE(6,40) IER
+ 40     FORMAT(///' SUNDIALS_ERROR: FARKSPILSINIT returned IER = ',I5)
+        CALL FARKFREE
+        STOP
       ENDIF
 C
 C     Initialize band preconditioner
@@ -121,8 +138,8 @@ C     Initialize band preconditioner
       ML = 2
       CALL FARKBPINIT(NEQ, MU, ML, IER)
       IF (IER .NE. 0) THEN
-         WRITE(6,40) IER
- 40      FORMAT(///' SUNDIALS_ERROR: FARKBPINIT returned IER = ', I5)
+         WRITE(6,45) IER
+ 45      FORMAT(///' SUNDIALS_ERROR: FARKBPINIT returned IER = ', I5)
          CALL FARKFREE
          STOP
       ENDIF
