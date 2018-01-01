@@ -17,16 +17,19 @@
 # Copyright (c) 2013, Southern Methodist University.
 # All rights reserved.
 # For details, see the LICENSE file.
-# -----------------------------------------------------------------
+# ---------------------------------------------------------------
 # CMakeLists.txt file for CVODES OpenMP examples
-# -----------------------------------------------------------------
+# ---------------------------------------------------------------
+
+# Example lists are tuples "name\;args\;type" where the type is
+# 'develop' for examples excluded from 'make test' in releases
 
 # Only include tests if OpenMP is enabled
 IF(OPENMP_FOUND)
 
   # Examples using SUNDIALS linear solvers
   SET(CVODES_examples_OMP
-    cvsAdvDiff_bnd_omp
+    "cvsAdvDiff_bnd_omp\;4\;develop"
     )
 
 ENDIF(OPENMP_FOUND)
@@ -49,26 +52,40 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_C_FLAGS}")
 
 # Add the build and install targets for each example
-FOREACH(example ${CVODES_examples_OMP})
+FOREACH(example_tuple ${CVODES_examples_OMP})
 
-  # example source files
-  ADD_EXECUTABLE(${example} ${example}.c)
+  # parse the example tuple
+  LIST(GET example_tuple 0 example)
+  LIST(GET example_tuple 1 example_args)
+  LIST(GET example_tuple 2 example_type)
 
-  SET_TARGET_PROPERTIES(${example} PROPERTIES FOLDER "Examples")
+  # check if this example has already been added, only need to add
+  # example source files once for testing with different inputs
+  IF(NOT TARGET ${example})
+    # example source files
+    ADD_EXECUTABLE(${example} ${example}.c)
 
-  # add to regression tests
-  SUNDIALS_ADD_TEST(${example} ${example} TEST_ARGS 4)
+    # folder to organize targets in an IDE
+    SET_TARGET_PROPERTIES(${example} PROPERTIES FOLDER "Examples")
 
-  # libraries to link against
-  TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_LIBS})
+    # libraries to link against
+    TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_LIBS})
+  ENDIF()
 
-  # install example source and out files
+  # add example to regression tests
+  SUNDIALS_ADD_TEST(${example} ${example}
+    TEST_ARGS ${example_args}
+    ANSWER_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+    ANSWER_FILE ${example}.out
+    EXAMPLE_TYPE ${example_type})
+
+  # install example source and .out files
   IF(EXAMPLES_INSTALL)
     INSTALL(FILES ${example}.c ${example}.out
       DESTINATION ${EXAMPLES_INSTALL_PATH}/cvodes/C_openmp)
   ENDIF()
 
-ENDFOREACH(example ${CVODES_examples_OMP})
+ENDFOREACH(example_tuple ${CVODES_examples_OMP})
 
 
 # create Makfile and CMakeLists.txt for examples
@@ -80,13 +97,13 @@ IF(EXAMPLES_INSTALL)
   # Install the extra files
   FOREACH(extrafile ${CVODES_extras_OMP})
     INSTALL(FILES ${extrafile} DESTINATION ${EXAMPLES_INSTALL_PATH}/cvodes/C_openmp)
-  ENDFOREACH(extrafile ${CVODES_extras_OMP})
+  ENDFOREACH()
 
   # Prepare substitution variables for Makefile and/or CMakeLists templates
   SET(SOLVER "CVODES")
   SET(SOLVER_LIB "sundials_cvodes")
 
-  LIST2STRING(CVODES_examples_OMP EXAMPLES)
+  EXAMPLES2STRING(CVODES_examples_OMP EXAMPLES)
 
   # Regardless of the platform we're on, we will generate and install
   # CMakeLists.txt file for building the examples. This file  can then
@@ -94,10 +111,10 @@ IF(EXAMPLES_INSTALL)
 
   # generate CMakelists.txt in the binary directory
   CONFIGURE_FILE(
-      ${PROJECT_SOURCE_DIR}/examples/templates/cmakelists_openmp_C_ex.in
-      ${PROJECT_BINARY_DIR}/examples/cvodes/C_openmp/CMakeLists.txt
-      @ONLY
-      )
+    ${PROJECT_SOURCE_DIR}/examples/templates/cmakelists_openmp_C_ex.in
+    ${PROJECT_BINARY_DIR}/examples/cvodes/C_openmp/CMakeLists.txt
+    @ONLY
+    )
 
   # install CMakelists.txt
   INSTALL(

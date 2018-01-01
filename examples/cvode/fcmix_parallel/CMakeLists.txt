@@ -14,11 +14,14 @@
 # CMakeLists.txt file for the FCVODE parallel examples
 # ---------------------------------------------------------------
 
+# Example lists are tuples "name\;nodes\;tasks\;type" where the
+# type is develop for examples excluded from 'make test' in releases
+
 # Examples using SUNDIALS linear solvers
 SET(FCVODE_examples
-  "fcvDiag_non_p\;1\;2"
-  "fcvDiag_kry_bbd_p\;1\;2"
-  "fcvDiag_kry_p\;1\;2"
+  "fcvDiag_non_p\;1\;2\;develop"
+  "fcvDiag_kry_bbd_p\;1\;2\;develop"
+  "fcvDiag_kry_p\;1\;2\;develop"
   )
 
 # Check whether we use MPI compiler scripts.
@@ -54,17 +57,23 @@ SET(SUNDIALS_LIBS ${FCVODE_LIB} ${CVODE_LIB} ${FNVECP_LIB} ${NVECP_LIB} ${EXTRA_
 # Add the build and install targets for each example
 FOREACH(example_tuple ${FCVODE_examples})
 
-  list(GET example_tuple 0 example)
-  list(GET example_tuple 1 number_of_nodes)
-  list(GET example_tuple 2 number_of_tasks)
+  # parse the example tuple
+  LIST(GET example_tuple 0 example)
+  LIST(GET example_tuple 1 number_of_nodes)
+  LIST(GET example_tuple 2 number_of_tasks)
+  LIST(GET example_tuple 3 example_type)
 
   # example source files
   ADD_EXECUTABLE(${example} ${example}.f)
 
   SET_TARGET_PROPERTIES(${example} PROPERTIES FOLDER "Examples")
 
-  # add to regression tests
-  SUNDIALS_ADD_TEST(${example} ${example} MPI_NPROCS ${number_of_tasks})
+  # add example to regression tests
+  SUNDIALS_ADD_TEST(${example} ${example}
+    MPI_NPROCS ${number_of_tasks}
+    ANSWER_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+    ANSWER_FILE ${example}.out
+    EXAMPLE_TYPE ${example_type})
 
   # libraries to link against
   TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_LIBS})
@@ -93,10 +102,7 @@ IF(EXAMPLES_INSTALL)
   SET(SOLVER_LIB "sundials_cvode")
   SET(SOLVER_FLIB "sundials_fcvode")
 
-  FOREACH(example_tuple ${FCVODE_examples})
-    list(GET example_tuple 0 example)
-    LIST2STRING(example EXAMPLES)
-  ENDFOREACH()
+  EXAMPLES2STRING(FCVODE_examples EXAMPLES)
 
   # Regardless of the platform we're on, we will generate and install
   # CMakeLists.txt file for building the examples. This file  can then
@@ -104,10 +110,10 @@ IF(EXAMPLES_INSTALL)
 
   # generate CMakelists.txt in the binary directory
   CONFIGURE_FILE(
-      ${PROJECT_SOURCE_DIR}/examples/templates/cmakelists_parallel_F77_ex.in
-      ${PROJECT_BINARY_DIR}/examples/cvode/fcmix_parallel/CMakeLists.txt
-      @ONLY
-      )
+    ${PROJECT_SOURCE_DIR}/examples/templates/cmakelists_parallel_F77_ex.in
+    ${PROJECT_BINARY_DIR}/examples/cvode/fcmix_parallel/CMakeLists.txt
+    @ONLY
+    )
 
   # install CMakelists.txt
   INSTALL(

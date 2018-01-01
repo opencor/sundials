@@ -14,15 +14,17 @@
 # CMakeLists.txt file for the FIDA parallel examples
 # ---------------------------------------------------------------
 
+# Example lists are tuples "name\;nodes\;tasks\;type" where the
+# type is develop for examples excluded from 'make test' in releases
+
 # Examples using SUNDIALS linear solvers
 SET(FIDA_examples
-  "fidaHeat2D_kry_bbd_p\;1\;4"
+  "fidaHeat2D_kry_bbd_p\;1\;4\;develop"
   )
 
 # Check whether we use MPI compiler scripts.
 # If yes, then change the Fortran compiler to the MPIF77 script.
 # If not, then add the MPI include directory for MPI headers.
-
 IF(MPI_MPIF77)
   # use MPI_MPIF77 as the compiler
   SET(CMAKE_Fortran_COMPILER ${MPI_MPIF77})
@@ -56,14 +58,19 @@ FOREACH(example_tuple ${FIDA_examples})
   list(GET example_tuple 0 example)
   list(GET example_tuple 1 number_of_nodes)
   list(GET example_tuple 2 number_of_tasks)
+  list(GET example_tuple 3 example_type)
 
   # example source files
   ADD_EXECUTABLE(${example} ${example}.f)
 
   SET_TARGET_PROPERTIES(${example} PROPERTIES FOLDER "Examples")
 
-  # add to regression tests
-  SUNDIALS_ADD_TEST(${example} ${example} MPI_NPROCS ${number_of_tasks})
+  # add example to regression tests
+  SUNDIALS_ADD_TEST(${example} ${example}
+    MPI_NPROCS ${number_of_tasks}
+    ANSWER_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+    ANSWER_FILE ${example}.out
+    EXAMPLE_TYPE ${example_type})
 
   # libraries to link against
   TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_LIBS})
@@ -92,10 +99,7 @@ IF(EXAMPLES_INSTALL)
   SET(SOLVER_LIB "sundials_ida")
   SET(SOLVER_FLIB "sundials_fida")
 
-  FOREACH(example_tuple ${FIDA_examples})
-    list(GET example_tuple 0 example)
-    LIST2STRING(example EXAMPLES)
-  ENDFOREACH()
+  EXAMPLES2STRING(FIDA_examples EXAMPLES)
 
   # Regardless of the platform we're on, we will generate and install
   # CMakeLists.txt file for building the examples. This file  can then
@@ -103,10 +107,10 @@ IF(EXAMPLES_INSTALL)
 
   # generate CMakelists.txt in the binary directory
   CONFIGURE_FILE(
-      ${PROJECT_SOURCE_DIR}/examples/templates/cmakelists_parallel_F77_ex.in
-      ${PROJECT_BINARY_DIR}/examples/ida/fcmix_parallel/CMakeLists.txt
-      @ONLY
-      )
+    ${PROJECT_SOURCE_DIR}/examples/templates/cmakelists_parallel_F77_ex.in
+    ${PROJECT_BINARY_DIR}/examples/ida/fcmix_parallel/CMakeLists.txt
+    @ONLY
+    )
 
   # install CMakelists.txt
   INSTALL(
