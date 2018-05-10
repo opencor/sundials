@@ -2,13 +2,13 @@
 ! Programmer(s): Daniel R. Reynolds @ SMU
 !-----------------------------------------------------------------
 ! LLNS/SMU Copyright Start
-! Copyright (c) 2015, Southern Methodist University and
+! Copyright (c) 2015, Southern Methodist University and 
 ! Lawrence Livermore National Security
 !
-! This work was performed under the auspices of the U.S. Department
-! of Energy by Southern Methodist University and Lawrence Livermore
+! This work was performed under the auspices of the U.S. Department 
+! of Energy by Southern Methodist University and Lawrence Livermore 
 ! National Laboratory under Contract DE-AC52-07NA27344.
-! Produced at Southern Methodist University and the Lawrence
+! Produced at Southern Methodist University and the Lawrence 
 ! Livermore National Laboratory.
 !
 ! All rights reserved.
@@ -19,26 +19,26 @@
 ! For details, see the LICENSE file.
 !-----------------------------------------------------------------
 ! Example problem:
-!
-! The following test simulates a brusselator problem from chemical
-! kinetics.  This is an ODE system with 3 components, Y = [u,v,w],
+! 
+! The following test simulates a brusselator problem from chemical 
+! kinetics.  This is an ODE system with 3 components, Y = [u,v,w], 
 ! satisfying the equations,
 !    du/dt = a - (w+1)*u + v*u^2
 !    dv/dt = w*u - v*u^2
 !    dw/dt = (b-w)/ep - w*u
-! for t in the interval [0.0, 10.0], with initial conditions
-! Y0 = [u0,v0,w0].  We use the initial conditions and parameters
+! for t in the interval [0.0, 10.0], with initial conditions 
+! Y0 = [u0,v0,w0].  We use the initial conditions and parameters 
 !    u0=3.9,  v0=1.1,  w0=2.8,  a=1.2,  b=2.5,  ep=1.0e-5
-! Here, all three solution components exhibit a rapid transient
-! change during the first 0.2 time units, followed by a slow and
+! Here, all three solution components exhibit a rapid transient 
+! change during the first 0.2 time units, followed by a slow and 
 ! smooth evolution.
-!
-! This program solves a the Fortran ODE test problem using the
+! 
+! This program solves a the Fortran ODE test problem using the 
 ! FARKODE interface for the ARKode ODE solver module.
-!
-! This program uses the IMEX ARK solver; here the
+! 
+! This program uses the IMEX ARK solver; here the 
 ! implicit systems are solved with a modified Newton iteration
-! with the SUNDENSE linear solver.  The Jacobian routine and
+! with the SUNDENSE linear solver.  The Jacobian routine and 
 ! right-hand side routines are supplied.
 !
 ! Output is printed 10 times throughout the defined time interval.
@@ -54,7 +54,7 @@ program driver
   include "sundials/sundials_fconfig.h"
 
   ! general problem variables
-  integer(kind=SUNINDEXTYPE), parameter :: NEQ=3
+  integer*8, parameter :: NEQ=3
   real(kind=REALTYPE), parameter :: T0=0.d0, Tf=10.d0
   real(kind=REALTYPE) :: dTout, Tout, Tcur, rtol, atol, rout(6)
   integer   :: it, Nt, ier
@@ -64,14 +64,14 @@ program driver
   ! real/integer parameters to pass through to supplied functions
   !    ipar(1) -> unused
   !    rpar(1) -> "a" parameter
-  !    rpar(2) -> "b" parameter
+  !    rpar(2) -> "b" parameter 
   !    rpar(3) -> "ep" parameter
   integer*8 :: ipar
   real(kind=REALTYPE) :: rpar(3)
 
   ! solver parameters
   integer :: adapt_method
-  integer(kind=SUNINDEXTYPE) :: order
+  integer*8 :: order
   real(kind=REALTYPE) :: nlscoef, adapt_params
 
   !-----------------------
@@ -95,7 +95,7 @@ program driver
   ! set tolerances according to problem specifications
   atol = 1.d-10
   rtol = 1.d-6
-
+  
   ! initialize vector module
   call FNVInitS(4, NEQ, ier)
   if (ier < 0) then
@@ -106,7 +106,7 @@ program driver
   ! initialize dense matrix and dense linear solver modules
   call FSunDenseMatInit(4, NEQ, NEQ, ier)
   call FSunDenseLinSolInit(4, ier)
-
+  
   ! initialize ARKode solver to use IMEX integrator, scalar tolerances
   call FARKMalloc(T0, y, 2, 1, rtol, atol, &
                   iout, rout, ipar, rpar, ier)
@@ -151,7 +151,7 @@ program driver
   open(100, file='solution.txt')
   write(100,*) '# t u v w'
 
-  ! output initial condition to disk
+  ! output initial condition to disk 
   write(100,'(3x,4(es23.16,1x))') T0, y
 
   ! loop over time outputs
@@ -234,7 +234,7 @@ subroutine farkifun(t, y, ydot, ipar, rpar, ier)
   ydot(2) = 0.d0
   ydot(3) = (b-w)/ep
   ier = 0
-
+  
 end subroutine farkifun
 !-----------------------------------------------------------------
 
@@ -270,7 +270,7 @@ subroutine farkefun(t, y, ydot, ipar, rpar, ier)
   ydot(2) = w*u - v*u*u
   ydot(3) = -w*u
   ier = 0
-
+  
 end subroutine farkefun
 !-----------------------------------------------------------------
 
@@ -286,7 +286,7 @@ subroutine farkdjac(neq,t,y,fy,DJac,h,ipar,rpar,wk1,wk2,wk3,ier)
   ! Arguments
   real(kind=REALTYPE), intent(in) :: t, h, rpar(3)
   integer*8, intent(in) :: ipar(1)
-  integer(kind=SUNINDEXTYPE), intent(in) :: neq
+  integer*8, intent(in) :: neq
   integer,   intent(out) :: ier
   real(kind=REALTYPE), intent(in), dimension(neq) :: y, fy, wk1, wk2, wk3
   real(kind=REALTYPE), intent(out) :: DJac(neq,neq)
@@ -306,6 +306,6 @@ subroutine farkdjac(neq,t,y,fy,DJac,h,ipar,rpar,wk1,wk2,wk3,ier)
   DJac = 0.d0
   DJac(3,3) = -1.d0/ep
   ier = 0
-
+    
 end subroutine farkdjac
 !-----------------------------------------------------------------

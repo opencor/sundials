@@ -1,11 +1,11 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Aaron Collier and Alan C. Hindmarsh @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -32,7 +32,7 @@
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
 #endif
-  extern void FIDA_ROOTFN(realtype*,  /* T    */
+  extern void FIDA_ROOTFN(realtype*,  /* T    */ 
                           realtype*,  /* Y    */
                           realtype*,  /* YP   */
                           realtype*,  /* G    */
@@ -58,7 +58,7 @@ void FIDA_ROOTINIT(int *nrtfn, int *ier)
 void FIDA_ROOTINFO(int *nrtfn, int *info, int *ier)
 {
   *ier = IDAGetRootInfo(IDA_idamem, info);
-  return;
+  return; 
 }
 
 /***************************************************************************/

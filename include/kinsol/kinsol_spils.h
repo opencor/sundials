@@ -1,11 +1,11 @@
 /*
  * -----------------------------------------------------------------
  * Programmer(s): Daniel R. Reynolds @ SMU
- *                Scott Cohen, Alan Hindmarsh, Radu Serban,
+ *                Scott Cohen, Alan Hindmarsh, Radu Serban, 
  *                  and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
  * This work was performed under the auspices of the U.S. Department
@@ -54,36 +54,36 @@ extern "C" {
   the right-preconditioner matrix P (stored in memory block
   referenced by pdata pointer) used to form the scaled
   preconditioned linear system:
-
+  
     (Df*J(uu)*(P^-1)*(Du^-1)) * (Du*P*x) = Df*(-F(uu))
-
+  
   where Du and Df denote the diagonal scaling matrices whose
   diagonal elements are stored in the vectors uscale and fscale,
   repsectively.
-
+ 
   The preconditioner setup routine (referenced by iterative linear
   solver modules via pset (type KINSpilsPrecSetupFn)) will not be
   called prior to every call made to the psolve function, but will
   instead be called only as often as necessary to achieve
   convergence of the Newton iteration.
-
+ 
   Note: If the psolve routine requires no preparation, then a
   preconditioner setup function need not be given.
-
+ 
     uu  current iterate (unscaled) [input]
-
+ 
     uscale  vector (type N_Vector) containing diagonal elements
             of scaling matrix for vector uu [input]
-
+ 
     fval  vector (type N_Vector) containing result of nonliear
           system function evaluated at current iterate:
           fval = F(uu) [input]
-
+ 
     fscale  vector (type N_Vector) containing diagonal elements
             of scaling matrix for fval [input]
-
+ 
     user_data  pointer to user-allocated data memory block
-
+ 
   If successful, the function should return 0 (zero). If an error
   occurs, then the routine should return a non-zero integer value.
   -----------------------------------------------------------------*/
@@ -100,68 +100,68 @@ typedef int (*KINSpilsPrecSetupFn)(N_Vector uu, N_Vector uscale,
   KINSpilsPrecSolveFn)) should solve a (scaled) preconditioned
   linear system of the generic form P*z = r, where P denotes the
   right-preconditioner matrix computed by the pset routine.
-
+  
    uu  current iterate (unscaled) [input]
-
+ 
    uscale  vector (type N_Vector) containing diagonal elements
            of scaling matrix for vector uu [input]
-
+ 
    fval  vector (type N_Vector) containing result of nonliear
          system function evaluated at current iterate:
          fval = F(uu) [input]
-
+ 
    fscale  vector (type N_Vector) containing diagonal elements
            of scaling matrix for fval [input]
-
+ 
    vv  vector initially set to the right-hand side vector r, but
        which upon return contains a solution of the linear system
        P*z = r [input/output]
-
+ 
    user_data  pointer to user-allocated data memory block
-
+ 
   If successful, the function should return 0 (zero). If a
   recoverable error occurs, then the subroutine should return
   a positive integer value (in this case, KINSOL attempts to
-  correct by calling the preconditioner setup function if the
-  preconditioner information is out of date). If an unrecoverable
-  error occurs, then the preconditioner solve function should return
+  correct by calling the preconditioner setup function if the 
+  preconditioner information is out of date). If an unrecoverable 
+  error occurs, then the preconditioner solve function should return 
   a negative integer value.
   ------------------------------------------------------------------*/
 
-typedef int (*KINSpilsPrecSolveFn)(N_Vector uu, N_Vector uscale,
-                                   N_Vector fval, N_Vector fscale,
+typedef int (*KINSpilsPrecSolveFn)(N_Vector uu, N_Vector uscale, 
+                                   N_Vector fval, N_Vector fscale, 
                                    N_Vector vv, void *user_data);
 
 /*------------------------------------------------------------------
   Type : KINSpilsJacTimesVecFn
-
+  
   The (optional) user-supplied matrix-vector product subroutine
   (referenced internally via jtimes (type KINSpilsJacTimesVecFn))
   is used to compute Jv = J(uu)*v (system Jacobian applied to a
   given vector). If a user-defined routine is not given, then the
   private routine is used.
-
+ 
    v  unscaled variant of vector to be multiplied by J(uu) [input]
-
+ 
    Jv  vector containing result of matrix-vector product J(uu)*v
        [output]
-
+ 
    uu  current iterate (unscaled) [input]
-
+ 
    new_uu  flag (reset by user) indicating if the iterate uu
            has been updated in the interim - Jacobian needs
            to be updated/reevaluated, if appropriate, unless
            new_uu = SUNFALSE [input/output]
-
+ 
    user_data  pointer to user data, the same as the user_data
               parameter passed to the KINSetUserData function.
-
+ 
   If successful, the function should return 0 (zero). If an error
   occurs, then the routine should return a non-zero integer value.
   ------------------------------------------------------------------*/
-
+  
 typedef int (*KINSpilsJacTimesVecFn)(N_Vector v, N_Vector Jv,
-                                     N_Vector uu, booleantype *new_uu,
+                                     N_Vector uu, booleantype *new_uu, 
                                      void *J_data);
 
 
@@ -171,27 +171,27 @@ typedef int (*KINSpilsJacTimesVecFn)(N_Vector v, N_Vector Jv,
 
 /*------------------------------------------------------------------
   Required inputs to the KINSPILS linear solver interface
-
-  KINSpilsSetLinearSolver specifies the iterative SUNLinearSolver
-  object that KINSOL should use.  This is required if KINSOL is
-  solving a problem with the Newton or Picard nonlinear solvers
+ 
+  KINSpilsSetLinearSolver specifies the iterative SUNLinearSolver 
+  object that KINSOL should use.  This is required if KINSOL is 
+  solving a problem with the Newton or Picard nonlinear solvers 
   with an iterative linear solver (i.e. not the fixed-point or
   accelerated fixed-point solvers).
-
+ 
   The return value is one of:
      KINSPILS_SUCCESS   if successful
      KINSPILS_MEM_NULL  if the KINSOL memory was NULL
      KINSPILS_ILL_INPUT if the linear solver memory was NULL
   ------------------------------------------------------------------*/
 
-SUNDIALS_EXPORT int KINSpilsSetLinearSolver(void *kinmem,
+SUNDIALS_EXPORT int KINSpilsSetLinearSolver(void *kinmem, 
                                             SUNLinearSolver LS);
 
 /*------------------------------------------------------------------
   Optional Input Specification Functions
 
   The following functions can be called to set optional inputs:
-
+ 
 	Function Name	    |	Optional Input	[Default Value]
 			    |
   ------------------------------------------------------------------
@@ -224,18 +224,18 @@ SUNDIALS_EXPORT int KINSpilsSetJacTimesVecFn(void *kinmem,
 
   The possible return values for the KINSpilsSet* subroutines
   are the following:
-
+ 
   KINSPILS_SUCCESS : means the associated parameter was successfully
 		     set [0]
-
+ 
   KINSPILS_ILL_INPUT : means the supplied parameter was invalid
 		       (check error message) [-3]
-
+ 
   KINSPILS_MEM_NULL : means a NULL KINSOL memory block pointer
 		      was given [-1]
-
+ 
   KINSPILS_LMEM_NULL : means system memory has not yet been
-		       allocated for the linear solver
+		       allocated for the linear solver 
 		       (lmem == NULL) [-2]
   ------------------------------------------------------------------*/
 
@@ -245,7 +245,7 @@ SUNDIALS_EXPORT int KINSpilsSetJacTimesVecFn(void *kinmem,
   The following functions can be called to get optional outputs
   and statistical information related to the KINSPILS linear
   solvers:
-
+ 
 	 Function Name	     |	    Returned Value
 			     |
   ------------------------------------------------------------------
@@ -305,7 +305,7 @@ SUNDIALS_EXPORT int KINSpilsGetNumConvFails(void *kinmem,
 SUNDIALS_EXPORT int KINSpilsGetNumJtimesEvals(void *kinmem,
                                               long int *njvevals);
 SUNDIALS_EXPORT int KINSpilsGetNumFuncEvals(void *kinmem,
-                                            long int *nfevals);
+                                            long int *nfevals); 
 SUNDIALS_EXPORT int KINSpilsGetLastFlag(void *kinmem,
                                         long int *flag);
 SUNDIALS_EXPORT char *KINSpilsGetReturnFlagName(long int flag);

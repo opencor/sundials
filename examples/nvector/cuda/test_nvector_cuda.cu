@@ -1,18 +1,18 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): Slaven Peles @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS Copyright End
  * -----------------------------------------------------------------
- * This is the testing routine to check the NVECTOR CUDA module
- * implementation.
+ * This is the testing routine to check the NVECTOR CUDA module 
+ * implementation. 
  * -----------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -28,7 +28,7 @@
 /* ----------------------------------------------------------------------
  * Main NVector Testing Routine
  * --------------------------------------------------------------------*/
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
   int          fails = 0;     /* counter for test failures  */
   sunindextype veclen;        /* vector length              */
@@ -43,10 +43,10 @@ int main(int argc, char *argv[])
     return(-1);
   }
 
-  veclen = atol(argv[1]);
+  veclen = atol(argv[1]); 
   if (veclen <= 0) {
     printf("ERROR: length of vector must be a positive integer \n");
-    return(-1);
+    return(-1); 
   }
 
   print_timing = atoi(argv[2]);
@@ -60,9 +60,9 @@ int main(int argc, char *argv[])
   X = N_VNew_Cuda(veclen);
 
   /* NVector Tests */
-
+  
   /* CUDA specific tests */
-
+  
   /* Memory allocation tests */
   fails += Test_N_VCloneEmpty(X, 0);
   fails += Test_N_VClone(X, veclen, 0);
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
   /* Skipped tests */
   /*   fails += Test_N_VSetArrayPointer(W, veclen, 0); */
   /*   fails += Test_N_VGetArrayPointer(X, veclen, 0); */
-
+  
   /* Vector operation tests */
   fails += Test_N_VConst(X, veclen, 0);
   fails += Test_N_VLinearSum(X, Y, Z, veclen, 0);
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
   /*   N_VSpace_Cuda(X, &lrw, &liw);               */
   /*   printf("lrw = %ld, liw = %ld\n", lrw, liw); */
-
+  
   /* Free vectors */
   N_VDestroy_Cuda(W);
   N_VDestroy_Cuda(X);
@@ -125,9 +125,9 @@ int check_ans(realtype ans, N_Vector X, sunindextype local_length)
   sunindextype i;
   suncudavec::Vector<realtype, sunindextype>* xv = suncudavec::extract<realtype, sunindextype>(X);
   realtype *xdata;
-
+  
   xv->copyFromDev();
-
+  
   xdata = xv->host();
   /* check vector data */
   for(i=0; i < local_length; i++){

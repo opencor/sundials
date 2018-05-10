@@ -3,23 +3,23 @@
  *                Aaron Collier and Radu Serban @ LLNL
  *-----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  *-----------------------------------------------------------------
- * The C functions FIDAJTSetup and FIDAJtimes are to interface
- * between the IDASPILS modules and the user-supplied
- * Jacobian-vector product routines FIDAJTSETUP and FIDAJTIMES.
- * Note the use of the generic names FIDA_JTSETUP and FIDA_JTIMES
+ * The C functions FIDAJTSetup and FIDAJtimes are to interface 
+ * between the IDASPILS modules and the user-supplied 
+ * Jacobian-vector product routines FIDAJTSETUP and FIDAJTIMES. 
+ * Note the use of the generic names FIDA_JTSETUP and FIDA_JTIMES 
  * below.
  *-----------------------------------------------------------------*/
 
@@ -38,7 +38,7 @@ extern "C" {
 #endif
 
   extern void FIDA_JTSETUP(realtype *T, realtype *Y, realtype *YP,
-                           realtype *R, realtype *CJ, realtype *EWT,
+                           realtype *R, realtype *CJ, realtype *EWT, 
                            realtype *H, long int *IPAR,
                            realtype *RPAR, int *IER);
 
@@ -54,7 +54,7 @@ extern "C" {
 
 /*************************************************/
 
-/* Fortran interface to C routine IDASpilsSetJacTimes; see
+/* Fortran interface to C routine IDASpilsSetJacTimes; see 
    fida.h for further information */
 void FIDA_SPILSSETJAC(int *flag, int *ier)
 {
@@ -77,14 +77,14 @@ void FIDA_SPILSSETJAC(int *flag, int *ier)
 
 /* C interface to user-supplied Fortran routine FIDAJTSETUP; see
    fida.h for further information */
-int FIDAJTSetup(realtype t, N_Vector y, N_Vector yp,
+int FIDAJTSetup(realtype t, N_Vector y, N_Vector yp, 
                 N_Vector r, realtype cj, void *user_data)
 {
   realtype *ydata, *ypdata, *rdata, *ewtdata;
   realtype h;
   FIDAUserData IDA_userdata;
   int ier = 0;
-
+  
   /* Initialize all pointers to NULL */
   ydata = ypdata = rdata = ewtdata = NULL;
 
@@ -93,7 +93,7 @@ int FIDAJTSetup(realtype t, N_Vector y, N_Vector yp,
      (meaning SUCCESS) so the user need only reset the
      value if an error occurred */
   ier = 0;
-
+  
   IDAGetErrWeights(IDA_idamem, F2C_IDA_ewtvec);
   IDAGetLastStep(IDA_idamem, &h);
   ydata   = N_VGetArrayPointer(y);
@@ -102,7 +102,7 @@ int FIDAJTSetup(realtype t, N_Vector y, N_Vector yp,
   ewtdata = N_VGetArrayPointer(F2C_IDA_ewtvec);
 
   IDA_userdata = (FIDAUserData) user_data;
-
+ 
   /* Call user-supplied routine */
   FIDA_JTSETUP(&t, ydata, ypdata, rdata, &cj, ewtdata, &h,
                IDA_userdata->ipar, IDA_userdata->rpar, &ier);
@@ -147,7 +147,7 @@ int FIDAJtimes(realtype t, N_Vector yy, N_Vector yp, N_Vector rr,
 
   /* Call user-supplied routine */
   FIDA_JTIMES(&t, yy_data, yp_data, rr_data, vdata, Jvdata,
-	      &c_j, ewtdata, &h,
+	      &c_j, ewtdata, &h, 
               IDA_userdata->ipar, IDA_userdata->rpar,
               v1data, v2data, &ier);
 

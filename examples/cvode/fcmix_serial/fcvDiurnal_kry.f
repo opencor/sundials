@@ -1,10 +1,10 @@
 C     ----------------------------------------------------------------
 C     FCVODE Example Problem: 2D kinetics-transport, precond. Krylov
-C     solver.
-C
+C     solver. 
+C     
 C     An ODE system is generated from the following 2-species diurnal
 C     kinetics advection-diffusion PDE system in 2 space dimensions:
-C
+C     
 C     dc(i)/dt = Kh*(d/dx)**2 c(i) + V*dc(i)/dx + (d/dy)(Kv(y)*dc(i)/dy)
 C                           + Ri(c1,c2,t)      for i = 1,2,   where
 C     R1(c1,c2,t) = -q1*c1*c3 - q2*c1*c2 + 2*q3(t)*c3 + q4(t)*c2 ,
@@ -23,11 +23,11 @@ C     10 x 10 mesh, with simple polynomial initial profiles.
 C     The problem is solved with CVODE, with the BDF/GMRES method and
 C     the block-diagonal part of the Jacobian as a left
 C     preconditioner.
-C
-C     Note: this program includes modified (64-bit integer) versions
-C     of the dense linear solver routines DGEFA and DGESL from LINPACK,
+C     
+C     Note: this program includes modified (64-bit integer) versions 
+C     of the dense linear solver routines DGEFA and DGESL from LINPACK, 
 C     and BLAS routines DCOPY and DSCAL.
-C
+C     
 C     The second and third dimensions of U here must match the values
 C     of MX and MY, for consistency with the output statements below.
 C     ----------------------------------------------------------------
@@ -51,7 +51,7 @@ C The following declaration specification should match C type long int.
 C
       DATA TWOHR/7200.0D0/, RTOL/1.0D-5/, FLOOR/100.0D0/,
      &     JPRETYPE/1/, IGSTYPE/1/, MAXL/0/, DELT/0.0D0/
-      DATA LNST/3/, LNFE/4/, LNETF/5/,  LNCF/6/, LNNI/7/, LNSETUP/8/,
+      DATA LNST/3/, LNFE/4/, LNETF/5/,  LNCF/6/, LNNI/7/, LNSETUP/8/, 
      &     LQ/9/, LNPE/18/, LNLI/20/, LNPS/19/, LNCFL/21/
       DATA LH/2/
 C
@@ -92,7 +92,7 @@ C     Initialize SPGMR linear solver module
  27     FORMAT(///' SUNDIALS_ERROR: FSUNSPGMRSETGSTYPE IER = ', I5)
         STOP
       ENDIF
-C
+C     
 C     Initialize CVODE
       CALL FCVMALLOC(T, U, METH, ITMETH, IATOL, RTOL, ATOL,
      &     IOUT, ROUT, IPAR, RPAR, IER)
@@ -110,7 +110,7 @@ C     attach linear solver module to CVSpils interface
         CALL FCVFREE
         STOP
       ENDIF
-C
+C     
 C     attach preconditioner to CVSpils interface
       CALL FCVSPILSSETPREC(1, IER)
 C
@@ -135,7 +135,7 @@ C
             CALL FCVFREE
             STOP
          ENDIF
-C
+C     
          TOUT = TOUT + TWOHR
 C
       ENDDO
@@ -166,7 +166,7 @@ C     Print final statistics.
      &     ' number of conv. failures.. nonlinear = ', I3,
      &     ' linear = ', I3/
      &     ' number of error test failures = ', I3)
-C
+C     
       CALL FCVFREE
 C
       STOP
@@ -232,7 +232,7 @@ C     Pointers into IPAR and RPAR
       P_IPP = 7
       P_BD  = 13
       P_P   = P_BD + 4*MM
-C
+C     
       IPAR(4) = P_IPP
       IPAR(5) = P_BD
       IPAR(6) = P_P
@@ -402,7 +402,7 @@ C
       IF (JOK .EQ. 1) THEN
 C     JOK = 1. Reuse saved BD
         JCUR = 0
-      ELSE
+      ELSE    
 C     JOK = 0. Compute diagonal Jacobian blocks.
 C     (using q4 value computed on last FCVFUN call).
          CALL PREC_JAC(MX, MY, MM, U, RPAR(P_BD),
@@ -423,7 +423,7 @@ C
       END
 
 C     ----------------------------------------------------------------
-
+      
       SUBROUTINE FCVPSOL(T, U, FU, R, Z, GAMMA, DELTA, LR,
      &                   IPAR, RPAR, IER)
 C     Routine to solve preconditioner linear system.
@@ -514,7 +514,7 @@ C     Add identity matrix and do LU decompositions on blocks, in place.
          CALL DGEFA(P(1,1,I), 2, 2, IPP(1,I), IER)
          IF (IER .NE. 0) RETURN
       ENDDO
-C
+C     
       RETURN
       END
 
@@ -528,7 +528,7 @@ C
       INTEGER*4 MM
       INTEGER*8 IPP(2,MM)
       DOUBLE PRECISION P(2,2,MM), Z(2,MM)
-C
+C      
       INTEGER*4 I
 C
       DO I = 1, MM

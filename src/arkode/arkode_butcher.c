@@ -2,20 +2,20 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2015, Southern Methodist University and
+ * Copyright (c) 2015, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
- * This is the implementation file for the known Butcher tables
+ * This is the implementation file for the known Butcher tables 
  * for the ARKODE solver.
  *--------------------------------------------------------------*/
 
@@ -28,7 +28,7 @@
 
 
 /*---------------------------------------------------------------
- Returns butcher table for Runge Kutta methods.
+ Returns butcher table for Runge Kutta methods.  
  Input:
      imeth -- integer key for the desired method (see below)
  Outputs:
@@ -40,18 +40,18 @@
      c[s] -- realtype canopy node coefficients
      b2[s] -- realtype embedding coefficients
 
- Allowed 'method' names and properties (those in an ARK pair are marked
- with a *).  All method names are of the form <name>_s_p_q.  The method
- 'type' is one of
+ Allowed 'method' names and properties (those in an ARK pair are marked 
+ with a *).  All method names are of the form <name>_s_p_q.  The method 
+ 'type' is one of 
     ERK -- explicit Runge Kutta
     SDIRK -- singly-diagonally implicit Runge Kutta
     SDIRK -- explicit [1st stage] singly-diagonally implicit Runge Kutta
- The 'A-stable' and 'L-stable' columns are based on numerical estimates
- of each property.  The 'QP' column denotes whether the coefficients
- of the method are known precisely enough for use in 'long double'
+ The 'A-stable' and 'L-stable' columns are based on numerical estimates 
+ of each property.  The 'QP' column denotes whether the coefficients 
+ of the method are known precisely enough for use in 'long double' 
  (128-bit) calculations.
 
-   imeth                       type  A-stable  L-stable  QP
+   imeth                       type  A-stable  L-stable  QP 
   ----------------------------------------------------------
    HEUN_EULER_2_1_2             ERK     N         N       Y
    BOGACKI_SHAMPINE_4_2_3       ERK     N         N       Y
@@ -80,9 +80,9 @@
   ----------------------------------------------------------
 
 ---------------------------------------------------------------*/
-int ARKodeLoadButcherTable(int imethod, int *s, int *q, int *p,
-			   realtype *A, realtype *b,
-			   realtype *c, realtype *b2)
+int ARKodeLoadButcherTable(int imethod, int *s, int *q, int *p, 
+			   realtype *A, realtype *b, 
+			   realtype *c, realtype *b2) 
 {
 
   int i, j;
@@ -108,7 +108,7 @@ int ARKodeLoadButcherTable(int imethod, int *s, int *q, int *p,
     *s = 2;
     *q = 2;
     *p = 1;
-
+      
     ARK_A(A,1,0) = RCONST(1.0);
 
     b[0] = RCONST(0.5);
@@ -241,9 +241,9 @@ int ARKodeLoadButcherTable(int imethod, int *s, int *q, int *p,
     *s = 6;
     *q = 4;
     *p = 3;
-    ARK_A(A,1,0) = RCONST(1.0)/RCONST(2.0);
-    ARK_A(A,2,0) = RCONST(-1.0);
-    ARK_A(A,2,1) = RCONST(2.0);
+    ARK_A(A,1,0) = RCONST(1.0)/RCONST(2.0); 
+    ARK_A(A,2,0) = RCONST(-1.0); 
+    ARK_A(A,2,1) = RCONST(2.0); 
     ARK_A(A,3,0) = RCONST(1.0)/RCONST(6.0);
     ARK_A(A,3,1) = RCONST(2.0)/RCONST(3.0);
     ARK_A(A,3,2) = RCONST(1.0)/RCONST(6.0);
@@ -341,7 +341,7 @@ int ARKodeLoadButcherTable(int imethod, int *s, int *q, int *p,
     b2[2] = RCONST(1408.0)/RCONST(2565.0);
     b2[3] = RCONST(2197.0)/RCONST(4104.0);
     b2[4] = RCONST(-1.0)/RCONST(5.0);
-
+      
     c[1] = RCONST(1.0)/RCONST(4.0);
     c[2] = RCONST(3.0)/RCONST(8.0);
     c[3] = RCONST(12.0)/RCONST(13.0);
@@ -593,7 +593,7 @@ int ARKodeLoadButcherTable(int imethod, int *s, int *q, int *p,
     *s = 2;
     *q = 2;
     *p = 1;
-
+      
     ARK_A(A,0,0) = RCONST(1.0);
     ARK_A(A,1,0) = RCONST(-1.0);
     ARK_A(A,1,1) = RCONST(1.0);
@@ -846,8 +846,8 @@ int ARKodeLoadButcherTable(int imethod, int *s, int *q, int *p,
     *s = 5;
     *q = 4;
     *p = 3;
-    ARK_A(A,1,0) = RCONST(0.4358665215);
-    ARK_A(A,1,1) = RCONST(0.4358665215);
+    ARK_A(A,1,0) = RCONST(0.4358665215); 
+    ARK_A(A,1,1) = RCONST(0.4358665215); 
     ARK_A(A,2,0) = RCONST(0.140737774731968);
     ARK_A(A,2,1) = RCONST(-0.108365551378832);
     ARK_A(A,2,2) = RCONST(0.4358665215);
@@ -1031,7 +1031,7 @@ int ARKodeLoadButcherTable(int imethod, int *s, int *q, int *p,
 
   default:
 
-    arkProcessError(NULL, ARK_ILL_INPUT, "ARKODE",
+    arkProcessError(NULL, ARK_ILL_INPUT, "ARKODE", 
 		    "ARKodeGetButcherTable", "Unknown Butcher table");
     return(ARK_ILL_INPUT);
 

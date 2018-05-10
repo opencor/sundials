@@ -1,27 +1,27 @@
 /*
  * -----------------------------------------------------------------
  * Programmer(s): Daniel Reynolds @ SMU
- * Based on sundials_spbcgs.c code, written by Peter Brown and
+ * Based on sundials_spbcgs.c code, written by Peter Brown and 
  *                Aaron Collier @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the implementation file for the SPBCGS implementation of
+ * This is the implementation file for the SPBCGS implementation of 
  * the SUNLINSOL package.
  * -----------------------------------------------------------------
- */
+ */ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@
 
 /*
  * -----------------------------------------------------------------
- * SPBCGS solver structure accessibility macros:
+ * SPBCGS solver structure accessibility macros: 
  * -----------------------------------------------------------------
  */
 
@@ -57,7 +57,7 @@ SUNLinearSolver SUNSPBCGS(N_Vector y, int pretype, int maxl)
   SUNLinearSolver S;
   SUNLinearSolver_Ops ops;
   SUNLinearSolverContent_SPBCGS content;
-
+  
   /* check for legal pretype and maxl values; if illegal use defaults */
   if ((pretype != PREC_NONE)  && (pretype != PREC_LEFT) &&
       (pretype != PREC_RIGHT) && (pretype != PREC_BOTH))
@@ -76,7 +76,7 @@ SUNLinearSolver SUNSPBCGS(N_Vector y, int pretype, int maxl)
   S = NULL;
   S = (SUNLinearSolver) malloc(sizeof *S);
   if (S == NULL) return(NULL);
-
+  
   /* Create linear solver operation structure */
   ops = NULL;
   ops = (SUNLinearSolver_Ops) malloc(sizeof(struct _generic_SUNLinearSolver_Ops));
@@ -93,8 +93,8 @@ SUNLinearSolver SUNSPBCGS(N_Vector y, int pretype, int maxl)
   ops->numiters          = SUNLinSolNumIters_SPBCGS;
   ops->resnorm           = SUNLinSolResNorm_SPBCGS;
   ops->resid             = SUNLinSolResid_SPBCGS;
-  ops->lastflag          = SUNLinSolLastFlag_SPBCGS;
-  ops->space             = SUNLinSolSpace_SPBCGS;
+  ops->lastflag          = SUNLinSolLastFlag_SPBCGS;  
+  ops->space             = SUNLinSolSpace_SPBCGS;  
   ops->free              = SUNLinSolFree_SPBCGS;
 
   /* Create content */
@@ -139,12 +139,12 @@ SUNLinearSolver SUNSPBCGS(N_Vector y, int pretype, int maxl)
 
 
 /* ----------------------------------------------------------------------------
- * Function to set the type of preconditioning for SPBCGS to use
+ * Function to set the type of preconditioning for SPBCGS to use 
  */
 
-SUNDIALS_EXPORT int SUNSPBCGSSetPrecType(SUNLinearSolver S, int pretype)
+SUNDIALS_EXPORT int SUNSPBCGSSetPrecType(SUNLinearSolver S, int pretype) 
 {
-  /* Check for legal pretype */
+  /* Check for legal pretype */ 
   if ((pretype != PREC_NONE)  && (pretype != PREC_LEFT) &&
       (pretype != PREC_RIGHT) && (pretype != PREC_BOTH)) {
     return(SUNLS_ILL_INPUT);
@@ -160,15 +160,15 @@ SUNDIALS_EXPORT int SUNSPBCGSSetPrecType(SUNLinearSolver S, int pretype)
 
 
 /* ----------------------------------------------------------------------------
- * Function to set the maximum number of iterations for SPBCGS to use
+ * Function to set the maximum number of iterations for SPBCGS to use 
  */
 
-SUNDIALS_EXPORT int SUNSPBCGSSetMaxl(SUNLinearSolver S, int maxl)
+SUNDIALS_EXPORT int SUNSPBCGSSetMaxl(SUNLinearSolver S, int maxl) 
 {
   /* Check for non-NULL SUNLinearSolver */
   if (S == NULL) return(SUNLS_MEM_NULL);
 
-  /* Check for legal pretype */
+  /* Check for legal pretype */ 
   if (maxl <= 0)
     maxl = SUNSPBCGS_MAXL_DEFAULT;
 
@@ -193,23 +193,23 @@ SUNLinearSolver_Type SUNLinSolGetType_SPBCGS(SUNLinearSolver S)
 int SUNLinSolInitialize_SPBCGS(SUNLinearSolver S)
 {
   /* ensure valid options */
-  if (S == NULL) return(SUNLS_MEM_NULL);
-  if ( (PRETYPE(S) != PREC_LEFT) &&
-       (PRETYPE(S) != PREC_RIGHT) &&
+  if (S == NULL) return(SUNLS_MEM_NULL);  
+  if ( (PRETYPE(S) != PREC_LEFT) && 
+       (PRETYPE(S) != PREC_RIGHT) && 
        (PRETYPE(S) != PREC_BOTH) )
     PRETYPE(S) = PREC_NONE;
-  if (SPBCGS_CONTENT(S)->maxl <= 0)
+  if (SPBCGS_CONTENT(S)->maxl <= 0) 
     SPBCGS_CONTENT(S)->maxl = SUNSPBCGS_MAXL_DEFAULT;
 
   /* no additional memory to allocate */
-
+  
   /* return with success */
   LASTFLAG(S) = SUNLS_SUCCESS;
   return(LASTFLAG(S));
 }
 
 
-int SUNLinSolSetATimes_SPBCGS(SUNLinearSolver S, void* ATData,
+int SUNLinSolSetATimes_SPBCGS(SUNLinearSolver S, void* ATData, 
                               ATimesFn ATimes)
 {
   /* set function pointers to integrator-supplied ATimes routine
@@ -239,7 +239,7 @@ int SUNLinSolSetPreconditioner_SPBCGS(SUNLinearSolver S, void* PData,
 int SUNLinSolSetScalingVectors_SPBCGS(SUNLinearSolver S, N_Vector s1,
                                       N_Vector s2)
 {
-  /* set N_Vector pointers to integrator-supplied scaling vectors,
+  /* set N_Vector pointers to integrator-supplied scaling vectors, 
      and return with success */
   if (S == NULL) return(SUNLS_MEM_NULL);
   SPBCGS_CONTENT(S)->s1 = s1;
@@ -259,25 +259,25 @@ int SUNLinSolSetup_SPBCGS(SUNLinearSolver S, SUNMatrix A)
   if (S == NULL) return(SUNLS_MEM_NULL);
   Psetup = SPBCGS_CONTENT(S)->Psetup;
   PData = SPBCGS_CONTENT(S)->PData;
-
-  /* no solver-specific setup is required, but if user-supplied
+  
+  /* no solver-specific setup is required, but if user-supplied 
      Psetup routine exists, call that here */
   if (Psetup != NULL) {
     ier = Psetup(PData);
     if (ier != 0) {
-      LASTFLAG(S) = (ier < 0) ?
+      LASTFLAG(S) = (ier < 0) ? 
 	SUNLS_PSET_FAIL_UNREC : SUNLS_PSET_FAIL_REC;
       return(LASTFLAG(S));
     }
   }
-
-  /* return with success */
+  
+  /* return with success */ 
   LASTFLAG(S) = SUNLS_SUCCESS;
   return(LASTFLAG(S));
 }
 
 
-int SUNLinSolSolve_SPBCGS(SUNLinearSolver S, SUNMatrix A, N_Vector x,
+int SUNLinSolSolve_SPBCGS(SUNLinearSolver S, SUNMatrix A, N_Vector x, 
                           N_Vector b, realtype delta)
 {
   /* local data and shortcut variables */
@@ -291,7 +291,7 @@ int SUNLinSolSolve_SPBCGS(SUNLinearSolver S, SUNMatrix A, N_Vector x,
   PSolveFn psolve;
   realtype *res_norm;
   int *nli;
-
+  
   /* Make local shorcuts to solver variables. */
   if (S == NULL) return(SUNLS_MEM_NULL);
   l_max        = SPBCGS_CONTENT(S)->maxl;
@@ -316,9 +316,9 @@ int SUNLinSolSolve_SPBCGS(SUNLinearSolver S, SUNMatrix A, N_Vector x,
   converged = SUNFALSE;
 
   /* set booleantype flags for internal solver options */
-  preOnLeft  = ( (PRETYPE(S) == PREC_LEFT) ||
+  preOnLeft  = ( (PRETYPE(S) == PREC_LEFT) || 
                  (PRETYPE(S) == PREC_BOTH) );
-  preOnRight = ( (PRETYPE(S) == PREC_RIGHT) ||
+  preOnRight = ( (PRETYPE(S) == PREC_RIGHT) || 
                  (PRETYPE(S) == PREC_BOTH) );
   scale_x = (sx != NULL);
   scale_b = (sb != NULL);
@@ -529,12 +529,12 @@ int SUNLinSolSolve_SPBCGS(SUNLinearSolver S, SUNMatrix A, N_Vector x,
       N_VScale(ONE, vtemp, x);
     }
 
-    if (converged == SUNTRUE)
+    if (converged == SUNTRUE) 
       LASTFLAG(S) = SUNLS_SUCCESS;
-    else
+    else 
       LASTFLAG(S) = SUNLS_RES_REDUCED;
     return(LASTFLAG(S));
-
+    
   }
   else {
     LASTFLAG(S) = SUNLS_CONV_FAIL;
@@ -574,8 +574,8 @@ long int SUNLinSolLastFlag_SPBCGS(SUNLinearSolver S)
 }
 
 
-int SUNLinSolSpace_SPBCGS(SUNLinearSolver S,
-                          long int *lenrwLS,
+int SUNLinSolSpace_SPBCGS(SUNLinearSolver S, 
+                          long int *lenrwLS, 
                           long int *leniwLS)
 {
   sunindextype liw1, lrw1;

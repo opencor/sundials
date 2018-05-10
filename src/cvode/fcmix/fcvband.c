@@ -1,24 +1,24 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel R. Reynolds @ SMU
  *                Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * Fortran/C interface routines for CVODE/CVDLS, for the case of
- * a user-supplied Jacobian approximation routine.
+ * Fortran/C interface routines for CVODE/CVDLS, for the case of 
+ * a user-supplied Jacobian approximation routine.                
  * -----------------------------------------------------------------
  */
 
@@ -41,7 +41,7 @@ extern "C" {
   extern void FCV_BJAC(long int *N, long int *MU, long int *ML,
                        long int *EBAND, realtype *T, realtype *Y,
                        realtype *FY, realtype *BJAC, realtype *H,
-                       long int *IPAR, realtype *RPAR, realtype *V1,
+                       long int *IPAR, realtype *RPAR, realtype *V1, 
                        realtype *V2, realtype *V3, int *IER);
 #ifdef __cplusplus
 }
@@ -64,7 +64,7 @@ void FCV_BANDSETJAC(int *flag, int *ier)
    FCVBJAC for solution of a linear system with band Jacobian approximation.
    Addresses of arguments are passed to FCVBJAC, using the accessor routines
    from the SUNBandMatrix and N_Vector modules.
-   The address passed for J is that of the element in column 0 with row
+   The address passed for J is that of the element in column 0 with row 
    index -mupper.  An extended bandwith equal to (J->smu) + mlower + 1 is
    passed as the column dimension of the corresponding array. */
 

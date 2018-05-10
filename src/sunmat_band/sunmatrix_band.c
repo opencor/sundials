@@ -2,27 +2,27 @@
  * -----------------------------------------------------------------
  * Programmer(s): Daniel Reynolds @ SMU
  *                David Gardner @ LLNL
- * Based on code sundials_band.c by: Alan C. Hindmarsh and
+ * Based on code sundials_band.c by: Alan C. Hindmarsh and 
  *    Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the implementation file for the band implementation of
+ * This is the implementation file for the band implementation of 
  * the SUNMATRIX package.
  * -----------------------------------------------------------------
- */
+ */ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,7 +65,7 @@ SUNMatrix SUNBandMatrix(sunindextype N, sunindextype mu,
   A = NULL;
   A = (SUNMatrix) malloc(sizeof *A);
   if (A == NULL) return(NULL);
-
+  
   /* Create matrix operation structure */
   ops = NULL;
   ops = (SUNMatrix_Ops) malloc(sizeof(struct _generic_SUNMatrix_Ops));
@@ -116,14 +116,14 @@ SUNMatrix SUNBandMatrix(sunindextype N, sunindextype mu,
 }
 
 /* ----------------------------------------------------------------------------
- * Function to print the band matrix
+ * Function to print the band matrix 
  */
-
+ 
 void SUNBandMatrix_Print(SUNMatrix A, FILE* outfile)
 {
   sunindextype i, j, start, finish;
 
-  /* should not be called unless A is a band matrix;
+  /* should not be called unless A is a band matrix; 
      otherwise return immediately */
   if (SUNMatGetID(A) != SUNMATRIX_BAND)
     return;
@@ -300,11 +300,12 @@ int SUNMatCopy_Band(SUNMatrix A, SUNMatrix B)
     SM_CONTENT_B(B)->s_mu = smu;
     SM_CONTENT_B(B)->ldim = colSize;
     SM_CONTENT_B(B)->ldata = SM_COLUMNS_B(B) * colSize;
-    SM_CONTENT_B(B)->data = realloc(SM_CONTENT_B(B)->data, SM_COLUMNS_B(B) * colSize*sizeof(realtype));
+    SM_CONTENT_B(B)->data = (realtype *)
+      realloc(SM_CONTENT_B(B)->data, SM_COLUMNS_B(B) * colSize*sizeof(realtype));
     for (j=0; j<SM_COLUMNS_B(B); j++)
-      SM_CONTENT_B(B)->cols[j] = SM_CONTENT_B(B)->data + j * colSize;
+      SM_CONTENT_B(B)->cols[j] = SM_CONTENT_B(B)->data + j * colSize;   
   }
-
+  
   /* Perform operation */
   if (SUNMatZero_Band(B) != 0)
     return 1;
@@ -321,7 +322,7 @@ int SUNMatScaleAddI_Band(realtype c, SUNMatrix A)
 {
   sunindextype i, j;
   realtype *A_colj;
-
+  
   /* Verify that A is a band matrix */
   if (SUNMatGetID(A) != SUNMATRIX_BAND)
     return 1;
@@ -350,7 +351,7 @@ int SUNMatScaleAdd_Band(realtype c, SUNMatrix A, SUNMatrix B)
        (SM_LBAND_B(B) > SM_LBAND_B(A)) ) {
     return SMScaleAddNew_Band(c,A,B);
   }
-
+  
   /* Otherwise, perform operation in-place */
   for (j=0; j<SM_COLUMNS_B(A); j++) {
     A_colj = SM_COLUMN_B(A,j);
@@ -365,7 +366,7 @@ int SUNMatMatvec_Band(SUNMatrix A, N_Vector x, N_Vector y)
 {
   sunindextype i, j, is, ie;
   realtype *col_j, *xd, *yd;
-
+  
   /* Verify that A, x and y are compatible */
   if (!SMCompatible2_Band(A, x, y))
     return 1;
@@ -428,13 +429,13 @@ static booleantype SMCompatible2_Band(SUNMatrix A, N_Vector x, N_Vector y)
   if (SUNMatGetID(A) != SUNMATRIX_BAND)
     return SUNFALSE;
 
-  /*   vectors must be one of {SERIAL, OPENMP, PTHREADS} */
+  /*   vectors must be one of {SERIAL, OPENMP, PTHREADS} */ 
   if ( (N_VGetVectorID(x) != SUNDIALS_NVEC_SERIAL) &&
        (N_VGetVectorID(x) != SUNDIALS_NVEC_OPENMP) &&
        (N_VGetVectorID(x) != SUNDIALS_NVEC_PTHREADS) )
     return SUNFALSE;
 
-  /* Optimally we would verify that the dimensions of A, x and y agree,
+  /* Optimally we would verify that the dimensions of A, x and y agree, 
    but since there is no generic 'length' routine for N_Vectors we cannot */
 
   return SUNTRUE;
@@ -460,7 +461,7 @@ int SMScaleAddNew_Band(realtype c, SUNMatrix A, SUNMatrix B)
     for (i=-SM_UBAND_B(A); i<=SM_LBAND_B(A); i++)
       C_colj[i] = c*A_colj[i];
   }
-
+  
   /* add B into new matrix */
   for (j=0; j<SM_COLUMNS_B(B); j++) {
     B_colj = SM_COLUMN_B(B,j);
@@ -468,7 +469,7 @@ int SMScaleAddNew_Band(realtype c, SUNMatrix A, SUNMatrix B)
     for (i=-SM_UBAND_B(B); i<=SM_LBAND_B(B); i++)
       C_colj[i] += B_colj[i];
   }
-
+  
   /* replace A contents with C contents, nullify C content pointer, destroy C */
   free(SM_DATA_B(A));  SM_DATA_B(A) = NULL;
   free(SM_COLS_B(A));  SM_COLS_B(A) = NULL;
@@ -476,7 +477,7 @@ int SMScaleAddNew_Band(realtype c, SUNMatrix A, SUNMatrix B)
   A->content = C->content;
   C->content = NULL;
   SUNMatDestroy_Band(C);
-
+  
   return 0;
 }
 

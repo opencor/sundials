@@ -3,8 +3,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -13,7 +13,7 @@
  * -----------------------------------------------------------------
  * This is the implementation file for operations to be used by a
  * generic direct linear solver.
- * -----------------------------------------------------------------*/
+ * -----------------------------------------------------------------*/ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@ DlsMat NewDenseMat(sunindextype M, sunindextype N)
   A = NULL;
   A = (DlsMat) malloc(sizeof *A);
   if (A==NULL) return (NULL);
-
+  
   A->data = (realtype *) malloc(M * N * sizeof(realtype));
   if (A->data == NULL) {
     free(A); A = NULL;
@@ -89,7 +89,7 @@ DlsMat NewBandMat(sunindextype N, sunindextype mu, sunindextype ml, sunindextype
   sunindextype j, colSize;
 
   if (N <= 0) return(NULL);
-
+  
   A = NULL;
   A = (DlsMat) malloc(sizeof *A);
   if (A == NULL) return (NULL);
@@ -235,14 +235,14 @@ realtype *newRealArray(sunindextype m)
 }
 
 void DestroyArray(void *V)
-{
-  free(V);
+{ 
+  free(V); 
   V = NULL;
 }
 
 void destroyArray(void *v)
 {
-  free(v);
+  free(v); 
   v = NULL;
 }
 
@@ -274,7 +274,7 @@ void SetToZero(DlsMat A)
   switch (A->type) {
 
   case SUNDIALS_DENSE:
-
+    
     for (j=0; j<A->N; j++) {
       col_j = A->cols[j];
       for (i=0; i<A->M; i++)
@@ -322,7 +322,7 @@ void PrintMat(DlsMat A, FILE *outfile)
       fprintf(outfile, "\n");
     }
     fprintf(outfile, "\n");
-
+    
     break;
 
   case SUNDIALS_BAND:
@@ -345,7 +345,7 @@ void PrintMat(DlsMat A, FILE *outfile)
       fprintf(outfile, "\n");
     }
     fprintf(outfile, "\n");
-
+    
     break;
 
   }

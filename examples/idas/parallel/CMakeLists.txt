@@ -76,7 +76,7 @@ FOREACH(example_tuple ${IDAS_examples})
 
     # libraries to link against
     TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_LIBS})
-
+    
     IF(NOT MPI_MPICC)
       TARGET_LINK_LIBRARIES(${example} ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARIES})
     ENDIF()

@@ -3,13 +3,13 @@
 # Programmer(s):  Daniel R. Reynolds @ SMU
 # ----------------------------------------------------------------
 # LLNS/SMU Copyright Start
-# Copyright (c) 2015, Southern Methodist University and
+# Copyright (c) 2015, Southern Methodist University and 
 # Lawrence Livermore National Security
 #
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Southern Methodist University and Lawrence Livermore
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Southern Methodist University and Lawrence Livermore 
 # National Laboratory under Contract DE-AC52-07NA27344.
-# Produced at Southern Methodist University and the Lawrence
+# Produced at Southern Methodist University and the Lawrence 
 # Livermore National Laboratory.
 #
 # All rights reserved.
@@ -53,7 +53,7 @@ for i in range(nprocs):
         if ((subd[0] != nx) or (subd[1] != ny)):
             sys.exit("error: subdomain files incompatible (clean up and re-run test)")
     subdomains[i,:] = subd[2:6]
-
+    
 # load first processor's data, and determine total number of time steps
 data = np.loadtxt('heat2d.000.txt', dtype=np.double)
 nt = np.shape(data)[0]
@@ -70,7 +70,7 @@ nxl = iend-istart+1
 nyl = jend-jstart+1
 for i in range(nt):
     results[i,jstart:jend+1,istart:iend+1] = np.reshape(data[i,:], (nyl,nxl))
-
+    
 # iterate over remaining data files, inserting into output
 if (nprocs > 1):
     for isub in range(1,nprocs):
@@ -113,7 +113,7 @@ for tstep in range(nt):
     # plot current solution as a surface, and save to disk
     fig = plt.figure(1)
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(X, Y, results[tstep,:,:], rstride=1, cstride=1,
+    ax.plot_surface(X, Y, results[tstep,:,:], rstride=1, cstride=1, 
                     cmap=cm.jet, linewidth=0, antialiased=True, shade=True)
     ax.set_xlabel('x')
     ax.set_ylabel('y')

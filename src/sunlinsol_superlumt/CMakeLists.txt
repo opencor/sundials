@@ -2,13 +2,13 @@
 # Programmer:  Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # LLNS/SMU Copyright Start
-# Copyright (c) 2017, Southern Methodist University and
+# Copyright (c) 2017, Southern Methodist University and 
 # Lawrence Livermore National Security
 #
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Southern Methodist University and Lawrence Livermore
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Southern Methodist University and Lawrence Livermore 
 # National Laboratory under Contract DE-AC52-07NA27344.
-# Produced at Southern Methodist University and the Lawrence
+# Produced at Southern Methodist University and the Lawrence 
 # Livermore National Laboratory.
 #
 # All rights reserved.
@@ -36,7 +36,7 @@ SET(sunlinsolsuperlumt_HEADERS
 # Add source directory to include directories
 INCLUDE_DIRECTORIES(.)
 
-# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY
+# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY 
 ADD_DEFINITIONS(-DBUILD_SUNDIALS_LIBRARY)
 
 # Rules for building and installing the static library:
@@ -62,13 +62,13 @@ IF(BUILD_SHARED_LIBS)
   TARGET_LINK_LIBRARIES(sundials_sunlinsolsuperlumt_shared
     sundials_sunmatrixsparse_shared
     ${SUPERLUMT_LIBRARIES})
-
+  
   # if a blas library is provided, assume SuperLU_MT depends on it
   IF(BLAS_FOUND)
     TARGET_LINK_LIBRARIES(sundials_sunlinsolsuperlumt_shared ${BLAS_LIBRARIES})
   ENDIF()
 
-  # if a blas library was not provided but a lapack library was set, assume
+  # if a blas library was not provided but a lapack library was set, assume 
   # SuperLU_MT depends depends on a blas library provided in LAPACK_LIBRARIES
   IF((NOT BLAS_FOUND) AND LAPACK_FOUND)
     TARGET_LINK_LIBRARIES(sundials_sunlinsolsuperlumt_shared ${LAPACK_LIBRARIES})
@@ -84,44 +84,33 @@ ENDIF(BUILD_SHARED_LIBS)
 # Install the SUNLINSOLSUPERLUMT header files
 INSTALL(FILES ${sunlinsolsuperlumt_HEADERS} DESTINATION include/sunlinsol)
 
-# If FCMIX is enabled and building with 64-bit indices, then build and install
-# the FSUNLINSOLSUPERLUMT library
-IF(SUNDIALS_INDEX_TYPE MATCHES "INT32_T")
+IF(FCMIX_ENABLE AND F77_FOUND)
+  SET(fsunlinsolsuperlumt_SOURCES fsunlinsol_superlumt.c)
 
-  PRINT_WARNING("The Fortran interface to SuperLU_MT is not compatible with ${SUNDIALS_INDEX_TYPE} integers"
-                "Fortran interfaces to SuperLU_MT will not be built")
+  IF(BUILD_STATIC_LIBS)
+    ADD_LIBRARY(sundials_fsunlinsolsuperlumt_static STATIC ${fsunlinsolsuperlumt_SOURCES})
+    SET_TARGET_PROPERTIES(sundials_fsunlinsolsuperlumt_static
+      PROPERTIES OUTPUT_NAME sundials_fsunlinsolsuperlumt CLEAN_DIRECT_OUTPUT 1)
+    INSTALL(TARGETS sundials_fsunlinsolsuperlumt_static DESTINATION lib)
+  ENDIF(BUILD_STATIC_LIBS)
 
-ELSE(SUNDIALS_INDEX_TYPE MATCHES "INT32_T")
+  IF(BUILD_SHARED_LIBS)
+    ADD_LIBRARY(sundials_fsunlinsolsuperlumt_shared ${fsunlinsolsuperlumt_SOURCES})
 
-  IF(FCMIX_ENABLE AND F77_FOUND)
-    SET(fsunlinsolsuperlumt_SOURCES fsunlinsol_superlumt.c)
+    # fsunlinsolsuperlumt dependes on fnvecserial, fsunmatrixsparse, sunlinsolsuperlumt
+    TARGET_LINK_LIBRARIES(sundials_fsunlinsolsuperlumt_shared
+      sundials_fnvecserial_shared
+      sundials_fsunmatrixsparse_shared
+      sundials_sunlinsolsuperlumt_shared)
 
-    IF(BUILD_STATIC_LIBS)
-      ADD_LIBRARY(sundials_fsunlinsolsuperlumt_static STATIC ${fsunlinsolsuperlumt_SOURCES})
-      SET_TARGET_PROPERTIES(sundials_fsunlinsolsuperlumt_static
-        PROPERTIES OUTPUT_NAME sundials_fsunlinsolsuperlumt CLEAN_DIRECT_OUTPUT 1)
-      INSTALL(TARGETS sundials_fsunlinsolsuperlumt_static DESTINATION lib)
-    ENDIF(BUILD_STATIC_LIBS)
+    SET_TARGET_PROPERTIES(sundials_fsunlinsolsuperlumt_shared
+      PROPERTIES OUTPUT_NAME sundials_fsunlinsolsuperlumt CLEAN_DIRECT_OUTPUT 1)
+    SET_TARGET_PROPERTIES(sundials_fsunlinsolsuperlumt_shared 
+      PROPERTIES VERSION ${sunlinsollib_VERSION} SOVERSION ${sunlinsollib_SOVERSION})
+    INSTALL(TARGETS sundials_fsunlinsolsuperlumt_shared DESTINATION lib)
+  ENDIF(BUILD_SHARED_LIBS)
 
-    IF(BUILD_SHARED_LIBS)
-      ADD_LIBRARY(sundials_fsunlinsolsuperlumt_shared ${fsunlinsolsuperlumt_SOURCES})
-
-      # fsunlinsolsuperlumt dependes on fnvecserial, fsunmatrixsparse, sunlinsolsuperlumt
-      TARGET_LINK_LIBRARIES(sundials_fsunlinsolsuperlumt_shared
-        sundials_fnvecserial_shared
-        sundials_fsunmatrixsparse_shared
-        sundials_sunlinsolsuperlumt_shared)
-
-      SET_TARGET_PROPERTIES(sundials_fsunlinsolsuperlumt_shared
-        PROPERTIES OUTPUT_NAME sundials_fsunlinsolsuperlumt CLEAN_DIRECT_OUTPUT 1)
-      SET_TARGET_PROPERTIES(sundials_fsunlinsolsuperlumt_shared
-        PROPERTIES VERSION ${sunlinsollib_VERSION} SOVERSION ${sunlinsollib_SOVERSION})
-      INSTALL(TARGETS sundials_fsunlinsolsuperlumt_shared DESTINATION lib)
-    ENDIF(BUILD_SHARED_LIBS)
-
-  ENDIF(FCMIX_ENABLE AND F77_FOUND)
-
-ENDIF(SUNDIALS_INDEX_TYPE MATCHES "INT32_T")
+ENDIF(FCMIX_ENABLE AND F77_FOUND)
 
 #
 MESSAGE(STATUS "Added SUNLINSOL_SUPERLUMT module")

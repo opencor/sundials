@@ -2,13 +2,13 @@
 # Programmer:  Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # LLNS/SMU Copyright Start
-# Copyright (c) 2014, Southern Methodist University and
+# Copyright (c) 2014, Southern Methodist University and 
 # Lawrence Livermore National Security
 #
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Southern Methodist University and Lawrence Livermore
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Southern Methodist University and Lawrence Livermore 
 # National Laboratory under Contract DE-AC52-07NA27344.
-# Produced at Southern Methodist University and the Lawrence
+# Produced at Southern Methodist University and the Lawrence 
 # Livermore National Laboratory.
 #
 # All rights reserved.
@@ -36,8 +36,8 @@ else(MPI_MPICXX)
   #  MPI_LIBRARIES    = cached list of libraries to link in (mpi mpich etc)
   if(NOT MPI_LIBRARIES)
     find_path(MPI_INCLUDE_PATH mpi.h
-      PATHS /usr/local/include
-      /usr/include
+      PATHS /usr/local/include 
+      /usr/include 
       /usr/include/mpi
       /usr/local/mpi/include
       "$ENV{ProgramFiles}/MPICH/SDK/Include"
@@ -45,17 +45,17 @@ else(MPI_MPICXX)
       "C:/Program Files/MPICH/SDK/Include"
       )
     find_library(MPI_LIBRARIES
-      NAMES mpich2 mpi mpich
+      NAMES mpich2 mpi mpich 
       PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib
       "$ENV{ProgramFiles}/MPICH/SDK/Lib"
       "$ENV{ProgramFiles}/MPICH2/Lib"
-      "C:/Program Files/MPICH/SDK/Lib"
+      "C:/Program Files/MPICH/SDK/Lib" 
       )
-    find_library(MPI_EXTRA_LIBRARIES
+    find_library(MPI_EXTRA_LIBRARIES 
       NAMES mpi++
-      PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib
+      PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib 
       "$ENV{ProgramFiles}/MPICH/SDK/Lib"
-      "C:/Program Files/MPICH/SDK/Lib"
+      "C:/Program Files/MPICH/SDK/Lib" 
       DOC "If a second mpi library is necessary, specify it here.")
     if(MPI_EXTRA_LIBRARIES)
       set(MPI_LIBRARIES ${MPI_LIBRARIES} ${MPI_EXTRA_LIBRARIES})
@@ -68,7 +68,7 @@ else(MPI_MPICXX)
   else(MPI_LIBRARIES)
     message(STATUS "Looking for MPI libraries... FAILED")
   endif(MPI_LIBRARIES)
-endif(MPI_MPICXX)
+endif(MPI_MPICXX)  
 # If we have what to test, do it now
 if(MPICXX_PERFORM_TEST)
   # Create the MPITest directory
@@ -116,7 +116,7 @@ if(MPICXX_PERFORM_TEST)
   # Use TRY_COMPILE to make the target "mpictest"
   try_compile(MPITEST_OK ${MPITest_DIR} ${MPITest_DIR}
     mpictest OUTPUT_VARIABLE MY_OUTPUT)
-  # To ensure we do not use stuff from the previous attempts,
+  # To ensure we do not use stuff from the previous attempts, 
   # we must remove the CMakeFiles directory.
   file(REMOVE_RECURSE ${MPITest_DIR}/CMakeFiles)
   # Process test result

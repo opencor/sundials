@@ -1,23 +1,23 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel R. Reynolds @ SMU
  *     Alan C. Hindmarsh, Radu Serban and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * The C functions FCVPSet and FCVPSol are to interface between the
+ * The C functions FCVPSet and FCVPSol are to interface between the 
  * CVSPILS module and the user-supplied preconditioner setup/solve
  * routines FCVPSET and FCVPSOL. Note the use of the generic names
  * FCV_PSET and FCV_PSOL below.
@@ -46,9 +46,9 @@ extern "C" {
 			long int *IPAR, realtype *RPAR, int *IER);
 
   extern void FCV_PSOL(realtype *T, realtype *Y, realtype *FY,
-			realtype *R, realtype *Z,
+			realtype *R, realtype *Z, 
 			realtype *GAMMA, realtype *DELTA,
-			int *LR, long int *IPAR, realtype *RPAR,
+			int *LR, long int *IPAR, realtype *RPAR, 
                         int *IER);
 
 #ifdef __cplusplus
@@ -70,7 +70,7 @@ void FCV_SPILSSETPREC(int *flag, int *ier)
 
 /* C function FCVPSet to interface between CVODE and a Fortran subroutine
    FCVPSET for setup of a Krylov preconditioner.
-   Addresses of t, y, fy, jok, gamma, h, vtemp1, vtemp2, vtemp3, and the
+   Addresses of t, y, fy, jok, gamma, h, vtemp1, vtemp2, vtemp3, and the 
    address jcurPtr are passed to FCVPSET, using the routine
    N_VGetArrayPointer from NVECTOR.
    A return flag ier from FCVPSET is returned by FCVPSet.
@@ -107,7 +107,7 @@ int FCVPSet(realtype t, N_Vector y, N_Vector fy, booleantype jok,
    A return flag ier from FCVPSOL is returned by FCVPSol.
    Auxiliary data is assumed to be communicated by Common blocks. */
 
-int FCVPSol(realtype t, N_Vector y, N_Vector fy,
+int FCVPSol(realtype t, N_Vector y, N_Vector fy, 
             N_Vector r, N_Vector z,
             realtype gamma, realtype delta,
             int lr, void *user_data)
@@ -123,7 +123,7 @@ int FCVPSol(realtype t, N_Vector y, N_Vector fy,
 
   CV_userdata = (FCVUserData) user_data;
 
-  FCV_PSOL(&t, ydata, fydata, rdata, zdata, &gamma, &delta, &lr,
+  FCV_PSOL(&t, ydata, fydata, rdata, zdata, &gamma, &delta, &lr, 
            CV_userdata->ipar, CV_userdata->rpar, &ier);
 
   return(ier);

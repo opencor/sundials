@@ -48,7 +48,7 @@
 #define KH           RCONST(4.0e-6)    /* horizontal diffusivity Kh */
 #define VEL          RCONST(0.001)     /* advection velocity V      */
 #define KV0          RCONST(1.0e-8)    /* coefficient in Kv(y)      */
-#define Q1           RCONST(1.63e-16)  /* coefficients q1, q2, c3   */
+#define Q1           RCONST(1.63e-16)  /* coefficients q1, q2, c3   */ 
 #define Q2           RCONST(4.66e-16)
 #define C3           RCONST(3.7e16)
 #define A3           RCONST(22.62)     /* coefficient in expression for q3(t) */
@@ -60,13 +60,13 @@
 #define NOUT         12                  /* number of output times */
 #define TWOHR        RCONST(7200.0)      /* number of seconds in two hours  */
 #define HALFDAY      RCONST(4.32e4)      /* number of seconds in a half day */
-#define PI       RCONST(3.1415926535898) /* pi */
+#define PI       RCONST(3.1415926535898) /* pi */ 
 
 #define XMIN         ZERO                /* grid boundaries in x  */
-#define XMAX         RCONST(20.0)
+#define XMAX         RCONST(20.0)           
 #define YMIN         RCONST(30.0)        /* grid boundaries in y  */
 #define YMAX         RCONST(50.0)
-#define XMID         RCONST(10.0)        /* grid midpoints in x,y */
+#define XMID         RCONST(10.0)        /* grid midpoints in x,y */          
 #define YMID         RCONST(40.0)
 
 #define MX           10             /* MX = number of x mesh points */
@@ -88,12 +88,12 @@
    mathematical 3-dimensional structure of the dependent variable vector
    to the underlying 1-dimensional storage. IJth is defined in order to
    write code which indexes into small dense matrices with a (row,column)
-   pair, where 1 <= row, column <= NUM_SPECIES.
-
+   pair, where 1 <= row, column <= NUM_SPECIES.   
+   
    IJKth(vdata,i,j,k) references the element in the vdata array for
    species i at mesh point (j,k), where 1 <= i <= NUM_SPECIES,
    0 <= j <= MX-1, 0 <= k <= MY-1. The vdata array is obtained via
-   the call vdata = N_VGetArrayPointer(v), where v is an N_Vector.
+   the call vdata = N_VGetArrayPointer(v), where v is an N_Vector. 
    For each mesh point (j,k), the elements for species i and i+1 are
    contiguous within vdata.
 
@@ -105,7 +105,7 @@
 #define IJKth(vdata,i,j,k) (vdata[i-1 + (j)*NUM_SPECIES + (k)*NSMX])
 #define IJth(a,i,j)        (a[j-1][i-1])
 
-/* Type : UserData
+/* Type : UserData 
    contains preconditioner blocks, pivot arrays, and problem constants */
 
 typedef struct {
@@ -148,17 +148,17 @@ int main()
   LS = NULL;
   cvode_mem = NULL;
 
-  /* Allocate and initialize u, and set problem data and tolerances */
+  /* Allocate and initialize u, and set problem data and tolerances */ 
   u = N_VNew_Serial(NEQ);
   if(check_flag((void *)u, "N_VNew_Serial", 0)) return(1);
   data = (UserData) malloc(sizeof *data);
   if(check_flag((void *)data, "malloc", 2)) return(1);
   InitUserData(data);
   SetInitialProfiles(u, data->dx, data->dy);
-  abstol = ATOL;
+  abstol = ATOL; 
   reltol = RTOL;
 
-  /* Call CVodeCreate to create the solver memory and specify the
+  /* Call CVodeCreate to create the solver memory and specify the 
    * Backward Differentiation Formula and the use of a Newton iteration */
   cvode_mem = CVodeCreate(CV_BDF, CV_NEWTON);
   if(check_flag((void *)cvode_mem, "CVodeCreate", 0)) return(1);
@@ -178,7 +178,7 @@ int main()
   flag = CVodeSStolerances(cvode_mem, reltol, abstol);
   if (check_flag(&flag, "CVodeSStolerances", 1)) return(1);
 
-  /* Call SUNSPGMR to specify the linear solver SUNSPGMR
+  /* Call SUNSPGMR to specify the linear solver SUNSPGMR 
    * with left preconditioning and the default Krylov dimension */
   LS = SUNSPGMR(u, PREC_LEFT, 0);
   if(check_flag((void *)LS, "SUNSPGMR", 0)) return(1);
@@ -197,13 +197,13 @@ int main()
   /* Loop over jpre (= PREC_LEFT, PREC_RIGHT), and solve the problem */
 
   for (jpre = PREC_LEFT; jpre <= PREC_RIGHT; jpre++) {
-
+    
     /* On second run, re-initialize u, the solver, and CVSPGMR */
-
+    
     if (jpre == PREC_RIGHT) {
-
+      
       SetInitialProfiles(u, data->dx, data->dy);
-
+      
       flag = CVodeReInit(cvode_mem, T0, u);
       if(check_flag(&flag, "CVodeReInit", 1)) return(1);
 
@@ -216,12 +216,12 @@ int main()
       printf("\n\n-------------------------------------------------------");
       printf("------------\n");
     }
-
+    
     printf("\n\nPreconditioner type is:  jpre = %s\n\n",
            (jpre == PREC_LEFT) ? "PREC_LEFT" : "PREC_RIGHT");
-
+    
     /* In loop over output points, call CVode, print results, test for error */
-
+    
     for (iout = 1, tout = TWOHR; iout <= NOUT; iout++, tout += TWOHR) {
       flag = CVode(cvode_mem, tout, u, &t, CV_NORMAL);
       check_flag(&flag, "CVode", 1);
@@ -230,11 +230,11 @@ int main()
         break;
       }
     }
-
+    
     /* Print final statistics */
-
+    
     PrintFinalStats(cvode_mem);
-
+    
   } /* End of jpre loop */
 
   /* Free memory */
@@ -286,7 +286,7 @@ static void SetInitialProfiles(N_Vector u, realtype dx, realtype dy)
       x = XMIN + jx*dx;
       cx = SUNSQR(RCONST(0.1)*(x - XMID));
       cx = ONE - cx + RCONST(0.5)*SUNSQR(cx);
-      IJKth(udata,1,jx,jy) = C1_SCALE*cx*cy;
+      IJKth(udata,1,jx,jy) = C1_SCALE*cx*cy; 
       IJKth(udata,2,jx,jy) = C2_SCALE*cx*cy;
     }
   }
@@ -494,7 +494,7 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
 
       /* Extract c1 and c2, and set kinetic rate terms. */
 
-      c1 = IJKth(udata,1,jx,jy);
+      c1 = IJKth(udata,1,jx,jy); 
       c2 = IJKth(udata,2,jx,jy);
       qq1 = Q1*c1*C3;
       qq2 = Q2*c1*c2;
@@ -516,7 +516,7 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
 
       ileft = (jx == 0) ? 1 : -1;
       iright =(jx == MX-1) ? -1 : 1;
-      c1lt = IJKth(udata,1,jx+ileft,jy);
+      c1lt = IJKth(udata,1,jx+ileft,jy); 
       c2lt = IJKth(udata,2,jx+ileft,jy);
       c1rt = IJKth(udata,1,jx+iright,jy);
       c2rt = IJKth(udata,2,jx+iright,jy);
@@ -527,7 +527,7 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
 
       /* Load all terms into udot. */
 
-      IJKth(dudata, 1, jx, jy) = vertd1 + hord1 + horad1 + rkin1;
+      IJKth(dudata, 1, jx, jy) = vertd1 + hord1 + horad1 + rkin1; 
       IJKth(dudata, 2, jx, jy) = vertd2 + hord2 + horad2 + rkin2;
     }
   }

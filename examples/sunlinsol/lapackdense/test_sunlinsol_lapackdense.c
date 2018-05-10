@@ -1,15 +1,15 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel Reynolds @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -17,7 +17,7 @@
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
  * This is the testing routine to check the SUNLinSol LapackDense
- * module implementation.
+ * module implementation. 
  * -----------------------------------------------------------------
  */
 
@@ -34,7 +34,7 @@
 /* ----------------------------------------------------------------------
  * SUNDenseLinearSolver Testing Routine
  * --------------------------------------------------------------------*/
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
   int             fails = 0;          /* counter for test failures  */
   sunindextype    cols, rows;         /* matrix columns, rows       */
@@ -51,10 +51,10 @@ int main(int argc, char *argv[])
     return(-1);
   }
 
-  cols = atol(argv[1]);
+  cols = atol(argv[1]); 
   if (cols <= 0) {
     printf("ERROR: number of matrix columns must be a positive integer \n");
-    return(-1);
+    return(-1); 
   }
 
   rows = cols;
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   for (j=0; j<cols; j++) {
     colj = SUNDenseMatrix_Column(A, j);
     for (k=0; k<rows; k++)
-      colj[k] = (realtype) rand() / (realtype) RAND_MAX / cols;
+      colj[k] = (realtype) rand() / (realtype) RAND_MAX / cols;    
   }
 
   /* Create anti-identity matrix */
@@ -86,14 +86,14 @@ int main(int argc, char *argv[])
     colj = SUNDenseMatrix_Column(I,j);
     colj[k] = 1;
     j = j-1;
-  }
-
+  }    
+  
   /* Add anti-identity to ensure the solver needs to do row-swapping */
   for (k=0; k<rows; k++){
     for(j=0; j<cols; j++){
       colj = SUNDenseMatrix_Column(A,j);
       colIj = SUNDenseMatrix_Column(I,j);
-      colj[k]  = colj[k] + colIj[k];
+      colj[k]  = colj[k] + colIj[k]; 
    }
   }
 
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
   xdata = N_VGetArrayPointer(x);
   for (j=0; j<cols; j++) {
     xdata[j] = (realtype) rand() / (realtype) RAND_MAX;
-  }
+  } 
 
   /* copy A and x into B and y to print in case of solver failure */
   SUNMatCopy(A, B);
@@ -116,12 +116,12 @@ int main(int argc, char *argv[])
 
   /* Create dense linear solver */
   LS = SUNLapackDense(x, A);
-
+  
   /* Run Tests */
   fails += Test_SUNLinSolInitialize(LS, 0);
   fails += Test_SUNLinSolSetup(LS, A, 0);
   fails += Test_SUNLinSolSolve(LS, A, x, b, RCONST(1.0e-15), 0);
-
+ 
   fails += Test_SUNLinSolGetType(LS, SUNLINEARSOLVER_DIRECT, 0);
   fails += Test_SUNLinSolLastFlag(LS, 0);
   fails += Test_SUNLinSolSpace(LS, 0);
@@ -159,11 +159,11 @@ int check_vector(N_Vector X, N_Vector Y, realtype tol)
   int failure = 0;
   sunindextype i, local_length;
   realtype *Xdata, *Ydata, maxerr;
-
+  
   Xdata = N_VGetArrayPointer(X);
   Ydata = N_VGetArrayPointer(Y);
   local_length = N_VGetLength_Serial(X);
-
+  
   /* check vector data */
   for(i=0; i < local_length; i++)
     failure += FNEQ(Xdata[i], Ydata[i], tol);

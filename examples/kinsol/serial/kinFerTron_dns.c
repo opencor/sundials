@@ -75,7 +75,7 @@ typedef struct {
 } *UserData;
 
 /* Accessor macro */
-#define Ith(v,i)    NV_Ith_S(v,i-1)
+#define Ith(v,i)    NV_Ith_S(v,i-1)   
 
 /* Functions Called by the KINSOL Solver */
 static int func(N_Vector u, N_Vector f, void *user_data);
@@ -145,7 +145,7 @@ int main()
   Ith(c,4) = -ONE;    /* L1 = x1 - x1_max <= 0 */
   Ith(c,5) =  ONE;    /* l2 = x2 - x2_min >= 0 */
   Ith(c,6) = -ONE;    /* L2 = x2 - x22_min <= 0 */
-
+  
   fnormtol=FTOL; scsteptol=STOL;
 
 
@@ -252,6 +252,8 @@ int main()
 
   /* Free memory */
 
+  N_VDestroy_Serial(u1);
+  N_VDestroy_Serial(u2);
   N_VDestroy_Serial(u);
   N_VDestroy_Serial(s);
   N_VDestroy_Serial(c);
@@ -302,8 +304,8 @@ static int SolveIt(void *kmem, N_Vector u, N_Vector s, int glstr, int mset)
  *--------------------------------------------------------------------
  */
 
-/*
- * System function for predator-prey system
+/* 
+ * System function for predator-prey system 
  */
 
 static int func(N_Vector u, N_Vector f, void *user_data)
@@ -312,7 +314,7 @@ static int func(N_Vector u, N_Vector f, void *user_data)
   realtype x1, l1, L1, x2, l2, L2;
   realtype *lb, *ub;
   UserData data;
-
+  
   data = (UserData)user_data;
   lb = data->lb;
   ub = data->ub;
@@ -397,7 +399,7 @@ static void SetInitialGuess2(N_Vector u, UserData data)
   udata[5] = x2 - ub[1];
 }
 
-/*
+/* 
  * Print first lines of output (problem description)
  */
 
@@ -405,7 +407,7 @@ static void PrintHeader(realtype fnormtol, realtype scsteptol)
 {
   printf("\nFerraris and Tronconi test problem\n");
   printf("Tolerance parameters:\n");
-#if defined(SUNDIALS_EXTENDED_PRECISION)
+#if defined(SUNDIALS_EXTENDED_PRECISION) 
   printf("  fnormtol  = %10.6Lg\n  scsteptol = %10.6Lg\n",
          fnormtol, scsteptol);
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
@@ -417,7 +419,7 @@ static void PrintHeader(realtype fnormtol, realtype scsteptol)
 #endif
 }
 
-/*
+/* 
  * Print solution
  */
 
@@ -432,15 +434,15 @@ static void PrintOutput(N_Vector u)
 #endif
 }
 
-/*
- * Print final statistics contained in iopt
+/* 
+ * Print final statistics contained in iopt 
  */
 
 static void PrintFinalStats(void *kmem)
 {
   long int nni, nfe, nje, nfeD;
   int flag;
-
+  
   flag = KINGetNumNonlinSolvIters(kmem, &nni);
   check_flag(&flag, "KINGetNumNonlinSolvIters", 1);
   flag = KINGetNumFuncEvals(kmem, &nfe);
@@ -463,7 +465,7 @@ static void PrintFinalStats(void *kmem)
  *    opt == 1 means SUNDIALS function returns a flag so check if
  *             flag >= 0
  *    opt == 2 means function allocates memory so check if returned
- *             NULL pointer
+ *             NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt)
@@ -472,7 +474,7 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
 
   /* Check if SUNDIALS function returned NULL pointer - no memory allocated */
   if (opt == 0 && flagvalue == NULL) {
-    fprintf(stderr,
+    fprintf(stderr, 
             "\nSUNDIALS_ERROR: %s() failed - returned NULL pointer\n\n",
 	    funcname);
     return(1);
@@ -485,7 +487,7 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
       fprintf(stderr,
               "\nSUNDIALS_ERROR: %s() failed with flag = %d\n\n",
 	      funcname, *errflag);
-      return(1);
+      return(1); 
     }
   }
 

@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -17,12 +17,12 @@
  *---------------------------------------------------------------
  * This is the header file for the ARKBANDPRE module, which
  * provides a banded difference quotient Jacobian-based
- * preconditioner and solver routines for use with the ARKSPILS
+ * preconditioner and solver routines for use with the ARKSPILS 
  * interface.
  *
  * Summary:
  * These routines provide a band matrix preconditioner based on
- * difference quotients of the implicit portion of the ODE
+ * difference quotients of the implicit portion of the ODE 
  * right-hand side function f.  The user supplies parameters
  *   mu = upper half-bandwidth (number of super-diagonals)
  *   ml = lower half-bandwidth (number of sub-diagonals)
@@ -81,7 +81,7 @@
  * (1) Include this file for the ARKBandPrecData type definition.
  * (2) In the ARKBandPrecAlloc call, the argument N is the
  *     problem dimension.
- * (3) In the linear solver creation call, the user is free to
+ * (3) In the linear solver creation call, the user is free to 
  *     specify the input pretype and the optional input maxl.
  *--------------------------------------------------------------*/
 
@@ -98,7 +98,7 @@ extern "C" {
 /*---------------------------------------------------------------
  ARKBandPrecInit:
 
- ARKBandPrecInit allocates and initializes the BANDPRE
+ ARKBandPrecInit allocates and initializes the BANDPRE 
  preconditioner module. This function must be called AFTER the
  ARKSPILS linear solver interface has been created.
 
@@ -120,11 +120,11 @@ extern "C" {
    ARKSPILS_MEM_FAIL if a memory allocation request failed
 
  NOTE: The band preconditioner assumes a serial/OpenMP/Pthreads
-       implementation of the NVECTOR package. Therefore,
-       ARKBandPrecInit will first test for a compatible N_Vector
+       implementation of the NVECTOR package. Therefore, 
+       ARKBandPrecInit will first test for a compatible N_Vector 
        internal representation by checking for required functions.
 ---------------------------------------------------------------*/
-SUNDIALS_EXPORT int ARKBandPrecInit(void *arkode_mem, sunindextype N,
+SUNDIALS_EXPORT int ARKBandPrecInit(void *arkode_mem, sunindextype N, 
 				    sunindextype mu, sunindextype ml);
 
 /*---------------------------------------------------------------
@@ -144,10 +144,10 @@ SUNDIALS_EXPORT int ARKBandPrecInit(void *arkode_mem, sunindextype N,
    ARKSPILS_PMEM_NULL if the preconditioner memory is NULL
 ---------------------------------------------------------------*/
 
-SUNDIALS_EXPORT int ARKBandPrecGetWorkSpace(void *arkode_mem,
-					    long int *lenrwLS,
+SUNDIALS_EXPORT int ARKBandPrecGetWorkSpace(void *arkode_mem, 
+					    long int *lenrwLS, 
 					    long int *leniwLS);
-SUNDIALS_EXPORT int ARKBandPrecGetNumRhsEvals(void *arkode_mem,
+SUNDIALS_EXPORT int ARKBandPrecGetNumRhsEvals(void *arkode_mem, 
 					      long int *nfevalsBP);
 
 

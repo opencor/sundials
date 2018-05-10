@@ -61,11 +61,11 @@
 
 /* IJth is defined in order to isolate the translation from the
    mathematical 2-dimensional structure of the dependent variable vector
-   to the underlying 1-dimensional storage.
+   to the underlying 1-dimensional storage. 
    IJth(vdata,i,j) references the element in the vdata array for
    u at mesh point (i,j), where 1 <= i <= MX, 1 <= j <= MY.
    The vdata array is obtained via the call vdata = N_VGetArrayPointer(v),
-   where v is an N_Vector.
+   where v is an N_Vector. 
    The variables are ordered by the y index j, then by the x index i. */
 
 #define IJth(vdata,i,j) (vdata[(j-1) + (i-1)*MY])
@@ -134,7 +134,7 @@ int main(void)
 
   SetIC(u, data);  /* Initialize u vector */
 
-  /* Call CVodeCreate to create the solver memory and specify the
+  /* Call CVodeCreate to create the solver memory and specify the 
    * Backward Differentiation Formula and the use of a Newton iteration */
   cvode_mem = CVodeCreate(CV_BDF, CV_NEWTON);
   if(check_flag((void *)cvode_mem, "CVodeCreate", 0)) return(1);
@@ -253,7 +253,7 @@ static int Jac(realtype t, N_Vector u, N_Vector fu, SUNMatrix J,
   sunindextype i, j, k;
   realtype *kthCol, hordc, horac, verdc;
   UserData data;
-
+  
   /*
     The components of f = udot that depend on u(i,j) are
     f(i,j), f(i-1,j), f(i+1,j), f(i,j-1), f(i,j+1), with
@@ -268,7 +268,7 @@ static int Jac(realtype t, N_Vector u, N_Vector fu, SUNMatrix J,
   hordc = data->hdcoef;
   horac = data->hacoef;
   verdc = data->vdcoef;
-
+  
   for (j=1; j <= MY; j++) {
     for (i=1; i <= MX; i++) {
       k = j-1 + (i-1)*MY;
@@ -311,14 +311,14 @@ static void SetIC(N_Vector u, UserData data)
   udata = N_VGetArrayPointer(u);
 
   /* Load initial profile into u vector */
-
+  
   for (j=1; j <= MY; j++) {
     y = j*dy;
     for (i=1; i <= MX; i++) {
       x = i*dx;
       IJth(udata,i,j) = x*(XMAX - x)*y*(YMAX - y)*SUNRexp(FIVE*x*y);
     }
-  }
+  }  
 }
 
 /* Print first lines of output (problem description) */

@@ -1,24 +1,24 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel Reynolds @ SMU
  *                David Gardner @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the testing routine to check the SUNMatrix Dense module
- * implementation.
+ * This is the testing routine to check the SUNMatrix Dense module 
+ * implementation. 
  * -----------------------------------------------------------------
  */
 
@@ -35,7 +35,7 @@
 /* ----------------------------------------------------------------------
  * Main SUNMatrix Testing Routine
  * --------------------------------------------------------------------*/
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
   int          fails = 0;        /* counter for test failures  */
   sunindextype matrows, matcols; /* vector length              */
@@ -51,33 +51,33 @@ int main(int argc, char *argv[])
     printf("ERROR: THREE (3) Input required: matrix rows, matrix cols, print timing \n");
     return(-1);
   }
-
-  matrows = atol(argv[1]);
+  
+  matrows = atol(argv[1]); 
   if (matrows <= 0) {
     printf("ERROR: number of rows must be a positive integer \n");
-    return(-1);
+    return(-1); 
   }
-
-  matcols = atol(argv[2]);
+  
+  matcols = atol(argv[2]); 
   if (matcols <= 0) {
     printf("ERROR: number of cols must be a positive integer \n");
-    return(-1);
+    return(-1); 
   }
 
   print_timing = atoi(argv[3]);
   SetTiming(print_timing);
-
+  
   square = (matrows == matcols) ? 1 : 0;
   printf("\nDense matrix test: size %ld by %ld\n\n",
          (long int) matrows, (long int) matcols);
-
+  
   /* Create vectors and matrices */
   x = N_VNew_Serial(matcols);
   y = N_VNew_Serial(matrows);
   A = SUNDenseMatrix(matrows, matcols);
   if (square)
     I = SUNDenseMatrix(matrows, matcols);
-
+  
   /* Fill matrices and vectors */
   Adata = SUNDenseMatrix_Data(A);
   for(j=0; j < matcols; j++) {
@@ -104,14 +104,14 @@ int main(int argc, char *argv[])
     n = m + matcols - 1;
     ydata[i] = HALF*(n+1-m)*(n+m);
   }
-
+    
   /* SUNMatrix Tests */
   fails += Test_SUNMatGetID(A, SUNMATRIX_DENSE, 0);
   fails += Test_SUNMatClone(A, 0);
   fails += Test_SUNMatCopy(A, 0);
   fails += Test_SUNMatZero(A, 0);
   fails += Test_SUNMatScaleAdd(A, I, 0);
-  if (square)
+  if (square) 
     fails += Test_SUNMatScaleAddI(A, I, 0);
   fails += Test_SUNMatMatvec(A, x, y, 0);
   fails += Test_SUNMatSpace(A, 0);
@@ -152,7 +152,7 @@ int check_matrix(SUNMatrix A, SUNMatrix B, realtype tol)
   realtype *Adata, *Bdata;
   sunindextype Aldata, Bldata;
   sunindextype i;
-
+  
   /* get data pointers */
   Adata = SUNDenseMatrix_Data(A);
   Bdata = SUNDenseMatrix_Data(B);
@@ -165,7 +165,7 @@ int check_matrix(SUNMatrix A, SUNMatrix B, realtype tol)
     printf(">>> ERROR: check_matrix: Different data array lengths \n");
     return(1);
   }
-
+  
   /* compare data */
   for(i=0; i < Aldata; i++){
     failure += FNEQ(Adata[i], Bdata[i], tol);
@@ -183,7 +183,7 @@ int check_matrix_entry(SUNMatrix A, realtype val, realtype tol)
   realtype *Adata;
   sunindextype Aldata;
   sunindextype i;
-
+  
   /* get data pointer */
   Adata = SUNDenseMatrix_Data(A);
 
@@ -200,7 +200,7 @@ int check_matrix_entry(SUNMatrix A, realtype val, realtype tol)
         printf("  Adata[%ld] = %g != %g (err = %g)\n", (long int) i,
                Adata[i], val, SUNRabs(Adata[i]-val));
   }
-
+  
   if (failure > ZERO)
     return(1);
   else
@@ -238,7 +238,7 @@ int check_vector(N_Vector x, N_Vector y, realtype tol)
         printf("  xdata[%ld] = %g != %g (err = %g)\n", (long int) i,
                xdata[i], ydata[i], SUNRabs(xdata[i]-ydata[i]));
   }
-
+  
   if (failure > ZERO)
     return(1);
   else

@@ -1,4 +1,4 @@
-
+ 
 2-species diurnal advection-diffusion problem
 
 t = 7.20e+03   no. steps = 219   order = 5   stepsize = 1.59e+02
@@ -50,7 +50,7 @@ c1 (bot.left/middle/top rt.) =    3.501e-14     2.474e-12     4.816e-14
 c2 (bot.left/middle/top rt.) =    3.352e+11     9.107e+11     4.163e+11
 
 
-Final Statistics..
+Final Statistics.. 
 
 lenrw   =  2089     leniw   =    50
 lenrwLS =  2450     leniwLS =    22

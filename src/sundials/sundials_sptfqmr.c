@@ -7,8 +7,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -423,7 +423,7 @@ int SptfqmrSolve(SptfqmrMem mem, void *A_data, N_Vector x, N_Vector b,
 	N_VLinearSum(ONE, vtemp3, -ONE, vtemp2, vtemp1);
 	*res_norm = r_curr_norm = SUNRsqrt(N_VDotProd(vtemp1, vtemp1));
 
-	/* Exit inner loop if inequality condition is satisfied
+	/* Exit inner loop if inequality condition is satisfied 
 	   (meaning exit if we have converged) */
 	if (r_curr_norm <= delta) {
 	  converged = SUNTRUE;

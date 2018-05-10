@@ -1,8 +1,8 @@
 # ---------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -16,8 +16,8 @@
 #  MPI_LIBRARIES    = cached list of libraries to link in (mpi mpich etc)
 
 FIND_PATH(MPI_INCLUDE_PATH mpi.h
-  PATHS /usr/local/include
-  /usr/include
+  PATHS /usr/local/include 
+  /usr/include 
   /usr/include/mpi
   /usr/local/mpi/include
   "$ENV{ProgramFiles}/MPICH/SDK/Include"
@@ -26,18 +26,18 @@ FIND_PATH(MPI_INCLUDE_PATH mpi.h
   )
 
 FIND_LIBRARY(MPI_LIBRARIES
-  NAMES mpich2 mpi mpich
+  NAMES mpich2 mpi mpich 
   PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib
   "$ENV{ProgramFiles}/MPICH/SDK/Lib"
   "$ENV{ProgramFiles}/MPICH2/Lib"
-  "C:/Program Files/MPICH/SDK/Lib"
+  "C:/Program Files/MPICH/SDK/Lib" 
   )
 
-FIND_LIBRARY(MPI_EXTRA_LIBRARIES
+FIND_LIBRARY(MPI_EXTRA_LIBRARIES 
   NAMES mpi++
-  PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib
+  PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib 
   "$ENV{ProgramFiles}/MPICH/SDK/Lib"
-  "C:/Program Files/MPICH/SDK/Lib"
+  "C:/Program Files/MPICH/SDK/Lib" 
   DOC "If a second mpi library is necessary, specify it here.")
 MARK_AS_ADVANCED(MPI_EXTRA_LIBRARIES)
 

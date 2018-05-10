@@ -1,22 +1,22 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): David J. Gardner @ LLNL
  * -----------------------------------------------------------------
- * Acknowledgements: This NVECTOR module is based on the NVECTOR
- *                   Serial module by Scott D. Cohen, Alan C.
- *                   Hindmarsh, Radu Serban, and Aaron Collier
+ * Acknowledgements: This NVECTOR module is based on the NVECTOR 
+ *                   Serial module by Scott D. Cohen, Alan C. 
+ *                   Hindmarsh, Radu Serban, and Aaron Collier 
  *                   @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS Copyright End
  * -----------------------------------------------------------------
- * This is the header file for the POSIX Threads (Pthreads)
+ * This is the header file for the POSIX Threads (Pthreads) 
  * implementation of the NVECTOR module using LOCAL data structs
  * to share data between threads.
  *
@@ -37,8 +37,8 @@
  *     in the header file sundials_nvector.h.
  *
  *   - The definition of the type 'realtype' can be found in the
- *     header file sundials_types.h, and it may be changed (at the
- *     configuration stage) according to the user's needs.
+ *     header file sundials_types.h, and it may be changed (at the 
+ *     configuration stage) according to the user's needs. 
  *     The sundials_types.h file also contains the definition
  *     for the type 'booleantype'.
  *
@@ -54,6 +54,7 @@
 #ifndef _NVECTOR_PTHREADS_H
 #define _NVECTOR_PTHREADS_H
 
+#include <stdio.h>
 #include <pthread.h>
 #include <sundials/sundials_nvector.h>
 
@@ -68,8 +69,8 @@ extern "C" {
  */
 
 /* pthreads implementation of the N_Vector 'content' structure
-   contains the length of the vector, number of threads, a pointer
-   to an array of 'realtype' components, and a flag indicating
+   contains the length of the vector, number of threads, a pointer 
+   to an array of 'realtype' components, and a flag indicating 
    ownership of the data */
 
 struct _N_VectorContent_Pthreads {
@@ -82,14 +83,19 @@ struct _N_VectorContent_Pthreads {
 typedef struct _N_VectorContent_Pthreads *N_VectorContent_Pthreads;
 
 
-/* structure to allow threads to share data */
+/* Structure to hold parallelization information for each thread when
+   calling "companion" functions to compute vector operations. The
+   start and end vector (loop) indices are unique to each thread, the
+   realtype variables are the same for each thread, and the mutex
+   variable is used to lock variables in reductions. */
+
 struct _Pthreads_Data{
-  sunindextype start;                /* starting index for loop  */
-  sunindextype end;                  /* ending index for loop    */
-  realtype c1, c2;               /* scaler values            */
+  sunindextype start;            /* starting index for loop  */ 
+  sunindextype end;              /* ending index for loop    */
+  realtype c1, c2;               /* scalar values            */
   realtype *v1, *v2, *v3;        /* vector data              */
   realtype *global_val;          /* shared global variable   */
-  pthread_mutex_t *global_mutex; /* lock for shared variable */
+  pthread_mutex_t *global_mutex; /* lock for shared variable */ 
 };
 
 typedef struct _Pthreads_Data Pthreads_Data;
@@ -129,8 +135,8 @@ typedef struct _Pthreads_Data Pthreads_Data;
  *     the length of v to be len_v.
  *
  *     The assignment v_nthreads = NV_NUM_THREADS(v) sets v_nthreads
- *     to be the number of threads that operate on v. The call
- *     NV_NUM_THREADS(v) = nthreads_v sets the number of threads that
+ *     to be the number of threads that operate on v. The call 
+ *     NV_NUM_THREADS(v) = nthreads_v sets the number of threads that 
  *     operate on v to be nthreads_v.
  *
  * (3) NV_Ith_PT
@@ -164,7 +170,7 @@ typedef struct _Pthreads_Data Pthreads_Data;
 /*
  * -----------------------------------------------------------------
  * PART III: functions exported by nvector_Pthreads
- *
+ * 
  * CONSTRUCTORS:
  *    N_VNew_Pthreads
  *    N_VNewEmpty_Pthreads
@@ -239,7 +245,7 @@ SUNDIALS_EXPORT N_Vector *N_VCloneVectorArrayEmpty_Pthreads(int count, N_Vector 
  * -----------------------------------------------------------------
  * Function : N_VDestroyVectorArray_Pthreads
  * -----------------------------------------------------------------
- * This function frees an array of PTHREADS vectors created with
+ * This function frees an array of PTHREADS vectors created with 
  * N_VCloneVectorArray_Pthreads or N_VCloneVectorArrayEmpty_Pthreads.
  * -----------------------------------------------------------------
  */

@@ -2,13 +2,13 @@ C     ----------------------------------------------------------------
 C     Programmer(s): Daniel R. Reynolds @ SMU
 C     ----------------------------------------------------------------
 C     LLNS/SMU Copyright Start
-C     Copyright (c) 2015, Southern Methodist University and
+C     Copyright (c) 2015, Southern Methodist University and 
 C     Lawrence Livermore National Security
 C
-C     This work was performed under the auspices of the U.S. Department
-C     of Energy by Southern Methodist University and Lawrence Livermore
+C     This work was performed under the auspices of the U.S. Department 
+C     of Energy by Southern Methodist University and Lawrence Livermore 
 C     National Laboratory under Contract DE-AC52-07NA27344.
-C     Produced at Southern Methodist University and the Lawrence
+C     Produced at Southern Methodist University and the Lawrence 
 C     Livermore National Laboratory.
 C
 C     All rights reserved.
@@ -25,15 +25,15 @@ C
 C     Note that this problem should only work with SUNDIALS configured
 C     to use 'realtype' as 'double' and 'sunindextype' as '64bit'
 C     ----------------------------------------------------------------
-C
+C     
 C     Include MPI-Fortran header file for MPI_COMM_WORLD, MPI types.
-
+      
       IMPLICIT NONE
 C
       INCLUDE "mpif.h"
 C
       INTEGER*8 NLOCAL
-      PARAMETER (NLOCAL=10)
+      PARAMETER (NLOCAL=10)   
 C
       INTEGER*4 NOUT, MYPE, IER, NPES, METH, IATOL, ITASK, IPRE, IGS
       INTEGER*4 LLENRW, LLENIW, LNST, LNST_ATT, LNFE, LNFI, LNSETUP
@@ -46,10 +46,10 @@ C
       DOUBLE PRECISION Y(1024), ROUT(6), RPAR(1)
       DOUBLE PRECISION ALPHA, TOUT, ERMAX, AVDIM
       DOUBLE PRECISION ATOL, ERRI, RTOL, GERMAX, DTOUT, T
-C
+C     
       DATA ATOL/1.0D-10/, RTOL/1.0D-5/, DTOUT/0.1D0/, NOUT/10/
-      DATA LLENRW/1/, LLENIW/2/, LNST/3/, LNST_ATT/6/, LNFE/7/, LNFI/8/,
-     1     LNSETUP/9/, LNETF/10/, LNNI/11/, LNCF/12/, LLENRWLS/14/,
+      DATA LLENRW/1/, LLENIW/2/, LNST/3/, LNST_ATT/6/, LNFE/7/, LNFI/8/, 
+     1     LNSETUP/9/, LNETF/10/, LNNI/11/, LNCF/12/, LLENRWLS/14/, 
      1     LLENIWLS/15/, LNPE/19/, LNPS/20/, LNLI/21/, LNCFL/22/
 C
 C     Get NPES and MYPE.  Requires initialization of MPI.
@@ -72,8 +72,8 @@ C     Get NPES and MYPE.  Requires initialization of MPI.
  7       FORMAT(///' MPI_ERROR: MPI_COMM_RANK returned IER = ', I5)
          CALL MPI_ABORT(MPI_COMM_WORLD, 1, IER)
          STOP
-      ENDIF
-C
+      ENDIF      
+C     
 C     Set input arguments.
       NEQ = NPES * NLOCAL
       T = 0.0D0
@@ -90,11 +90,11 @@ C     Load IPAR and RPAR
       IPAR(2) = MYPE
       IPAR(3) = NEQ
       RPAR(1) = ALPHA
-C
+C     
       DO I = 1, NLOCAL
          Y(I) = 1.0D0
       ENDDO
-C
+C     
       IF (MYPE .EQ. 0) THEN
          WRITE(6,15) NEQ, NLOCAL, ALPHA, RTOL, ATOL, NPES
  15      FORMAT('Diagonal test problem:'//
@@ -107,9 +107,9 @@ C
      &        ' Precond is band-block-diagonal, using ARKBBDPRE'
      &        /' Number of processors = ', I3/)
       ENDIF
-C
+C     
       CALL FNVINITP(MPI_COMM_WORLD, 4, NLOCAL, NEQ, IER)
-C
+C     
       IF (IER .NE. 0) THEN
          WRITE(6,20) IER
  20      FORMAT(///' SUNDIALS_ERROR: FNVINITP returned IER = ', I5)
@@ -133,10 +133,10 @@ C
          CALL MPI_ABORT(MPI_COMM_WORLD, 1, IER)
          STOP
       ENDIF
-C
+C     
       CALL FARKMALLOC(T, Y, METH, IATOL, RTOL, ATOL,
      &                IOUT, ROUT, IPAR, RPAR, IER)
-C
+C     
       IF (IER .NE. 0) THEN
          WRITE(6,30) IER
  30      FORMAT(///' SUNDIALS_ERROR: FARKMALLOC returned IER = ', I5)
@@ -168,23 +168,23 @@ C     initialize BBD preconditioner (build diagonal preconditioner)
 C
       IF (MYPE .EQ. 0) WRITE(6,38)
  38   FORMAT(/'Preconditioning on left'/)
-C
+C     
 C     Looping point for cases IPRE = 1 and 2.
-C
+C     
  40   CONTINUE
-C
+C     
 C     Loop through tout values, call solver, print output, test for failure.
       TOUT = DTOUT
       DO 60 JOUT = 1, NOUT
-C
+C     
          CALL FARKODE(TOUT, T, Y, ITASK, IER)
-C
-         IF (MYPE .EQ. 0) WRITE(6,45) T, IOUT(LNST), IOUT(LNST_ATT),
+C     
+         IF (MYPE .EQ. 0) WRITE(6,45) T, IOUT(LNST), IOUT(LNST_ATT), 
      &        IOUT(LNFE), IOUT(LNFI)
- 45      FORMAT(' t = ', E10.2, 5X, 'no. steps = ', I5,
+ 45      FORMAT(' t = ', E10.2, 5X, 'no. steps = ', I5, 
      &        '   no. attempts = ', I5,'   no. fe-s = ', I5,
      &        '   no. fi-s = ', I5)
-C
+C     
          IF (IER .NE. 0) THEN
             WRITE(6,50) IER, IOUT(16)
  50         FORMAT(///' SUNDIALS_ERROR: FARKODE returned IER = ', I5, /,
@@ -192,10 +192,10 @@ C
             CALL MPI_ABORT(MPI_COMM_WORLD, 1, IER)
             STOP
          ENDIF
-C
+C     
          TOUT = TOUT + DTOUT
  60   CONTINUE
-C
+C     
 C     Get max. absolute error in the local vector.
       ERMAX = 0.0D0
       DO 65 I = 1, NLOCAL
@@ -213,7 +213,7 @@ C     Get global max. error from MPI_REDUCE call.
       ENDIF
       IF (MYPE .EQ. 0) WRITE(6,75) GERMAX
  75   FORMAT(/'Max. absolute error is', E10.2/)
-C
+C     
 C     Print final statistics.
       IF (MYPE .EQ. 0) THEN
          NST = IOUT(LNST)
@@ -257,7 +257,7 @@ C     Print final statistics.
      &          ' real/int local workspace = ', 2I5/
      &          ' number of g evals. = ', I5)
       ENDIF
-C
+C     
 C     If IPRE = 1, re-initialize T, Y, and the solver, and loop for
 C     case IPRE = 2.  Otherwise jump to final block.
       IF (IPRE .EQ. 2) GO TO 99
@@ -265,7 +265,7 @@ C
       T = 0.0D0
       DO I = 1, NLOCAL
          Y(I) = 1.0D0
-      ENDDO
+      ENDDO         
 C
       CALL FARKREINIT(T, Y, METH, IATOL, RTOL, ATOL, IER)
       IF (IER .NE. 0) THEN
@@ -277,7 +277,7 @@ C
 C
       IPRE = 2
 C
-      CALL FARKBBDREINIT(MUDQ, MLDQ, 0.0D0, IER)
+      CALL FARKBBDREINIT(MUDQ, MLDQ, 0.0D0, IER) 
       IF (IER .NE. 0) THEN
          WRITE(6,92) IER
  92      FORMAT(///' SUNDIALS_ERROR: FARKBBDREINIT returned IER = ', I5)
@@ -296,11 +296,11 @@ C
       IF (MYPE .EQ. 0) WRITE(6,95)
  95   FORMAT(//60('-')///'Preconditioning on right'/)
       GO TO 40
-C
+C     
 C     Free the memory and finalize MPI.
  99   CALL FARKFREE
       CALL MPI_FINALIZE(IER)
-C
+C     
       STOP
       END
 C
@@ -316,7 +316,7 @@ C
 C
       INTEGER*8 MYPE, I, NLOCAL
       DOUBLE PRECISION ALPHA
-C
+C     
       NLOCAL = IPAR(1)
       MYPE = IPAR(2)
       ALPHA = RPAR(1)
@@ -324,7 +324,7 @@ C
       DO I = 1, NLOCAL
          YDOT(I) = -ALPHA * (MYPE * NLOCAL + I) * Y(I)
       ENDDO
-C
+C     
       IER = 0
 C
       RETURN
@@ -341,13 +341,13 @@ C
       DOUBLE PRECISION T, Y(*), YDOT(*), RPAR(*)
 C
       INTEGER*8 I, NLOCAL
-C
+C     
       NLOCAL = IPAR(1)
 C
       DO I = 1, NLOCAL
          YDOT(I) = 0.D0
       ENDDO
-C
+C     
       IER = 0
 C
       RETURN
@@ -356,20 +356,20 @@ C
 C     ------------------------------------------------------------------------
 C
       SUBROUTINE FARKGLOCFN(NLOC, T, YLOC, GLOC, IPAR, RPAR, IER)
-C     Routine to define local approximate function g, here the same as fi.
+C     Routine to define local approximate function g, here the same as fi. 
       IMPLICIT NONE
 C
       INTEGER*8 NLOC, IPAR(*)
       INTEGER*4 IER
       DOUBLE PRECISION T, YLOC(*), GLOC(*), RPAR(*)
-C
+C     
       CALL FARKIFUN(T, YLOC, GLOC, IPAR, RPAR, IER)
 C
       RETURN
       END
 C
 C     ------------------------------------------------------------------------
-C
+C      
       SUBROUTINE FARKCOMMFN(NLOC, T, YLOC, IPAR, RPAR, IER)
 C     Routine to perform communication required for evaluation of g.
       INTEGER*8 NLOC, IPAR(*)

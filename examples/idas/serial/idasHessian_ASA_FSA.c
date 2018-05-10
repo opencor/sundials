@@ -1,10 +1,10 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban and Cosmin Petra @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -12,22 +12,22 @@
  * LLNS Copyright End
  * -----------------------------------------------------------------
  *
- * Hessian using adjoint sensitivity example problem.
- *
- * This simple example problem for IDAS, due to Robertson,
- * is from chemical kinetics, and consists of the following three
+ * Hessian using adjoint sensitivity example problem. 
+ * 
+ * This simple example problem for IDAS, due to Robertson, 
+ * is from chemical kinetics, and consists of the following three 
  * equations:
  *
- *   [ y1' + p1 * y1 - p2 * y2 * y3              = 0
- *   [ y2' - p1 * y1 + p2 * y2 * y3 + p3 * y2^2  = 0
- *   [ y1 + y2 + y3 -1                               = 0
- *
+ *   [ y1' + p1 * y1 - p2 * y2 * y3              = 0 
+ *   [ y2' - p1 * y1 + p2 * y2 * y3 + p3 * y2^2  = 0 
+ *   [ y1 + y2 + y3 -1                               = 0 
+ * 
  *        [1]        [-p1]
- *   y(0)=[0]  y'(0)=[ p1]   p1 = 0.04   p2 = 1e4   p3 = 1e07
+ *   y(0)=[0]  y'(0)=[ p1]   p1 = 0.04   p2 = 1e4   p3 = 1e07   
  *        [0]        [ 0 ]
  *
  *       80
- *      /
+ *      / 
  *  G = | 0.5 * (y1^2 + y2^2 + y3^2) dt
  *      /
  *      0
@@ -80,22 +80,22 @@
 #define TWO  RCONST(2.0)
 
 /* User defined struct */
-typedef struct {
+typedef struct { 
   realtype p[3];
 } *UserData;
 
 /* residual for forward problem */
-static int res(realtype t, N_Vector yy, N_Vector yp,
+static int res(realtype t, N_Vector yy, N_Vector yp, 
                N_Vector resval, void *user_data);
 
-static int resS(int Ns, realtype t,
+static int resS(int Ns, realtype t, 
                 N_Vector yy, N_Vector yp, N_Vector resval,
                 N_Vector *yyS, N_Vector *ypS, N_Vector *resvalS,
                 void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 
 static int rhsQ(realtype t, N_Vector yy, N_Vector yp, N_Vector qdot, void *user_data);
 
-static int rhsQS(int Ns, realtype t, N_Vector yy, N_Vector yp,
+static int rhsQS(int Ns, realtype t, N_Vector yy, N_Vector yp, 
                  N_Vector *yyS, N_Vector *ypS, N_Vector rrQ, N_Vector *rhsvalQS,
                  void *user_data,  N_Vector yytmp, N_Vector yptmp, N_Vector tmpQS);
 
@@ -120,7 +120,7 @@ static int check_flag(void *flagvalue, const char *funcname, int opt);
 
 int main(int argc, char *argv[])
 {
-  N_Vector yy, yp, q, *yyS, *ypS, *qS;
+  N_Vector yy, yp, q, *yyS, *ypS, *qS; 
   N_Vector yyB1, ypB1, qB1, yyB2, ypB2, qB2;
   void *ida_mem;
   UserData data;
@@ -198,8 +198,8 @@ int main(int argc, char *argv[])
   /* Setup of quadrature's sensitivities */
   flag = IDAQuadSensInit(ida_mem, rhsQS, qS);
   flag = IDAQuadSensEEtolerances(ida_mem);
-  flag = IDASetQuadSensErrCon(ida_mem, SUNTRUE);
-
+  flag = IDASetQuadSensErrCon(ida_mem, SUNTRUE); 
+  
   /* Initialize ASA. */
   flag = IDAAdjInit(ida_mem, 100, IDA_HERMITE);
 
@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
   printf("     G:    %12.4Le\n", G);
 #else
   printf("     G:    %12.4e\n", G);
-#endif
+#endif  
 
   /* Sensitivities are needed for IC of backward problems. */
   IDAGetSensDky(ida_mem, tf, 0, yyS);
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
   printf("   dG/dp:  %12.4Le %12.4Le\n", Ith(qS[0],1), Ith(qS[1],1));
 #else
   printf("   dG/dp:  %12.4e %12.4e\n", Ith(qS[0],1), Ith(qS[1],1));
-#endif
+#endif  
   printf("\n");
   /******************************
   * BACKWARD PROBLEM #1
@@ -246,13 +246,13 @@ int main(int argc, char *argv[])
   Ith(ypB1,2) = Ith(yy,3)-Ith(yy,2);
   Ith(ypB1,4) = Ith(yyS[0],3) - Ith(yyS[0],1);
   Ith(ypB1,5) = Ith(yyS[0],3) - Ith(yyS[0],2);
-
+  
   qB1 = N_VNew_Serial(2*NP);
   N_VConst(ZERO, qB1);
 
   flag = IDACreateB(ida_mem, &indexB1);
   flag = IDAInitBS(ida_mem, indexB1, resBS1, tf, yyB1, ypB1);
-  flag = IDASStolerancesB(ida_mem, indexB1, RTOLA, ATOLA);
+  flag = IDASStolerancesB(ida_mem, indexB1, RTOLA, ATOLA);   
   flag = IDASetUserDataB(ida_mem, indexB1, data);
   flag = IDASetMaxNumStepsB(ida_mem, indexB1, 5000);
 
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
   flag = IDAQuadInitBS(ida_mem, indexB1, rhsQBS1, qB1);
 
   /******************************
-  * BACKWARD PROBLEM #2
+  * BACKWARD PROBLEM #2  
   *******************************/
 
   /* Consistent IC. */
@@ -287,13 +287,13 @@ int main(int argc, char *argv[])
   Ith(ypB2,2) = Ith(yy,3)-Ith(yy,2);
   Ith(ypB2,4) = Ith(yyS[1],3) - Ith(yyS[1],1);
   Ith(ypB2,5) = Ith(yyS[1],3) - Ith(yyS[1],2);
-
+  
   qB2 = N_VNew_Serial(2*NP);
   N_VConst(ZERO, qB2);
 
   flag = IDACreateB(ida_mem, &indexB2);
   flag = IDAInitBS(ida_mem, indexB2, resBS2, tf, yyB2, ypB2);
-  flag = IDASStolerancesB(ida_mem, indexB2, RTOLA, ATOLA);
+  flag = IDASStolerancesB(ida_mem, indexB2, RTOLA, ATOLA);   
   flag = IDASetUserDataB(ida_mem, indexB2, data);
   flag = IDASetMaxNumStepsB(ida_mem, indexB2, 2500);
 
@@ -314,16 +314,16 @@ int main(int argc, char *argv[])
   /* Integrate backward problems. */
   printf("---------------------------------------------------------\n");
   printf("Backward integration \n");
-  printf("---------------------------------------------------------\n\n");
+  printf("---------------------------------------------------------\n\n"); 
 
   flag = IDASolveB(ida_mem, ti, IDA_NORMAL);
 
   flag = IDAGetB(ida_mem, indexB1, &time, yyB1, ypB1);
-  /*
+  /* 
      flag = IDAGetNumSteps(IDAGetAdjIDABmem(ida_mem, indexB1), &nst);
-     printf("at time=%g \tpb 1 Num steps:%d\n", time, nst);
+     printf("at time=%g \tpb 1 Num steps:%d\n", time, nst); 
      flag = IDAGetNumSteps(IDAGetAdjIDABmem(ida_mem, indexB2), &nst);
-     printf("at time=%g \tpb 2 Num steps:%d\n\n", time, nst);
+     printf("at time=%g \tpb 2 Num steps:%d\n\n", time, nst); 
   */
 
   flag = IDAGetQuadB(ida_mem, indexB1, &time, qB1);
@@ -334,7 +334,7 @@ int main(int argc, char *argv[])
 #else
   printf("   dG/dp:  %12.4e %12.4e   (from backward pb. 1)\n", Ith(qB1,1), Ith(qB1,2));
   printf("   dG/dp:  %12.4e %12.4e   (from backward pb. 2)\n", Ith(qB2,1), Ith(qB2,2));
-#endif
+#endif  
 
   printf("\n");
   printf("   H = d2G/dp2:\n");
@@ -345,7 +345,7 @@ int main(int argc, char *argv[])
 #else
   printf("  %12.4e  %12.4e\n", Ith(qB1,3), Ith(qB2,3));
   printf("  %12.4e  %12.4e\n", Ith(qB1,4), Ith(qB2,4));
-#endif
+#endif  
 
   IDAFree(&ida_mem);
   SUNLinSolFree(LS);
@@ -370,7 +370,7 @@ int main(int argc, char *argv[])
   printf("Finite Differences ( dp1=%6.1Le and dp2 = %6.1Le )\n", dp1, dp2);
 #else
   printf("Finite Differences ( dp1=%6.1e and dp2 = %6.1e )\n", dp1, dp2);
-#endif
+#endif  
   printf("---------------------------------------------------------\n\n");
 
   ida_mem = IDACreate();
@@ -424,7 +424,7 @@ int main(int argc, char *argv[])
   Ith(yy,1) = ONE; Ith(yy,2) = ZERO; Ith(yy,3) = ZERO;
   Ith(yp,1) = -data->p[0]; Ith(yp,2) = -Ith(yp,1); Ith(yp,3) = 0;
   N_VConst(ZERO, q);
-
+  
   flag = IDAReInit(ida_mem, ti, yy, yp);
   flag = IDAQuadReInit(ida_mem, q);
 
@@ -442,7 +442,7 @@ int main(int argc, char *argv[])
   * Forward FD for p2
   ********************/
   /*restore p1*/
-  data->p[0] += dp1;
+  data->p[0] += dp1; 
   data->p[1] += dp2;
 
   Ith(yy,1) = ONE; Ith(yy,2) = ZERO; Ith(yy,3) = ZERO;
@@ -464,7 +464,7 @@ int main(int argc, char *argv[])
   Ith(yy,1) = ONE; Ith(yy,2) = ZERO; Ith(yy,3) = ZERO;
   Ith(yp,1) = -data->p[0]; Ith(yp,2) = -Ith(yp,1); Ith(yp,3) = 0;
   N_VConst(ZERO, q);
-
+  
   flag = IDAReInit(ida_mem, ti, yy, yp);
   flag = IDAQuadReInit(ida_mem, q);
 
@@ -494,7 +494,7 @@ int main(int argc, char *argv[])
   printf("\n");
   printf("  H(1,1):  %12.4e\n", H11);
   printf("  H(2,2):  %12.4e\n", H22);
-#endif
+#endif  
 
   IDAFree(&ida_mem);
   SUNLinSolFree(LS);
@@ -527,7 +527,7 @@ static int res(realtype tres, N_Vector yy, N_Vector yp, N_Vector rr, void *user_
   UserData data;
   realtype p1, p2, p3;
 
-  y1  = Ith(yy,1); y2  = Ith(yy,2); y3  = Ith(yy,3);
+  y1  = Ith(yy,1); y2  = Ith(yy,2); y3  = Ith(yy,3); 
   yp1 = Ith(yp,1); yp2 = Ith(yp,2); yp3 = Ith(yp,3);
   rval = N_VGetArrayPointer(rr);
 
@@ -542,10 +542,10 @@ static int res(realtype tres, N_Vector yy, N_Vector yp, N_Vector rr, void *user_
   return(0);
 }
 
-static int resS(int Ns, realtype t,
+static int resS(int Ns, realtype t, 
                 N_Vector yy, N_Vector yp, N_Vector resval,
                 N_Vector *yyS, N_Vector *ypS, N_Vector *resvalS,
-                void *user_data,
+                void *user_data, 
                 N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
   UserData data;
@@ -594,7 +594,7 @@ static int resS(int Ns, realtype t,
       rs2 += y2*y3;
       break;
     }
-
+  
     Ith(resvalS[is],1) = rs1;
     Ith(resvalS[is],2) = rs2;
     Ith(resvalS[is],3) = rs3;
@@ -609,15 +609,15 @@ static int rhsQ(realtype t, N_Vector yy, N_Vector yp, N_Vector qdot, void *user_
 
   realtype y1, y2, y3;
 
-  y1 = Ith(yy,1); y2 = Ith(yy,2); y3 = Ith(yy,3);
+  y1 = Ith(yy,1); y2 = Ith(yy,2); y3 = Ith(yy,3); 
   Ith(qdot,1) = HALF*(y1*y1+y2*y2+y3*y3);
 
   return(0);
 }
 
 static int rhsQS(int Ns, realtype t,
-                 N_Vector yy, N_Vector yp,
-                 N_Vector *yyS, N_Vector *ypS,
+                 N_Vector yy, N_Vector yp, 
+                 N_Vector *yyS, N_Vector *ypS, 
                  N_Vector rrQ, N_Vector *rhsvalQS,
                  void *user_data,
                  N_Vector yytmp, N_Vector yptmp, N_Vector tmpQS)
@@ -626,8 +626,8 @@ static int rhsQS(int Ns, realtype t,
   realtype y1, y2, y3;
   realtype s1, s2, s3;
 
-  y1 = Ith(yy,1);
-  y2 = Ith(yy,2);
+  y1 = Ith(yy,1); 
+  y2 = Ith(yy,2); 
   y3 = Ith(yy,3);
 
   /* 1st sensitivity RHS */
@@ -646,8 +646,8 @@ static int rhsQS(int Ns, realtype t,
 }
 
 /* Residuals for adjoint model. */
-static int resBS1(realtype tt,
-                  N_Vector yy, N_Vector yp,
+static int resBS1(realtype tt, 
+                  N_Vector yy, N_Vector yp, 
                   N_Vector *yyS, N_Vector *ypS,
                   N_Vector yyB, N_Vector ypB,
                   N_Vector rrBS, void *user_dataB)
@@ -660,7 +660,7 @@ static int resBS1(realtype tt,
   realtype lp1, lp2, mp1, mp2;
   realtype s1, s2, s3;
   realtype l21;
-
+  
   data = (UserData) user_dataB;
 
   /* The parameters. */
@@ -696,7 +696,7 @@ static int resBS1(realtype tt,
   return(0);
 }
 
-static int rhsQBS1(realtype tt,
+static int rhsQBS1(realtype tt, 
                  N_Vector yy, N_Vector yp,
                  N_Vector *yyS, N_Vector *ypS,
                  N_Vector yyB, N_Vector ypB,
@@ -708,7 +708,7 @@ static int rhsQBS1(realtype tt,
   realtype l1, l2, l3, m1, m2, m3;
   realtype s1, s2, s3;
   realtype l21;
-
+  
   data = (UserData) user_dataB;
 
   /* The p vector */
@@ -716,7 +716,7 @@ static int rhsQBS1(realtype tt,
 
   /* The y vector */
   y1 = Ith(yy,1); y2 = Ith(yy,2); y3 = Ith(yy,3);
-
+  
   /* The lambda vector. */
   l1 = Ith(yyB,1); l2 = Ith(yyB,2); l3 = Ith(yyB,3);
   /* The mu vector. */
@@ -724,21 +724,21 @@ static int rhsQBS1(realtype tt,
 
   /* The sensitivity with respect to p1 */
   s1 = Ith(yyS[0],1); s2 = Ith(yyS[0],2); s3 = Ith(yyS[0],3);
-
+  
   /* Temporary variables */
   l21 = l2-l1;
 
   Ith(rhsBQS,1) = -y1*l21;
   Ith(rhsBQS,2) = y2*y3*l21;
 
-  Ith(rhsBQS,3) = y1*(m1-m2) - s1*l21;
+  Ith(rhsBQS,3) = y1*(m1-m2) - s1*l21; 
   Ith(rhsBQS,4) = y2*y3*(m2-m1) + (y3*s2+y2*s3)*l21;
 
   return(0);
 }
 
-static int resBS2(realtype tt,
-                  N_Vector yy, N_Vector yp,
+static int resBS2(realtype tt, 
+                  N_Vector yy, N_Vector yp, 
                   N_Vector *yyS, N_Vector *ypS,
                   N_Vector yyB, N_Vector ypB,
                   N_Vector rrBS, void *user_dataB)
@@ -751,7 +751,7 @@ static int resBS2(realtype tt,
   realtype lp1, lp2, mp1, mp2;
   realtype s1, s2, s3;
   realtype l21;
-
+  
   data = (UserData) user_dataB;
 
   /* The parameters. */
@@ -787,7 +787,7 @@ static int resBS2(realtype tt,
   return(0);
 }
 
-static int rhsQBS2(realtype tt,
+static int rhsQBS2(realtype tt, 
                  N_Vector yy, N_Vector yp,
                  N_Vector *yyS, N_Vector *ypS,
                  N_Vector yyB, N_Vector ypB,
@@ -799,7 +799,7 @@ static int rhsQBS2(realtype tt,
   realtype l1, l2, l3, m1, m2, m3;
   realtype s1, s2, s3;
   realtype l21;
-
+  
   data = (UserData) user_dataB;
 
   /* The p vector */
@@ -807,7 +807,7 @@ static int rhsQBS2(realtype tt,
 
   /* The y vector */
   y1 = Ith(yy,1); y2 = Ith(yy,2); y3 = Ith(yy,3);
-
+  
   /* The lambda vector. */
   l1 = Ith(yyB,1); l2 = Ith(yyB,2); l3 = Ith(yyB,3);
   /* The mu vector. */
@@ -815,27 +815,27 @@ static int rhsQBS2(realtype tt,
 
   /* The sensitivity with respect to p2 */
   s1 = Ith(yyS[1],1); s2 = Ith(yyS[1],2); s3 = Ith(yyS[1],3);
-
+  
   /* Temporary variables */
   l21 = l2-l1;
 
   Ith(rhsBQS,1) = -y1*l21;
   Ith(rhsBQS,2) =  y2*y3*l21;
 
-  Ith(rhsBQS,3) = y1*(m1-m2) - s1*l21;
+  Ith(rhsBQS,3) = y1*(m1-m2) - s1*l21; 
   Ith(rhsBQS,4) = y2*y3*(m2-m1) + (y3*s2+y2*s3)*l21;
 
   return(0);
 }
 
-/*
+/* 
  * Check function return value.
  *    opt == 0 means SUNDIALS function allocates memory so check if
  *             returned NULL pointer
  *    opt == 1 means SUNDIALS function returns a flag so check if
  *             flag >= 0
  *    opt == 2 means function allocates memory so check if returned
- *             NULL pointer
+ *             NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt)

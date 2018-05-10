@@ -2,13 +2,13 @@ C     ----------------------------------------------------------------
 C     Programmer(s): Daniel R. Reynolds @ SMU
 C     ----------------------------------------------------------------
 C     LLNS/SMU Copyright Start
-C     Copyright (c) 2015, Southern Methodist University and
+C     Copyright (c) 2015, Southern Methodist University and 
 C     Lawrence Livermore National Security
 C
-C     This work was performed under the auspices of the U.S. Department
-C     of Energy by Southern Methodist University and Lawrence Livermore
+C     This work was performed under the auspices of the U.S. Department 
+C     of Energy by Southern Methodist University and Lawrence Livermore 
 C     National Laboratory under Contract DE-AC52-07NA27344.
-C     Produced at Southern Methodist University and the Lawrence
+C     Produced at Southern Methodist University and the Lawrence 
 C     Livermore National Laboratory.
 C
 C     All rights reserved.
@@ -38,7 +38,7 @@ C
       DOUBLE PRECISION ERMAX, ERRI, GERMAX
 C
       DATA ATOL/1.0D-10/, RTOL/1.0D-5/, DTOUT/0.1D0/, NOUT/10/
-      DATA LNST/3/, LNST_ATT/6/, LNFE/7/, LNFI/8/, LNNI/11/, LNCF/12/,
+      DATA LNST/3/, LNST_ATT/6/, LNFE/7/, LNFI/8/, LNNI/11/, LNCF/12/, 
      1     LNETF/10/
 C
 C     Get NPES and MYPE.  Requires initialization of MPI.
@@ -120,10 +120,10 @@ C     Loop through tout values, call solver, print output, test for failure.
 C
         CALL FARKODE(TOUT, T, Y, ITASK, IER)
 C
-        IF (MYPE .EQ. 0) WRITE(6,40) T, IOUT(LNST), IOUT(LNST_ATT),
+        IF (MYPE .EQ. 0) WRITE(6,40) T, IOUT(LNST), IOUT(LNST_ATT), 
      &       IOUT(LNFE), IOUT(LNFI)
   40    FORMAT(' t = ', D10.2, 5X, 'steps = ', I5,
-     &         '  (attempted = ', I5, '),  fe = ', I5,
+     &         '  (attempted = ', I5, '),  fe = ', I5, 
      &         '  fi = ', I5)
 C
         IF (IER .NE. 0) THEN
@@ -163,7 +163,7 @@ C     Print final statistics.
       NNI = IOUT(LNNI)
       NCFN = IOUT(LNCF)
       NETF = IOUT(LNETF)
-      IF (MYPE .EQ. 0) WRITE (6,90) NST, NST_ATT, NFE, NFI, NNI, NCFN,
+      IF (MYPE .EQ. 0) WRITE (6,90) NST, NST_ATT, NFE, NFI, NNI, NCFN, 
      &     NETF
   90  FORMAT(/'Final statistics:'//
      &       ' number of steps = ', I5/

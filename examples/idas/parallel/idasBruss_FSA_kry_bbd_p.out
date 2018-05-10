@@ -1,5 +1,5 @@
 
- Brusselator PDE -  DAE parallel example problem for IDA
+ Brusselator PDE -  DAE parallel example problem for IDA 
 
 Number of species ns: 2     Mesh dimensions: 82 x 82
 Total system size: 13448
@@ -8,7 +8,7 @@ Tolerance parameters:  rtol = 1e-05   atol = 1e-05
 Linear solver: SUNSPGMR     Max. Krylov dimension maxl: 16
 Preconditioner: band-block-diagonal (IDABBDPRE), with parameters
      mudq = 82,  mldq = 82,  mukeep = 2,  mlkeep = 2
-CalcIC called to correct initial concentrations
+CalcIC called to correct initial concentrations 
 
 -----------------------------------------------------------
   t        bottom-left  top-right    | nst  k      h
@@ -37,7 +37,7 @@ CalcIC called to correct initial concentrations
 
 -----------------------------------------------------------
 
-Final statistics:
+Final statistics: 
 
 Number of steps                    = 152
 Number of residual evaluations     = 1243

@@ -96,9 +96,9 @@
 /* Problem Constants */
 
 #define NUM_SPECIES     6  /* must equal 2*(number of prey or predators)
-                              number of prey = number of predators       */
+                              number of prey = number of predators       */ 
 
-#define PI       RCONST(3.1415926535898)   /* pi */
+#define PI       RCONST(3.1415926535898)   /* pi */ 
 
 #define NPEX        2            /* number of processors in the x-direction  */
 #define NPEY        2            /* number of processors in the y-direction  */
@@ -130,12 +130,12 @@
 
 /* IJ_Vptr is defined in order to translate from the underlying 3D structure
    of the dependent variable vector to the 1D storage scheme for an N-vector.
-   IJ_Vptr(vv,i,j) returns a pointer to the location in vv corresponding to
+   IJ_Vptr(vv,i,j) returns a pointer to the location in vv corresponding to 
    indices is = 0, jx = i, jy = j.    */
 
 #define IJ_Vptr(vv,i,j)   (&NV_Ith_P(vv, i*NUM_SPECIES + j*NSMXSUB))
 
-/* Type : UserData
+/* Type : UserData 
    contains problem constants and extended array */
 
 typedef struct {
@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
     return(1);
   }
 
-  /* Allocate memory, and set problem data, initial values, tolerances */
+  /* Allocate memory, and set problem data, initial values, tolerances */ 
 
   /* Set local vector length */
   Nlocal = NUM_SPECIES*MXSUB*MYSUB;
@@ -274,9 +274,9 @@ int main(int argc, char *argv[])
      creates a private copy for KINSOL to use. */
   N_VDestroy_Parallel(constraints);
 
-  /* Create SUNSPGMR object with right preconditioning and the
+  /* Create SUNSPGMR object with right preconditioning and the 
      maximum Krylov dimension maxl */
-  maxl = 20;
+  maxl = 20; 
   LS = SUNSPGMR(cc, PREC_RIGHT, maxl);
   if(check_flag((void *)LS, "SUNSPGMR", 0, my_pe)) MPI_Abort(comm, 1);
 
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
   maxlrst = 2;
   flag = SUNSPGMRSetMaxRestarts(LS, maxlrst);
   if (check_flag(&flag, "SUNSPGMRSpilsSetMaxRestarts", 1, my_pe)) MPI_Abort(comm, 1);
-
+  
   /* Call KINBBDPrecInit to initialize and allocate memory for the
      band-block-diagonal preconditioner, and specify the local and
      communication functions func_local and gcomm=NULL (all communication
@@ -345,9 +345,9 @@ int main(int argc, char *argv[])
  *--------------------------------------------------------------------
  */
 
-/*
- * ccomm routine.  This routine performs all communication
- * between processors of data needed to calculate f.
+/* 
+ * ccomm routine.  This routine performs all communication 
+ * between processors of data needed to calculate f. 
  */
 
 static int ccomm(sunindextype Nlocal, N_Vector cc, void *userdata)
@@ -382,7 +382,7 @@ static int ccomm(sunindextype Nlocal, N_Vector cc, void *userdata)
 }
 
 /*
- * System function for predator-prey system - calculation part
+ * System function for predator-prey system - calculation part 
  */
 
 static int func_local(sunindextype Nlocal, N_Vector cc, N_Vector fval, void *user_data)
@@ -393,15 +393,15 @@ static int func_local(sunindextype Nlocal, N_Vector cc, N_Vector fval, void *use
   int isubx, isuby, nsmxsub, nsmxsub2;
   int shifty, offsetc, offsetce, offsetcl, offsetcr, offsetcd, offsetcu;
   UserData data;
-
+  
   data = (UserData)user_data;
   cdata = N_VGetArrayPointer_Parallel(cc);
-
+  
   /* Get subgrid indices, data sizes, extended work array cext */
   isubx = data->isubx;   isuby = data->isuby;
   nsmxsub = data->nsmxsub; nsmxsub2 = data->nsmxsub2;
   cext = data->cext;
-
+  
   /* Copy local segment of cc vector into the working extended array cext */
   offsetc = 0;
   offsetce = nsmxsub2 + NUM_SPECIES;
@@ -410,22 +410,22 @@ static int func_local(sunindextype Nlocal, N_Vector cc, N_Vector fval, void *use
     offsetc = offsetc + nsmxsub;
     offsetce = offsetce + nsmxsub2;
   }
-
+  
   /* To facilitate homogeneous Neumann boundary conditions, when this is a
      boundary PE, copy data from the first interior mesh line of cc to cext */
-
+  
   /* If isuby = 0, copy x-line 2 of cc to cext */
   if (isuby == 0) {
     for (i = 0; i < nsmxsub; i++) cext[NUM_SPECIES+i] = cdata[nsmxsub+i];
   }
-
+  
   /* If isuby = NPEY-1, copy x-line MYSUB-1 of cc to cext */
   if (isuby == NPEY-1) {
     offsetc = (MYSUB-2)*nsmxsub;
     offsetce = (MYSUB+1)*nsmxsub2 + NUM_SPECIES;
     for (i = 0; i < nsmxsub; i++) cext[offsetce+i] = cdata[offsetc+i];
   }
-
+  
   /* If isubx = 0, copy y-line 2 of cc to cext */
   if (isubx == 0) {
     for (ly = 0; ly < MYSUB; ly++) {
@@ -434,7 +434,7 @@ static int func_local(sunindextype Nlocal, N_Vector cc, N_Vector fval, void *use
       for (i = 0; i < NUM_SPECIES; i++) cext[offsetce+i] = cdata[offsetc+i];
     }
   }
-
+  
   /* If isubx = NPEX-1, copy y-line MXSUB-1 of cc to cext */
   if (isubx == NPEX-1) {
     for (ly = 0; ly < MYSUB; ly++) {
@@ -459,7 +459,7 @@ static int func_local(sunindextype Nlocal, N_Vector cc, N_Vector fval, void *use
       cxy = IJ_Vptr(cc,jx,jy);
       rxy = IJ_Vptr(data->rates,jx,jy);
       fxy = IJ_Vptr(fval,jx,jy);
-
+      
       WebRate(xx, yy, cxy, rxy, user_data);
 
       offsetc = (jx+1)*NUM_SPECIES + (jy+1)*NSMXSUB2;
@@ -467,34 +467,34 @@ static int func_local(sunindextype Nlocal, N_Vector cc, N_Vector fval, void *use
       offsetcu = offsetc + shifty;
       offsetcl = offsetc - NUM_SPECIES;
       offsetcr = offsetc + NUM_SPECIES;
-
+      
       for (is = 0; is < NUM_SPECIES; is++) {
-
+        
         /* differencing in x */
         dcydi = cext[offsetc+is]  - cext[offsetcd+is];
         dcyui = cext[offsetcu+is] - cext[offsetc+is];
-
+        
         /* differencing in y */
         dcxli = cext[offsetc+is]  - cext[offsetcl+is];
         dcxri = cext[offsetcr+is] - cext[offsetc+is];
-
+        
         /* compute the value at xx , yy */
         fxy[is] = (coy)[is] * (dcyui - dcydi) +
           (cox)[is] * (dcxri - dcxli) + rxy[is];
-
+        
       } /* end of is loop */
-
+      
     } /* end of jx loop */
-
+    
   } /* end of jy loop */
 
   return(0);
 }
 
 /*
- * System function routine.  Evaluate f(cc).  First call ccomm to do
+ * System function routine.  Evaluate f(cc).  First call ccomm to do 
  * communication of subgrid boundary data into cext.  Then calculate f
- * by a call to func_local.
+ * by a call to func_local. 
  */
 
 static int func(N_Vector cc, N_Vector fval, void *user_data)
@@ -513,40 +513,40 @@ static int func(N_Vector cc, N_Vector fval, void *user_data)
 }
 
 /*
- * Interaction rate function routine
+ * Interaction rate function routine 
  */
 
-static void WebRate(realtype xx, realtype yy, realtype *cxy, realtype *ratesxy,
+static void WebRate(realtype xx, realtype yy, realtype *cxy, realtype *ratesxy, 
                     void *user_data)
 {
   int i;
   realtype fac;
   UserData data;
-
+  
   data = (UserData)user_data;
-
+  
   for (i = 0; i<NUM_SPECIES; i++)
     ratesxy[i] = DotProd(NUM_SPECIES, cxy, acoef[i]);
-
+  
   fac = ONE + ALPHA * xx * yy;
-
+  
   for (i = 0; i < NUM_SPECIES; i++)
-    ratesxy[i] = cxy[i] * ( bcoef[i] * fac + ratesxy[i] );
+    ratesxy[i] = cxy[i] * ( bcoef[i] * fac + ratesxy[i] );  
 }
 
 /*
- * Dot product routine for realtype arrays
+ * Dot product routine for realtype arrays 
  */
 
 static realtype DotProd(int size, realtype *x1, realtype *x2)
 {
   int i;
   realtype *xx1, *xx2, temp = ZERO;
-
+  
   xx1 = x1; xx2 = x2;
   for (i = 0; i < size; i++) temp += (*xx1++) * (*xx2++);
 
-  return(temp);
+  return(temp);  
 }
 
 /*
@@ -556,25 +556,25 @@ static realtype DotProd(int size, realtype *x1, realtype *x2)
  */
 
 /*
- * Allocate memory for data structure of type UserData
+ * Allocate memory for data structure of type UserData 
  */
 
 static UserData AllocUserData(void)
 {
   UserData data;
-
+  
   data = (UserData) malloc(sizeof *data);
-
+  
   acoef = newDenseMat(NUM_SPECIES, NUM_SPECIES);
   bcoef = (realtype *)malloc(NUM_SPECIES * sizeof(realtype));
   cox   = (realtype *)malloc(NUM_SPECIES * sizeof(realtype));
   coy   = (realtype *)malloc(NUM_SPECIES * sizeof(realtype));
-
+  
   return(data);
 }
 
-/*
- * Load problem constants in data
+/* 
+ * Load problem constants in data 
  */
 
 static void InitUserData(int my_pe, sunindextype Nlocal, MPI_Comm comm, UserData data)
@@ -597,7 +597,7 @@ static void InitUserData(int my_pe, sunindextype Nlocal, MPI_Comm comm, UserData
   data->isubx = my_pe - data->isuby*NPEX;
   data->nsmxsub = NUM_SPECIES * MXSUB;
   data->nsmxsub2 = NUM_SPECIES * (MXSUB+2);
-
+  
   /* Set up the coefficients a and b plus others found in the equations */
   np = data->np;
 
@@ -633,7 +633,7 @@ static void InitUserData(int my_pe, sunindextype Nlocal, MPI_Comm comm, UserData
 }
 
 /*
- * Free data memory
+ * Free data memory 
  */
 
 static void FreeUserData(UserData data)
@@ -649,7 +649,7 @@ static void FreeUserData(UserData data)
 }
 
 /*
- * Set initial conditions in cc
+ * Set initial conditions in cc 
  */
 
 static void SetInitialProfiles(N_Vector cc, N_Vector sc)
@@ -679,7 +679,7 @@ static void SetInitialProfiles(N_Vector cc, N_Vector sc)
       }
     }
   }
-
+  
 }
 
 /*
@@ -706,7 +706,7 @@ static void PrintHeader(int globalstrategy, int maxl, int maxlrst,
 	   (long int) mudq, (long int) mldq);
     printf("  Retained band block half-bandwidths: mukeep = %ld, mlkeep = %ld\n",
 	   (long int) mukeep, (long int) mlkeep);
-#if defined(SUNDIALS_EXTENDED_PRECISION)
+#if defined(SUNDIALS_EXTENDED_PRECISION) 
     printf("Tolerance parameters:  fnormtol = %Lg   scsteptol = %Lg\n",
            fnormtol, scsteptol);
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
@@ -731,7 +731,7 @@ static void PrintHeader(int globalstrategy, int maxl, int maxlrst,
 }
 
 /*
- * Print sample of current cc values
+ * Print sample of current cc values 
  */
 
 static void PrintOutput(int my_pe, MPI_Comm comm, N_Vector cc)
@@ -739,31 +739,31 @@ static void PrintOutput(int my_pe, MPI_Comm comm, N_Vector cc)
   int is, i0, npelast;
   realtype  *ct, tempc[NUM_SPECIES];
   MPI_Status status;
-
+  
   npelast = NPEX*NPEY - 1;
-
+  
   ct = N_VGetArrayPointer_Parallel(cc);
-
+  
   /* Send the cc values (for all species) at the top right mesh point to PE 0 */
   if (my_pe == npelast) {
     i0 = NUM_SPECIES*(MXSUB*MYSUB-1);
     if (npelast!=0)
       MPI_Send(&ct[i0],NUM_SPECIES,PVEC_REAL_MPI_TYPE,0,0,comm);
     else  /* single processor case */
-      for (is = 0; is < NUM_SPECIES; is++) tempc[is]=ct[i0+is];
+      for (is = 0; is < NUM_SPECIES; is++) tempc[is]=ct[i0+is];   
   }
-
-  /* On PE 0, receive the cc values at top right, then print performance data
+  
+  /* On PE 0, receive the cc values at top right, then print performance data 
      and sampled solution values */
   if (my_pe == 0) {
-
+    
     if (npelast != 0)
       MPI_Recv(&tempc[0],NUM_SPECIES,PVEC_REAL_MPI_TYPE,npelast,0,comm,&status);
-
+    
     printf("\nAt bottom left:");
     for (is = 0; is < NUM_SPECIES; is++){
       if ((is%6)*6== is) printf("\n");
-#if defined(SUNDIALS_EXTENDED_PRECISION)
+#if defined(SUNDIALS_EXTENDED_PRECISION) 
       printf(" %Lg",ct[is]);
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
       printf(" %g",ct[is]);
@@ -771,11 +771,11 @@ static void PrintOutput(int my_pe, MPI_Comm comm, N_Vector cc)
       printf(" %g",ct[is]);
 #endif
     }
-
+    
     printf("\n\nAt top right:");
     for (is = 0; is < NUM_SPECIES; is++) {
       if ((is%6)*6 == is) printf("\n");
-#if defined(SUNDIALS_EXTENDED_PRECISION)
+#if defined(SUNDIALS_EXTENDED_PRECISION) 
       printf(" %Lg",tempc[is]);
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
       printf(" %g",tempc[is]);
@@ -784,18 +784,18 @@ static void PrintOutput(int my_pe, MPI_Comm comm, N_Vector cc)
 #endif
     }
     printf("\n\n");
-  }
+  } 
 }
 
 /*
- * Print final statistics contained in iopt
+ * Print final statistics contained in iopt 
  */
 
 static void PrintFinalStats(void *kmem)
 {
   long int nni, nfe, nli, npe, nps, ncfl, nfeSG;
   int flag;
-
+  
   flag = KINGetNumNonlinSolvIters(kmem, &nni);
   check_flag(&flag, "KINGetNumNonlinSolvIters", 1, 0);
   flag = KINGetNumFuncEvals(kmem, &nfe);
@@ -815,15 +815,15 @@ static void PrintFinalStats(void *kmem)
   printf("nni    = %5ld    nli   = %5ld\n", nni, nli);
   printf("nfe    = %5ld    nfeSG = %5ld\n", nfe, nfeSG);
   printf("nps    = %5ld    npe   = %5ld     ncfl  = %5ld\n", nps, npe, ncfl);
-
+  
 }
 
 /*
- * Routine to send boundary data to neighboring PEs
+ * Routine to send boundary data to neighboring PEs 
  */
 
-static void BSend(MPI_Comm comm, int my_pe,
-                  int isubx, int isuby,
+static void BSend(MPI_Comm comm, int my_pe, 
+                  int isubx, int isuby, 
                   int dsizex, int dsizey, realtype *cdata)
 {
   int i, ly;
@@ -848,7 +848,7 @@ static void BSend(MPI_Comm comm, int my_pe,
       for (i = 0; i < NUM_SPECIES; i++)
         bufleft[offsetbuf+i] = cdata[offsetc+i];
     }
-    MPI_Send(&bufleft[0], dsizey, PVEC_REAL_MPI_TYPE, my_pe-1, 0, comm);
+    MPI_Send(&bufleft[0], dsizey, PVEC_REAL_MPI_TYPE, my_pe-1, 0, comm);   
   }
 
   /* If isubx < NPEX-1, send data from right y-line of u (via bufright) */
@@ -859,7 +859,7 @@ static void BSend(MPI_Comm comm, int my_pe,
       for (i = 0; i < NUM_SPECIES; i++)
         bufright[offsetbuf+i] = cdata[offsetc+i];
     }
-    MPI_Send(&bufright[0], dsizey, PVEC_REAL_MPI_TYPE, my_pe+1, 0, comm);
+    MPI_Send(&bufright[0], dsizey, PVEC_REAL_MPI_TYPE, my_pe+1, 0, comm);   
   }
 }
 
@@ -869,7 +869,7 @@ static void BSend(MPI_Comm comm, int my_pe,
  *  1) buffer should be able to hold 2*NUM_SPECIES*MYSUB realtype entries,
  *     should be passed to both the BRecvPost and BRecvWait functions, and
  *     should not be manipulated between the two calls.
- *  2) request should have 4 entries, and should be passed in both calls also.
+ *  2) request should have 4 entries, and should be passed in both calls also. 
  */
 
 static void BRecvPost(MPI_Comm comm, MPI_Request request[], int my_pe,
@@ -881,30 +881,30 @@ static void BRecvPost(MPI_Comm comm, MPI_Request request[], int my_pe,
 
   /* Have bufleft and bufright use the same buffer */
   realtype *bufleft = buffer, *bufright = buffer+NUM_SPECIES*MYSUB;
-
+  
   /* If isuby > 0, receive data for bottom x-line of cext */
   if (isuby != 0)
     MPI_Irecv(&cext[NUM_SPECIES], dsizex, PVEC_REAL_MPI_TYPE,
               my_pe-NPEX, 0, comm, &request[0]);
-
+  
   /* If isuby < NPEY-1, receive data for top x-line of cext */
   if (isuby != NPEY-1) {
     offsetce = NUM_SPECIES*(1 + (MYSUB+1)*(MXSUB+2));
     MPI_Irecv(&cext[offsetce], dsizex, PVEC_REAL_MPI_TYPE,
               my_pe+NPEX, 0, comm, &request[1]);
   }
-
+  
   /* If isubx > 0, receive data for left y-line of cext (via bufleft) */
   if (isubx != 0) {
     MPI_Irecv(&bufleft[0], dsizey, PVEC_REAL_MPI_TYPE,
               my_pe-1, 0, comm, &request[2]);
   }
-
+  
   /* If isubx < NPEX-1, receive data for right y-line of cext (via bufright) */
   if (isubx != NPEX-1) {
     MPI_Irecv(&bufright[0], dsizey, PVEC_REAL_MPI_TYPE,
               my_pe+1, 0, comm, &request[3]);
-  }
+  } 
 }
 
 /*
@@ -913,7 +913,7 @@ static void BRecvPost(MPI_Comm comm, MPI_Request request[], int my_pe,
  *  1) buffer should be able to hold 2*NUM_SPECIES*MYSUB realtype entries,
  *     should be passed to both the BRecvPost and BRecvWait functions, and
  *     should not be manipulated between the two calls.
- *  2) request should have 4 entries, and should be passed in both calls also.
+ *  2) request should have 4 entries, and should be passed in both calls also. 
  */
 
 static void BRecvWait(MPI_Request request[], int isubx,
@@ -924,13 +924,13 @@ static void BRecvWait(MPI_Request request[], int isubx,
   int dsizex2, offsetce, offsetbuf;
   realtype *bufleft = buffer, *bufright = buffer+NUM_SPECIES*MYSUB;
   MPI_Status status;
-
+  
   dsizex2 = dsizex + 2*NUM_SPECIES;
-
+  
   /* If isuby > 0, receive data for bottom x-line of cext */
   if (isuby != 0)
     MPI_Wait(&request[0],&status);
-
+  
   /* If isuby < NPEY-1, receive data for top x-line of cext */
   if (isuby != NPEY-1)
     MPI_Wait(&request[1],&status);
@@ -938,7 +938,7 @@ static void BRecvWait(MPI_Request request[], int isubx,
   /* If isubx > 0, receive data for left y-line of cext (via bufleft) */
   if (isubx != 0) {
     MPI_Wait(&request[2],&status);
-
+    
     /* Copy the buffer to cext */
     for (ly = 0; ly < MYSUB; ly++) {
       offsetbuf = ly*NUM_SPECIES;
@@ -947,11 +947,11 @@ static void BRecvWait(MPI_Request request[], int isubx,
         cext[offsetce+i] = bufleft[offsetbuf+i];
     }
   }
-
+  
   /* If isubx < NPEX-1, receive data for right y-line of cext (via bufright) */
   if (isubx != NPEX-1) {
     MPI_Wait(&request[3],&status);
-
+    
     /* Copy the buffer to cext */
     for (ly = 0; ly < MYSUB; ly++) {
       offsetbuf = ly*NUM_SPECIES;
@@ -959,7 +959,7 @@ static void BRecvWait(MPI_Request request[], int isubx,
       for (i = 0; i < NUM_SPECIES; i++)
         cext[offsetce+i] = bufright[offsetbuf+i];
     }
-  }
+  }  
 }
 /*
  * Check function return value...
@@ -968,7 +968,7 @@ static void BRecvWait(MPI_Request request[], int isubx,
  *    opt == 1 means SUNDIALS function returns a flag so check if
  *             flag >= 0
  *    opt == 2 means function allocates memory so check if returned
- *             NULL pointer
+ *             NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt, int id)
@@ -977,7 +977,7 @@ static int check_flag(void *flagvalue, const char *funcname, int opt, int id)
 
   /* Check if SUNDIALS function returned NULL pointer - no memory allocated */
   if (opt == 0 && flagvalue == NULL) {
-    fprintf(stderr,
+    fprintf(stderr, 
             "\nSUNDIALS_ERROR(%d): %s() failed - returned NULL pointer\n\n",
 	    id, funcname);
     return(1);

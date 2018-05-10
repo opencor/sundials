@@ -4,8 +4,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -48,7 +48,7 @@ static void VNeg_Parallel(N_Vector x, N_Vector z);
 /* z=c(x+y) */
 static void VScaleSum_Parallel(realtype c, N_Vector x, N_Vector y, N_Vector z);
 /* z=c(x-y) */
-static void VScaleDiff_Parallel(realtype c, N_Vector x, N_Vector y, N_Vector z);
+static void VScaleDiff_Parallel(realtype c, N_Vector x, N_Vector y, N_Vector z); 
 /* z=ax+y */
 static void VLin1_Parallel(realtype a, N_Vector x, N_Vector y, N_Vector z);
 /* z=ax-y */
@@ -65,7 +65,7 @@ static void VScaleBy_Parallel(realtype a, N_Vector x);
  */
 
 /* ----------------------------------------------------------------
- * Returns vector type ID. Used to identify vector implementation
+ * Returns vector type ID. Used to identify vector implementation 
  * from abstract N_Vector interface.
  */
 
@@ -78,7 +78,7 @@ N_Vector_ID N_VGetVectorID_Parallel(N_Vector v)
  * Function to create a new parallel vector with empty data array
  */
 
-N_Vector N_VNewEmpty_Parallel(MPI_Comm comm,
+N_Vector N_VNewEmpty_Parallel(MPI_Comm comm, 
                               sunindextype local_length,
                               sunindextype global_length)
 {
@@ -93,13 +93,13 @@ N_Vector N_VNewEmpty_Parallel(MPI_Comm comm,
   if (Nsum != global_length) {
     fprintf(stderr, BAD_N);
     return(NULL);
-  }
+  } 
 
   /* Create vector */
   v = NULL;
   v = (N_Vector) malloc(sizeof *v);
   if (v == NULL) return(NULL);
-
+  
   /* Create vector operation structure */
   ops = NULL;
   ops = (N_Vector_Ops) malloc(sizeof(struct _generic_N_Vector_Ops));
@@ -151,11 +151,11 @@ N_Vector N_VNewEmpty_Parallel(MPI_Comm comm,
   return(v);
 }
 
-/* ----------------------------------------------------------------
+/* ---------------------------------------------------------------- 
  * Function to create a new parallel vector
  */
 
-N_Vector N_VNew_Parallel(MPI_Comm comm,
+N_Vector N_VNew_Parallel(MPI_Comm comm, 
                          sunindextype local_length,
                          sunindextype global_length)
 {
@@ -176,18 +176,18 @@ N_Vector N_VNew_Parallel(MPI_Comm comm,
 
     /* Attach data */
     NV_OWN_DATA_P(v) = SUNTRUE;
-    NV_DATA_P(v)     = data;
+    NV_DATA_P(v)     = data; 
 
   }
 
   return(v);
 }
 
-/* ----------------------------------------------------------------
- * Function to create a parallel N_Vector with user data component
+/* ---------------------------------------------------------------- 
+ * Function to create a parallel N_Vector with user data component 
  */
 
-N_Vector N_VMake_Parallel(MPI_Comm comm,
+N_Vector N_VMake_Parallel(MPI_Comm comm, 
                           sunindextype local_length,
                           sunindextype global_length,
                           realtype *v_data)
@@ -207,8 +207,8 @@ N_Vector N_VMake_Parallel(MPI_Comm comm,
   return(v);
 }
 
-/* ----------------------------------------------------------------
- * Function to create an array of new parallel vectors.
+/* ---------------------------------------------------------------- 
+ * Function to create an array of new parallel vectors. 
  */
 
 N_Vector *N_VCloneVectorArray_Parallel(int count, N_Vector w)
@@ -234,7 +234,7 @@ N_Vector *N_VCloneVectorArray_Parallel(int count, N_Vector w)
   return(vs);
 }
 
-/* ----------------------------------------------------------------
+/* ---------------------------------------------------------------- 
  * Function to create an array of new parallel vectors with empty
  * (NULL) data array.
  */
@@ -277,8 +277,8 @@ void N_VDestroyVectorArray_Parallel(N_Vector *vs, int count)
   return;
 }
 
-/* ----------------------------------------------------------------
- * Function to return global vector length
+/* ---------------------------------------------------------------- 
+ * Function to return global vector length 
  */
 
 sunindextype N_VGetLength_Parallel(N_Vector v)
@@ -286,8 +286,8 @@ sunindextype N_VGetLength_Parallel(N_Vector v)
   return NV_GLOBLENGTH_P(v);
 }
 
-/* ----------------------------------------------------------------
- * Function to return local vector length
+/* ---------------------------------------------------------------- 
+ * Function to return local vector length 
  */
 
 sunindextype N_VGetLocalLength_Parallel(N_Vector v)
@@ -295,7 +295,7 @@ sunindextype N_VGetLocalLength_Parallel(N_Vector v)
   return NV_LOCLENGTH_P(v);
 }
 
-/* ----------------------------------------------------------------
+/* ---------------------------------------------------------------- 
  * Function to print the local data in a parallel vector to stdout
  */
 
@@ -304,7 +304,7 @@ void N_VPrint_Parallel(N_Vector x)
   N_VPrintFile_Parallel(x, stdout);
 }
 
-/* ----------------------------------------------------------------
+/* ---------------------------------------------------------------- 
  * Function to print the local data in a parallel vector to outfile
  */
 
@@ -350,12 +350,12 @@ N_Vector N_VCloneEmpty_Parallel(N_Vector w)
   v = NULL;
   v = (N_Vector) malloc(sizeof *v);
   if (v == NULL) return(NULL);
-
+  
   /* Create vector operation structure */
   ops = NULL;
   ops = (N_Vector_Ops) malloc(sizeof(struct _generic_N_Vector_Ops));
   if (ops == NULL) { free(v); return(NULL); }
-
+  
   ops->nvgetvectorid     = w->ops->nvgetvectorid;
   ops->nvclone           = w->ops->nvclone;
   ops->nvcloneempty      = w->ops->nvcloneempty;
@@ -364,10 +364,10 @@ N_Vector N_VCloneEmpty_Parallel(N_Vector w)
   ops->nvgetarraypointer = w->ops->nvgetarraypointer;
   ops->nvsetarraypointer = w->ops->nvsetarraypointer;
   ops->nvlinearsum       = w->ops->nvlinearsum;
-  ops->nvconst           = w->ops->nvconst;
-  ops->nvprod            = w->ops->nvprod;
+  ops->nvconst           = w->ops->nvconst;  
+  ops->nvprod            = w->ops->nvprod;   
   ops->nvdiv             = w->ops->nvdiv;
-  ops->nvscale           = w->ops->nvscale;
+  ops->nvscale           = w->ops->nvscale; 
   ops->nvabs             = w->ops->nvabs;
   ops->nvinv             = w->ops->nvinv;
   ops->nvaddconst        = w->ops->nvaddconst;
@@ -378,12 +378,12 @@ N_Vector N_VCloneEmpty_Parallel(N_Vector w)
   ops->nvmin             = w->ops->nvmin;
   ops->nvwl2norm         = w->ops->nvwl2norm;
   ops->nvl1norm          = w->ops->nvl1norm;
-  ops->nvcompare         = w->ops->nvcompare;
+  ops->nvcompare         = w->ops->nvcompare;    
   ops->nvinvtest         = w->ops->nvinvtest;
   ops->nvconstrmask      = w->ops->nvconstrmask;
   ops->nvminquotient     = w->ops->nvminquotient;
 
-  /* Create content */
+  /* Create content */  
   content = NULL;
   content = (N_VectorContent_Parallel) malloc(sizeof(struct _N_VectorContent_Parallel));
   if (content == NULL) { free(ops); free(v); return(NULL); }
@@ -450,7 +450,7 @@ void N_VSpace_Parallel(N_Vector v, sunindextype *lrw, sunindextype *liw)
 
   comm = NV_COMM_P(v);
   MPI_Comm_size(comm, &npes);
-
+  
   *lrw = NV_GLOBLENGTH_P(v);
   *liw = 2*npes;
 
@@ -544,7 +544,7 @@ void N_VLinearSum_Parallel(realtype a, N_Vector x, realtype b, N_Vector y, N_Vec
      (1) a == other, b == 0.0 - user should have called N_VScale
      (2) a == 0.0, b == other - user should have called N_VScale
      (3) a,b == other, a !=b, a != -b */
-
+  
   N  = NV_LOCLENGTH_P(x);
   xd = NV_DATA_P(x);
   yd = NV_DATA_P(y);
@@ -678,7 +678,7 @@ void N_VAddConst_Parallel(N_Vector x, realtype b, N_Vector z)
   N  = NV_LOCLENGTH_P(x);
   xd = NV_DATA_P(x);
   zd = NV_DATA_P(z);
-
+  
   for (i = 0; i < N; i++) zd[i] = xd[i]+b;
 
   return;
@@ -722,7 +722,7 @@ realtype N_VMaxNorm_Parallel(N_Vector x)
   for (i = 0; i < N; i++) {
     if (SUNRabs(xd[i]) > max) max = SUNRabs(xd[i]);
   }
-
+   
   gmax = VAllReduce_Parallel(max, 2, comm);
 
   return(gmax);
@@ -848,7 +848,7 @@ realtype N_VL1Norm_Parallel(N_Vector x)
   xd = NV_DATA_P(x);
   comm = NV_COMM_P(x);
 
-  for (i = 0; i<N; i++)
+  for (i = 0; i<N; i++) 
     sum += SUNRabs(xd[i]);
 
   gsum = VAllReduce_Parallel(sum, 1, comm);
@@ -889,7 +889,7 @@ booleantype N_VInvTest_Parallel(N_Vector x, N_Vector z)
 
   val = ONE;
   for (i = 0; i < N; i++) {
-    if (xd[i] == ZERO)
+    if (xd[i] == ZERO) 
       val = ZERO;
     else
       zd[i] = ONE/xd[i];
@@ -977,12 +977,12 @@ realtype N_VMinQuotient_Parallel(N_Vector num, N_Vector denom)
 
 static realtype VAllReduce_Parallel(realtype d, int op, MPI_Comm comm)
 {
-  /*
+  /* 
    * This function does a global reduction.  The operation is
    *   sum if op = 1,
    *   max if op = 2,
    *   min if op = 3.
-   * The operation is over all processors in the communicator
+   * The operation is over all processors in the communicator 
    */
 
   realtype out;
@@ -1015,7 +1015,7 @@ static void VCopy_Parallel(N_Vector x, N_Vector z)
   zd = NV_DATA_P(z);
 
   for (i = 0; i < N; i++)
-    zd[i] = xd[i];
+    zd[i] = xd[i]; 
 
   return;
 }
@@ -1161,13 +1161,13 @@ static void Vaxpy_Parallel(realtype a, N_Vector x, N_Vector y)
       yd[i] += xd[i];
     return;
   }
-
+  
   if (a == -ONE) {
     for (i = 0; i < N; i++)
       yd[i] -= xd[i];
     return;
-  }
-
+  }    
+  
   for (i = 0; i < N; i++)
     yd[i] += a*xd[i];
 

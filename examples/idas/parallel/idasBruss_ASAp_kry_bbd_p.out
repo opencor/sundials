@@ -20,7 +20,7 @@ Preconditioner: band-block-diagonal (IDABBDPRE), with parameters
 
 -----------------------------------------------------------
 
-Final statistics:
+Final statistics: 
 
 Number of steps                    = 154
 Number of residual evaluations     = 392
@@ -38,7 +38,7 @@ Number of local residual evals.    = 1462
 		 BACKWARD problem
 -----------------------------------------------------------
 
-Final statistics:
+Final statistics: 
 
 Number of steps                    = 99
 Number of residual evaluations     = 268

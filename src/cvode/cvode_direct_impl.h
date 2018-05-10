@@ -1,16 +1,16 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel R. Reynolds @ SMU
  *                Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -42,7 +42,7 @@ extern "C" {
 #define CVD_DGMAX RCONST(0.2)
 
 /*-----------------------------------------------------------------
-  Types : CVDlsMemRec, CVDlsMem
+  Types : CVDlsMemRec, CVDlsMem                             
   -----------------------------------------------------------------
   CVDlsMem is pointer to a CVDlsMemRec structure.
   -----------------------------------------------------------------*/
@@ -59,7 +59,7 @@ typedef struct CVDlsMemRec {
   SUNLinearSolver LS;   /* generic direct linear solver object           */
 
   N_Vector x;           /* solution vector used by SUNLinearSolver       */
-
+  
   long int nstlj;       /* nstlj = nst at last Jacobian eval.            */
 
   long int nje;         /* nje = no. of calls to jac                     */
@@ -77,20 +77,20 @@ typedef struct CVDlsMemRec {
 /* difference-quotient Jacobian approximation routines */
 int cvDlsDQJac(realtype t, N_Vector y, N_Vector fy, SUNMatrix Jac,
                void *data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-
-int cvDlsDenseDQJac(realtype t, N_Vector y, N_Vector fy,
+  
+int cvDlsDenseDQJac(realtype t, N_Vector y, N_Vector fy, 
                     SUNMatrix Jac, CVodeMem cv_mem, N_Vector tmp1);
-
-int cvDlsBandDQJac(realtype t, N_Vector y, N_Vector fy,
-                   SUNMatrix Jac, CVodeMem cv_mem, N_Vector tmp1,
+  
+int cvDlsBandDQJac(realtype t, N_Vector y, N_Vector fy, 
+                   SUNMatrix Jac, CVodeMem cv_mem, N_Vector tmp1, 
                    N_Vector tmp2);
-
+  
 /* generic linit/lsetup/lsolve/lfree interface routines for CVode to call */
 int cvDlsInitialize(CVodeMem cv_mem);
 
 int cvDlsSetup(CVodeMem cv_mem, int convfail, N_Vector ypred,
                N_Vector fpred, booleantype *jcurPtr,
-               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3); 
 
 int cvDlsSolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                N_Vector ycur, N_Vector fcur);

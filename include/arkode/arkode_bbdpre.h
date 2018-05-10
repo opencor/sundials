@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -17,7 +17,7 @@
  *---------------------------------------------------------------
  * This is the header file for the ARKBBDPRE module, for a
  * band-block-diagonal preconditioner, i.e. a block-diagonal
- * matrix with banded blocks, for use with the ARKSPILS
+ * matrix with banded blocks, for use with the ARKSPILS 
  * interface, and the MPI-parallel NVECTOR module.
  *
  * Summary:
@@ -73,7 +73,7 @@
  *   ...
  *   SUNLinSolFree(LS);
  *   ...
- *
+ * 
  * The user-supplied routines required are:
  *
  *   fi   = function defining the implicit ODE right-hand side fi(t,y).
@@ -128,11 +128,11 @@ extern "C" {
  Type: ARKLocalFn
 
  The user must supply a function g(t,y) which approximates the
- implicit right-hand side function fi for the system
-    My'=fe(t,y)+fi(t,y),
- and which is computed locally (without interprocess
- communication).  (The case where g is mathematically identical
- to fi is allowed.)  The implementation of this function must
+ implicit right-hand side function fi for the system 
+    My'=fe(t,y)+fi(t,y), 
+ and which is computed locally (without interprocess 
+ communication).  (The case where g is mathematically identical 
+ to fi is allowed.)  The implementation of this function must 
  have type ARKLocalFn.
 
  This function takes as input the local vector size Nlocal, the
@@ -142,14 +142,14 @@ extern "C" {
  store this in the vector g.
  (Allocation of memory for y and g is handled within the
  preconditioner module.)
- The user_data parameter is the same as that specified by the
+ The user_data parameter is the same as that specified by the 
  user through the ARKodeSetUserData routine.
 
- An ARKLocalFn should return 0 if successful, a positive value
- if a recoverable error occurred, and a negative value if an
+ An ARKLocalFn should return 0 if successful, a positive value 
+ if a recoverable error occurred, and a negative value if an 
  unrecoverable error occurred.
 ---------------------------------------------------------------*/
-typedef int (*ARKLocalFn)(sunindextype Nlocal, realtype t,
+typedef int (*ARKLocalFn)(sunindextype Nlocal, realtype t, 
                           N_Vector y, N_Vector g, void *user_data);
 
 
@@ -162,24 +162,24 @@ typedef int (*ARKLocalFn)(sunindextype Nlocal, realtype t,
 
  This function takes as input the local vector size Nlocal,
  the independent variable value t, the dependent variable
- vector y, and a pointer to the user-defined data block
- user_data. The user_data parameter is the same as that
- specified by the user through the ARKodeSetUserData routine.
- The ARKCommFn cfn is expected to save communicated data in
- space defined within the structure user_data.
+ vector y, and a pointer to the user-defined data block 
+ user_data. The user_data parameter is the same as that 
+ specified by the user through the ARKodeSetUserData routine. 
+ The ARKCommFn cfn is expected to save communicated data in 
+ space defined within the structure user_data. 
  Note: An ARKCommFn cfn does not have a return value.
 
  Each call to the ARKCommFn cfn is preceded by a call to the
- ARKRhsFn fi with the same (t,y) arguments. Thus cfn can omit
- any communications done by fi if relevant to the evaluation of
- g.  If all necessary communication was done by fi, the user
+ ARKRhsFn fi with the same (t,y) arguments. Thus cfn can omit 
+ any communications done by fi if relevant to the evaluation of 
+ g.  If all necessary communication was done by fi, the user 
  can pass NULL for cfn in ARKBBDPrecInit (see below).
 
- An ARKCommFn should return 0 if successful, a positive value
- if a recoverable error occurred, and a negative value if an
+ An ARKCommFn should return 0 if successful, a positive value 
+ if a recoverable error occurred, and a negative value if an 
  unrecoverable error occurred.
 ---------------------------------------------------------------*/
-typedef int (*ARKCommFn)(sunindextype Nlocal, realtype t,
+typedef int (*ARKCommFn)(sunindextype Nlocal, realtype t, 
 			 N_Vector y, void *user_data);
 
 
@@ -223,12 +223,12 @@ typedef int (*ARKCommFn)(sunindextype Nlocal, realtype t,
    ARKSPILS_ILL_INPUT if an input has an illegal value
    ARKSPILS_MEM_FAIL if a memory allocation request failed
 ---------------------------------------------------------------*/
-SUNDIALS_EXPORT int ARKBBDPrecInit(void *arkode_mem,
-                                   sunindextype Nlocal,
-				   sunindextype mudq,
-                                   sunindextype mldq,
-				   sunindextype mukeep,
-                                   sunindextype mlkeep,
+SUNDIALS_EXPORT int ARKBBDPrecInit(void *arkode_mem, 
+                                   sunindextype Nlocal, 
+				   sunindextype mudq, 
+                                   sunindextype mldq, 
+				   sunindextype mukeep, 
+                                   sunindextype mlkeep, 
 				   realtype dqrely,
 				   ARKLocalFn gloc,
                                    ARKCommFn cfn);
@@ -238,10 +238,10 @@ SUNDIALS_EXPORT int ARKBBDPrecInit(void *arkode_mem,
  ARKBBDPrecReInit:
 
  ARKBBDPrecReInit re-initializes the BBDPRE module when solving a
- sequence of problems of the same size with ARKSPILS/ARKBBDPRE
- provided there is no change in Nlocal, mukeep, or mlkeep. After
- solving one problem, and after calling ARKodeReInit to
- re-initialize the integrator for a subsequent problem, call
+ sequence of problems of the same size with ARKSPILS/ARKBBDPRE 
+ provided there is no change in Nlocal, mukeep, or mlkeep. After 
+ solving one problem, and after calling ARKodeReInit to 
+ re-initialize the integrator for a subsequent problem, call 
  ARKBBDPrecReInit.
 
  All arguments have the same names and meanings as those
@@ -253,16 +253,16 @@ SUNDIALS_EXPORT int ARKBBDPrecInit(void *arkode_mem,
    ARKSPILS_LMEM_NULL if the linear solver memory is NULL
    ARKSPILS_PMEM_NULL if the preconditioner memory is NULL
 ---------------------------------------------------------------*/
-SUNDIALS_EXPORT int ARKBBDPrecReInit(void *arkode_mem,
-                                     sunindextype mudq,
-				     sunindextype mldq,
+SUNDIALS_EXPORT int ARKBBDPrecReInit(void *arkode_mem, 
+                                     sunindextype mudq, 
+				     sunindextype mldq, 
                                      realtype dqrely);
 
 
 /*---------------------------------------------------------------
  BBDPRE optional output extraction routines:
 
- ARKBBDPrecGetWorkSpace returns the BBDPRE real and integer work
+ ARKBBDPrecGetWorkSpace returns the BBDPRE real and integer work 
                        space sizes.
  ARKBBDPrecGetNumGfnEvals returns the number of calls to gfn.
 
@@ -273,10 +273,10 @@ SUNDIALS_EXPORT int ARKBBDPrecReInit(void *arkode_mem,
    ARKSPILS_PMEM_NULL if the preconditioner memory is NULL
 ---------------------------------------------------------------*/
 
-SUNDIALS_EXPORT int ARKBBDPrecGetWorkSpace(void *arkode_mem,
-					   long int *lenrwLS,
+SUNDIALS_EXPORT int ARKBBDPrecGetWorkSpace(void *arkode_mem, 
+					   long int *lenrwLS, 
 					   long int *leniwLS);
-SUNDIALS_EXPORT int ARKBBDPrecGetNumGfnEvals(void *arkode_mem,
+SUNDIALS_EXPORT int ARKBBDPrecGetNumGfnEvals(void *arkode_mem, 
 					     long int *ngevalsBBDP);
 
 #ifdef __cplusplus

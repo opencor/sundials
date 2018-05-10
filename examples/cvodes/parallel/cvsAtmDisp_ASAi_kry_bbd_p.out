@@ -5,12 +5,12 @@ Computes gradient of G = int_t_Omega ( c_i^2 ) dt dOmega
 with respect to the source values at each grid point.
 
 Domain:
-   0.000000 < x < 20.000000   mx = 80  npe_x = 2
-   0.000000 < y < 20.000000   my = 80  npe_y = 4
+   0.000000 < x < 20.000000   mx = 80  npe_x = 2 
+   0.000000 < y < 20.000000   my = 80  npe_y = 4 
 
 Begin forward integration... done.   G = 4.791513e+03
 
-Final Statistics..
+Final Statistics.. 
 
 lenrw   =  65786     leniw =    372
 llrw    =  78782     lliw  =    202
@@ -23,7 +23,7 @@ ncfn    =      0     ncfl  =      0
 
 Begin backward integration... done.
 
-Final Statistics..
+Final Statistics.. 
 
 lenrw   = 131316     leniw =    372
 llrw    =  78782     lliw  =    202

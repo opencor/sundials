@@ -4,8 +4,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -58,7 +58,7 @@ int KINDlsSetLinearSolver(void *kinmem, SUNLinearSolver LS,
     return(KINDLS_MEM_NULL);
   }
   if ( (LS == NULL) || (A == NULL) ) {
-    KINProcessError(NULL, KINDLS_ILL_INPUT, "KINDLS",
+    KINProcessError(NULL, KINDLS_ILL_INPUT, "KINDLS", 
                     "KINDlsSetLinearSolver",
                     "Both LS and A must be non-NULL");
     return(KINDLS_ILL_INPUT);
@@ -67,14 +67,14 @@ int KINDlsSetLinearSolver(void *kinmem, SUNLinearSolver LS,
 
   /* Test if solver and vector are compatible with DLS */
   if (SUNLinSolGetType(LS) != SUNLINEARSOLVER_DIRECT) {
-    KINProcessError(kin_mem, KINDLS_ILL_INPUT, "KINDLS",
-                    "KINDlsSetLinearSolver",
+    KINProcessError(kin_mem, KINDLS_ILL_INPUT, "KINDLS", 
+                    "KINDlsSetLinearSolver", 
                     "Non-direct LS supplied to KINDls interface");
     return(KINDLS_ILL_INPUT);
   }
   if (kin_mem->kin_vtemp1->ops->nvgetarraypointer == NULL ||
       kin_mem->kin_vtemp1->ops->nvsetarraypointer == NULL) {
-    KINProcessError(kin_mem, KINDLS_ILL_INPUT, "KINDLS",
+    KINProcessError(kin_mem, KINDLS_ILL_INPUT, "KINDLS", 
                     "KINDlsSetLinearSolver", MSGD_BAD_NVECTOR);
     return(KINDLS_ILL_INPUT);
   }
@@ -173,7 +173,7 @@ int KINDlsGetWorkSpace(void *kinmem, long int *lenrwLS,
 
   /* Return immediately if kinmem or kin_mem->kin_lmem are NULL */
   if (kinmem == NULL) {
-    KINProcessError(NULL, KINDLS_MEM_NULL, "KINDLS",
+    KINProcessError(NULL, KINDLS_MEM_NULL, "KINDLS", 
                     "KINDlsGetWorkSpace", MSGD_KINMEM_NULL);
     return(KINDLS_MEM_NULL);
   }
@@ -325,16 +325,16 @@ char *KINDlsGetReturnFlagName(long int flag)
 
 
 /*==================================================================
-  KINDLS Private function
+  KINDLS Private function 
   ==================================================================*/
 
 /*------------------------------------------------------------------
-  kinDlsDenseDQJac
+  kinDlsDenseDQJac 
 
   This routine is a wrapper for the Dense and Band implementations
-  of the difference quotient Jacobian approximation routines.
+  of the difference quotient Jacobian approximation routines. 
   ------------------------------------------------------------------*/
-int kinDlsDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac,
+int kinDlsDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac, 
                 void *kinmem, N_Vector tmp1, N_Vector tmp2)
 {
   int retval;
@@ -343,7 +343,7 @@ int kinDlsDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac,
 
   /* verify that Jac is non-NULL */
   if (Jac == NULL) {
-    KINProcessError(kin_mem, KINDLS_LMEM_NULL, "KINDLS",
+    KINProcessError(kin_mem, KINDLS_LMEM_NULL, "KINDLS", 
 		    "kinDlsDQJac", MSGD_LMEM_NULL);
     return(KINDLS_LMEM_NULL);
   }
@@ -372,25 +372,25 @@ int kinDlsDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac,
 
   This routine generates a dense difference quotient approximation
   to the Jacobian of F(u). It assumes a dense SUNMatrix input
-  stored column-wise, and that elements within each column are
+  stored column-wise, and that elements within each column are 
   contiguous. The address of the jth column of J is obtained via
   the function SUNDenseMatrix_Column() and this pointer is
   associated with an N_Vector using the N_VGetArrayPointer and
   N_VSetArrayPointer functions. Finally, the actual computation of
   the jth column of the Jacobian is done with a call to N_VLinearSum.
-
+ 
   The increment used in the finite-difference approximation
     J_ij = ( F_i(u+sigma_j * e_j) - F_i(u)  ) / sigma_j
   is
    sigma_j = max{|u_j|, |1/uscale_j|} * sqrt(uround)
-
+ 
   Note: uscale_j = 1/typ(u_j)
-
+ 
   NOTE: Any type of failure of the system function here leads to an
-        unrecoverable failure of the Jacobian function and thus of
+        unrecoverable failure of the Jacobian function and thus of 
         the linear solver setup function, stopping KINSOL.
   ------------------------------------------------------------------*/
-int kinDlsDenseDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac,
+int kinDlsDenseDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac, 
                      KINMem kin_mem, N_Vector tmp1, N_Vector tmp2)
 {
   realtype inc, inc_inv, ujsaved, ujscale, sign;
@@ -410,7 +410,7 @@ int kinDlsDenseDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac,
   tmp2_data = N_VGetArrayPointer(tmp2);
 
   /* Rename work vectors for readibility */
-  ftemp  = tmp1;
+  ftemp  = tmp1; 
   jthCol = tmp2;
 
   /* Obtain pointers to the data for u and uscale */
@@ -463,7 +463,7 @@ int kinDlsDenseDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac,
   This makes it possible to get the address of a column of J via the
   function SUNBandMatrix_Column() and to write a simple for loop to
   set each of the elements of a column in succession.
-
+ 
   NOTE: Any type of failure of the system function her leads to an
         unrecoverable failure of the Jacobian function and thus of
         the linear solver setup function, stopping KINSOL.
@@ -504,9 +504,9 @@ int kinDlsBandDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac,
   /* Set bandwidth and number of column groups for band differencing */
   width   = mlower + mupper + 1;
   ngroups = SUNMIN(width, N);
-
+  
   for (group=1; group <= ngroups; group++) {
-
+    
     /* Increment all utemp components in group */
     for(j=group-1; j < N; j+=width) {
       inc = kin_mem->kin_sqrt_relfunc*SUNMAX(SUNRabs(u_data[j]),
@@ -516,7 +516,7 @@ int kinDlsBandDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac,
 
     /* Evaluate f with incremented u */
     retval = kin_mem->kin_func(utemp, futemp, kin_mem->kin_user_data);
-    if (retval != 0) return(retval);
+    if (retval != 0) return(retval); 
 
     /* Restore utemp components, then form and load difference quotients */
     for (j=group-1; j < N; j+=width) {
@@ -531,7 +531,7 @@ int kinDlsBandDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac,
         SM_COLUMN_ELEMENT_B(col_j,i,j) = inc_inv * (futemp_data[i] - fu_data[i]);
     }
   }
-
+  
   /* Increment counter nfeDQ */
   kindls_mem->nfeDQ += ngroups;
 
@@ -540,7 +540,7 @@ int kinDlsBandDQJac(N_Vector u, N_Vector fu, SUNMatrix Jac,
 
 
 /*------------------------------------------------------------------
-  kinDlsInitialize performs remaining initializations specific to
+  kinDlsInitialize performs remaining initializations specific to 
   the direct linear solver interface (and solver itself)
   ------------------------------------------------------------------*/
 int kinDlsInitialize(KINMem kin_mem)
@@ -549,20 +549,20 @@ int kinDlsInitialize(KINMem kin_mem)
 
   /* Return immediately if kin_mem or kin_mem->kin_lmem are NULL */
   if (kin_mem == NULL) {
-    KINProcessError(NULL, KINDLS_MEM_NULL, "KINDLS",
+    KINProcessError(NULL, KINDLS_MEM_NULL, "KINDLS", 
                     "kinDlsInitialize", MSGD_KINMEM_NULL);
     return(KINDLS_MEM_NULL);
   }
   if (kin_mem->kin_lmem == NULL) {
-    KINProcessError(kin_mem, KINDLS_LMEM_NULL, "KINDLS",
+    KINProcessError(kin_mem, KINDLS_LMEM_NULL, "KINDLS", 
                     "kinDlsInitialize", MSGD_LMEM_NULL);
     return(KINDLS_LMEM_NULL);
   }
   kindls_mem = (KINDlsMem) kin_mem->kin_lmem;
-
+  
   kinDlsInitializeCounters(kindls_mem);
 
-  /* Set Jacobian function and data, depending on jacDQ (in case
+  /* Set Jacobian function and data, depending on jacDQ (in case 
      it has changed based on user input) */
   if (kindls_mem->jacDQ) {
     kindls_mem->jac    = kinDlsDQJac;
@@ -585,8 +585,8 @@ int kinDlsInitialize(KINMem kin_mem)
 
 /*------------------------------------------------------------------
   kinDlsSetup does the setup operations for the KINDLS linear solver
-  interface. It calls the Jacobian evaluation routine, updates
-  counters, and calls the LS 'setup' routine to prepare for
+  interface. It calls the Jacobian evaluation routine, updates 
+  counters, and calls the LS 'setup' routine to prepare for 
   subsequent calls to the LS 'solve' routine.
 
   The return value is either
@@ -601,12 +601,12 @@ int kinDlsSetup(KINMem kin_mem)
 
   /* Return immediately if kin_mem or kin_mem->kin_lmem are NULL */
   if (kin_mem == NULL) {
-    KINProcessError(NULL, KINDLS_MEM_NULL, "KINDLS",
+    KINProcessError(NULL, KINDLS_MEM_NULL, "KINDLS", 
                     "kinDlsSetup", MSGD_KINMEM_NULL);
     return(KINDLS_MEM_NULL);
   }
   if (kin_mem->kin_lmem == NULL) {
-    KINProcessError(kin_mem, KINDLS_LMEM_NULL, "KINDLS",
+    KINProcessError(kin_mem, KINDLS_LMEM_NULL, "KINDLS", 
                     "kinDlsSetup", MSGD_LMEM_NULL);
     return(KINDLS_LMEM_NULL);
   }
@@ -641,7 +641,7 @@ int kinDlsSetup(KINMem kin_mem)
 
 
 /*------------------------------------------------------------------
-  kinDlsSolve interfaces between KINSOL and the generic
+  kinDlsSolve interfaces between KINSOL and the generic 
   SUNLinearSolver object LS, by calling the LS 'solve' routine
 
   The return value is KINLS_SUCCESS = 0 if successful. The argument
@@ -655,12 +655,12 @@ int kinDlsSolve(KINMem kin_mem, N_Vector x, N_Vector b,
 
   /* Return immediately if kin_mem or kin_mem->kin_lmem are NULL */
   if (kin_mem == NULL) {
-    KINProcessError(NULL, KINDLS_MEM_NULL, "KINDLS",
+    KINProcessError(NULL, KINDLS_MEM_NULL, "KINDLS", 
 		    "kinDlsSolve", MSGD_KINMEM_NULL);
     return(KINDLS_MEM_NULL);
   }
   if (kin_mem->kin_lmem == NULL) {
-    KINProcessError(kin_mem, KINDLS_LMEM_NULL, "KINDLS",
+    KINProcessError(kin_mem, KINDLS_LMEM_NULL, "KINDLS", 
 		    "kinDlsSolve", MSGD_LMEM_NULL);
     return(KINDLS_LMEM_NULL);
   }
@@ -673,14 +673,14 @@ int kinDlsSolve(KINMem kin_mem, N_Vector x, N_Vector b,
     Compute the term sFdotJp for use in the linesearch routine.
     This term is subsequently corrected if the step is reduced by
     constraints or the linesearch.
-
+    
     sFdotJp is the dot product of the scaled f vector and the scaled
     vector J*p, where the scaling uses fscale.
   */
   N_VProd(b, kin_mem->kin_fscale, b);
   N_VProd(b, kin_mem->kin_fscale, b);
   *sFdotJp = N_VDotProd(kin_mem->kin_fval, b);
-
+  
   /* store solver return value and return */
   kindls_mem->last_flag = retval;
   return(retval);
@@ -706,7 +706,7 @@ int kinDlsFree(KINMem kin_mem)
   /* free KINDls interface structure */
   free(kin_mem->kin_lmem);
   kindls_mem = NULL;
-
+  
   return(KINDLS_SUCCESS);
 }
 
@@ -718,6 +718,6 @@ int kinDlsInitializeCounters(KINDlsMem kindls_mem)
 {
   kindls_mem->nje   = 0;
   kindls_mem->nfeDQ = 0;
-
+  
   return(0);
 }

@@ -1,16 +1,16 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel R. Reynolds @ SMU
  *                Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -54,11 +54,11 @@ typedef struct CVSpilsMemRec {
   long int ncfl;      /* ncfl = total number of convergence failures  */
   long int njtsetup;  /* njtsetup = total number of calls to jtsetup  */
   long int njtimes;   /* njtimes = total number of calls to jtimes    */
-  long int nfes;      /* nfeSG = total number of calls to f for
+  long int nfes;      /* nfeSG = total number of calls to f for     
                          difference quotient Jacobian-vector products */
 
   SUNLinearSolver LS; /* generic iterative linear solver object       */
-
+  
   N_Vector ytemp;     /* temp vector passed to jtimes and psolve      */
   N_Vector x;         /* temp vector used by CVSpilsSolve             */
   N_Vector ycur;      /* CVODE current y vector in Newton Iteration   */
@@ -111,7 +111,7 @@ int CVSpilsDQJtimes(N_Vector v, N_Vector Jv, realtype t,
 int cvSpilsInitialize(CVodeMem cv_mem);
 int cvSpilsSetup(CVodeMem cv_mem, int convfail, N_Vector ypred,
                  N_Vector fpred, booleantype *jcurPtr,
-                 N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+                 N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3); 
 int cvSpilsSolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                  N_Vector ycur, N_Vector fcur);
 int cvSpilsFree(CVodeMem cv_mem);

@@ -179,18 +179,18 @@
                   0 if successful,
                  >0 if a recoverable error occurred,
                  <0 if an unrecoverable error ocurred.
-
- (3) Optional user-supplied Jacobian-vector setup and product
+ 
+ (3) Optional user-supplied Jacobian-vector setup and product 
      functions: FARKJTSETUP and FARKJTIMES
 
      As an option, the user may supply a routine that computes
      the product of the system Jacobian  J = dfi(t,y)/dy and a
      given vector v.  If supplied, a 'setup' routine to prepare
      any user data structures must exist, and have the form:
-
+ 
        SUBROUTINE FARKJTSETUP(T, Y, FY, H, IPAR, RPAR, IER)
 
-     Typically this routine will use only T and Y.  It must perform any
+     Typically this routine will use only T and Y.  It must perform any 
      relevant preparations for subsequent calls to the user-provided
      FARKJTIMES routine (see below).
 
@@ -240,15 +240,15 @@
 
         CALL FNVINITP(COMM, 4, NLOCAL, NGLOBAL, IER)
 
-     where the second argument is an int containing the ARKODE
+     where the second argument is an int containing the ARKODE 
      solver ID (4). The other arguments are:
         COMM = the MPI communicator [int, input]
-        NLOCAL = local vector size on this processor
+        NLOCAL = local vector size on this processor 
            [long int, input]
-        NGLOBAL = system size, and the global size of vectors
+        NGLOBAL = system size, and the global size of vectors 
            (the sum of all values of NLOCAL) [long int, input]
-        IER = return completion flag [int, ouptut].
-                  0 = success,
+        IER = return completion flag [int, ouptut]. 
+                  0 = success, 
                  -1 = failure.
 
  (4.2) To initialize a generic iterative linear solver structure for
@@ -294,9 +294,9 @@
 		      error weight vector.
         RTOL = scalar relative tolerance [realtype, input]
 	ATOL = scalar/array absolute tolerance [realtype, input]
-	IOUT = array of length at least 29 for integer optional
+	IOUT = array of length at least 29 for integer optional 
                outputs [long int, output]
-	ROUT = array of length at least 6 for real optional
+	ROUT = array of length at least 6 for real optional 
                outputs [realtype, output]
 	IPAR = array of user integer data [long int, in/out]
 	RPAR = array with user real data [realtype, in/out]
@@ -311,14 +311,14 @@
      with COMMON blocks to pass data betwen user-provided
      routines.
 
- (4.4) Create the ARKSPILS interface to attach the generic
+ (4.4) Create the ARKSPILS interface to attach the generic 
      iterative linear solver to ARKode, by making the following call:
-
+    
        CALL FARKSPILSINIT(IER)
 
      The arguments are:
-	IER = error return flag [int, output]:
-	       0 = success;
+	IER = error return flag [int, output]: 
+	       0 = success; 
 	      <0 = an error occured
 
  (4.5) To allocate memory and initialize data associated with the
@@ -327,16 +327,16 @@
        CALL FARKBBDINIT(NLOCAL, MUDQ, MLDQ, MU, ML, DQRELY, IER)
 
       The arguments are:
-        NLOCAL = local vector size on this process
+        NLOCAL = local vector size on this process 
              [long int, input]
         MUDQ = upper half-bandwidth to be used in the computation
-             of the local Jacobian blocks by difference
-             quotients.  These may be smaller than the true
-             half-bandwidths of the Jacobian of the local block
-             of g, when smaller values may provide greater
+             of the local Jacobian blocks by difference 
+             quotients.  These may be smaller than the true 
+             half-bandwidths of the Jacobian of the local block 
+             of g, when smaller values may provide greater 
              efficiency [long int, input]
         MLDQ = lower half-bandwidth to be used in the computation
-             of the local Jacobian blocks by difference
+             of the local Jacobian blocks by difference 
              quotients [long int, input]
         MU = upper half-bandwidth of the band matrix that is
              retained as an approximation of the local Jacobian
@@ -344,7 +344,7 @@
         ML = lower half-bandwidth of the band matrix that is
              retained as an approximation of the local Jacobian
              block (may be smaller than MLDQ) [long int, input]
-        DQRELY = relative increment factor in y for difference
+        DQRELY = relative increment factor in y for difference 
              quotients [realtype, input]
                     0.0 = default (sqrt(unit roundoff))
         IER = return completion flag [int, output]:
@@ -352,16 +352,16 @@
                    <0 = an error occurred
 
  (4.6) To specify whether the Krylov linear solver should use the
-     supplied FARKJTSETUP and FARKJTIMES routines, or the internal
+     supplied FARKJTSETUP and FARKJTIMES routines, or the internal 
      finite difference approximation, make the call
 
         CALL FARKSPILSSETJAC(FLAG, IER)
 
-     with the int FLAG=1 to specify that FARKJTSETUP and FARKJTIMES
-     are provided (FLAG=0 specifies to use and internal finite
-     difference approximation to this product).  The int return
+     with the int FLAG=1 to specify that FARKJTSETUP and FARKJTIMES 
+     are provided (FLAG=0 specifies to use and internal finite 
+     difference approximation to this product).  The int return 
      flag IER=0 if successful, and nonzero otherwise.
-
+ 
  (5) Re-initialization: FARKREINIT, FARKBBDREINIT
 
      If a sequence of problems of the same size is being solved
@@ -380,29 +380,29 @@
      FARKMALLOC call.  The subsequent call to specify the linear
      system solution method may or may not be needed.
 
-     If there is no change in any of the linear solver or
-     preconditioner arguments, then no additional calls are
-     necessary.
+     If there is no change in any of the linear solver or 
+     preconditioner arguments, then no additional calls are 
+     necessary.  
 
-     Following the call to FARKREINIT, if there is no change in
-     any of the linear solver arguments, but the user wishes to
-     modify the values of MUDQ, MLDQ or DQRELY from the previous
+     Following the call to FARKREINIT, if there is no change in 
+     any of the linear solver arguments, but the user wishes to 
+     modify the values of MUDQ, MLDQ or DQRELY from the previous 
      call to FARKBBDINIT, then a user may call:
 
        CALL FARKBBDREINIT(MUDQ, MLDQ, DQRELY, IER)
 
-     The arguments have the same names and meanings as those of
+     The arguments have the same names and meanings as those of 
      FARKBBDINIT.
 
-     However, if there is a change in any of the linear solver
+     However, if there is a change in any of the linear solver 
      arguments or other preconditioner arguments, then a call to
-     FSUNPCGINIT, FSUNSPBCGSINIT, FSUNSPFGMRINIT, FSUNSPGMRINIT,
-     or FSUNSPTFQMRINIT is required; in this case the linear
-     solver memory is reallocated.  Following this call, the
+     FSUNPCGINIT, FSUNSPBCGSINIT, FSUNSPFGMRINIT, FSUNSPGMRINIT, 
+     or FSUNSPTFQMRINIT is required; in this case the linear 
+     solver memory is reallocated.  Following this call, the 
      ARKSPILS interface must also be reconstructed using another
-     call to FARKSPILSINIT (interface memory is freed and
+     call to FARKSPILSINIT (interface memory is freed and 
      reallocated), as well as a subsequent call to FARKBBDINIT.
-
+ 
  (6) The integrator: FARKODE
 
      Carrying out the integration is accomplished by making calls
@@ -479,7 +479,7 @@
        IER = return flag [int, output]:
                     0 = success
                    <0 = illegal argument.
-
+ 
  (9) Memory freeing: FARKFREE
 
      To free the internal memory created by the calls to
@@ -532,7 +532,7 @@ void FARK_BBDOPT(long int *lenrwbbd, long int *leniwbbd,
 /* Prototypes: Functions Called by the ARKBBDPRE Module */
 int FARKgloc(long int Nloc, realtype t, N_Vector yloc,
 	     N_Vector gloc, void *user_data);
-int FARKcfn(long int Nloc, realtype t, N_Vector y,
+int FARKcfn(long int Nloc, realtype t, N_Vector y, 
 	    void *user_data);
 
 #ifdef __cplusplus

@@ -5,7 +5,7 @@
  * Example problem:
  *
  * The following is a simple example problem, with the coding
- * needed for its solution by CVODES for Forward Sensitivity
+ * needed for its solution by CVODES for Forward Sensitivity 
  * Analysis. The problem is from chemical kinetics, and consists
  * of the following three rate equations:
  *    dy1/dt = -p1*y1 + p2*y2*y3
@@ -100,7 +100,7 @@ static int ewt(N_Vector y, N_Vector w, void *user_data);
 /* Prototypes of private functions */
 
 static void ProcessArgs(int argc, char *argv[],
-                        booleantype *sensi, int *sensi_meth,
+                        booleantype *sensi, int *sensi_meth, 
                         booleantype *err_con);
 static void WrongArgs(char *name);
 static void PrintOutput(void *cvode_mem, realtype t, N_Vector u);
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
   int iout, flag;
 
   realtype pbar[NS];
-  int is;
+  int is; 
   N_Vector *yS;
   booleantype sensi, err_con;
   int sensi_meth;
@@ -209,29 +209,29 @@ int main(int argc, char *argv[])
     flag = CVodeSensInit1(cvode_mem, NS, sensi_meth, fS, yS);
     if(check_flag(&flag, "CVodeSensInit", 1)) return(1);
 
-    /* Call CVodeSensEEtolerances to estimate tolerances for sensitivity
-       variables based on the rolerances supplied for states variables and
+    /* Call CVodeSensEEtolerances to estimate tolerances for sensitivity 
+       variables based on the rolerances supplied for states variables and 
        the scaling factor pbar */
     flag = CVodeSensEEtolerances(cvode_mem);
     if(check_flag(&flag, "CVodeSensEEtolerances", 1)) return(1);
 
     /* Set sensitivity analysis optional inputs */
-    /* Call CVodeSetSensErrCon to specify the error control strategy for
+    /* Call CVodeSetSensErrCon to specify the error control strategy for 
        sensitivity variables */
     flag = CVodeSetSensErrCon(cvode_mem, err_con);
     if (check_flag(&flag, "CVodeSetSensErrCon", 1)) return(1);
 
-    /* Call CVodeSetSensParams to specify problem parameter information for
+    /* Call CVodeSetSensParams to specify problem parameter information for 
        sensitivity calculations */
     flag = CVodeSetSensParams(cvode_mem, NULL, pbar, NULL);
     if (check_flag(&flag, "CVodeSetSensParams", 1)) return(1);
 
     printf("Sensitivity: YES ");
-    if(sensi_meth == CV_SIMULTANEOUS)
+    if(sensi_meth == CV_SIMULTANEOUS)   
       printf("( SIMULTANEOUS +");
-    else
+    else 
       if(sensi_meth == CV_STAGGERED) printf("( STAGGERED +");
-      else                           printf("( STAGGERED1 +");
+      else                           printf("( STAGGERED1 +");   
     if(err_con) printf(" FULL ERROR CONTROL )");
     else        printf(" PARTIAL ERROR CONTROL )");
 
@@ -240,9 +240,9 @@ int main(int argc, char *argv[])
     printf("Sensitivity: NO ");
 
   }
-
+  
   /* In loop over output points, call CVode, print results, test for error */
-
+  
   printf("\n\n");
   printf("===========================================");
   printf("============================\n");
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
       flag = CVodeGetSens(cvode_mem, &t, yS);
       if (check_flag(&flag, "CVodeGetSens", 1)) break;
       PrintOutputS(yS);
-    }
+    } 
     printf("-----------------------------------------");
     printf("------------------------------\n");
 
@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
  */
 
 /*
- * f routine. Compute f(t,y).
+ * f routine. Compute f(t,y). 
  */
 
 static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
@@ -315,8 +315,8 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 }
 
 
-/*
- * Jacobian routine. Compute J(t,y).
+/* 
+ * Jacobian routine. Compute J(t,y). 
  */
 
 static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
@@ -325,24 +325,24 @@ static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
   realtype y1, y2, y3;
   UserData data;
   realtype p1, p2, p3;
-
+ 
   y1 = Ith(y,1); y2 = Ith(y,2); y3 = Ith(y,3);
   data = (UserData) user_data;
   p1 = data->p[0]; p2 = data->p[1]; p3 = data->p[2];
-
+ 
   IJth(J,1,1) = -p1;  IJth(J,1,2) = p2*y3;          IJth(J,1,3) = p2*y2;
   IJth(J,2,1) =  p1;  IJth(J,2,2) = -p2*y3-2*p3*y2; IJth(J,2,3) = -p2*y2;
                       IJth(J,3,2) = 2*p3*y2;
 
   return(0);
 }
-
-/*
- * fS routine. Compute sensitivity r.h.s.
+ 
+/* 
+ * fS routine. Compute sensitivity r.h.s. 
  */
 
-static int fS(int Ns, realtype t, N_Vector y, N_Vector ydot,
-              int iS, N_Vector yS, N_Vector ySdot,
+static int fS(int Ns, realtype t, N_Vector y, N_Vector ydot, 
+              int iS, N_Vector yS, N_Vector ySdot, 
               void *user_data, N_Vector tmp1, N_Vector tmp2)
 {
   UserData data;
@@ -375,7 +375,7 @@ static int fS(int Ns, realtype t, N_Vector y, N_Vector ydot,
     sd3 +=  y2*y2;
     break;
   }
-
+  
   Ith(ySdot,1) = sd1;
   Ith(ySdot,2) = sd2;
   Ith(ySdot,3) = sd3;
@@ -417,7 +417,7 @@ static int ewt(N_Vector y, N_Vector w, void *user_data)
  * Process and verify arguments to cvsfwddenx.
  */
 
-static void ProcessArgs(int argc, char *argv[],
+static void ProcessArgs(int argc, char *argv[], 
                         booleantype *sensi, int *sensi_meth, booleantype *err_con)
 {
   *sensi = SUNFALSE;
@@ -432,7 +432,7 @@ static void ProcessArgs(int argc, char *argv[],
     *sensi = SUNTRUE;
   else
     WrongArgs(argv[0]);
-
+  
   if (*sensi) {
 
     if (argc != 4)
@@ -444,7 +444,7 @@ static void ProcessArgs(int argc, char *argv[],
       *sensi_meth = CV_STAGGERED;
     else if (strcmp(argv[2],"stg1") == 0)
       *sensi_meth = CV_STAGGERED1;
-    else
+    else 
       WrongArgs(argv[0]);
 
     if (strcmp(argv[3],"t") == 0)
@@ -462,7 +462,7 @@ static void WrongArgs(char *name)
     printf("\nUsage: %s [-nosensi] [-sensi sensi_meth err_con]\n",name);
     printf("         sensi_meth = sim, stg, or stg1\n");
     printf("         err_con    = t or f\n");
-
+    
     exit(0);
 }
 
@@ -475,7 +475,7 @@ static void PrintOutput(void *cvode_mem, realtype t, N_Vector u)
   long int nst;
   int qu, flag;
   realtype hu, *udata;
-
+  
   udata = N_VGetArrayPointer(u);
 
   flag = CVodeGetNumSteps(cvode_mem, &nst);
@@ -505,7 +505,7 @@ static void PrintOutput(void *cvode_mem, realtype t, N_Vector u)
 
 }
 
-/*
+/* 
  * Print sensitivities.
 */
 
@@ -523,7 +523,7 @@ static void PrintOutputS(N_Vector *uS)
 #else
   printf("%12.4e %12.4e %12.4e \n", sdata[0], sdata[1], sdata[2]);
 #endif
-
+  
   sdata = N_VGetArrayPointer(uS[1]);
   printf("                  Sensitivity 2  ");
 
@@ -547,7 +547,7 @@ static void PrintOutputS(N_Vector *uS)
 #endif
 }
 
-/*
+/* 
  * Print some final statistics from the CVODES memory.
  */
 
@@ -610,14 +610,14 @@ static void PrintFinalStats(void *cvode_mem, booleantype sensi)
 
 }
 
-/*
+/* 
  * Check function return value.
  *    opt == 0 means SUNDIALS function allocates memory so check if
  *             returned NULL pointer
  *    opt == 1 means SUNDIALS function returns a flag so check if
  *             flag >= 0
  *    opt == 2 means function allocates memory so check if returned
- *             NULL pointer
+ *             NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt)
@@ -626,7 +626,7 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
 
   /* Check if SUNDIALS function returned NULL pointer - no memory allocated */
   if (opt == 0 && flagvalue == NULL) {
-    fprintf(stderr,
+    fprintf(stderr, 
             "\nSUNDIALS_ERROR: %s() failed - returned NULL pointer\n\n",
 	    funcname);
     return(1); }
@@ -635,14 +635,14 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
   else if (opt == 1) {
     errflag = (int *) flagvalue;
     if (*errflag < 0) {
-      fprintf(stderr,
+      fprintf(stderr, 
               "\nSUNDIALS_ERROR: %s() failed with flag = %d\n\n",
 	      funcname, *errflag);
       return(1); }}
 
   /* Check if function returned NULL pointer - no memory allocated */
   else if (opt == 2 && flagvalue == NULL) {
-    fprintf(stderr,
+    fprintf(stderr, 
             "\nMEMORY_ERROR: %s() failed - returned NULL pointer\n\n",
 	    funcname);
     return(1); }

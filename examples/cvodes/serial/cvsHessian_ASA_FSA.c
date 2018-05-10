@@ -1,10 +1,10 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -60,18 +60,18 @@ static int fS(int Ns, realtype t,
               void *user_data,
               N_Vector tmp1, N_Vector tmp2);
 static int fQS(int Ns, realtype t,
-               N_Vector y, N_Vector *yS,
+               N_Vector y, N_Vector *yS, 
                N_Vector yQdot, N_Vector *yQSdot,
                void *user_data,
                N_Vector tmp, N_Vector tmpQ);
 
-static int fB1(realtype t, N_Vector y, N_Vector *yS,
+static int fB1(realtype t, N_Vector y, N_Vector *yS, 
                N_Vector yB, N_Vector yBdot, void *user_dataB);
-static int fQB1(realtype t, N_Vector y, N_Vector *yS,
+static int fQB1(realtype t, N_Vector y, N_Vector *yS, 
                 N_Vector yB, N_Vector qBdot, void *user_dataB);
 
 
-static int fB2(realtype t, N_Vector y, N_Vector *yS,
+static int fB2(realtype t, N_Vector y, N_Vector *yS, 
                N_Vector yB, N_Vector yBdot, void *user_dataB);
 static int fQB2(realtype t, N_Vector y, N_Vector *yS,
                 N_Vector yB, N_Vector qBdot, void *user_dataB);
@@ -398,7 +398,7 @@ int main(int argc, char *argv[])
 #else
   printf("   dG/dp:  %12.4e %12.4e   (from backward pb. 1)\n", -Ith(yQB1,1), -Ith(yQB1,2));
   printf("           %12.4e %12.4e   (from backward pb. 2)\n", -Ith(yQB2,1), -Ith(yQB2,2));
-#endif
+#endif  
   printf("\n");
   printf("   H = d2G/dp2:\n");
   printf("        (1)            (2)\n");
@@ -494,7 +494,7 @@ int main(int argc, char *argv[])
 #else
   printf("p1+  y:   %12.4e %12.4e %12.4e", Ith(y,1), Ith(y,2), Ith(y,3));
   printf("     G:   %12.4e\n",Ith(yQ,1));
-#endif
+#endif  
   data->p1 -= 2.0*dp;
 
   N_VConst(ONE, y);
@@ -567,7 +567,7 @@ int main(int argc, char *argv[])
 #else
   printf("p2-  y:   %12.4e %12.4e %12.4e", Ith(y,1), Ith(y,2), Ith(y,3));
   printf("     G:   %12.4e\n",Ith(yQ,1));
-#endif
+#endif  
   data->p2 += dp;
 
   grdG_fwd[1] = (Gp-G)/dp;
@@ -591,7 +591,7 @@ int main(int argc, char *argv[])
   printf("\n");
   printf("  H(1,1):  %12.4e\n", H11);
   printf("  H(2,2):  %12.4e\n", H22);
-#endif
+#endif  
 
   /* Free memory */
 
@@ -630,11 +630,11 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
   realtype p1, p2;
 
   data = (UserData) user_data;
-  p1 = data->p1;
-  p2 = data->p2;
+  p1 = data->p1; 
+  p2 = data->p2; 
 
-  y1 = Ith(y,1);
-  y2 = Ith(y,2);
+  y1 = Ith(y,1); 
+  y2 = Ith(y,2); 
   y3 = Ith(y,3);
 
   Ith(ydot,1) = -p1*y1*y1 - y3;
@@ -648,8 +648,8 @@ static int fQ(realtype t, N_Vector y, N_Vector qdot, void *user_data)
 {
   realtype y1, y2, y3;
 
-  y1 = Ith(y,1);
-  y2 = Ith(y,2);
+  y1 = Ith(y,1); 
+  y2 = Ith(y,2); 
   y3 = Ith(y,3);
 
   Ith(qdot,1) = 0.5 * ( y1*y1 + y2*y2 + y3*y3 );
@@ -670,11 +670,11 @@ static int fS(int Ns, realtype t,
   realtype p1, p2;
 
   data = (UserData) user_data;
-  p1 = data->p1;
-  p2 = data->p2;
+  p1 = data->p1; 
+  p2 = data->p2; 
 
-  y1 = Ith(y,1);
-  y2 = Ith(y,2);
+  y1 = Ith(y,1); 
+  y2 = Ith(y,2); 
   y3 = Ith(y,3);
 
   /* 1st sensitivity RHS */
@@ -709,7 +709,7 @@ static int fS(int Ns, realtype t,
 }
 
 static int fQS(int Ns, realtype t,
-               N_Vector y, N_Vector *yS,
+               N_Vector y, N_Vector *yS, 
                N_Vector yQdot, N_Vector *yQSdot,
                void *user_data,
                N_Vector tmp, N_Vector tmpQ)
@@ -717,8 +717,8 @@ static int fQS(int Ns, realtype t,
   realtype y1, y2, y3;
   realtype s1, s2, s3;
 
-  y1 = Ith(y,1);
-  y2 = Ith(y,2);
+  y1 = Ith(y,1); 
+  y2 = Ith(y,2); 
   y3 = Ith(y,3);
 
 
@@ -742,7 +742,7 @@ static int fQS(int Ns, realtype t,
   return(0);
 }
 
-static int fB1(realtype t, N_Vector y, N_Vector *yS,
+static int fB1(realtype t, N_Vector y, N_Vector *yS, 
                N_Vector yB, N_Vector yBdot, void *user_dataB)
 {
   UserData data;
@@ -751,28 +751,28 @@ static int fB1(realtype t, N_Vector y, N_Vector *yS,
   realtype s1, s2, s3;  /* sensitivity 1 */
   realtype l1, l2, l3;  /* lambda */
   realtype m1, m2, m3;  /* mu */
-
+  
   data = (UserData) user_dataB;
-  p1 = data->p1;
-  p2 = data->p2;
+  p1 = data->p1; 
+  p2 = data->p2; 
 
-  y1 = Ith(y,1);
-  y2 = Ith(y,2);
+  y1 = Ith(y,1); 
+  y2 = Ith(y,2); 
   y3 = Ith(y,3);
-
-  s1 = Ith(yS[0],1);
-  s2 = Ith(yS[0],2);
+  
+  s1 = Ith(yS[0],1); 
+  s2 = Ith(yS[0],2); 
   s3 = Ith(yS[0],3);
 
-  l1 = Ith(yB,1);
-  l2 = Ith(yB,2);
+  l1 = Ith(yB,1); 
+  l2 = Ith(yB,2); 
   l3 = Ith(yB,3);
 
-  m1 = Ith(yB,4);
-  m2 = Ith(yB,5);
+  m1 = Ith(yB,4); 
+  m2 = Ith(yB,5); 
   m3 = Ith(yB,6);
 
-
+  
   Ith(yBdot,1) = 2.0*p1*y1 * l1     - y1;
   Ith(yBdot,2) = l2 + p2*p2*y3 * l3 - y2;
   Ith(yBdot,3) = l1 + p2*p2*y2 * l3 - y3;
@@ -793,25 +793,25 @@ static int fQB1(realtype t, N_Vector y, N_Vector *yS,
   realtype s1, s2, s3;  /* sensitivity 1 */
   realtype l1, l2, l3;  /* lambda */
   realtype m1, m2, m3;  /* mu */
-
+  
   data = (UserData) user_dataB;
-  p1 = data->p1;
-  p2 = data->p2;
+  p1 = data->p1; 
+  p2 = data->p2; 
 
-  y1 = Ith(y,1);
-  y2 = Ith(y,2);
+  y1 = Ith(y,1); 
+  y2 = Ith(y,2); 
   y3 = Ith(y,3);
-
-  s1 = Ith(yS[0],1);
-  s2 = Ith(yS[0],2);
+  
+  s1 = Ith(yS[0],1); 
+  s2 = Ith(yS[0],2); 
   s3 = Ith(yS[0],3);
-
-  l1 = Ith(yB,1);
-  l2 = Ith(yB,2);
+  
+  l1 = Ith(yB,1); 
+  l2 = Ith(yB,2); 
   l3 = Ith(yB,3);
 
-  m1 = Ith(yB,4);
-  m2 = Ith(yB,5);
+  m1 = Ith(yB,4); 
+  m2 = Ith(yB,5); 
   m3 = Ith(yB,6);
 
   Ith(qBdot,1) = -y1*y1 * l1;
@@ -826,7 +826,7 @@ static int fQB1(realtype t, N_Vector y, N_Vector *yS,
 
 
 
-static int fB2(realtype t, N_Vector y, N_Vector *yS,
+static int fB2(realtype t, N_Vector y, N_Vector *yS, 
                N_Vector yB, N_Vector yBdot, void *user_dataB)
 {
   UserData data;
@@ -837,23 +837,23 @@ static int fB2(realtype t, N_Vector y, N_Vector *yS,
   realtype m1, m2, m3;  /* mu */
 
   data = (UserData) user_dataB;
-  p1 = data->p1;
-  p2 = data->p2;
+  p1 = data->p1; 
+  p2 = data->p2; 
 
-  y1 = Ith(y,1);
-  y2 = Ith(y,2);
+  y1 = Ith(y,1); 
+  y2 = Ith(y,2); 
   y3 = Ith(y,3);
-
-  s1 = Ith(yS[1],1);
-  s2 = Ith(yS[1],2);
+  
+  s1 = Ith(yS[1],1); 
+  s2 = Ith(yS[1],2); 
   s3 = Ith(yS[1],3);
-
-  l1 = Ith(yB,1);
-  l2 = Ith(yB,2);
+  
+  l1 = Ith(yB,1); 
+  l2 = Ith(yB,2); 
   l3 = Ith(yB,3);
 
-  m1 = Ith(yB,4);
-  m2 = Ith(yB,5);
+  m1 = Ith(yB,4); 
+  m2 = Ith(yB,5); 
   m3 = Ith(yB,6);
 
   Ith(yBdot,1) = 2.0*p1*y1 * l1     - y1;
@@ -878,25 +878,25 @@ static int fQB2(realtype t, N_Vector y, N_Vector *yS,
   realtype s1, s2, s3;  /* sensitivity 2 */
   realtype l1, l2, l3;  /* lambda */
   realtype m1, m2, m3;  /* mu */
-
+  
   data = (UserData) user_dataB;
-  p1 = data->p1;
-  p2 = data->p2;
+  p1 = data->p1; 
+  p2 = data->p2; 
 
-  y1 = Ith(y,1);
-  y2 = Ith(y,2);
+  y1 = Ith(y,1); 
+  y2 = Ith(y,2); 
   y3 = Ith(y,3);
 
-  s1 = Ith(yS[1],1);
-  s2 = Ith(yS[1],2);
+  s1 = Ith(yS[1],1); 
+  s2 = Ith(yS[1],2); 
   s3 = Ith(yS[1],3);
 
-  l1 = Ith(yB,1);
-  l2 = Ith(yB,2);
+  l1 = Ith(yB,1); 
+  l2 = Ith(yB,2); 
   l3 = Ith(yB,3);
 
-  m1 = Ith(yB,4);
-  m2 = Ith(yB,5);
+  m1 = Ith(yB,4); 
+  m2 = Ith(yB,5); 
   m3 = Ith(yB,6);
 
   Ith(qBdot,1) = -y1*y1 * l1;
@@ -928,7 +928,7 @@ void PrintFwdStats(void *cvode_mem)
   int flag;
 
 
-  flag = CVodeGetIntegratorStats(cvode_mem, &nst, &nfe, &nsetups, &netf,
+  flag = CVodeGetIntegratorStats(cvode_mem, &nst, &nfe, &nsetups, &netf, 
                                  &qlast, &qcur,
                                  &h0u, &hlast, &hcur,
                                  &tcur);
@@ -977,7 +977,7 @@ void PrintBckStats(void *cvode_mem, int idx)
 
   cvode_mem_bck = CVodeGetAdjCVodeBmem(cvode_mem, idx);
 
-  flag = CVodeGetIntegratorStats(cvode_mem_bck, &nst, &nfe, &nsetups, &netf,
+  flag = CVodeGetIntegratorStats(cvode_mem_bck, &nst, &nfe, &nsetups, &netf, 
                                  &qlast, &qcur,
                                  &h0u, &hlast, &hcur,
                                  &tcur);
@@ -1010,7 +1010,7 @@ void PrintBckStats(void *cvode_mem, int idx)
  *   opt == 1 means SUNDIALS function returns a flag so check if
  *            flag >= 0
  *   opt == 2 means function allocates memory so check if returned
- *            NULL pointer
+ *            NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt)

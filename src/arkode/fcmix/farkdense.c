@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-  extern void FARK_DJAC(long int *N, realtype *T, realtype *Y,
+  extern void FARK_DJAC(long int *N, realtype *T, realtype *Y, 
 			realtype *FY, realtype *DJAC,
 			realtype *H, long int *IPAR,
 			realtype *RPAR, realtype *V1,

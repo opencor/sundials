@@ -1,23 +1,23 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel Reynolds @ SMU
  *                David Gardner, Carol Woodward, Slaven Peles @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the implementation file for a generic SUNLINEARSOLVER
+ * This is the implementation file for a generic SUNLINEARSOLVER 
  * package.  It contains the implementation of the SUNLinearSolver
  * operations listed in sundials_linearsolver.h
  * -----------------------------------------------------------------
@@ -48,7 +48,7 @@ int SUNLinSolSetATimes(SUNLinearSolver S, void* A_data,
     return SUNLS_SUCCESS;
 }
 
-
+  
 int SUNLinSolSetPreconditioner(SUNLinearSolver S, void* P_data,
                                PSetupFn Pset, PSolveFn Psol)
 {
@@ -57,7 +57,7 @@ int SUNLinSolSetPreconditioner(SUNLinearSolver S, void* P_data,
   else
     return SUNLS_SUCCESS;
 }
-
+  
 int SUNLinSolSetScalingVectors(SUNLinearSolver S,
                                N_Vector s1, N_Vector s2)
 {
@@ -66,12 +66,12 @@ int SUNLinSolSetScalingVectors(SUNLinearSolver S,
   else
     return SUNLS_SUCCESS;
 }
-
+  
 int SUNLinSolInitialize(SUNLinearSolver S)
 {
   return ((int) S->ops->initialize(S));
 }
-
+  
 int SUNLinSolSetup(SUNLinearSolver S, SUNMatrix A)
 {
   return ((int) S->ops->setup(S, A));
@@ -82,7 +82,7 @@ int SUNLinSolSolve(SUNLinearSolver S, SUNMatrix A, N_Vector x,
 {
   return ((int) S->ops->solve(S, A, x, b, tol));
 }
-
+  
 int SUNLinSolNumIters(SUNLinearSolver S)
 {
   if (S->ops->numiters)

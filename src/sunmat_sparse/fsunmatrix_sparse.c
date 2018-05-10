@@ -3,13 +3,13 @@
  * Programmer(s): Daniel Reynolds @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -72,7 +72,7 @@ void FSUNSPARSEMAT_INIT(int *code, long int *M, long int *N,
   }
 }
 
-void FSUNSPARSEMASSMAT_INIT(long int *M, long int *N, long int *NNZ,
+void FSUNSPARSEMASSMAT_INIT(long int *M, long int *N, long int *NNZ, 
                             int *sparsetype, int *ier)
 {
   *ier = 0;

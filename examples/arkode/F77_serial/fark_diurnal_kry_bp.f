@@ -2,13 +2,13 @@ C     ----------------------------------------------------------------
 C     Programmer(s): Daniel R. Reynolds @ SMU
 C     ----------------------------------------------------------------
 C     LLNS/SMU Copyright Start
-C     Copyright (c) 2015, Southern Methodist University and
+C     Copyright (c) 2015, Southern Methodist University and 
 C     Lawrence Livermore National Security
 C
-C     This work was performed under the auspices of the U.S. Department
-C     of Energy by Southern Methodist University and Lawrence Livermore
+C     This work was performed under the auspices of the U.S. Department 
+C     of Energy by Southern Methodist University and Lawrence Livermore 
 C     National Laboratory under Contract DE-AC52-07NA27344.
-C     Produced at Southern Methodist University and the Lawrence
+C     Produced at Southern Methodist University and the Lawrence 
 C     Livermore National Laboratory.
 C
 C     All rights reserved.
@@ -18,12 +18,12 @@ C     Copyright (c) 2013, Southern Methodist University.
 C     All rights reserved.
 C     For details, see the LICENSE file.
 C     ----------------------------------------------------------------
-C     FARKODE Example Problem: 2D kinetics-transport,
-C     precond. Krylov solver.
-C
+C     FARKODE Example Problem: 2D kinetics-transport, 
+C     precond. Krylov solver. 
+C     
 C     An ODE system is generated from the following 2-species diurnal
 C     kinetics advection-diffusion PDE system in 2 space dimensions:
-C
+C     
 C     dc(i)/dt = Kh*(d/dx)**2 c(i) + V*dc(i)/dx + (d/dy)(Kv(y)*dc(i)/dy)
 C                           + Ri(c1,c2,t)      for i = 1,2,   where
 C     R1(c1,c2,t) = -q1*c1*c3 - q2*c1*c2 + 2*q3(t)*c3 + q4(t)*c2 ,
@@ -44,7 +44,7 @@ C     using the FARKBP banded preconditioner.
 C
 C     Note that this problem should only work with SUNDIALS configured
 C     to use 'realtype' as 'double' and 'sunindextype' as '64bit'
-C
+C     
 C     The second and third dimensions of U here must match the values of
 C     MX and MY, for consistency with the output statements below.
 C     ----------------------------------------------------------------
@@ -67,8 +67,8 @@ C
 C
       DATA TWOHR/7200.0D0/, RTOL/1.0D-5/, FLOOR/100.0D0/,
      1     JPRETYPE/1/, IGSTYPE/1/, MAXL/0/, DELT/0.0D0/, MXSTEPS/10000/
-      DATA LLENRW/1/, LLENIW/2/, LNST/3/, LNST_ATT/6/, LNFE/7/, LNFI/8/,
-     1     LNETF/10/, LNCF/12/, LNNI/11/, LNSETUP/9/, LLENRWLS/14/,
+      DATA LLENRW/1/, LLENIW/2/, LNST/3/, LNST_ATT/6/, LNFE/7/, LNFI/8/, 
+     1     LNETF/10/, LNCF/12/, LNNI/11/, LNSETUP/9/, LLENRWLS/14/, 
      1     LLENIWLS/15/, LNPE/19/, LNLI/21/, LNPS/20/, LNCFL/22/
       DATA LH/2/
 C
@@ -85,7 +85,7 @@ C
       WRITE(6,10) NEQ
  10   FORMAT('Krylov example problem:'//
      1       ' Kinetics-transport, NEQ = ', I4/)
-C
+C     
 C     Initialize vector specification
       CALL FNVINITS(4, NEQ, IER)
       IF (IER .NE. 0) THEN
@@ -107,7 +107,7 @@ C     initialize SPGMR linear solver module
  27     FORMAT(///' SUNDIALS_ERROR: FSUNSPGMRSETGSTYPE IER = ', I5)
         STOP
       ENDIF
-C
+C     
 C     Initialize ARKODE
       CALL FARKMALLOC(T, U, METH, IATOL, RTOL, ATOL,
      1               IOUT, ROUT, IPAR, RPAR, IER)
@@ -132,32 +132,32 @@ C     attach matrix and linear solver modules to ARKSpils interface
         CALL FARKFREE
         STOP
       ENDIF
-C
+C     
 C     Initialize band preconditioner
       MU = 2
       ML = 2
-      CALL FARKBPINIT(NEQ, MU, ML, IER)
+      CALL FARKBPINIT(NEQ, MU, ML, IER) 
       IF (IER .NE. 0) THEN
          WRITE(6,45) IER
  45      FORMAT(///' SUNDIALS_ERROR: FARKBPINIT returned IER = ', I5)
          CALL FARKFREE
          STOP
       ENDIF
-C
+C     
 C     Loop over output points, call FARKODE, print sample solution values.
       TOUT = TWOHR
       DO 70 JOUT = 1, 12
 C
          CALL FARKODE(TOUT, T, U, ITASK, IER)
-C
+C     
          WRITE(6,50) T, IOUT(LNST), IOUT(LNST_ATT), ROUT(LH)
- 50      FORMAT(/' t = ', E14.6, 5X, 'no. steps = ', I5,
+ 50      FORMAT(/' t = ', E14.6, 5X, 'no. steps = ', I5, 
      1        '  no. att. steps = ', I5, '   stepsize = ', E14.6)
          WRITE(6,55) U(1,1,1), U(1,5,5), U(1,10,10),
      1               U(2,1,1), U(2,5,5), U(2,10,10)
  55      FORMAT('  c1 (bot.left/middle/top rt.) = ', 3E14.6/
      1        '  c2 (bot.left/middle/top rt.) = ', 3E14.6)
-C
+C     
          IF (IER .NE. 0) THEN
             WRITE(6,60) IER, IOUT(16)
  60         FORMAT(///' SUNDIALS_ERROR: FARKODE returned IER = ', I5, /,
@@ -165,10 +165,10 @@ C
             CALL FARKFREE
             STOP
          ENDIF
-C
+C     
          TOUT = TOUT + TWOHR
  70   CONTINUE
-
+      
 C     Print final statistics.
       NST = IOUT(LNST)
       NST_ATT = IOUT(LNST_ATT)
@@ -187,7 +187,7 @@ C     Print final statistics.
       LENIW = IOUT(LLENIW)
       LENRWLS = IOUT(LLENRWLS)
       LENIWLS = IOUT(LLENIWLS)
-      WRITE(6,80) NST, NST_ATT, NFE, NFI, NPSET, NPE, NPS, NNI, NLI,
+      WRITE(6,80) NST, NST_ATT, NFE, NFI, NPSET, NPE, NPS, NNI, NLI, 
      1     AVDIM, NCFN, NCFL, NETF, LENRW, LENIW, LENRWLS, LENIWLS
  80   FORMAT(//'Final statistics:'//
      &   ' number of steps        = ', I6/
@@ -210,9 +210,9 @@ C     Print final statistics.
  82   FORMAT('In ARKBANDPRE:'/
      &        ' real/int workspace sizes = ', 2I5/
      &        ' number of f evaluations  = ', I5)
-C
+C     
       CALL FARKFREE
-C
+C     
       STOP
       END
 
@@ -288,7 +288,7 @@ C Set initial profiles.
 C
       RETURN
       END
-
+      
 C     ----------------------------------------------------------------
 
       SUBROUTINE FARKIFUN(T, U, UDOT, IPAR, RPAR, IER)
@@ -324,7 +324,7 @@ C
       HDCO = RPAR(10)
       VDCO = RPAR(11)
       HACO = RPAR(12)
-C
+C     
 C     Set diurnal rate coefficients.
       S = SIN(OM * T)
       IF (S .GT. 0.0D0) THEN
@@ -334,7 +334,7 @@ C     Set diurnal rate coefficients.
          Q3 = 0.0D0
          Q4 = 0.0D0
       ENDIF
-C
+C     
 C     Loop over all grid points.
       DO 20 JY = 1, MY
          YDN = 30.0D0 + (JY - 1.5D0) * DY
@@ -387,7 +387,7 @@ C
 C
       RETURN
       END
-
+      
 C     ----------------------------------------------------------------
 
       SUBROUTINE FARKEFUN(T, U, UDOT, IPAR, RPAR, IER)
@@ -403,7 +403,7 @@ C
 C     Extract constants from IPAR
       MX = IPAR(1)
       MY = IPAR(2)
-C
+C     
 C     Loop over all grid points, setting UDOT to zero
       DO 20 JY = 1, MY
          IBLOK0 = (JY - 1) * MX

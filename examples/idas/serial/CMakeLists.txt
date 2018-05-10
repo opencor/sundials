@@ -208,10 +208,10 @@ IF(KLU_FOUND)
     IF(NOT TARGET ${example})
       # example source files
       ADD_EXECUTABLE(${example} ${example}.c)
-
+      
       # folder to organize targets in an IDE
       SET_TARGET_PROPERTIES(${example} PROPERTIES FOLDER "Examples")
-
+      
       # libraries to link against
       TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_LIBS} ${SUNLINSOLKLU_LIBS})
     ENDIF()
@@ -274,10 +274,10 @@ IF(SUPERLUMT_FOUND)
     IF(NOT TARGET ${example})
       # example source files
       ADD_EXECUTABLE(${example} ${example}.c)
-
+      
       # folder to organize targets in an IDE
       SET_TARGET_PROPERTIES(${example} PROPERTIES FOLDER "Examples")
-
+      
       # libraries to link against
       TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_LIBS} ${SUNLINSOLSLUMT_LIBS})
     ENDIF()

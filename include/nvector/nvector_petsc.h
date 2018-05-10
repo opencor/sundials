@@ -1,17 +1,17 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): Slaven Peles @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS Copyright End
  * -----------------------------------------------------------------
- * This is the main header file for the PETSc vector wrapper
+ * This is the main header file for the PETSc vector wrapper 
  * for NVECTOR module.
  *
  * Part I contains declarations specific to the PETSc vector wrapper
@@ -27,8 +27,8 @@
  *     found in the header file sundials_nvector.h.
  *
  *   - The definition of the type realtype can be found in the
- *     header file sundials_types.h, and it may be changed (at the
- *     build configuration stage) according to the user's needs.
+ *     header file sundials_types.h, and it may be changed (at the 
+ *     build configuration stage) according to the user's needs. 
  *     The sundials_types.h file also contains the definition
  *     for the type booleantype.
  *
@@ -56,7 +56,7 @@ extern "C" {
 
 /*
  * -----------------------------------------------------------------
- * PART I: PARALLEL implementation of N_Vector
+ * PART I: PARALLEL implementation of N_Vector               
  * -----------------------------------------------------------------
  */
 
@@ -78,7 +78,7 @@ typedef struct _N_VectorContent_Petsc *N_VectorContent_Petsc;
 /*
  * -----------------------------------------------------------------
  * PART II: functions exported by nvector_Petsc
- *
+ * 
  * CONSTRUCTORS:
  *    N_VNewEmpty_Petsc
  *    N_VMake_Petsc
@@ -103,7 +103,7 @@ typedef struct _N_VectorContent_Petsc *N_VectorContent_Petsc;
  * -----------------------------------------------------------------
  */
 
-SUNDIALS_EXPORT N_Vector N_VNewEmpty_Petsc(MPI_Comm comm,
+SUNDIALS_EXPORT N_Vector N_VNewEmpty_Petsc(MPI_Comm comm, 
                                            sunindextype local_length,
                                            sunindextype global_length);
 
@@ -142,7 +142,7 @@ SUNDIALS_EXPORT N_Vector *N_VCloneVectorArray_Petsc(int count, N_Vector w);
  * -----------------------------------------------------------------
  * Function : N_VCloneVectorArrayEmpty_Petsc
  * -----------------------------------------------------------------
- * This function creates an array of 'count' PARALLEL vectors each
+ * This function creates an array of 'count' PARALLEL vectors each 
  * with an empty (NULL) data array by cloning w.
  * -----------------------------------------------------------------
  */
@@ -153,7 +153,7 @@ SUNDIALS_EXPORT N_Vector *N_VCloneVectorArrayEmpty_Petsc(int count, N_Vector w);
  * -----------------------------------------------------------------
  * Function : N_VDestroyVectorArray_Petsc
  * -----------------------------------------------------------------
- * This function frees an array of N_Vector created with
+ * This function frees an array of N_Vector created with 
  * N_VCloneVectorArray_Petsc or N_VCloneVectorArrayEmpty_Petsc.
  * -----------------------------------------------------------------
  */

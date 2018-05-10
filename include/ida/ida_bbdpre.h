@@ -1,16 +1,16 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel R. Reynolds @ SMU,
  *      Alan C. Hindmarsh, Radu Serban and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -102,7 +102,7 @@
  *
  * 3) The actual name of the user's res function is passed to
  *    IDAInit, and the names of the user's Gres and Gcomm
- *    functions are passed to IDABBDPrecInit.
+ *    functions are passed to IDABBDPrecInit.        
  *
  * 4) The pointer to the user-defined data block user_data, which
  *    is set through IDASetUserData is also available to the user
@@ -141,10 +141,10 @@ extern "C" {
  * the current solution vector yy, the current solution
  * derivative vector yp, and a pointer to the user-defined data
  * block user_data. It is to compute the local part of G(t,y,y')
- * and store it in the vector gval.
- * (Allocation of memory for yy and gval is handled within the
- * preconditioner module.)
- * It is expected that this routine will save communicated data
+ * and store it in the vector gval. 
+ * (Allocation of memory for yy and gval is handled within the 
+ * preconditioner module.) 
+ * It is expected that this routine will save communicated data 
  * in work space defined by the user, and made available to the
  * preconditioner function for the problem. The user_data
  * parameter is the same as that passed by the user to the
@@ -250,9 +250,9 @@ SUNDIALS_EXPORT int IDABBDPrecInit(void *ida_mem,
  * -----------------------------------------------------------------
  * IDABBDPrecReInit reinitializes the IDABBDPRE module when
  * solving a sequence of problems of the same size with
- * IDASPILS/IDABBDPRE provided there is no change in Nlocal, mukeep,
- * or mlkeep. After solving one problem, and after calling IDAReInit
- * to reinitialize the integrator for a subsequent problem, call
+ * IDASPILS/IDABBDPRE provided there is no change in Nlocal, mukeep, 
+ * or mlkeep. After solving one problem, and after calling IDAReInit 
+ * to reinitialize the integrator for a subsequent problem, call 
  * IDABBDPrecReInit.
  *
  * All arguments have the same names and meanings as those
@@ -279,7 +279,7 @@ SUNDIALS_EXPORT int IDABBDPrecReInit(void *ida_mem,
  *                        for IDABBDPRE.
  * IDABBDPrecGetNumGfnEvals returns the number of calls to the
  *                          user Gres function.
- *
+ * 
  * The return value of IDABBDPrecGet* is one of:
  *   IDASPILS_SUCCESS if no errors occurred
  *   IDASPILS_MEM_NULL if the integrator memory is NULL
@@ -288,7 +288,7 @@ SUNDIALS_EXPORT int IDABBDPrecReInit(void *ida_mem,
  * -----------------------------------------------------------------
  */
 
-SUNDIALS_EXPORT int IDABBDPrecGetWorkSpace(void *ida_mem,
+SUNDIALS_EXPORT int IDABBDPrecGetWorkSpace(void *ida_mem, 
                                            long int *lenrwBBDP,
                                            long int *leniwBBDP);
 SUNDIALS_EXPORT int IDABBDPrecGetNumGfnEvals(void *ida_mem,

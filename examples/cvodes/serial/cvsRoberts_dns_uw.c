@@ -3,11 +3,11 @@
  *                Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * Example problem:
- *
+ * 
  * The following is a simple example problem, with the coding
  * needed for its solution by CVODE. The problem is from
  * chemical kinetics, and consists of the following three rate
- * equations:
+ * equations:         
  *    dy1/dt = -.04*y1 + 1.e4*y2*y3
  *    dy2/dt = .04*y1 - 1.e4*y2*y3 - 3.e7*(y2)^2
  *    dy3/dt = 3.e7*(y2)^2
@@ -46,7 +46,7 @@
 
    IJth(A,i,j) references the (i,j)th element of the dense matrix A, where
    i and j are in the range [1..NEQ]. The IJth macro is defined using the
-   SM_ELEMENT_D macro in dense.h. SM_ELEMENT_D numbers rows and columns of
+   SM_ELEMENT_D macro in dense.h. SM_ELEMENT_D numbers rows and columns of 
    a dense matrix starting from 0. */
 
 #define Ith(v,i)    NV_Ith_S(v,i-1)         /* Ith numbers components 1..NEQ */
@@ -125,11 +125,11 @@ int main()
   Ith(y,2) = Y2;
   Ith(y,3) = Y3;
 
-  /* Call CVodeCreate to create the solver memory and specify the
+  /* Call CVodeCreate to create the solver memory and specify the 
    * Backward Differentiation Formula and the use of a Newton iteration */
   cvode_mem = CVodeCreate(CV_BDF, CV_NEWTON);
   if (check_flag((void *)cvode_mem, "CVodeCreate", 0)) return(1);
-
+  
   /* Call CVodeInit to initialize the integrator memory and specify the
    * user's right hand side function in y'=f(t,y), the inital time T0, and
    * the initial dependent variable vector y. */
@@ -210,7 +210,7 @@ int main()
  */
 
 /*
- * f routine. Compute function f(t,y).
+ * f routine. Compute function f(t,y). 
  */
 
 static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
@@ -227,7 +227,7 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 }
 
 /*
- * g routine. Compute functions g_i(t,y) for i = 0,1.
+ * g routine. Compute functions g_i(t,y) for i = 0,1. 
  */
 
 static int g(realtype t, N_Vector y, realtype *gout, void *user_data)
@@ -245,7 +245,7 @@ static int g(realtype t, N_Vector y, realtype *gout, void *user_data)
  * Jacobian routine. Compute J(t,y) = df/dy. *
  */
 
-static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
+static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J, 
                void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
   realtype y1, y2, y3;
@@ -256,7 +256,7 @@ static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
   IJth(J,1,2) = RCONST(1.0e4)*y3;
   IJth(J,1,3) = RCONST(1.0e4)*y2;
 
-  IJth(J,2,1) = RCONST(0.04);
+  IJth(J,2,1) = RCONST(0.04); 
   IJth(J,2,2) = RCONST(-1.0e4)*y3-RCONST(6.0e7)*y2;
   IJth(J,2,3) = RCONST(-1.0e4)*y2;
 
@@ -317,7 +317,7 @@ static void PrintRootInfo(int root_f1, int root_f2)
   return;
 }
 
-/*
+/* 
  * Get and print some final statistics
  */
 
@@ -361,7 +361,7 @@ static void PrintFinalStats(void *cvode_mem)
  *   opt == 1 means SUNDIALS function returns a flag so check if
  *            flag >= 0
  *   opt == 2 means function allocates memory so check if returned
- *            NULL pointer
+ *            NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt)

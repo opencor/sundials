@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2015, Southern Methodist University and
+ * Copyright (c) 2015, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -16,17 +16,17 @@
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
  * Example problem:
- *
- * The following is a simple example problem with analytical
+ * 
+ * The following is a simple example problem with analytical 
  * solution,
  *    dy/dt = lamda*y + 1/(1+t^2) - lamda*atan(t)
- * for t in the interval [0.0, 10.0], with initial condition: y=0.
- *
- * The stiffness of the problem is directly proportional to the
+ * for t in the interval [0.0, 10.0], with initial condition: y=0. 
+ * 
+ * The stiffness of the problem is directly proportional to the 
  * value of "lamda".  The value of lamda should be negative to
- * result in a well-posed ODE; for values with magnitude larger
+ * result in a well-posed ODE; for values with magnitude larger 
  * than 100 the problem becomes quite stiff.
- *
+ * 
  * This program solves the problem with the DIRK method,
  * Newton iteration with the dense SUNLinearSolver, and a
  * user-supplied Jacobian routine.
@@ -57,7 +57,7 @@
 
 /* User-supplied Functions Called by the Solver */
 static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data);
-static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
+static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J, 
                void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 
 /* Private function to check function return values */
@@ -135,7 +135,7 @@ int main()
   fprintf(UFID,"# t u\n");
 
   /* output initial condition to disk */
-  fprintf(UFID," %.16"ESYM" %.16"ESYM"\n", T0, NV_Ith_S(y,0));
+  fprintf(UFID," %.16"ESYM" %.16"ESYM"\n", T0, NV_Ith_S(y,0));  
 
   /* Main time-stepping loop: calls ARKode to perform the integration, then
      prints results.  Stops when the final time has been reached */
@@ -148,7 +148,7 @@ int main()
     flag = ARKode(arkode_mem, tout, y, &t, ARK_NORMAL);      /* call integrator */
     if (check_flag(&flag, "ARKode", 1)) break;
     printf("  %10.6"FSYM"  %10.6"FSYM"\n", t, NV_Ith_S(y,0));          /* access/print solution */
-    fprintf(UFID," %.16"ESYM" %.16"ESYM"\n", t, NV_Ith_S(y,0));
+    fprintf(UFID," %.16"ESYM" %.16"ESYM"\n", t, NV_Ith_S(y,0));  
     if (flag >= 0) {                                         /* successful solve: update time */
       tout += dTout;
       tout = (tout > Tf) ? Tf : tout;
@@ -198,7 +198,7 @@ int main()
   ARKodeFree(&arkode_mem);  /* Free integrator memory */
   SUNLinSolFree(LS);        /* Free linear solver */
   SUNMatDestroy(A);         /* Free A matrix */
-
+ 
   return flag;
 }
 
@@ -226,7 +226,7 @@ static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
   realtype *rdata = (realtype *) user_data;   /* cast user_data to realtype */
   realtype lamda = rdata[0];                  /* set shortcut for stiffness parameter */
   realtype *Jdata = SUNDenseMatrix_Data(J);
-
+  
   /* Fill in Jacobian of f: set the first entry of the data array to set the (0,0) entry */
   Jdata[0] = lamda;
 
@@ -243,7 +243,7 @@ static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
     opt == 1 means SUNDIALS function returns a flag so check if
              flag >= 0
     opt == 2 means function allocates memory so check if returned
-             NULL pointer
+             NULL pointer  
 */
 static int check_flag(void *flagvalue, const char *funcname, int opt)
 {
@@ -275,7 +275,7 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
 /* check the computed solution */
 static int check_ans(N_Vector y, realtype t, realtype rtol, realtype atol)
 {
-  int      passfail=0;     /* answer pass (0) or fail (1) flag     */
+  int      passfail=0;     /* answer pass (0) or fail (1) flag     */  
   realtype ans, err, ewt;  /* answer data, error, and error weight */
   realtype ONE=RCONST(1.0);
 
@@ -285,7 +285,7 @@ static int check_ans(N_Vector y, realtype t, realtype rtol, realtype atol)
   err = ewt * SUNRabs(NV_Ith_S(y,0) - ans);
 
   /* is the solution within the tolerances? */
-  passfail = (err < ONE) ? 0 : 1;
+  passfail = (err < ONE) ? 0 : 1; 
 
   if (passfail) {
     fprintf(stdout, "\nSUNDIALS_WARNING: check_ans error=%g \n\n", err);

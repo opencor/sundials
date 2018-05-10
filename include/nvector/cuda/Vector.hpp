@@ -162,7 +162,7 @@ private:
 // Vector extractor
 template <typename T, typename I>
 inline Vector<T, I> *extract(N_Vector v)
-{
+{ 
   return static_cast<Vector<T, I>*>(v->content);
 }
 

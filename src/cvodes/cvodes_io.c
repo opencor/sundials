@@ -7,8 +7,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -31,13 +31,13 @@
 #define ZERO RCONST(0.0)
 #define ONE  RCONST(1.0)
 
-/*
+/* 
  * =================================================================
  * CVODES optional input functions
  * =================================================================
  */
 
-/*
+/* 
  * CVodeSetErrHandlerFn
  *
  * Specifies the error handler function
@@ -60,7 +60,7 @@ int CVodeSetErrHandlerFn(void *cvode_mem, CVErrHandlerFn ehfun, void *eh_data)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetErrFile
  *
  * Specifies the FILE pointer for output (NULL means no messages)
@@ -82,7 +82,7 @@ int CVodeSetErrFile(void *cvode_mem, FILE *errfp)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetIterType
  *
  * Specifies the iteration type (CV_FUNCTIONAL or CV_NEWTON)
@@ -109,7 +109,7 @@ int CVodeSetIterType(void *cvode_mem, int iter)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetUserData
  *
  * Specifies the user data pointer for f
@@ -131,7 +131,7 @@ int CVodeSetUserData(void *cvode_mem, void *user_data)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetMaxOrd
  *
  * Specifies the maximum method order
@@ -153,7 +153,7 @@ int CVodeSetMaxOrd(void *cvode_mem, int maxord)
     cvProcessError(cv_mem, CV_ILL_INPUT, "CVODES", "CVodeSetMaxOrd", MSGCV_NEG_MAXORD);
     return(CV_ILL_INPUT);
   }
-
+  
   /* Cannot increase maximum order beyond the value that
      was used when allocating memory */
   qmax_alloc = cv_mem->cv_qmax_alloc;
@@ -170,7 +170,7 @@ int CVodeSetMaxOrd(void *cvode_mem, int maxord)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetMaxNumSteps
  *
  * Specifies the maximum number of integration steps
@@ -196,7 +196,7 @@ int CVodeSetMaxNumSteps(void *cvode_mem, long int mxsteps)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetMaxHnilWarns
  *
  * Specifies the maximum number of warnings for small h
@@ -218,7 +218,7 @@ int CVodeSetMaxHnilWarns(void *cvode_mem, int mxhnil)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  *CVodeSetStabLimDet
  *
  * Turns on/off the stability limit detection algorithm
@@ -245,7 +245,7 @@ int CVodeSetStabLimDet(void *cvode_mem, booleantype sldet)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetInitStep
  *
  * Specifies the initial step size
@@ -267,7 +267,7 @@ int CVodeSetInitStep(void *cvode_mem, realtype hin)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetMinStep
  *
  * Specifies the minimum step size
@@ -305,7 +305,7 @@ int CVodeSetMinStep(void *cvode_mem, realtype hmin)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetMaxStep
  *
  * Specifies the maximum step size
@@ -345,7 +345,7 @@ int CVodeSetMaxStep(void *cvode_mem, realtype hmax)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetStopTime
  *
  * Specifies the time beyond which the integration is not to proceed.
@@ -380,7 +380,7 @@ int CVodeSetStopTime(void *cvode_mem, realtype tstop)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetMaxErrTestFails
  *
  * Specifies the maximum number of error test failures during one
@@ -403,10 +403,10 @@ int CVodeSetMaxErrTestFails(void *cvode_mem, int maxnef)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetMaxConvFails
  *
- * Specifies the maximum number of nonlinear convergence failures
+ * Specifies the maximum number of nonlinear convergence failures 
  * during one step try.
  */
 
@@ -426,7 +426,7 @@ int CVodeSetMaxConvFails(void *cvode_mem, int maxncf)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetMaxNonlinIters
  *
  * Specifies the maximum number of nonlinear iterations during
@@ -449,7 +449,7 @@ int CVodeSetMaxNonlinIters(void *cvode_mem, int maxcor)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetNonlinConvCoef
  *
  * Specifies the coeficient in the nonlinear solver convergence
@@ -472,7 +472,7 @@ int CVodeSetNonlinConvCoef(void *cvode_mem, realtype nlscoef)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeSetRootDirection
  *
  * Specifies the direction of zero-crossings to be monitored.
@@ -494,7 +494,7 @@ int CVodeSetRootDirection(void *cvode_mem, int *rootdir)
   nrt = cv_mem->cv_nrtfn;
   if (nrt==0) {
     cvProcessError(cv_mem, CV_ILL_INPUT, "CVODES", "CVodeSetRootDirection", MSGCV_NO_ROOT);
-    return(CV_ILL_INPUT);
+    return(CV_ILL_INPUT);    
   }
 
   for(i=0; i<nrt; i++) cv_mem->cv_rootdir[i] = rootdir[i];
@@ -522,11 +522,11 @@ int CVodeSetNoInactiveRootWarn(void *cvode_mem)
   cv_mem = (CVodeMem) cvode_mem;
 
   cv_mem->cv_mxgnull = 0;
-
+  
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * =================================================================
  * Quadrature optional input functions
  * =================================================================
@@ -537,7 +537,7 @@ int CVodeSetQuadErrCon(void *cvode_mem, booleantype errconQ)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetQuadErrCon", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetQuadErrCon", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
   cv_mem = (CVodeMem) cvode_mem;
@@ -547,7 +547,7 @@ int CVodeSetQuadErrCon(void *cvode_mem, booleantype errconQ)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * =================================================================
  * FSA optional input functions
  * =================================================================
@@ -558,19 +558,19 @@ int CVodeSetSensDQMethod(void *cvode_mem, int DQtype, realtype DQrhomax)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetSensDQMethod", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetSensDQMethod", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
   cv_mem = (CVodeMem) cvode_mem;
 
   if ( (DQtype != CV_CENTERED) && (DQtype != CV_FORWARD) ) {
-    cvProcessError(cv_mem, CV_ILL_INPUT, "CVODES", "CVodeSetSensDQMethod", MSGCV_BAD_DQTYPE);
+    cvProcessError(cv_mem, CV_ILL_INPUT, "CVODES", "CVodeSetSensDQMethod", MSGCV_BAD_DQTYPE);    
     return(CV_ILL_INPUT);
   }
 
   if (DQrhomax < ZERO ) {
-    cvProcessError(cv_mem, CV_ILL_INPUT, "CVODES", "CVodeSetSensDQMethod", MSGCV_BAD_DQRHO);
+    cvProcessError(cv_mem, CV_ILL_INPUT, "CVODES", "CVodeSetSensDQMethod", MSGCV_BAD_DQRHO);    
     return(CV_ILL_INPUT);
   }
 
@@ -587,7 +587,7 @@ int CVodeSetSensErrCon(void *cvode_mem, booleantype errconS)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetSensErrCon", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetSensErrCon", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
   cv_mem = (CVodeMem) cvode_mem;
@@ -604,7 +604,7 @@ int CVodeSetSensMaxNonlinIters(void *cvode_mem, int maxcorS)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetSensMaxNonlinIters", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetSensMaxNonlinIters", MSGCV_NO_MEM);    
     return (CV_MEM_NULL);
   }
 
@@ -623,7 +623,7 @@ int CVodeSetSensParams(void *cvode_mem, realtype *p, realtype *pbar, int *plist)
   int is, Ns;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetSensParams", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetSensParams", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
@@ -682,7 +682,7 @@ int CVodeSetQuadSensErrCon(void *cvode_mem, booleantype errconQS)
   if (cvode_mem==NULL) {
     cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeSetQuadSensErrCon", MSGCV_NO_MEM);
     return(CV_MEM_NULL);
-  }
+  }  
   cv_mem = (CVodeMem) cvode_mem;
 
   /* Was sensitivity initialized? */
@@ -690,12 +690,12 @@ int CVodeSetQuadSensErrCon(void *cvode_mem, booleantype errconQS)
   if (cv_mem->cv_SensMallocDone == SUNFALSE) {
     cvProcessError(cv_mem, CV_NO_SENS, "CVODES", "CVodeSetQuadSensTolerances", MSGCV_NO_SENSI);
     return(CV_NO_SENS);
-  }
+  } 
 
   /* Ckeck if quadrature sensitivity was initialized? */
 
   if (cv_mem->cv_QuadSensMallocDone == SUNFALSE) {
-    cvProcessError(cv_mem, CV_NO_QUADSENS, "CVODES", "CVodeSetQuadSensErrCon", MSGCV_NO_QUADSENSI);
+    cvProcessError(cv_mem, CV_NO_QUADSENS, "CVODES", "CVodeSetQuadSensErrCon", MSGCV_NO_QUADSENSI); 
     return(CV_NO_QUAD);
   }
 
@@ -704,7 +704,7 @@ int CVodeSetQuadSensErrCon(void *cvode_mem, booleantype errconQS)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * =================================================================
  * CVODES optional output functions
  * =================================================================
@@ -732,7 +732,7 @@ int CVodeGetNumSteps(void *cvode_mem, long int *nsteps)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetNumRhsEvals
  *
  * Returns the current number of calls to f
@@ -754,7 +754,7 @@ int CVodeGetNumRhsEvals(void *cvode_mem, long int *nfevals)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetNumLinSolvSetups
  *
  * Returns the current number of calls to the linear solver setup routine
@@ -798,7 +798,7 @@ int CVodeGetNumErrTestFails(void *cvode_mem, long int *netfails)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetLastOrder
  *
  * Returns the order on the last succesful step
@@ -820,7 +820,7 @@ int CVodeGetLastOrder(void *cvode_mem, int *qlast)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetCurrentOrder
  *
  * Returns the order to be attempted on the next step
@@ -842,7 +842,7 @@ int CVodeGetCurrentOrder(void *cvode_mem, int *qcur)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetNumStabLimOrderReds
  *
  * Returns the number of order reductions triggered by the stability
@@ -868,7 +868,7 @@ int CVodeGetNumStabLimOrderReds(void *cvode_mem, long int *nslred)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetActualInitStep
  *
  * Returns the step size used on the first step
@@ -912,7 +912,7 @@ int CVodeGetLastStep(void *cvode_mem, realtype *hlast)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetCurrentStep
  *
  * Returns the step size to be attempted on the next step
@@ -928,13 +928,13 @@ int CVodeGetCurrentStep(void *cvode_mem, realtype *hcur)
   }
 
   cv_mem = (CVodeMem) cvode_mem;
-
+  
   *hcur = cv_mem->cv_next_h;
 
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetCurrentTime
  *
  * Returns the current value of the independent variable
@@ -956,7 +956,7 @@ int CVodeGetCurrentTime(void *cvode_mem, realtype *tcur)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetTolScaleFactor
  *
  * Returns a suggested factor for scaling tolerances
@@ -978,7 +978,7 @@ int CVodeGetTolScaleFactor(void *cvode_mem, realtype *tolsfact)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetErrWeights
  *
  * This routine returns the current weight vector.
@@ -1022,7 +1022,7 @@ int CVodeGetEstLocalErrors(void *cvode_mem, N_Vector ele)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetWorkSpace
  *
  * Returns integrator work space requirements
@@ -1045,15 +1045,15 @@ int CVodeGetWorkSpace(void *cvode_mem, long int *lenrw, long int *leniw)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetIntegratorStats
  *
  * Returns integrator statistics
  */
 
-int CVodeGetIntegratorStats(void *cvode_mem, long int *nsteps, long int *nfevals,
-                            long int *nlinsetups, long int *netfails, int *qlast,
-                            int *qcur, realtype *hinused, realtype *hlast,
+int CVodeGetIntegratorStats(void *cvode_mem, long int *nsteps, long int *nfevals, 
+                            long int *nlinsetups, long int *netfails, int *qlast, 
+                            int *qcur, realtype *hinused, realtype *hlast, 
                             realtype *hcur, realtype *tcur)
 {
   CVodeMem cv_mem;
@@ -1079,7 +1079,7 @@ int CVodeGetIntegratorStats(void *cvode_mem, long int *nsteps, long int *nfevals
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetNumGEvals
  *
  * Returns the current number of calls to g (for rootfinding)
@@ -1101,7 +1101,7 @@ int CVodeGetNumGEvals(void *cvode_mem, long int *ngevals)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetRootInfo
  *
  * Returns pointer to array rootsfound showing roots found
@@ -1127,7 +1127,7 @@ int CVodeGetRootInfo(void *cvode_mem, int *rootsfound)
 }
 
 
-/*
+/* 
  * CVodeGetNumNonlinSolvIters
  *
  * Returns the current number of iterations in the nonlinear solver
@@ -1149,7 +1149,7 @@ int CVodeGetNumNonlinSolvIters(void *cvode_mem, long int *nniters)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetNumNonlinSolvConvFails
  *
  * Returns the current number of convergence failures in the
@@ -1172,13 +1172,13 @@ int CVodeGetNumNonlinSolvConvFails(void *cvode_mem, long int *nncfails)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * CVodeGetNonlinSolvStats
  *
  * Returns nonlinear solver statistics
  */
 
-int CVodeGetNonlinSolvStats(void *cvode_mem, long int *nniters,
+int CVodeGetNonlinSolvStats(void *cvode_mem, long int *nniters, 
                             long int *nncfails)
 {
   CVodeMem cv_mem;
@@ -1197,7 +1197,7 @@ int CVodeGetNonlinSolvStats(void *cvode_mem, long int *nniters,
 }
 
 
-/*
+/* 
  * =================================================================
  * Quadrature optional output functions
  * =================================================================
@@ -1210,14 +1210,14 @@ int CVodeGetQuadNumRhsEvals(void *cvode_mem, long int *nfQevals)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadNumRhsEvals", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadNumRhsEvals", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
   cv_mem = (CVodeMem) cvode_mem;
 
   if (cv_mem->cv_quadr==SUNFALSE) {
-    cvProcessError(cv_mem, CV_NO_QUAD, "CVODES", "CVodeGetQuadNumRhsEvals", MSGCV_NO_QUAD);
+    cvProcessError(cv_mem, CV_NO_QUAD, "CVODES", "CVodeGetQuadNumRhsEvals", MSGCV_NO_QUAD); 
     return(CV_NO_QUAD);
   }
 
@@ -1233,14 +1233,14 @@ int CVodeGetQuadNumErrTestFails(void *cvode_mem, long int *nQetfails)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadNumErrTestFails", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadNumErrTestFails", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
   cv_mem = (CVodeMem) cvode_mem;
 
   if (cv_mem->cv_quadr==SUNFALSE) {
-    cvProcessError(cv_mem, CV_NO_QUAD, "CVODES", "CVodeGetQuadNumErrTestFails", MSGCV_NO_QUAD);
+    cvProcessError(cv_mem, CV_NO_QUAD, "CVODES", "CVodeGetQuadNumErrTestFails", MSGCV_NO_QUAD); 
     return(CV_NO_QUAD);
   }
 
@@ -1256,14 +1256,14 @@ int CVodeGetQuadErrWeights(void *cvode_mem, N_Vector eQweight)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadErrWeights", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadErrWeights", MSGCV_NO_MEM); 
     return(CV_MEM_NULL);
   }
 
   cv_mem = (CVodeMem) cvode_mem;
 
   if (cv_mem->cv_quadr==SUNFALSE) {
-    cvProcessError(cv_mem, CV_NO_QUAD, "CVODES", "CVodeGetQuadErrWeights", MSGCV_NO_QUAD);
+    cvProcessError(cv_mem, CV_NO_QUAD, "CVODES", "CVodeGetQuadErrWeights", MSGCV_NO_QUAD); 
     return(CV_NO_QUAD);
   }
 
@@ -1279,14 +1279,14 @@ int CVodeGetQuadStats(void *cvode_mem, long int *nfQevals, long int *nQetfails)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadStats", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadStats", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
   cv_mem = (CVodeMem) cvode_mem;
 
   if (cv_mem->cv_quadr==SUNFALSE) {
-    cvProcessError(cv_mem, CV_NO_QUAD, "CVODES", "CVodeGetQuadStats", MSGCV_NO_QUAD);
+    cvProcessError(cv_mem, CV_NO_QUAD, "CVODES", "CVodeGetQuadStats", MSGCV_NO_QUAD); 
     return(CV_NO_QUAD);
   }
 
@@ -1296,7 +1296,7 @@ int CVodeGetQuadStats(void *cvode_mem, long int *nfQevals, long int *nQetfails)
   return(CV_SUCCESS);
 }
 
-/*
+/* 
  * =================================================================
  * Quadrature FSA optional output functions
  * =================================================================
@@ -1309,14 +1309,14 @@ int CVodeGetQuadSensNumRhsEvals(void *cvode_mem, long int *nfQSevals)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadSensNumRhsEvals", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadSensNumRhsEvals", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
   cv_mem = (CVodeMem) cvode_mem;
 
   if (cv_mem->cv_quadr_sensi == SUNFALSE) {
-    cvProcessError(cv_mem, CV_NO_QUADSENS, "CVODES", "CVodeGetQuadSensNumRhsEvals", MSGCV_NO_QUADSENSI);
+    cvProcessError(cv_mem, CV_NO_QUADSENS, "CVODES", "CVodeGetQuadSensNumRhsEvals", MSGCV_NO_QUADSENSI); 
     return(CV_NO_QUADSENS);
   }
 
@@ -1332,14 +1332,14 @@ int CVodeGetQuadSensNumErrTestFails(void *cvode_mem, long int *nQSetfails)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadSensNumErrTestFails", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadSensNumErrTestFails", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
   cv_mem = (CVodeMem) cvode_mem;
 
   if (cv_mem->cv_quadr_sensi == SUNFALSE) {
-    cvProcessError(cv_mem, CV_NO_QUADSENS, "CVODES", "CVodeGetQuadSensNumErrTestFails", MSGCV_NO_QUADSENSI);
+    cvProcessError(cv_mem, CV_NO_QUADSENS, "CVODES", "CVodeGetQuadSensNumErrTestFails", MSGCV_NO_QUADSENSI); 
     return(CV_NO_QUADSENS);
   }
 
@@ -1356,14 +1356,14 @@ int CVodeGetQuadSensErrWeights(void *cvode_mem, N_Vector *eQSweight)
   int is, Ns;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadSensErrWeights", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadSensErrWeights", MSGCV_NO_MEM); 
     return(CV_MEM_NULL);
   }
 
   cv_mem = (CVodeMem) cvode_mem;
 
   if (cv_mem->cv_quadr_sensi == SUNFALSE) {
-    cvProcessError(cv_mem, CV_NO_QUADSENS, "CVODES", "CVodeGetQuadSensErrWeights", MSGCV_NO_QUADSENSI);
+    cvProcessError(cv_mem, CV_NO_QUADSENS, "CVODES", "CVodeGetQuadSensErrWeights", MSGCV_NO_QUADSENSI); 
     return(CV_NO_QUADSENS);
   }
   Ns = cv_mem->cv_Ns;
@@ -1382,14 +1382,14 @@ int CVodeGetQuadSensStats(void *cvode_mem, long int *nfQSevals, long int *nQSetf
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadSensStats", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetQuadSensStats", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
   cv_mem = (CVodeMem) cvode_mem;
 
   if (cv_mem->cv_quadr_sensi == SUNFALSE) {
-    cvProcessError(cv_mem, CV_NO_QUADSENS, "CVODES", "CVodeGetQuadSensStats", MSGCV_NO_QUADSENSI);
+    cvProcessError(cv_mem, CV_NO_QUADSENS, "CVODES", "CVodeGetQuadSensStats", MSGCV_NO_QUADSENSI); 
     return(CV_NO_QUADSENS);
   }
 
@@ -1400,7 +1400,7 @@ int CVodeGetQuadSensStats(void *cvode_mem, long int *nfQSevals, long int *nQSetf
 }
 
 
-/*
+/* 
  * =================================================================
  * FSA optional output functions
  * =================================================================
@@ -1413,7 +1413,7 @@ int CVodeGetSensNumRhsEvals(void *cvode_mem, long int *nfSevals)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetSensNumRhsEvals", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetSensNumRhsEvals", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
@@ -1436,7 +1436,7 @@ int CVodeGetNumRhsEvalsSens(void *cvode_mem, long int *nfevalsS)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetNumRhsEvalsSens", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetNumRhsEvalsSens", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
@@ -1459,7 +1459,7 @@ int CVodeGetSensNumErrTestFails(void *cvode_mem, long int *nSetfails)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetSensNumErrTestFails", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetSensNumErrTestFails", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
@@ -1482,7 +1482,7 @@ int CVodeGetSensNumLinSolvSetups(void *cvode_mem, long int *nlinsetupsS)
   CVodeMem cv_mem;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetSensNumLinSolvSetups", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetSensNumLinSolvSetups", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
@@ -1506,7 +1506,7 @@ int CVodeGetSensErrWeights(void *cvode_mem, N_Vector *eSweight)
   int is, Ns;
 
   if (cvode_mem==NULL) {
-    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetSensErrWeights", MSGCV_NO_MEM);
+    cvProcessError(NULL, CV_MEM_NULL, "CVODES", "CVodeGetSensErrWeights", MSGCV_NO_MEM);    
     return(CV_MEM_NULL);
   }
 
@@ -1527,7 +1527,7 @@ int CVodeGetSensErrWeights(void *cvode_mem, N_Vector *eSweight)
 
 /*-----------------------------------------------------------------*/
 
-int CVodeGetSensStats(void *cvode_mem, long int *nfSevals, long int *nfevalsS,
+int CVodeGetSensStats(void *cvode_mem, long int *nfSevals, long int *nfevalsS, 
                       long int *nSetfails, long int *nlinsetupsS)
 {
   CVodeMem cv_mem;
@@ -1619,7 +1619,7 @@ int CVodeGetStgrSensNumNonlinSolvIters(void *cvode_mem, long int *nSTGR1niters)
     return(CV_NO_SENS);
   }
 
-  if(cv_mem->cv_ism==CV_STAGGERED1)
+  if(cv_mem->cv_ism==CV_STAGGERED1) 
     for(is=0; is<Ns; is++) nSTGR1niters[is] = cv_mem->cv_nniS1[is];
 
   return(CV_SUCCESS);
@@ -1646,7 +1646,7 @@ int CVodeGetStgrSensNumNonlinSolvConvFails(void *cvode_mem, long int *nSTGR1ncfa
     return(CV_NO_SENS);
   }
 
-  if(cv_mem->cv_ism==CV_STAGGERED1)
+  if(cv_mem->cv_ism==CV_STAGGERED1) 
     for(is=0; is<Ns; is++) nSTGR1ncfails[is] = cv_mem->cv_ncfnS1[is];
 
   return(CV_SUCCESS);
@@ -1654,7 +1654,7 @@ int CVodeGetStgrSensNumNonlinSolvConvFails(void *cvode_mem, long int *nSTGR1ncfa
 
 /*-----------------------------------------------------------------*/
 
-int CVodeGetSensNonlinSolvStats(void *cvode_mem, long int *nSniters,
+int CVodeGetSensNonlinSolvStats(void *cvode_mem, long int *nSniters, 
                                 long int *nSncfails)
 {
   CVodeMem cv_mem;
@@ -1787,7 +1787,7 @@ char *CVodeGetReturnFlagName(long int flag)
     break;
   case CV_TOO_CLOSE:
     sprintf(name,"CV_TOO_CLOSE");
-    break;
+    break; 
   case CV_NO_ADJ:
     sprintf(name,"CV_NO_ADJ");
     break;
@@ -1808,7 +1808,7 @@ char *CVodeGetReturnFlagName(long int flag)
     break;
   case CV_GETY_BADT:
     sprintf(name,"CV_GETY_BADT");
-    break;
+    break;  
   default:
     sprintf(name,"NONE");
   }

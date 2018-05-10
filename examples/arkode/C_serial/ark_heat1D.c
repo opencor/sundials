@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2015, Southern Methodist University and
+ * Copyright (c) 2015, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -16,26 +16,26 @@
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
  * Example problem:
- *
+ * 
  * The following test simulates a simple 1D heat equation,
  *    u_t = k*u_xx + f
  * for t in [0, 10], x in [0, 1], with initial conditions
  *    u(0,x) =  0
- * Dirichlet boundary conditions, i.e.
+ * Dirichlet boundary conditions, i.e. 
  *    u_t(t,0) = u_t(t,1) = 0,
  * and a point-source heating term,
  *    f = 1 for x=0.5.
- *
- * The spatial derivatives are computed using second-order
- * centered differences, with the data distributed over N points
+ * 
+ * The spatial derivatives are computed using second-order 
+ * centered differences, with the data distributed over N points 
  * on a uniform spatial grid.
  *
  * This program solves the problem with either an ERK or DIRK
- * method.  For the DIRK method, we use a Newton iteration with
- * the SUNPCG linear solver, and a user-supplied Jacobian-vector
+ * method.  For the DIRK method, we use a Newton iteration with 
+ * the SUNPCG linear solver, and a user-supplied Jacobian-vector 
  * product routine.
  *
- * 100 outputs are printed at equal intervals, and run statistics
+ * 100 outputs are printed at equal intervals, and run statistics 
  * are printed at the end.
  *---------------------------------------------------------------*/
 
@@ -138,7 +138,7 @@ int main() {
   /* Initialize PCG solver -- no preconditioning, with up to N iterations  */
   LS = SUNPCG(y, 0, N);
   if (check_flag((void *)LS, "SUNPCG", 0)) return 1;
-
+  
   /* Linear solver interface -- set user-supplied J*v routine (no 'jtsetup' required) */
   flag = ARKSpilsSetLinearSolver(arkode_mem, LS);        /* Attach linear solver to ARKode */
   if (check_flag(&flag, "ARKSpilsSetLinearSolver", 1)) return 1;
@@ -266,7 +266,7 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 }
 
 /* Jacobian routine to compute J(t,y) = df/dy. */
-static int Jac(N_Vector v, N_Vector Jv, realtype t, N_Vector y,
+static int Jac(N_Vector v, N_Vector Jv, realtype t, N_Vector y, 
 	       N_Vector fy, void *user_data, N_Vector tmp)
 {
   UserData udata = (UserData) user_data;     /* variable shortcuts */
@@ -304,7 +304,7 @@ static int Jac(N_Vector v, N_Vector Jv, realtype t, N_Vector y,
     opt == 1 means SUNDIALS function returns a flag so check if
              flag >= 0
     opt == 2 means function allocates memory so check if returned
-             NULL pointer
+             NULL pointer  
 */
 static int check_flag(void *flagvalue, const char *funcname, int opt)
 {

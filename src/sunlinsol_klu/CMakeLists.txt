@@ -2,13 +2,13 @@
 # Programmer:  Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # LLNS/SMU Copyright Start
-# Copyright (c) 2017, Southern Methodist University and
+# Copyright (c) 2017, Southern Methodist University and 
 # Lawrence Livermore National Security
 #
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Southern Methodist University and Lawrence Livermore
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Southern Methodist University and Lawrence Livermore 
 # National Laboratory under Contract DE-AC52-07NA27344.
-# Produced at Southern Methodist University and the Lawrence
+# Produced at Southern Methodist University and the Lawrence 
 # Livermore National Laboratory.
 #
 # All rights reserved.
@@ -36,7 +36,7 @@ SET(sunlinsolklu_HEADERS
 # Add source directory to include directories
 INCLUDE_DIRECTORIES(.)
 
-# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY
+# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY 
 ADD_DEFINITIONS(-DBUILD_SUNDIALS_LIBRARY)
 
 # Rules for building and installing the static library:
@@ -73,44 +73,33 @@ ENDIF(BUILD_SHARED_LIBS)
 # Install the SUNLINSOLKLU header files
 INSTALL(FILES ${sunlinsolklu_HEADERS} DESTINATION include/sunlinsol)
 
-# If FCMIX is enabled and building with 64-bit indices, then build and install
-# the FSUNLINSOLKLU library
-IF(SUNDIALS_INDEX_TYPE MATCHES "INT32_T")
+IF(FCMIX_ENABLE AND F77_FOUND)
+  SET(fsunlinsolklu_SOURCES fsunlinsol_klu.c)
 
-  PRINT_WARNING("The Fortran interface to KLU is not compatible with ${SUNDIALS_INDEX_TYPE} integers"
-                "Fortran interfaces to KLU will not be built")
+  IF(BUILD_STATIC_LIBS)
+    ADD_LIBRARY(sundials_fsunlinsolklu_static STATIC ${fsunlinsolklu_SOURCES})
+    SET_TARGET_PROPERTIES(sundials_fsunlinsolklu_static
+      PROPERTIES OUTPUT_NAME sundials_fsunlinsolklu CLEAN_DIRECT_OUTPUT 1)
+    INSTALL(TARGETS sundials_fsunlinsolklu_static DESTINATION lib)
+  ENDIF(BUILD_STATIC_LIBS)
 
-ELSE(SUNDIALS_INDEX_TYPE MATCHES "INT32_T")
+  IF(BUILD_SHARED_LIBS)
+    ADD_LIBRARY(sundials_fsunlinsolklu_shared ${fsunlinsolklu_SOURCES})
 
-  IF(FCMIX_ENABLE AND F77_FOUND)
-    SET(fsunlinsolklu_SOURCES fsunlinsol_klu.c)
+    # fsunlinsolklu depends on fnvecserial, fsunmatrixsparse, sunlinsolklu
+    TARGET_LINK_LIBRARIES(sundials_fsunlinsolklu_shared
+      sundials_fnvecserial_shared
+      sundials_fsunmatrixsparse_shared
+      sundials_sunlinsolklu_shared)
 
-    IF(BUILD_STATIC_LIBS)
-      ADD_LIBRARY(sundials_fsunlinsolklu_static STATIC ${fsunlinsolklu_SOURCES})
-      SET_TARGET_PROPERTIES(sundials_fsunlinsolklu_static
-        PROPERTIES OUTPUT_NAME sundials_fsunlinsolklu CLEAN_DIRECT_OUTPUT 1)
-      INSTALL(TARGETS sundials_fsunlinsolklu_static DESTINATION lib)
-    ENDIF(BUILD_STATIC_LIBS)
+    SET_TARGET_PROPERTIES(sundials_fsunlinsolklu_shared
+      PROPERTIES OUTPUT_NAME sundials_fsunlinsolklu CLEAN_DIRECT_OUTPUT 1)
+    SET_TARGET_PROPERTIES(sundials_fsunlinsolklu_shared 
+      PROPERTIES VERSION ${sunlinsollib_VERSION} SOVERSION ${sunlinsollib_SOVERSION})
+    INSTALL(TARGETS sundials_fsunlinsolklu_shared DESTINATION lib)
+  ENDIF(BUILD_SHARED_LIBS)
 
-    IF(BUILD_SHARED_LIBS)
-      ADD_LIBRARY(sundials_fsunlinsolklu_shared ${fsunlinsolklu_SOURCES})
-
-      # fsunlinsolklu depends on fnvecserial, fsunmatrixsparse, sunlinsolklu
-      TARGET_LINK_LIBRARIES(sundials_fsunlinsolklu_shared
-        sundials_fnvecserial_shared
-        sundials_fsunmatrixsparse_shared
-        sundials_sunlinsolklu_shared)
-
-      SET_TARGET_PROPERTIES(sundials_fsunlinsolklu_shared
-        PROPERTIES OUTPUT_NAME sundials_fsunlinsolklu CLEAN_DIRECT_OUTPUT 1)
-      SET_TARGET_PROPERTIES(sundials_fsunlinsolklu_shared
-        PROPERTIES VERSION ${sunlinsollib_VERSION} SOVERSION ${sunlinsollib_SOVERSION})
-      INSTALL(TARGETS sundials_fsunlinsolklu_shared DESTINATION lib)
-    ENDIF(BUILD_SHARED_LIBS)
-
-  ENDIF(FCMIX_ENABLE AND F77_FOUND)
-
-ENDIF(SUNDIALS_INDEX_TYPE MATCHES "INT32_T")
+ENDIF(FCMIX_ENABLE AND F77_FOUND)
 
 #
 MESSAGE(STATUS "Added SUNLINSOL_KLU module")

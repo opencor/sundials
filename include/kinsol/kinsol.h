@@ -8,8 +8,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -121,13 +121,13 @@ extern "C" {
 #define KIN_ETACHOICE1  1
 #define KIN_ETACHOICE2  2
 #define KIN_ETACONSTANT 3
-
+  
 /*
  * -----------------------------------------------------------------
  * Enumeration for global strategy
  * -----------------------------------------------------------------
  */
-
+  
 #define KIN_NONE       0
 #define KIN_LINESEARCH 1
 #define KIN_PICARD     2
@@ -149,7 +149,7 @@ extern "C" {
  * N_Vector) equal to F(uu) before returning. Additional workspace
  * is allocated by the user and referenced by the user_data memory
  * pointer.
- *
+ * 
  * Note: The user-defined routine (internally referenced by a
  * a pointer (type KINSysFn) named func) should have an 'int' return
  * value type. However, the return value is currently ignored.
@@ -168,17 +168,17 @@ typedef int (*KINSysFn)(N_Vector uu, N_Vector fval, void *user_data );
  * The function eh takes as input the error code, the name of the
  * module reporting the error, the error message, and a pointer to
  * user data, the same as that passed to KINSetUserData.
- *
- * All error codes are negative, except KIN_WARNING which indicates
+ * 
+ * All error codes are negative, except KIN_WARNING which indicates 
  * a warning (the solver continues).
  *
  * A KINErrHandlerFn has no return value.
  * -----------------------------------------------------------------
  */
 
-typedef void (*KINErrHandlerFn)(int error_code,
-				const char *module, const char *function,
-				char *msg, void *user_data);
+typedef void (*KINErrHandlerFn)(int error_code, 
+				const char *module, const char *function, 
+				char *msg, void *user_data); 
 
 
 /*
@@ -190,17 +190,17 @@ typedef void (*KINErrHandlerFn)(int error_code,
  * The function ih takes as input the name of the module and of the
  * function reporting the info message and a pointer to
  * user data, the same as that passed to KINSetfdata.
- *
+ * 
  * A KINInfoHandlerFn has no return value.
  * -----------------------------------------------------------------
  */
 
-typedef void (*KINInfoHandlerFn)(const char *module, const char *function,
-				 char *msg, void *user_data);
+typedef void (*KINInfoHandlerFn)(const char *module, const char *function, 
+				 char *msg, void *user_data); 
 
 /*
  * ================================================================
- *          U S E R - C A L L A B L E   R O U T I N E S
+ *          U S E R - C A L L A B L E   R O U T I N E S           
  * ================================================================
  */
 
@@ -234,7 +234,7 @@ SUNDIALS_EXPORT void *KINCreate(void);
  *                        |
  * KINSetErrFile          | pointer (type FILE) indicating where all
  *                        | warning/error messages should be sent
- *                        | if the default internal error handler
+ *                        | if the default internal error handler 
  *                        | is used
  *                        | [stderr]
  *                        |
@@ -301,7 +301,7 @@ SUNDIALS_EXPORT void *KINCreate(void);
  *                        | [SUNFALSE if using direct linear solver]
  *                        | [SUNTRUE if using inexact linear solver]
  *                        |
- * KINSetMaxSetupCalls    | mbset, number of nonlinear iteraions, such
+ * KINSetMaxSetupCalls    | mbset, number of nonlinear iteraions, such 
  *                        | that a call to the linear solver setup routine
  *                        | (lsetup) is forced every mbset iterations.
  *                        | If mbset=1, lsetup s called at every iteration.
@@ -338,7 +338,7 @@ SUNDIALS_EXPORT void *KINCreate(void);
  *                        |  eta = ABS(||F(u_k+1)||_L2-||F(u_k)+J(u_k)*p_k||_L2)
  *                        |        ---------------------------------------------
  *                        |                        ||F(u_k)||_L2
- *                        |
+ *                        | 
  *                        |  KIN_ETACHOICE2  (refer to KINForcingTerm)
  *                        |
  *                        |                [ ||F(u_k+1)||_L2 ]^alpha
@@ -413,7 +413,7 @@ SUNDIALS_EXPORT void *KINCreate(void);
  *                        |
  * KINSetConstraints      | pointer to an array (type N_Vector) of
  *                        | constraints on the solution vector u
- *                        |
+ *                        | 
  *                        | if constraints[i] =
  *                        |
  *                        |   0  u[i] not constrained
@@ -429,7 +429,7 @@ SUNDIALS_EXPORT void *KINCreate(void);
  *                        | [NULL]
  *                        |
  * KINSetSysFunc          | set the user-provided routine which
- *                        | defines the nonlinear problem to be
+ *                        | defines the nonlinear problem to be 
  *                        | solved
  *                        | [none]
  * -----------------------------------------------------------------
@@ -733,7 +733,7 @@ SUNDIALS_EXPORT int KINSol(void *kinmem, N_Vector uu, int strategy,
  * following:
  *
  * KIN_SUCCESS : means the information was successfully retrieved [0]
- *
+ * 
  * KIN_MEM_NULL : means a NULL KINSOL memory block pointer was given
  *                (must call the KINCreate and KINInit memory
  *                allocation subroutines prior to calling KINSol) [-1]
@@ -743,7 +743,7 @@ SUNDIALS_EXPORT int KINSol(void *kinmem, N_Vector uu, int strategy,
 SUNDIALS_EXPORT int KINGetWorkSpace(void *kinmem, long int *lenrw, long int *leniw);
 SUNDIALS_EXPORT int KINGetNumNonlinSolvIters(void *kinmem, long int *nniters);
 SUNDIALS_EXPORT int KINGetNumFuncEvals(void *kinmem, long int *nfevals);
-SUNDIALS_EXPORT int KINGetNumBetaCondFails(void *kinmem, long int *nbcfails);
+SUNDIALS_EXPORT int KINGetNumBetaCondFails(void *kinmem, long int *nbcfails); 
 SUNDIALS_EXPORT int KINGetNumBacktrackOps(void *kinmem, long int *nbacktr);
 SUNDIALS_EXPORT int KINGetFuncNorm(void *kinmem, realtype *fnorm);
 SUNDIALS_EXPORT int KINGetStepLength(void *kinmem, realtype *steplength);

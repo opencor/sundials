@@ -5,7 +5,7 @@
  All rights reserved.
  For details, see the LICENSE file.
  ----------------------------------------------------------------
- This is the implementation file for the preconditioned conjugate
+ This is the implementation file for the preconditioned conjugate 
  gradient solver in SUNDIALS.
  --------------------------------------------------------------*/
 #include <stdio.h>
@@ -176,7 +176,7 @@ int PcgSolve(PcgMem mem, void *A_data, N_Vector x, N_Vector b,
     /* update rz */
     rz_old = rz;
     rz = N_VDotProd(r, z);
-
+    
     /* Calculate beta = <r,z> / <r_old,z_old> */
     beta = rz / rz_old;
 

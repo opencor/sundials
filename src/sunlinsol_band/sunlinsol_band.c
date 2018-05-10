@@ -3,23 +3,23 @@
  * Programmer(s): Daniel Reynolds @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the implementation file for the band implementation of
+ * This is the implementation file for the band implementation of 
  * the SUNLINSOL package.
  * -----------------------------------------------------------------
- */
+ */ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +37,7 @@ sunindextype GlobalVectorLength_BandLS(N_Vector y);
 
 /*
  * -----------------------------------------------------------------
- * Band solver structure accessibility macros:
+ * Band solver structure accessibility macros: 
  * -----------------------------------------------------------------
  */
 
@@ -61,7 +61,7 @@ SUNLinearSolver SUNBandLinearSolver(N_Vector y, SUNMatrix A)
   SUNLinearSolver_Ops ops;
   SUNLinearSolverContent_Band content;
   sunindextype MatrixRows, VecLength;
-
+  
   /* Check compatibility with supplied SUNMatrix and N_Vector */
   if (SUNMatGetID(A) != SUNMATRIX_BAND)
     return(NULL);
@@ -82,12 +82,12 @@ SUNLinearSolver SUNBandLinearSolver(N_Vector y, SUNMatrix A)
   VecLength = GlobalVectorLength_BandLS(y);
   if (MatrixRows != VecLength)
     return(NULL);
-
+  
   /* Create linear solver */
   S = NULL;
   S = (SUNLinearSolver) malloc(sizeof *S);
   if (S == NULL) return(NULL);
-
+  
   /* Create linear solver operation structure */
   ops = NULL;
   ops = (SUNLinearSolver_Ops) malloc(sizeof(struct _generic_SUNLinearSolver_Ops));
@@ -121,7 +121,7 @@ SUNLinearSolver SUNBandLinearSolver(N_Vector y, SUNMatrix A)
   if (content->pivots == NULL) {
     free(content); free(ops); free(S); return(NULL);
   }
-
+  
   /* Attach content and ops */
   S->content = content;
   S->ops     = ops;
@@ -153,15 +153,15 @@ int SUNLinSolSetup_Band(SUNLinearSolver S, SUNMatrix A)
   sunindextype *pivots;
 
   /* check for valid inputs */
-  if ( (A == NULL) || (S == NULL) )
+  if ( (A == NULL) || (S == NULL) ) 
     return(SUNLS_MEM_NULL);
-
+  
   /* Ensure that A is a band matrix */
   if (SUNMatGetID(A) != SUNMATRIX_BAND) {
     LASTFLAG(S) = SUNLS_ILL_INPUT;
     return(LASTFLAG(S));
   }
-
+  
   /* access data pointers (return with failure on NULL) */
   A_cols = NULL;
   pivots = NULL;
@@ -177,27 +177,27 @@ int SUNLinSolSetup_Band(SUNLinearSolver S, SUNMatrix A)
     LASTFLAG(S) = SUNLS_MEM_FAIL;
     return(LASTFLAG(S));
   }
-
+  
   /* perform LU factorization of input matrix */
   LASTFLAG(S) = bandGBTRF(A_cols, SM_COLUMNS_B(A), SM_UBAND_B(A),
 			  SM_LBAND_B(A), SM_SUBAND_B(A), pivots);
-
+  
   /* store error flag (if nonzero, that row encountered zero-valued pivod) */
   if (LASTFLAG(S) > 0)
     return(SUNLS_LUFACT_FAIL);
   return(SUNLS_SUCCESS);
 }
 
-int SUNLinSolSolve_Band(SUNLinearSolver S, SUNMatrix A, N_Vector x,
+int SUNLinSolSolve_Band(SUNLinearSolver S, SUNMatrix A, N_Vector x, 
                         N_Vector b, realtype tol)
 {
   realtype **A_cols, *xdata;
   sunindextype *pivots;
-
+  
   /* check for valid inputs */
-  if ( (A == NULL) || (S == NULL) || (x == NULL) || (b == NULL) )
+  if ( (A == NULL) || (S == NULL) || (x == NULL) || (b == NULL) ) 
     return(SUNLS_MEM_NULL);
-
+  
   /* copy b into x */
   N_VScale(ONE, b, x);
 
@@ -214,7 +214,7 @@ int SUNLinSolSolve_Band(SUNLinearSolver S, SUNMatrix A, N_Vector x,
   }
 
   /* solve using LU factors */
-  bandGBTRS(A_cols, SM_COLUMNS_B(A), SM_SUBAND_B(A),
+  bandGBTRS(A_cols, SM_COLUMNS_B(A), SM_SUBAND_B(A), 
             SM_LBAND_B(A), pivots, xdata);
   LASTFLAG(S) = SUNLS_SUCCESS;
   return(LASTFLAG(S));
@@ -226,8 +226,8 @@ long int SUNLinSolLastFlag_Band(SUNLinearSolver S)
   return(LASTFLAG(S));
 }
 
-int SUNLinSolSpace_Band(SUNLinearSolver S,
-                        long int *lenrwLS,
+int SUNLinSolSpace_Band(SUNLinearSolver S, 
+                        long int *lenrwLS, 
                         long int *leniwLS)
 {
   *leniwLS = 2 + BAND_CONTENT(S)->N;
@@ -247,11 +247,11 @@ int SUNLinSolFree_Band(SUNLinearSolver S)
       free(PIVOTS(S));
       PIVOTS(S) = NULL;
     }
-    free(S->content);
+    free(S->content);  
     S->content = NULL;
   }
   if (S->ops) {
-    free(S->ops);
+    free(S->ops);  
     S->ops = NULL;
   }
   free(S); S = NULL;
@@ -264,7 +264,7 @@ int SUNLinSolFree_Band(SUNLinearSolver S)
  * -----------------------------------------------------------------
  */
 
-/* Inefficient kludge for determining the number of entries in a N_Vector
+/* Inefficient kludge for determining the number of entries in a N_Vector 
    object (replace if such a routine is ever added to the N_Vector API).
 
    Returns "-1" on an error. */

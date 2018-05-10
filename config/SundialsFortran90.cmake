@@ -2,13 +2,13 @@
 # Programmer:  Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # LLNS/SMU Copyright Start
-# Copyright (c) 2014, Southern Methodist University and
+# Copyright (c) 2014, Southern Methodist University and 
 # Lawrence Livermore National Security
 #
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Southern Methodist University and Lawrence Livermore
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Southern Methodist University and Lawrence Livermore 
 # National Laboratory under Contract DE-AC52-07NA27344.
-# Produced at Southern Methodist University and the Lawrence
+# Produced at Southern Methodist University and the Lawrence 
 # Livermore National Laboratory.
 #
 # All rights reserved.
@@ -26,7 +26,7 @@ if(CMAKE_Fortran_COMPILER)
   # If Fortran compiler flags are set using environemnt variables and both FFLAGS
   # and FCFLAGS are used, then check if the variables are the same. If they are
   # not the same then a fatal error occurs.
-  #
+  # 
   # NOTE: This check must occur before 'enable_language(Fortran)' as it will use
   # the value of FFLAGS to set CMAKE_Fortran_FLAGS
   SET(ENV_FFLAGS "$ENV{FFLAGS}")
@@ -57,7 +57,7 @@ if(CMAKE_Fortran_COMPILER)
 
   # only show flags for the current build type
   # these flags are appended to CMAKE_Fortran_FLAGS
-  IF(CMAKE_BUILD_TYPE)
+  IF(CMAKE_BUILD_TYPE)       
     IF(CMAKE_BUILD_TYPE MATCHES "Debug")
       MESSAGE("Appending Fortran debug flags")
       MARK_AS_ADVANCED(CLEAR CMAKE_Fortran_FLAGS_DEBUG)
@@ -113,7 +113,7 @@ if(CMAKE_Fortran_COMPILER)
   try_compile(F90TEST_OK ${Fortran90Test_DIR} ${Fortran90Test_DIR}
     f90test OUTPUT_VARIABLE MY_OUTPUT)
 
-  # To ensure we do not use stuff from the previous attempts,
+  # To ensure we do not use stuff from the previous attempts, 
   # we must remove the CMakeFiles directory.
   file(REMOVE_RECURSE ${Fortran90Test_DIR}/CMakeFiles)
 

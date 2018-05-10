@@ -45,12 +45,12 @@ c The following declaration specification should match C type long int.
       msbpre  = 5
 
 c     The user MUST call mpi_init, Fortran binding, for the fkinsol package
-c     to work. The communicator, MPI_COMM_WORLD, is the only one common
+c     to work. The communicator, MPI_COMM_WORLD, is the only one common 
 c     between the Fortran and C bindings. So in the following, the communicator
 c     MPI_COMM_WORLD is used in calls to mpi_comm_size and mpi_comm_rank
-c     to determine the total number of processors and the rank (0 ... size-1)
+c     to determine the total number of processors and the rank (0 ... size-1) 
 c     number of this process.
-
+      
       call mpi_init(ier)
       if (ier .ne. 0) then
          write(6,1210) ier
@@ -65,7 +65,7 @@ c     number of this process.
          call mpi_finalize(ier)
          stop
       endif
-
+      
       call mpi_comm_size(mpi_comm_world, size, ier)
       if (ier .ne. 0) then
          write(6,1222) ier
@@ -73,7 +73,7 @@ c     number of this process.
          call mpi_abort(mpi_comm_world, 1, ier)
          stop
       endif
-
+      
       if (size .ne. 4) then
          write(6,1223)
  1223    format('MPI_ERROR: must use 4 processes')
@@ -99,7 +99,7 @@ c     number of this process.
          scale(ii) = 1.0d0
          constr(ii) = 0.0d0
  20   continue
-
+      
       call fkincreate(ier)
       if (ier .ne. 0) then
          write(6,1230) ier
@@ -246,12 +246,12 @@ c     the constructs used in fkinsol.
 
       stop
       end
-
+      
 
 c * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 c     The function defining the system f(u) = 0 must be defined by a Fortran
 c     function with the following name and form.
-
+      
       subroutine fkfun(uu, fval, ier)
 
       implicit none
@@ -274,13 +274,13 @@ c The following declaration specification should match C type long int.
 
       return
       end
-
-
+      
+      
 c * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 c     The routine kpreco is the preconditioner setup routine. It must have
 c     that specific name be used in order that the c code can find and link
 c     to it.  The argument list must also be as illustrated below:
-
+      
       subroutine fkpset(udata, uscale, fdata, fscale, ier)
 
       implicit none
@@ -303,13 +303,13 @@ c The following declaration specification should match C type long int.
 
       return
       end
-
-
+      
+      
 c * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 c     The routine kpsol is the preconditioner solve routine. It must have
 c     that specific name be used in order that the c code can find and link
 c     to it.  The argument list must also be as illustrated below:
-
+      
       subroutine fkpsol(udata, uscale, fdata, fscale, vv, ier)
 
       implicit none

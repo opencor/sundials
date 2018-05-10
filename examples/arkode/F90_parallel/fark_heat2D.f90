@@ -2,13 +2,13 @@
 ! Programmer(s): Daniel R. Reynolds @ SMU
 !-----------------------------------------------------------------
 ! LLNS/SMU Copyright Start
-! Copyright (c) 2015, Southern Methodist University and
+! Copyright (c) 2015, Southern Methodist University and 
 ! Lawrence Livermore National Security
 !
-! This work was performed under the auspices of the U.S. Department
-! of Energy by Southern Methodist University and Lawrence Livermore
+! This work was performed under the auspices of the U.S. Department 
+! of Energy by Southern Methodist University and Lawrence Livermore 
 ! National Laboratory under Contract DE-AC52-07NA27344.
-! Produced at Southern Methodist University and the Lawrence
+! Produced at Southern Methodist University and the Lawrence 
 ! Livermore National Laboratory.
 !
 ! All rights reserved.
@@ -19,13 +19,13 @@
 ! For details, see the LICENSE file.
 !-----------------------------------------------------------------
 ! Example problem:
-!
-! The following test simulates a simple anisotropic 2D heat
+! 
+! The following test simulates a simple anisotropic 2D heat 
 ! equation,
 !    u_t = kx*u_xx + ky*u_yy + h,
 ! for t in [0, 10], (x,y) in [0, 1]^2, with initial conditions
 !    u(0,x,y) =  0,
-! stationary boundary conditions, i.e.
+! stationary boundary conditions, i.e. 
 !    u_t(t,0,y) = u_t(t,1,y) = u_t(t,x,0) = u_t(t,x,1) = 0,
 ! and a heat source of the form
 !    h(x,y) = sin(pi*x)*sin(2*pi*y).
@@ -33,22 +33,22 @@
 ! Under this setup, the problem has an analytical solution:
 !    u(t,x,y) = a(t)*sin(pi*x)*sin(2*pi*y), where
 !    a(t) = (1 - exp(-(kx+4*ky)*pi^2*t)) / ((kx+4*ky)*pi^2).
-!
-! The spatial derivatives are computed using second-order
+! 
+! The spatial derivatives are computed using second-order 
 ! centered differences, with the data distributed over nx*ny
 ! points on a uniform spatial grid.
 !
-! The spatial grid parameters nx and ny, the parameters kx and ky,
-! as well as the desired relative and absolute solver tolerances,
+! The spatial grid parameters nx and ny, the parameters kx and ky, 
+! as well as the desired relative and absolute solver tolerances, 
 ! are provided in the input file input_heat2D.txt.
-!
-! This program solves the problem with a DIRK method.  This
-! employs a Newton iteration with the PCG iterative linear solver,
-! which itself uses a Jacobi preconditioner.  The example uses the
-! built-in finite-difference Jacobian-vector product routine, but
+! 
+! This program solves the problem with a DIRK method.  This 
+! employs a Newton iteration with the PCG iterative linear solver, 
+! which itself uses a Jacobi preconditioner.  The example uses the 
+! built-in finite-difference Jacobian-vector product routine, but 
 ! supplies both the RHS and preconditioner setup/solve functions.
 !
-! 20 outputs are printed at equal intervals, and run statistics
+! 20 outputs are printed at equal intervals, and run statistics 
 ! are printed at the end.
 !-----------------------------------------------------------------
 
@@ -57,7 +57,7 @@
 !-----------------------------------------------------------------
 module UserData
   !---------------------------------------------------------------
-  ! Description:
+  ! Description: 
   !    Module containing problem-defining parameters, as well as
   !    data buffers for MPI exchanges with neighboring processes.
   !    Also contains routines to:
@@ -69,18 +69,18 @@ module UserData
   include "sundials/sundials_fconfig.h"
   save
 
-  integer*8 :: nx          ! global number of x grid points
-  integer*8 :: ny          ! global number of y grid points
+  integer*8 :: nx          ! global number of x grid points 
+  integer*8 :: ny          ! global number of y grid points 
   integer*8 :: is          ! global x indices of this subdomain
   integer*8 :: ie
   integer*8 :: js          ! global y indices of this subdomain
   integer*8 :: je
-  integer*8 :: nxl         ! local number of x grid points
-  integer*8 :: nyl         ! local number of y grid points
-  real*8    :: dx          ! x-directional mesh spacing
-  real*8    :: dy          ! y-directional mesh spacing
-  real*8    :: kx          ! x-directional diffusion coefficient
-  real*8    :: ky          ! y-directional diffusion coefficient
+  integer*8 :: nxl         ! local number of x grid points 
+  integer*8 :: nyl         ! local number of y grid points 
+  real*8    :: dx          ! x-directional mesh spacing 
+  real*8    :: dy          ! y-directional mesh spacing 
+  real*8    :: kx          ! x-directional diffusion coefficient 
+  real*8    :: ky          ! y-directional diffusion coefficient 
   real(kind=REALTYPE), dimension(:,:), allocatable :: h    ! heat source vector
   real(kind=REALTYPE), dimension(:,:), allocatable :: d    ! inverse of Jacobian diagonal
   integer :: comm                             ! communicator object
@@ -143,7 +143,7 @@ contains
     include "mpif.h"
     integer, intent(out) :: ierr
     integer :: dims(2), periods(2), coords(2)
-
+    
     ! internals
 
     ! check that this has not been called before
@@ -217,7 +217,7 @@ contains
     ! allocate temporary vectors
     allocate(h(nxl,nyl))    ! Create vector for heat source
     allocate(d(nxl,nyl))    ! Create vector for Jacobian diagonal
-
+    
     ierr = 0     ! return with success flag
     return
   end subroutine SetupDecomp
@@ -238,7 +238,7 @@ contains
     integer*8 :: i
     integer :: ipW, ipE, ipS, ipN
     integer :: coords(2), dims(2), periods(2), nbcoords(2)
-
+    
     ! internals
 
     ! MPI neighborhood information
@@ -250,7 +250,7 @@ contains
     if (.not. HaveBdry(1,1)) then
        nbcoords = (/ coords(1)-1, coords(2) /)
        call MPI_Cart_rank(comm, nbcoords, ipW, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Cart_rank = ", ierr
           return
        endif
@@ -258,7 +258,7 @@ contains
     if (.not. HaveBdry(1,2)) then
        nbcoords = (/ coords(1)+1, coords(2) /)
        call MPI_Cart_rank(comm, nbcoords, ipE, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Cart_rank = ", ierr
           return
        endif
@@ -266,7 +266,7 @@ contains
     if (.not. HaveBdry(2,1)) then
        nbcoords = (/ coords(1), coords(2)-1 /)
        call MPI_Cart_rank(comm, nbcoords, ipS, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Cart_rank = ", ierr
           return
        endif
@@ -274,7 +274,7 @@ contains
     if (.not. HaveBdry(2,2)) then
        nbcoords = (/ coords(1), coords(2)+1 /)
        call MPI_Cart_rank(comm, nbcoords, ipN, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Cart_rank = ", ierr
           return
        endif
@@ -284,7 +284,7 @@ contains
     if (.not. HaveBdry(1,1)) then
        call MPI_Irecv(Wrecv, nyl, MPI_DOUBLE_PRECISION, ipW, &
                       MPI_ANY_TAG, comm, reqRW, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Irecv = ", ierr
           return
        endif
@@ -292,7 +292,7 @@ contains
     if (.not. HaveBdry(1,2)) then
        call MPI_Irecv(Erecv, nyl, MPI_DOUBLE_PRECISION, ipE, &
                       MPI_ANY_TAG, comm, reqRE, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Irecv = ", ierr
           return
        endif
@@ -300,7 +300,7 @@ contains
     if (.not. HaveBdry(2,1)) then
        call MPI_Irecv(Srecv, nxl, MPI_DOUBLE_PRECISION, ipS, &
                       MPI_ANY_TAG, comm, reqRS, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Irecv = ", ierr
           return
        endif
@@ -308,7 +308,7 @@ contains
     if (.not. HaveBdry(2,2)) then
        call MPI_Irecv(Nrecv, nxl, MPI_DOUBLE_PRECISION, ipN, &
                       MPI_ANY_TAG, comm, reqRN, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Irecv = ", ierr
           return
        endif
@@ -321,7 +321,7 @@ contains
        enddo
        call MPI_Isend(Wsend, nyl, MPI_DOUBLE_PRECISION, ipW, 0, &
                       comm, reqSW, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Isend = ", ierr
           return
        endif
@@ -332,7 +332,7 @@ contains
        enddo
        call MPI_Isend(Esend, nyl, MPI_DOUBLE_PRECISION, ipE, 1, &
                       comm, reqSE, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Isend = ", ierr
           return
        endif
@@ -343,7 +343,7 @@ contains
        enddo
        call MPI_Isend(Ssend, nxl, MPI_DOUBLE_PRECISION, ipS, 2, &
                       comm, reqSS, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Isend = ", ierr
           return
        endif
@@ -354,7 +354,7 @@ contains
        enddo
        call MPI_Isend(Nsend, nxl, MPI_DOUBLE_PRECISION, ipN, 3, &
                       comm, reqSN, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Isend = ", ierr
           return
        endif
@@ -363,48 +363,48 @@ contains
     ! wait for messages to finish
     if (.not. HaveBdry(1,1)) then
        call MPI_Wait(reqRW, stat, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Wait = ", ierr
           return
        endif
        call MPI_Wait(reqSW, stat, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Wait = ", ierr
           return
        endif
     endif
     if (.not. HaveBdry(1,2)) then
        call MPI_Wait(reqRE, stat, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Wait = ", ierr
           return
        endif
        call MPI_Wait(reqSE, stat, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Wait = ", ierr
           return
        endif
     endif
     if (.not. HaveBdry(2,1)) then
        call MPI_Wait(reqRS, stat, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Wait = ", ierr
           return
        endif
        call MPI_Wait(reqSS, stat, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Wait = ", ierr
           return
        endif
     endif
     if (.not. HaveBdry(2,2)) then
        call MPI_Wait(reqRN, stat, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Wait = ", ierr
           return
        endif
        call MPI_Wait(reqSN, stat, ierr)
-       if (ierr /= MPI_SUCCESS) then
+       if (ierr /= MPI_SUCCESS) then 
           write(0,*) "Error in MPI_Wait = ", ierr
           return
        endif
@@ -488,9 +488,9 @@ program driver
   ! Declarations
   ! general problem parameters
   real*8,    parameter :: pi = 3.1415926535897932d0
-  real(kind=REALTYPE),    parameter :: T0 = 0.d0     ! initial time
-  real(kind=REALTYPE),    parameter :: Tf = 0.3d0    ! final time
-  integer,   parameter :: Nt = 20       ! total number of output times
+  real(kind=REALTYPE),    parameter :: T0 = 0.d0     ! initial time 
+  real(kind=REALTYPE),    parameter :: Tf = 0.3d0    ! final time 
+  integer,   parameter :: Nt = 20       ! total number of output times 
   real(kind=REALTYPE),    parameter :: rtol = 1.d-5  ! relative and absolute tolerances
   real(kind=REALTYPE),    parameter :: atol = 1.d-10
   integer*8, parameter :: nx_ = 60      ! spatial mesh size
@@ -503,9 +503,8 @@ program driver
 
   ! solution vector and other local variables
   real(kind=REALTYPE), allocatable :: y(:,:)
-  real(kind=REALTYPE)    :: rout(6), rpar, t, dTout, tout, urms
-  integer(kind=SUNINDEXTYPE) :: N, Ntot, i, j
-  integer*8 :: iout(22), ipar
+  real(kind=REALTYPE) :: rout(6), rpar, t, dTout, tout, urms
+  integer*8 :: iout(22), ipar, N, Ntot, i, j
   integer   :: flag, ioutput
   logical   :: outproc
   character*100 :: outname
@@ -528,8 +527,8 @@ program driver
   ny = ny_
   kx = kx_
   ky = ky_
-  dx = 1.d0/(nx-1)   ! x mesh spacing
-  dy = 1.d0/(ny-1)   ! x mesh spacing
+  dx = 1.d0/(nx-1)   ! x mesh spacing 
+  dy = 1.d0/(ny-1)   ! x mesh spacing 
 
   ! Set up parallel decomposition (computes local mesh sizes)
   call SetupDecomp(flag)
@@ -538,7 +537,7 @@ program driver
      call MPI_Finalize(flag)
   end if
 
-  ! Initial problem output
+  ! Initial problem output 
   outproc = (myid == 0)
   if (outproc) then
      write(6,*) "  "
@@ -555,7 +554,7 @@ program driver
      write(6,*) "  "
   endif
 
-  ! Initialize data structures
+  ! Initialize data structures 
   N = nxl*nyl
   Ntot = nx*ny
   call FNVInitP(comm, 4, N, Ntot, flag)
@@ -563,8 +562,8 @@ program driver
      write(0,*) "Error in FNVInitP = ", flag
      call MPI_Finalize(flag)
   end if
-  allocate(y(nxl,nyl))         ! Create parallel vector for solution
-  y = 0.d0                     ! Set initial conditions
+  allocate(y(nxl,nyl))         ! Create parallel vector for solution 
+  y = 0.d0                     ! Set initial conditions 
 
   ! initialize PCG linear solver module
   call FSunPCGInit(4, PCGpretype, PCGmaxl, flag)
@@ -572,7 +571,7 @@ program driver
      write(0,*) "Error in FSunPCGInit = ", flag
      call MPI_Finalize(flag)
   end if
-
+  
   ! Create the solver memory to use DIRK integrator, scalar tolerances
   call FARKMalloc(T0, y, 0, 1, rtol, atol, iout, rout, ipar, rpar, flag)
   if (flag /= MPI_SUCCESS) then
@@ -625,7 +624,7 @@ program driver
   write(100,'(6(i9,1x))') nx, ny, is, ie, js, je
   close(100)
 
-  ! Open output streams for results, access data array
+  ! Open output streams for results, access data array 
   write(outname,'(6Hheat2d,f4.3,4H.txt)') myid/1000.0
   open(101, file=outname)
 
@@ -650,38 +649,38 @@ program driver
   endif
   do ioutput=1,Nt
 
-     call FARKode(tout, t, y, 1, flag)         ! call integrator
+     call FARKode(tout, t, y, 1, flag)         ! call integrator 
      if (flag < 0) then
         write(0,*) "Error in FARKode = ", flag
         exit
      end if
-
+     
      call PRMS(y, urms, flag)
      if (outproc) &
-          write(6,'(2(2x,f10.6))') t, urms     ! print solution stats
+          write(6,'(2(2x,f10.6))') t, urms     ! print solution stats 
      if (flag >= 0) then                       ! successful solve: update output time
         tout = min(tout + dTout, Tf)
-     else                                      ! unsuccessful solve: break
+     else                                      ! unsuccessful solve: break 
         if (outproc) &
              write(0,*) "Solver failure, stopping integration"
         exit
      endif
 
-     ! output results to disk
+     ! output results to disk 
      do j=1,nyl
         do i=1,nxl
            write(101,'(es25.16)',advance='no') y(i,j)
         enddo
      enddo
      write(101,*) "  "
-
+     
   enddo
   if (outproc) then
      write(6,*) "   ----------------------"
   endif
   close(101)
 
-  ! Print some final statistics
+  ! Print some final statistics 
   if (outproc) then
      write(6,*) "  "
      write(6,*) "Final Solver Statistics:"
@@ -701,12 +700,12 @@ program driver
      write(6,'(A,i6)') "   Total number of error test failures = ", iout(10)
  endif
 
- ! Clean up and return with successful completion
+ ! Clean up and return with successful completion 
  deallocate(y)              ! free vectors
  deallocate(h)
  deallocate(d)
- call FreeUserData(flag)    ! free user data
- call FARKFree()            ! free integrator memory
+ call FreeUserData(flag)    ! free user data 
+ call FARKFree()            ! free integrator memory 
  call MPI_Barrier(comm, flag)
  call MPI_Finalize(flag)    ! Finalize MPI
 
@@ -722,7 +721,7 @@ end program driver
 
 subroutine farkifun(t, y, ydot, ipar, rpar, ierr)
 !-----------------------------------------------------------------
-! f routine to compute the ODE RHS function f(t,y).
+! f routine to compute the ODE RHS function f(t,y). 
 !-----------------------------------------------------------------
   ! declarations
   use UserData
@@ -735,10 +734,10 @@ subroutine farkifun(t, y, ydot, ipar, rpar, ierr)
   real(kind=REALTYPE) :: c1, c2, c3
   integer, intent(out) :: ierr
   integer*8 :: i, j
-
+  
   ! internals
 
-  ! Initialize ydot to zero
+  ! Initialize ydot to zero 
   ydot = 0.d0
 
   ! Exchange boundary data with neighbors
@@ -757,7 +756,7 @@ subroutine farkifun(t, y, ydot, ipar, rpar, ierr)
         ydot(i,j) = c1*(y(i-1,j)+y(i+1,j)) + c2*(y(i,j-1)+y(i,j+1)) + c3*y(i,j)
      enddo
   enddo
-
+  
   ! iterate over subdomain boundaries (if not at overall domain boundary)
   if (.not. HaveBdry(1,1)) then    ! West face
      i=1
@@ -794,7 +793,7 @@ subroutine farkifun(t, y, ydot, ipar, rpar, ierr)
      ydot(i,j) = c1*(Wrecv(j)+y(i+1,j)) + c2*(y(i,j-1)+Nrecv(i)) + c3*y(i,j)
   endif
   if (.not. HaveBdry(1,2) .and. .not. HaveBdry(2,1)) then  ! South-East corner
-     i=nxl
+     i=nxl 
      j=1
      ydot(i,j) = c1*(y(i-1,j)+Erecv(j)) + c2*(Srecv(i)+y(i,j+1)) + c3*y(i,j)
   endif
@@ -806,7 +805,7 @@ subroutine farkifun(t, y, ydot, ipar, rpar, ierr)
 
   ydot = ydot + h         ! add in heat source
 
-  ierr = 0                ! Return with success
+  ierr = 0                ! Return with success 
   return
 end subroutine farkifun
 !-----------------------------------------------------------------
@@ -824,7 +823,7 @@ subroutine farkefun(t, y, ydot, ipar, rpar, ierr)
   real(kind=REALTYPE), intent(in)  :: y(nxl,nyl)
   real(kind=REALTYPE), intent(out) :: ydot(nxl,nyl)
   integer, intent(out) :: ierr
-
+  
   ! internals
 
   ! Initialize ydot to zero and return with success
@@ -858,7 +857,7 @@ subroutine farkpset(t, y, fy, jok, jcur, gamma, hcur, ipar, &
   d = 1.d0/c
 
   jcur = 1     ! update jcur flag
-  ierr = 0     ! Return with success
+  ierr = 0     ! Return with success 
   return
 end subroutine farkpset
 
@@ -880,7 +879,7 @@ subroutine farkpsol(t, y, fy, r, z, gamma, delta, lr, &
 
   ! internals
   z = r*d      ! perform Jacobi iteration (whole array operation)
-  ierr = 0     ! Return with success
+  ierr = 0     ! Return with success 
   return
 end subroutine farkpsol
 !-----------------------------------------------------------------

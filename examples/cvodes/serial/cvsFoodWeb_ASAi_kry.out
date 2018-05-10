@@ -7,7 +7,7 @@ Forward integration
 
 ncheck = 1
 
-   G = int_t int_x int_y c6(t,x,y) dx dy dt = 422295.485891
+   G = int_t int_x int_y c6(t,x,y) dx dy dt = 422295.485891 
 
 
 Create and allocate CVODES memory for backward run

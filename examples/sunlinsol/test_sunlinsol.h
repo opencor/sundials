@@ -3,21 +3,21 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the header file contains the prototypes for functions to
- * test SUNLinearSolver module implementations.
+ * This is the header file contains the prototypes for functions to 
+ * test SUNLinearSolver module implementations. 
  * -----------------------------------------------------------------
  */
 
@@ -40,7 +40,7 @@ extern "C" {
 #endif
   /* Forward declarations for implementation specific utility functions */
   int check_vector(N_Vector X, N_Vector Y, realtype tol);
-
+   
   /* Test function declarations */
   int Test_SUNLinSolGetType(SUNLinearSolver S, SUNLinearSolver_Type sunid, int myid);
   int Test_SUNLinSolLastFlag(SUNLinearSolver S, int myid);
@@ -52,7 +52,7 @@ extern "C" {
                               ATimesFn ATimes, int myid);
   int Test_SUNLinSolSetPreconditioner(SUNLinearSolver S, void *Pdata,
                                       PSetupFn PSetup, PSolveFn PSolve, int myid);
-  int Test_SUNLinSolSetScalingVectors(SUNLinearSolver S, N_Vector s1,
+  int Test_SUNLinSolSetScalingVectors(SUNLinearSolver S, N_Vector s1, 
                                       N_Vector s2, int myid);
   int Test_SUNLinSolInitialize(SUNLinearSolver S, int myid);
   int Test_SUNLinSolSetup(SUNLinearSolver S, SUNMatrix A, int myid);
@@ -61,7 +61,7 @@ extern "C" {
 
   /* Timing function */
   void SetTiming(int onoff);
-
+  
 #ifdef __cplusplus
 }
 #endif

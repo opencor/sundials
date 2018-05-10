@@ -14,7 +14,7 @@ Find dG/dp for
 Create and allocate IDAS memory for forward runs
 Forward integration ... done ( nst = 774 )
 --------------------------------------------------------
-G:            4.0000e+10
+G:            4.0000e+10 
 --------------------------------------------------------
 
 Create and allocate IDAS memory for backward run

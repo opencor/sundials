@@ -3,7 +3,7 @@ Slider-Crank example for IDAS:
 
 Forward integration ... done!
 
-Final Run Statistics:
+Final Run Statistics: 
 
 Number of steps                    = 232
 Number of residual evaluations     = 1170
@@ -21,7 +21,7 @@ Number of nonlinear conv. failures = 0
 
 
 
-   Checking using Finite Differences
+   Checking using Finite Differences 
 
 ---------------BACKWARD------------------
    dG/dp:    3.3345e-01  -3.6375e-01

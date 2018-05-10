@@ -1,22 +1,22 @@
 C     ----------------------------------------------------------------
 C     Programmer(s): Daniel R. Reynolds @ SMU
-C                    Alan C. Hindmarsh and Radu Serban @ LLNL
+C                    Alan C. Hindmarsh and Radu Serban @ LLNL      
 C     ----------------------------------------------------------------
 C     LLNS/SMU Copyright Start
-C     Copyright (c) 2017, Southern Methodist University and
+C     Copyright (c) 2017, Southern Methodist University and 
 C     Lawrence Livermore National Security
 C
-C     This work was performed under the auspices of the U.S. Department
-C     of Energy by Southern Methodist University and Lawrence Livermore
+C     This work was performed under the auspices of the U.S. Department 
+C     of Energy by Southern Methodist University and Lawrence Livermore 
 C     National Laboratory under Contract DE-AC52-07NA27344.
-C     Produced at Southern Methodist University and the Lawrence
+C     Produced at Southern Methodist University and the Lawrence 
 C     Livermore National Laboratory.
 C
 C     All rights reserved.
 C     For details, see the LICENSE file.
 C     LLNS/SMU Copyright End
 c     ----------------------------------------------------------------
-c     This simple example problem for FIDA, due to Robertson, is from
+c     This simple example problem for FIDA, due to Robertson, is from 
 c     chemical kinetics, and consists of the following three equations:
 c
 c          dy1/dt = -.04*y1 + 1.e4*y2*y3
@@ -80,7 +80,7 @@ c
          stop
       endif
 c
-      call fidamalloc(t0, y, yp, iatol, rtol, atol,
+      call fidamalloc(t0, y, yp, iatol, rtol, atol, 
      &                iout, rout, ipar, rpar, ier)
       if (ier .ne. 0) then
          write(6,20) ier
@@ -166,7 +166,7 @@ c
           endif
           write(6,60) (info(i), i = 1,2)
  60       format(5x, 'Above is a root, INFO() = ', 2i3)
-        endif
+        endif                   
 c
         if (ier .eq. 0) then
            tout = tout * 10.0d0

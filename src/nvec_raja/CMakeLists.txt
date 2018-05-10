@@ -3,8 +3,8 @@
 # ---------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -16,7 +16,7 @@
 INSTALL(CODE "MESSAGE(\"\nInstall NVECTOR_RAJA\n\")")
 
 # Add variable nveccuda_SOURCES with the sources for the NVECRAJA lib
-SET(nvecraja_SOURCES
+SET(nvecraja_SOURCES 
   nvector_raja.cu
 )
 
@@ -25,15 +25,15 @@ set_source_files_properties(${nvecraja_SOURCES} PROPERTIES CUDA_SOURCE_PROPERTY_
 
 # Add variable shared_SOURCES with the common SUNDIALS sources which will
 # also be included in the NVECRAJA library
-SET(shared_SOURCES
+SET(shared_SOURCES 
   sundials_math.c
 )
 ADD_PREFIX(${sundials_SOURCE_DIR}/src/sundials/ shared_SOURCES)
 
 # Add variable nveccuda_HEADERS with the exported NVECRAJA header files
 SET(nvecraja_HEADERS
-  nvector_raja.h
-#  raja/Vector.hpp
+  nvector_raja.h 
+#  raja/Vector.hpp 
 #  raja/VectorKernels.cuh
 )
 ADD_PREFIX(${sundials_SOURCE_DIR}/include/nvector/ nvecraja_HEADERS)
@@ -41,7 +41,7 @@ ADD_PREFIX(${sundials_SOURCE_DIR}/include/nvector/ nvecraja_HEADERS)
 # Add source directory to include directories
 INCLUDE_DIRECTORIES(.)
 
-# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY
+# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY 
 ADD_DEFINITIONS(-DBUILD_SUNDIALS_LIBRARY)
 
 # Rules for building and installing the static library:
@@ -69,7 +69,7 @@ IF(BUILD_SHARED_LIBS)
   SET_TARGET_PROPERTIES(sundials_nvecraja_shared
     PROPERTIES VERSION ${nveclib_VERSION} SOVERSION ${nveclib_SOVERSION}
   )
-#  SET_TARGET_PROPERTIES(sundials_nvecraja_shared
+#  SET_TARGET_PROPERTIES(sundials_nvecraja_shared 
 #    PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE
 #  )
   INSTALL(TARGETS sundials_nvecraja_shared DESTINATION lib)

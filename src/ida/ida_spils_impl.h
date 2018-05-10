@@ -1,22 +1,22 @@
-/*-----------------------------------------------------------------
+/*----------------------------------------------------------------- 
  * Programmer(s): Daniel R. Reynolds @ SMU
  *                Alan C. Hindmarsh and Radu Serban @ LLNL
  *-----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  *-----------------------------------------------------------------
- * Implementation header file for the Scaled Preconditioned
+ * Implementation header file for the Scaled Preconditioned 
  * Iterative Linear Solver interface.
  *-----------------------------------------------------------------*/
 
@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 /*-----------------------------------------------------------------
-  Types : IDASpilsMemRec, IDASpilsMem
+  Types : IDASpilsMemRec, IDASpilsMem                             
   -----------------------------------------------------------------*/
 
 typedef struct IDASpilsMemRec {
@@ -41,7 +41,7 @@ typedef struct IDASpilsMemRec {
   realtype dqincfac;  /* dqincfac = optional increment factor in Jv   */
   realtype epslin;    /* Solver tolerance parameter                   */
 
-  long int npe;       /* npe = total number of precond calls          */
+  long int npe;       /* npe = total number of precond calls          */   
   long int nli;       /* nli = total number of linear iterations      */
   long int nps;       /* nps = total number of psolve calls           */
   long int ncfl;      /* ncfl = total number of convergence failures  */
@@ -49,21 +49,21 @@ typedef struct IDASpilsMemRec {
   long int njtsetup;  /* njtsetup = total number of calls to jtsetup  */
   long int njtimes;   /* njtimes = total number of calls to jtimes    */
 
-  long int nst0;      /* nst0 = saved nst (for performance monitor)   */
-  long int nni0;      /* nni0 = saved nni (for performance monitor)   */
-  long int ncfn0;     /* ncfn0 = saved ncfn (for performance monitor) */
-  long int ncfl0;     /* ncfl0 = saved ncfl (for performance monitor) */
-  long int nwarn;     /* nwarn = no. of warnings (for perf. monitor)  */
+  long int nst0;      /* nst0 = saved nst (for performance monitor)   */   
+  long int nni0;      /* nni0 = saved nni (for performance monitor)   */   
+  long int ncfn0;     /* ncfn0 = saved ncfn (for performance monitor) */   
+  long int ncfl0;     /* ncfl0 = saved ncfl (for performance monitor) */   
+  long int nwarn;     /* nwarn = no. of warnings (for perf. monitor)  */   
 
-  N_Vector ytemp;     /* temp vector used by IDAAtimesDQ              */
-  N_Vector yptemp;    /* temp vector used by IDAAtimesDQ              */
+  N_Vector ytemp;     /* temp vector used by IDAAtimesDQ              */ 
+  N_Vector yptemp;    /* temp vector used by IDAAtimesDQ              */ 
   N_Vector x;         /* temp vector used by the solve function       */
   N_Vector ycur;      /* current y vector in Newton iteration         */
   N_Vector ypcur;     /* current yp vector in Newton iteration        */
   N_Vector rcur;      /* rcur = F(tn, ycur, ypcur)                    */
 
   SUNLinearSolver LS; /* generic iterative linear solver object       */
-
+  
   long int last_flag; /* last error return flag                       */
 
   /* Preconditioner computation
@@ -77,7 +77,7 @@ typedef struct IDASpilsMemRec {
   IDASpilsPrecSolveFn psolve;
   int (*pfree)(IDAMem IDA_mem);
   void *pdata;
-
+  
   /* Jacobian times vector compuation
      (a) jtimes function provided by the user:
          - jdata == user_data
@@ -105,15 +105,15 @@ int IDASpilsPSolve(void *ida_mem, N_Vector r, N_Vector z,
 
 /* Difference quotient approximation for Jac times vector */
 int IDASpilsDQJtimes(realtype tt, N_Vector yy, N_Vector yp,
-                     N_Vector rr, N_Vector v, N_Vector Jv,
-                     realtype c_j, void *data,
+                     N_Vector rr, N_Vector v, N_Vector Jv, 
+                     realtype c_j, void *data, 
                      N_Vector work1, N_Vector work2);
 
 /* Generic linit/lsetup/lsolve/lfree interface routines for IDA to call */
 int idaSpilsInitialize(IDAMem IDA_mem);
 
-int idaSpilsSetup(IDAMem IDA_mem, N_Vector y, N_Vector yp, N_Vector r,
-                  N_Vector vt1, N_Vector vt2, N_Vector vt3);
+int idaSpilsSetup(IDAMem IDA_mem, N_Vector y, N_Vector yp, N_Vector r, 
+                  N_Vector vt1, N_Vector vt2, N_Vector vt3); 
 
 int idaSpilsSolve(IDAMem IDA_mem, N_Vector b, N_Vector weight,
                   N_Vector ycur, N_Vector ypcur, N_Vector rescur);
@@ -122,11 +122,11 @@ int idaSpilsPerf(IDAMem IDA_mem, int perftask);
 
 int idaSpilsFree(IDAMem IDA_mem);
 
-
+  
 /* Auxilliary functions */
 int idaSpilsInitializeCounters(IDASpilsMem idaspils_mem);
 
-
+  
 /*---------------------------------------------------------------
   Error and Warning Messages
   ---------------------------------------------------------------*/

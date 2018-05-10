@@ -1,4 +1,4 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): Aaron Collier and Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * Copyright (c) 2005, The Regents of the University of California.
@@ -33,8 +33,8 @@
  */
 @F77_MANGLE_MACRO2@
 
-/* Define precision of SUNDIALS data type 'realtype'
- * Depending on the precision level, one of the following
+/* Define precision of SUNDIALS data type 'realtype' 
+ * Depending on the precision level, one of the following 
  * three macros will be defined:
  *     #define SUNDIALS_SINGLE_PRECISION 1
  *     #define SUNDIALS_DOUBLE_PRECISION 1
@@ -42,15 +42,15 @@
  */
 @PRECISION_LEVEL@
 
-/* Define type of vector indices in SUNDIALS 'sunindextype'.
- * Depending on user choice of index type, one of the following
+/* Define type of vector indices in SUNDIALS 'sunindextype'. 
+ * Depending on user choice of index type, one of the following 
  * two macros will be defined:
  *     #define SUNDIALS_INT64_T 1
  *     #define SUNDIALS_INT32_T 1
  */
 @INDEX_TYPE@
 
-/* Use generic math functions
+/* Use generic math functions 
  * If it was decided that generic math functions can be used, then
  *     #define SUNDIALS_USE_GENERIC_MATH
  */
@@ -69,14 +69,14 @@
 
 /* SUPERLUMT available
  * If working libraries for SUPERLUMT support were found, then
- *     #define SUNDIALS_SUPERLUMT
+ *     #define SUNDIALS_SUPERLUMT 
  */
 #cmakedefine SUNDIALS_SUPERLUMT
 #cmakedefine SUNDIALS_SUPERLUMT_THREAD_TYPE "@SUPERLUMT_THREAD_TYPE@"
 
 /* KLU available
  * If working libraries for KLU support were found, then
- *     #define SUNDIALS_KLU
+ *     #define SUNDIALS_KLU 
  */
 #cmakedefine SUNDIALS_KLU
 

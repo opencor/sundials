@@ -1,15 +1,15 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel Reynolds @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -57,8 +57,8 @@ extern SUNLinearSolver F2C_KINSOL_linsol;
 extern SUNLinearSolver F2C_ARKODE_linsol;
 extern SUNLinearSolver F2C_ARKODE_mass_sol;
 
-/*
- * Prototypes of exported functions
+/* 
+ * Prototypes of exported functions 
  *
  * FSUNKLU_INIT - initializes klu linear solver for main problem
  * FSUNKLU_REINIT - reinitializes klu linear solver for main problem
@@ -69,12 +69,12 @@ extern SUNLinearSolver F2C_ARKODE_mass_sol;
  */
 
 void FSUNKLU_INIT(int *code, int *ier);
-void FSUNKLU_REINIT(int *code, long int *NNZ,
+void FSUNKLU_REINIT(int *code, long int *NNZ, 
                     int *reinit_type, int *ier);
 void FSUNKLU_SETORDERING(int *code, int *ordering,
                          int *ier);
 void FSUNMASSKLU_INIT(int *ier);
-void FSUNMASSKLU_REINIT(long int *NNZ,
+void FSUNMASSKLU_REINIT(long int *NNZ, 
                         int *reinit_type, int *ier);
 void FSUNMASSKLU_SETORDERING(int *ordering, int *ier);
 

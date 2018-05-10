@@ -2,13 +2,13 @@
 # Programmer:  Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # LLNS/SMU Copyright Start
-# Copyright (c) 2017, Southern Methodist University and
+# Copyright (c) 2017, Southern Methodist University and 
 # Lawrence Livermore National Security
 #
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Southern Methodist University and Lawrence Livermore
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Southern Methodist University and Lawrence Livermore 
 # National Laboratory under Contract DE-AC52-07NA27344.
-# Produced at Southern Methodist University and the Lawrence
+# Produced at Southern Methodist University and the Lawrence 
 # Livermore National Laboratory.
 #
 # All rights reserved.
@@ -30,11 +30,13 @@ SET(farkode_SOURCES
   farkexpstab.c
   farkjtimes.c
   farkmtimes.c
+  farknulllinsol.c
+  farknullmatrix.c
   farkode.c
   farkpreco.c
   farkmasspreco.c
   farkroot.c
-  farksparse.c
+  farksparse.c 
   farksparsemass.c
   )
 
@@ -89,11 +91,11 @@ ENDIF()
 INCLUDE_DIRECTORIES(.)
 INCLUDE_DIRECTORIES(..)
 
-# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY
+# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY 
 ADD_DEFINITIONS(-DBUILD_SUNDIALS_LIBRARY)
 
-# Only build STATIC libraries (we cannot build shared libraries
-# for the FCMIX interfaces due to unresolved symbol errors
+# Only build STATIC libraries (we cannot build shared libraries 
+# for the FCMIX interfaces due to unresolved symbol errors 
 # coming from inexistent user-provided functions)
 
 # Add the build target for the FARKODE library

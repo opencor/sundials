@@ -39,7 +39,7 @@ namespace math_kernels
 
 /**
  * Sets all elements of the vector X to constant value a.
- *
+ * 
  */
 
 template <typename T, typename I>
@@ -57,7 +57,7 @@ setConstKernel(T a, T *X, I n)
 
 /**
  * Computes linear sum (combination) of two vectors.
- *
+ * 
  */
 
 template <typename T, typename I>
@@ -201,7 +201,7 @@ compareKernel(T c, const T *X, T *Z, I n)
 
 /*
  * Sums all elements of the vector.
- *
+ *    
  */
 template <typename T, typename I>
 __global__ void
@@ -239,7 +239,7 @@ sumReduceKernel(const T *x, T *out, I n)
 
 /*
  * Dot product of two vectors.
- *
+ *    
  */
 template <typename T, typename I>
 __global__ void
@@ -277,7 +277,7 @@ dotProdKernel(const T *x, const T *y, T *out, I n)
 
 /*
  * Finds max norm the vector.
- *
+ *    
  */
 template <typename T, typename I>
 __global__ void
@@ -315,7 +315,7 @@ maxNormKernel(const T *x, T *out, I n)
 
 /*
  * Weighted root mean square norm of a vector.
- *
+ *    
  */
 template <typename T, typename I>
 __global__ void
@@ -370,7 +370,7 @@ wrmsNormMaskKernel(const T *x, const T *w, const T *id, T *out, I n)
   // First reduction step before storing data in shared memory.
   if (i < n && id[i] > 0.0)
     sum = x[i] * w[i] * x[i] * w[i];
-  if ((i + blockDim.x < n) && (id[i] > 0.0))
+  if ((i + blockDim.x < n) && (id[i + blockDim.x] > 0.0))
     sum += ( x[i+blockDim.x] * w[i+blockDim.x] * x[i+blockDim.x] * w[i+blockDim.x]);
   shmem[tid] = sum;
   __syncthreads();
@@ -391,7 +391,7 @@ wrmsNormMaskKernel(const T *x, const T *w, const T *id, T *out, I n)
 
 /*
  * Finds min value in the vector.
- *
+ *    
  */
 template <typename T, typename I>
 __global__ void

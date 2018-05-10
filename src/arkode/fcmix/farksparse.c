@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -34,11 +34,11 @@
 extern "C" {
 #endif
 
-
-  extern void FARK_SPJAC(realtype *T, realtype *Y,
-			 realtype *FY, long int *N,
-                         long int *NNZ, realtype *JDATA,
-                         long int *JRVALS, long int *JCPTRS,
+ 
+  extern void FARK_SPJAC(realtype *T, realtype *Y, 
+			 realtype *FY, long int *N, 
+                         long int *NNZ, realtype *JDATA, 
+                         sunindextype *JRVALS, sunindextype *JCPTRS, 
 			 realtype *H,  long int *IPAR,
                          realtype *RPAR, realtype *V1,
                          realtype *V2, realtype *V3,
@@ -50,32 +50,33 @@ extern "C" {
 
 /*=============================================================*/
 
-/* Fortran interface to C routine ARKDlsSetJacFn; see
+/* Fortran interface to C routine ARKDlsSetJacFn; see 
    farkode.h for further information */
 void FARK_SPARSESETJAC(int *ier)
 {
 #if defined(SUNDIALS_INT32_T)
   arkProcessError((ARKodeMem) ARK_arkodemem, ARK_ILL_INPUT, "ARKODE",
-                  "FARKSPARSESETJAC",
+                  "FARKSPARSESETJAC", 
                   "Sparse Fortran users must configure SUNDIALS with 64-bit integers.");
   *ier = 1;
-#else
+#else  
   *ier = ARKDlsSetJacFn(ARK_arkodemem, FARKSparseJac);
 #endif
 }
 
 /*=============================================================*/
 
-/* C interface to user-supplied Fortran routine FARKSPJAC; see
+/* C interface to user-supplied Fortran routine FARKSPJAC; see 
    farkode.h for additional information  */
-int FARKSparseJac(realtype t, N_Vector y, N_Vector fy,
-		  SUNMatrix J, void *user_data, N_Vector vtemp1,
+int FARKSparseJac(realtype t, N_Vector y, N_Vector fy, 
+		  SUNMatrix J, void *user_data, N_Vector vtemp1, 
 		  N_Vector vtemp2, N_Vector vtemp3)
 {
   int ier;
   realtype *ydata, *fydata, *v1data, *v2data, *v3data, *Jdata;
   realtype h;
-  long int NP, NNZ, *indexvals, *indexptrs;
+  long int NP, NNZ; 
+  sunindextype *indexvals, *indexptrs; 
   FARKUserData ARK_userdata;
 
   ARKodeGetLastStep(ARK_arkodemem, &h);
@@ -91,9 +92,9 @@ int FARKSparseJac(realtype t, N_Vector y, N_Vector fy,
   indexvals = SUNSparseMatrix_IndexValues(J);
   indexptrs = SUNSparseMatrix_IndexPointers(J);
 
-  FARK_SPJAC(&t, ydata, fydata, &NP, &NNZ, Jdata, indexvals,
-             indexptrs, &h, ARK_userdata->ipar, ARK_userdata->rpar,
-             v1data, v2data, v3data, &ier);
+  FARK_SPJAC(&t, ydata, fydata, &NP, &NNZ, Jdata, indexvals, 
+             indexptrs, &h, ARK_userdata->ipar, ARK_userdata->rpar, 
+             v1data, v2data, v3data, &ier); 
   return(ier);
 }
 

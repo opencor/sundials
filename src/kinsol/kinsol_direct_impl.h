@@ -4,8 +4,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -26,10 +26,10 @@ extern "C" {
 #endif
 
 /*------------------------------------------------------------------
-  Types: KINDlsMemRec, KINDlsMem
+  Types: KINDlsMemRec, KINDlsMem                             
   ------------------------------------------------------------------
   The type KINDlsMem is pointer to a KINDlsMemRec.
-  This structure contains KINDLS solver-specific data.
+  This structure contains KINDLS solver-specific data. 
   ------------------------------------------------------------------*/
 
 typedef struct KINDlsMemRec {
@@ -37,17 +37,17 @@ typedef struct KINDlsMemRec {
   booleantype jacDQ;   /* SUNTRUE if using internal DQ Jacobian approx. */
   KINDlsJacFn jac;     /* Jacobian routine to be called                 */
   void *J_data;        /* J_data is passed to jac                       */
-
+  
   SUNLinearSolver LS;  /* generic direct linear solver object           */
 
   SUNMatrix J;         /* problem Jacobian                              */
 
   long int nje  ;      /* no. of calls to jac                           */
-
+    
   long int nfeDQ;      /* no. of calls to F due to DQ Jacobian approx.  */
-
+    
   long int last_flag;  /* last error return flag                        */
-
+    
 } *KINDlsMem;
 
 
@@ -72,7 +72,7 @@ int kinDlsSetup(KINMem kin_mem);
 
 int kinDlsSolve(KINMem kin_mem, N_Vector x, N_Vector b,
                 realtype *sJpnorm, realtype *sFdotJp);
-
+                  
 int kinDlsFree(KINMem kin_mem);
 
 /* Auxilliary functions */

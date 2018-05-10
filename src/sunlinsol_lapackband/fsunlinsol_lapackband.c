@@ -3,13 +3,13 @@
  * Programmer(s): Daniel Reynolds @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -17,7 +17,7 @@
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
  * This file (companion of fsunlinsol_lapackband.h) contains the
- * implementation needed for the Fortran initialization of LAPACK
+ * implementation needed for the Fortran initialization of LAPACK 
  * band linear solver operations.
  * -----------------------------------------------------------------
  */
@@ -90,7 +90,7 @@ void FSUNMASSLAPACKBAND_INIT(int *ier)
   *ier = 0;
   if (F2C_ARKODE_mass_sol)  SUNLinSolFree(F2C_ARKODE_mass_sol);
   F2C_ARKODE_mass_sol = NULL;
-  F2C_ARKODE_mass_sol = SUNLapackBand(F2C_ARKODE_vec,
+  F2C_ARKODE_mass_sol = SUNLapackBand(F2C_ARKODE_vec, 
                                       F2C_ARKODE_mass_matrix);
   if (F2C_ARKODE_mass_sol == NULL) *ier = -1;
 }

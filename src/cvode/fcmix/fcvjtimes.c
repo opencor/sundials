@@ -1,26 +1,26 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel R. Reynolds @ SMU
  *    Alan C. Hindmarsh, Radu Serban and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * The C functions FCVJTSetup and FCVJtimes are to interface
- * between the CVSPILS module and the user-supplied
- * Jacobian-vector product routines FCVJTSETUP and FCVJTIMES.
- * Note the use of the generic names FCV_JTSETUP and FCV_JTIMES
+ * The C functions FCVJTSetup and FCVJtimes are to interface 
+ * between the CVSPILS module and the user-supplied 
+ * Jacobian-vector product routines FCVJTSETUP and FCVJTIMES. 
+ * Note the use of the generic names FCV_JTSETUP and FCV_JTIMES 
  * in the code below.
  * -----------------------------------------------------------------
  */
@@ -41,11 +41,11 @@
 extern "C" {
 #endif
 
-  extern void FCV_JTSETUP(realtype *T, realtype *Y, realtype *FY,
-                          realtype *H, long int *IPAR,
+  extern void FCV_JTSETUP(realtype *T, realtype *Y, realtype *FY, 
+                          realtype *H, long int *IPAR, 
                           realtype *RPAR, int *IER);
 
-  extern void FCV_JTIMES(realtype *V, realtype *JV, realtype *T,
+  extern void FCV_JTIMES(realtype *V, realtype *JV, realtype *T, 
 			  realtype *Y, realtype *FY, realtype *H,
 			  long int *IPAR, realtype *RPAR,
 			  realtype *WRK, int *IER);
@@ -79,13 +79,13 @@ int FCVJTSetup(realtype t, N_Vector y, N_Vector fy, void *user_data)
   realtype h;
   FCVUserData CV_userdata;
   int ier = 0;
-
+  
   CVodeGetLastStep(CV_cvodemem, &h);
   ydata  = N_VGetArrayPointer(y);
   fydata = N_VGetArrayPointer(fy);
   CV_userdata = (FCVUserData) user_data;
-
-  FCV_JTSETUP(&t, ydata, fydata, &h, CV_userdata->ipar,
+ 
+  FCV_JTSETUP(&t, ydata, fydata, &h, CV_userdata->ipar, 
 	      CV_userdata->rpar, &ier);
   return(ier);
 }
@@ -96,7 +96,7 @@ int FCVJTSetup(realtype t, N_Vector y, N_Vector fy, void *user_data)
    using the routine N_VGetArrayPointer from NVECTOR.
    A return flag ier from FCVJTIMES is returned by FCVJtimes. */
 
-int FCVJtimes(N_Vector v, N_Vector Jv, realtype t,
+int FCVJtimes(N_Vector v, N_Vector Jv, realtype t, 
               N_Vector y, N_Vector fy,
               void *user_data, N_Vector work)
 {
@@ -105,7 +105,7 @@ int FCVJtimes(N_Vector v, N_Vector Jv, realtype t,
   FCVUserData CV_userdata;
 
   int ier = 0;
-
+  
   CVodeGetLastStep(CV_cvodemem, &h);
 
   vdata   = N_VGetArrayPointer(v);
@@ -115,8 +115,8 @@ int FCVJtimes(N_Vector v, N_Vector Jv, realtype t,
   wkdata  = N_VGetArrayPointer(work);
 
   CV_userdata = (FCVUserData) user_data;
-
-  FCV_JTIMES (vdata, Jvdata, &t, ydata, fydata, &h,
+ 
+  FCV_JTIMES (vdata, Jvdata, &t, ydata, fydata, &h, 
               CV_userdata->ipar, CV_userdata->rpar, wkdata, &ier);
 
   return(ier);

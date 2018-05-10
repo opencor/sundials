@@ -1,4 +1,4 @@
-
+   
  2D Heat PDE test problem:
    nprocs =    2
    nx =   60
@@ -9,7 +9,7 @@
    atol =  1.00E-10
    nxl (proc 0) =   30
    nyl (proc 0) =  120
-
+   
          t      ||u||_rms
     ----------------------
     0.000000    0.000000
@@ -34,7 +34,7 @@
     0.285000    0.014296
     0.300000    0.014296
     ----------------------
-
+   
  Final Solver Statistics:
    Internal solver steps =     57 (attempted =     59)
    Total RHS evals:  Fe =      0,  Fi =    594

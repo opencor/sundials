@@ -1,18 +1,18 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): Slaven Peles @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS Copyright End
  * -----------------------------------------------------------------
- * This is the testing routine to check the NVECTOR Parallel module
- * implementation.
+ * This is the testing routine to check the NVECTOR Parallel module 
+ * implementation. 
  * -----------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -40,7 +40,7 @@ static int Test_N_VGetVectorID(N_Vector W, int myid);
 /* ----------------------------------------------------------------------
  * Main NVector Testing Routine
  * --------------------------------------------------------------------*/
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
   int              fails = 0;                   /* counter for test failures */
   int              globfails = 0;               /* counter for test failures */
@@ -61,14 +61,14 @@ int main(int argc, char *argv[])
    print_timing = atoi(argv[2]);
    SetTiming(print_timing);
   }
-
+  
   if (argc < 2) {
     veclen = VECLEN;
   } else {
-    veclen = atol(argv[1]);
+    veclen = atol(argv[1]); 
     if (veclen <= 0) {
       printf("ERROR: length of vector must be a positive integer \n");
-      return(-1);
+      return(-1); 
     }
   }
 
@@ -119,12 +119,12 @@ int main(int argc, char *argv[])
   /* Create a couple of more vectors by cloning X */
   Y = N_VClone(X);
   Z = N_VClone(X);
-
+  
   /* Skipped tests */
   /* Accessing HYPRE vector raw data is not allowed from N_Vector interface */
   /* fails += Test_N_VSetArrayPointer(W, local_length, myid); */
   /* fails += Test_N_VGetArrayPointer(X, local_length, myid); */
-
+  
   /* N_Vector interface tests */
   fails += Test_N_VGetVectorID(W, myid);
   fails += Test_N_VConst(X, local_length, myid);
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
   N_VDestroy_ParHyp(X);
   N_VDestroy_ParHyp(Y);
   N_VDestroy_ParHyp(Z);
-
+  
   /* Print result */
   if (fails) {
     printf("FAIL: NVector module failed %i tests, Proc %d \n \n", fails, myid);
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 
   /* Free hypre template vector */
   HYPRE_ParVectorDestroy(Xhyp);
-
+  
   MPI_Finalize();
 
   return(globfails);
@@ -175,8 +175,8 @@ int main(int argc, char *argv[])
 
 /* ----------------------------------------------------------------------
  * Check vector
- *
- * Checks if all elements of vector X are set to value ans.
+ * 
+ * Checks if all elements of vector X are set to value ans. 
  * --------------------------------------------------------------------*/
 int check_ans(realtype ans, N_Vector X, sunindextype local_length)
 {
@@ -184,7 +184,7 @@ int check_ans(realtype ans, N_Vector X, sunindextype local_length)
   sunindextype i;
   hypre_ParVector *Xvec = N_VGetVector_ParHyp(X);
   realtype *Xdata = Xvec == NULL ? NULL : hypre_VectorData(hypre_ParVectorLocalVector(Xvec));
-
+  
   /* check vector data */
   for(i=0; i < local_length; i++) {
     failure += FNEQ(Xdata[i], ans);
@@ -199,7 +199,7 @@ int check_ans(realtype ans, N_Vector X, sunindextype local_length)
 /* ----------------------------------------------------------------------
  * has_data
  *
- * Utility that drills down to the hypre vector local data block and
+ * Utility that drills down to the hypre vector local data block and 
  * checks if it is allocated. Does not verify the size of the block.
  * --------------------------------------------------------------------*/
 booleantype has_data(N_Vector X)
@@ -216,7 +216,7 @@ booleantype has_data(N_Vector X)
 /* ----------------------------------------------------------------------
  * set_element
  *
- * Sets single element in hypre vector by accessing its raw block.
+ * Sets single element in hypre vector by accessing its raw block. 
  * Probably not the most efficient way to set the entire vector.
  * --------------------------------------------------------------------*/
 void set_element(N_Vector X, sunindextype i, realtype val)
@@ -225,11 +225,11 @@ void set_element(N_Vector X, sunindextype i, realtype val)
   realtype *Xdata = hypre_VectorData(hypre_ParVectorLocalVector(Xvec));
   Xdata[i] = val;
 }
-
+ 
 /* ----------------------------------------------------------------------
  * get_element
  *
- * Reads single element from hypre vector by accessing its raw block.
+ * Reads single element from hypre vector by accessing its raw block. 
  * Probably not the most efficient way to get the vector values.
  * --------------------------------------------------------------------*/
 realtype get_element(N_Vector X, sunindextype i)
@@ -255,7 +255,7 @@ int Test_N_VGetVectorID(N_Vector v, int myid)
   } else {
     printf(">>> FAILED test -- N_VGetVectorID, Proc %d \n", myid);
     printf("    Unrecognized vector type %d \n \n", id);
-    return (1);
+    return (1);    
   }
 }
 
@@ -270,11 +270,11 @@ int Test_N_VMake(HYPRE_ParVector W, int myid)
   int failure;
   /* double   start_time, stop_time; */
   N_Vector X;
-  int local_length = hypre_ParVectorLastIndex(W)
+  int local_length = hypre_ParVectorLastIndex(W) 
                      - hypre_ParVectorFirstIndex(W) + 1;
 
   /* clone vector */
-  /* start_time = get_time(); */
+  /* start_time = get_time(); */  
   X = N_VMake_ParHyp(W);
   /* stop_time = get_time();  */
 
@@ -283,7 +283,7 @@ int Test_N_VMake(HYPRE_ParVector W, int myid)
     printf(">>> FAILED test -- N_VMake, Proc %d \n", myid);
     printf("    After N_VMakeEmpty, X == NULL \n \n");
     return(1);
-  }
+  } 
 
   /* check cloned vector data */
   if (!has_data(X)) {
@@ -291,7 +291,7 @@ int Test_N_VMake(HYPRE_ParVector W, int myid)
     printf("    Vector data == NULL \n \n");
     N_VDestroy(X);
     return(1);
-  }
+  }    
 
   N_VConst(ONE,X);
   failure = check_ans(ONE, X, local_length);
@@ -300,9 +300,9 @@ int Test_N_VMake(HYPRE_ParVector W, int myid)
     printf("    Failed N_VConst check \n \n");
     N_VDestroy(X);
     return(1);
-  }
+  }    
 
-  N_VDestroy(X);
+  N_VDestroy(X); 
 
   if (myid == 0) {
     printf("    PASSED test -- N_VMake \n");

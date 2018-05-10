@@ -5,7 +5,7 @@ List of parallel ARKODE C++ examples
 Sample results:
 
   The example output was produced by running with 4 MPI processes:
-
+  
       mpiexec -n 4 ./ark_heat2D
 
 

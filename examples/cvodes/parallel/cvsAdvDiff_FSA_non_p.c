@@ -72,7 +72,7 @@
 
 #define ZERO  RCONST(0.0)
 
-/* Type : UserData
+/* Type : UserData 
    contains problem parameters, grid constants, work array. */
 
 typedef struct {
@@ -96,7 +96,7 @@ static void WrongArgs(int my_pe, char *name);
 static void SetIC(N_Vector u, realtype dx, sunindextype my_length, sunindextype my_base);
 static void PrintOutput(void *cvode_mem, int my_pe, realtype t, N_Vector u);
 static void PrintOutputS(int my_pe, N_Vector *uS);
-static void PrintFinalStats(void *cvode_mem, booleantype sensi);
+static void PrintFinalStats(void *cvode_mem, booleantype sensi); 
 static int check_flag(void *flagvalue, const char *funcname, int opt, int id);
 
 /*
@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
   flag = CVodeSStolerances(cvode_mem, reltol, abstol);
   if(check_flag(&flag, "CVodeSStolerances", 1, my_pe)) MPI_Abort(comm, 1);
 
-
+ 
   if (my_pe == 0) {
     printf("\n1-D advection-diffusion equation, mesh size =%3d \n", MX);
     printf("\nNumber of PEs = %3d \n",npes);
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
     for(is=0; is<NS; is++) pbar[is] = data->p[plist[is]];
 
     uS = N_VCloneVectorArray_Parallel(NS, u);
-    if(check_flag((void *)uS, "N_VCloneVectorArray_Parallel", 0, my_pe))
+    if(check_flag((void *)uS, "N_VCloneVectorArray_Parallel", 0, my_pe)) 
       MPI_Abort(comm, 1);
     for(is=0;is<NS;is++)
       N_VConst(ZERO,uS[is]);
@@ -218,11 +218,11 @@ int main(int argc, char *argv[])
 
     if(my_pe == 0) {
       printf("Sensitivity: YES ");
-      if(sensi_meth == CV_SIMULTANEOUS)
+      if(sensi_meth == CV_SIMULTANEOUS)   
         printf("( SIMULTANEOUS +");
-      else
+      else 
         if(sensi_meth == CV_STAGGERED) printf("( STAGGERED +");
-        else                           printf("( STAGGERED1 +");
+        else                           printf("( STAGGERED1 +");   
       if(err_con) printf(" FULL ERROR CONTROL )");
       else        printf(" PARTIAL ERROR CONTROL )");
     }
@@ -258,12 +258,12 @@ int main(int argc, char *argv[])
   }
 
   /* Print final statistics */
-  if (my_pe == 0)
+  if (my_pe == 0) 
     PrintFinalStats(cvode_mem, sensi);
 
   /* Free memory */
   N_VDestroy(u);                   /* Free the u vector              */
-  if (sensi)
+  if (sensi) 
     N_VDestroyVectorArray(uS, NS); /* Free the uS vectors            */
   free(data->p);                   /* Free the p vector              */
   free(data);                      /* Free block of UserData         */
@@ -283,7 +283,7 @@ int main(int argc, char *argv[])
  */
 
 /*
- * f routine. Compute f(t,u).
+ * f routine. Compute f(t,u). 
  */
 
 static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
@@ -302,15 +302,15 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
 
   /* Extract needed problem constants from data */
   data  = (UserData) user_data;
-  dx    = data->dx;
+  dx    = data->dx; 
   hordc = data->p[0]/(dx*dx);
   horac = data->p[1]/(RCONST(2.0)*dx);
 
   /* Extract parameters for parallel computation. */
   comm = data->comm;
-  npes = data->npes;           /* Number of processes. */
+  npes = data->npes;           /* Number of processes. */ 
   my_pe = data->my_pe;         /* Current process number. */
-  my_length = N_VGetLocalLength_Parallel(u); /* Number of local elements of u. */
+  my_length = N_VGetLocalLength_Parallel(u); /* Number of local elements of u. */ 
   z = data->z;
 
   /* Compute related parameters. */
@@ -327,7 +327,7 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
    if (my_pe != 0)
      MPI_Send(&z[1], 1, PVEC_REAL_MPI_TYPE, my_pe_m1, 0, comm);
    if (my_pe != last_pe)
-     MPI_Send(&z[my_length], 1, PVEC_REAL_MPI_TYPE, my_pe_p1, 0, comm);
+     MPI_Send(&z[my_length], 1, PVEC_REAL_MPI_TYPE, my_pe_p1, 0, comm);   
 
   /* Receive needed data from processes before and after current process. */
    if (my_pe != 0)
@@ -335,7 +335,7 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
    else z[0] = ZERO;
    if (my_pe != last_pe)
      MPI_Recv(&z[my_length+1], 1, PVEC_REAL_MPI_TYPE, my_pe_p1, 0, comm,
-              &status);
+              &status);   
    else z[my_length + 1] = ZERO;
 
   /* Loop over all grid points in current process. */
@@ -361,7 +361,7 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
  *--------------------------------------------------------------------
  */
 
-/*
+/* 
  * Process and verify arguments to cvsfwdnonx_p.
  */
 
@@ -380,7 +380,7 @@ static void ProcessArgs(int argc, char *argv[], int my_pe,
     *sensi = SUNTRUE;
   else
     WrongArgs(my_pe, argv[0]);
-
+  
   if (*sensi) {
 
     if (argc != 4)
@@ -392,7 +392,7 @@ static void ProcessArgs(int argc, char *argv[], int my_pe,
       *sensi_meth = CV_STAGGERED;
     else if (strcmp(argv[2],"stg1") == 0)
       *sensi_meth = CV_STAGGERED1;
-    else
+    else 
       WrongArgs(my_pe, argv[0]);
 
     if (strcmp(argv[3],"t") == 0)
@@ -411,16 +411,16 @@ static void WrongArgs(int my_pe, char *name)
     printf("\nUsage: %s [-nosensi] [-sensi sensi_meth err_con]\n",name);
     printf("         sensi_meth = sim, stg, or stg1\n");
     printf("         err_con    = t or f\n");
-  }
+  }  
   MPI_Finalize();
   exit(0);
 }
 
 /*
- * Set initial conditions in u vector
+ * Set initial conditions in u vector 
  */
 
-static void SetIC(N_Vector u, realtype dx, sunindextype my_length,
+static void SetIC(N_Vector u, realtype dx, sunindextype my_length, 
                   sunindextype my_base)
 {
   int i;
@@ -437,11 +437,11 @@ static void SetIC(N_Vector u, realtype dx, sunindextype my_length,
     iglobal = my_base + i;
     x = iglobal*dx;
     udata[i-1] = x*(XMAX - x)*SUNRexp(2.0*x);
-  }
+  }  
 }
 
 /*
- * Print current t, step count, order, stepsize, and max norm of solution
+ * Print current t, step count, order, stepsize, and max norm of solution  
  */
 
 static void PrintOutput(void *cvode_mem, int my_pe, realtype t, N_Vector u)
@@ -479,12 +479,12 @@ static void PrintOutput(void *cvode_mem, int my_pe, realtype t, N_Vector u)
     printf("%12.4e \n", umax);
 #endif
 
-  }
+  }  
 
 }
 
 /*
- * Print max norm of sensitivities
+ * Print max norm of sensitivities 
  */
 
 static void PrintOutputS(int my_pe, N_Vector *uS)
@@ -518,10 +518,10 @@ static void PrintOutputS(int my_pe, N_Vector *uS)
 }
 
 /*
- * Print some final statistics located in the iopt array
+ * Print some final statistics located in the iopt array 
  */
 
-static void PrintFinalStats(void *cvode_mem, booleantype sensi)
+static void PrintFinalStats(void *cvode_mem, booleantype sensi) 
 {
   long int nst;
   long int nfe, nsetups, nni, ncfn, netf;
@@ -571,14 +571,14 @@ static void PrintFinalStats(void *cvode_mem, booleantype sensi)
 
 }
 
-/*
+/* 
  * Check function return value...
  *   opt == 0 means SUNDIALS function allocates memory so check if
  *            returned NULL pointer
  *   opt == 1 means SUNDIALS function returns a flag so check if
  *            flag >= 0
  *   opt == 2 means function allocates memory so check if returned
- *            NULL pointer
+ *            NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt, int id)

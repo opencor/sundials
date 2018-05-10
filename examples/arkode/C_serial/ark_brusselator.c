@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2015, Southern Methodist University and
+ * Copyright (c) 2015, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -16,44 +16,44 @@
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
  * Example problem:
- *
- * The following test simulates a brusselator problem from chemical
- * kinetics.  This is an ODE system with 3 components, Y = [u,v,w],
+ * 
+ * The following test simulates a brusselator problem from chemical 
+ * kinetics.  This is an ODE system with 3 components, Y = [u,v,w], 
  * satisfying the equations,
  *    du/dt = a - (w+1)*u + v*u^2
  *    dv/dt = w*u - v*u^2
  *    dw/dt = (b-w)/ep - w*u
- * for t in the interval [0.0, 10.0], with initial conditions
- * Y0 = [u0,v0,w0].
- *
+ * for t in the interval [0.0, 10.0], with initial conditions 
+ * Y0 = [u0,v0,w0]. 
+ * 
  * We have 3 different testing scenarios:
  *
  * Test 1:  u0=3.9,  v0=1.1,  w0=2.8,  a=1.2,  b=2.5,  ep=1.0e-5
- *    Here, all three components exhibit a rapid transient change
- *    during the first 0.2 time units, followed by a slow and
+ *    Here, all three components exhibit a rapid transient change 
+ *    during the first 0.2 time units, followed by a slow and 
  *    smooth evolution.
  *
  * Test 2:  u0=1.2,  v0=3.1,  w0=3,  a=1,  b=3.5,  ep=5.0e-6
- *    Here, w experiences a fast initial transient, jumping 0.5
- *    within a few steps.  All values proceed smoothly until
- *    around t=6.5, when both u and v undergo a sharp transition,
- *    with u increaseing from around 0.5 to 5 and v decreasing
+ *    Here, w experiences a fast initial transient, jumping 0.5 
+ *    within a few steps.  All values proceed smoothly until 
+ *    around t=6.5, when both u and v undergo a sharp transition, 
+ *    with u increaseing from around 0.5 to 5 and v decreasing 
  *    from around 6 to 1 in less than 0.5 time units.  After this
- *    transition, both u and v continue to evolve somewhat
+ *    transition, both u and v continue to evolve somewhat 
  *    rapidly for another 1.4 time units, and finish off smoothly.
  *
  * Test 3:  u0=3,  v0=3,  w0=3.5,  a=0.5,  b=3,  ep=5.0e-4
- *    Here, all components undergo very rapid initial transients
- *    during the first 0.3 time units, and all then proceed very
+ *    Here, all components undergo very rapid initial transients 
+ *    during the first 0.3 time units, and all then proceed very 
  *    smoothly for the remainder of the simulation.
  *
  * This file is hard-coded to use test 2.
- *
+ * 
  * This program solves the problem with the DIRK method, using a
  * Newton iteration with the SUNDENSE dense linear solver, and a
  * user-supplied Jacobian routine.
  *
- * 100 outputs are printed at equal intervals, and run statistics
+ * 100 outputs are printed at equal intervals, and run statistics 
  * are printed at the end.
  *-----------------------------------------------------------------*/
 
@@ -183,8 +183,8 @@ int main()
   fprintf(UFID,"# t u v w\n");
 
   /* output initial condition to disk */
-  fprintf(UFID," %.16"ESYM" %.16"ESYM" %.16"ESYM" %.16"ESYM"\n",
-	  T0, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));
+  fprintf(UFID," %.16"ESYM" %.16"ESYM" %.16"ESYM" %.16"ESYM"\n", 
+	  T0, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));  
 
   /* Main time-stepping loop: calls ARKode to perform the integration, then
      prints results.  Stops when the final time has been reached */
@@ -198,8 +198,8 @@ int main()
     if (check_flag(&flag, "ARKode", 1)) break;
     printf("  %10.6"FSYM"  %10.6"FSYM"  %10.6"FSYM"  %10.6"FSYM"\n",             /* access/print solution */
            t, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));
-    fprintf(UFID," %.16"ESYM" %.16"ESYM" %.16"ESYM" %.16"ESYM"\n",
-	    t, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));
+    fprintf(UFID," %.16"ESYM" %.16"ESYM" %.16"ESYM" %.16"ESYM"\n", 
+	    t, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));  
     if (flag >= 0) {                                         /* successful solve: update time */
       tout += dTout;
       tout = (tout > Tf) ? Tf : tout;
@@ -308,7 +308,7 @@ static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J, void *user_data
     opt == 1 means SUNDIALS function returns a flag so check if
              flag >= 0
     opt == 2 means function allocates memory so check if returned
-             NULL pointer
+             NULL pointer  
 */
 static int check_flag(void *flagvalue, const char *funcname, int opt)
 {

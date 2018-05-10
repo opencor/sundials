@@ -1,23 +1,23 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel Reynolds, Ashley Crawford @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the testing routine to check the SUNLinSol Band module
- * implementation.
+ * This is the testing routine to check the SUNLinSol Band module 
+ * implementation. 
  * -----------------------------------------------------------------
  */
 
@@ -35,7 +35,7 @@
 /* ----------------------------------------------------------------------
  * SUNBandLinearSolver Testing Routine
  * --------------------------------------------------------------------*/
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
   int             fails = 0;          /* counter for test failures  */
   sunindextype    cols, uband, lband; /* matrix columns, bandwidths */
@@ -52,22 +52,22 @@ int main(int argc, char *argv[])
     return(-1);
   }
 
-  cols = atol(argv[1]);
+  cols = atol(argv[1]); 
   if (cols <= 0) {
     printf("ERROR: number of matrix columns must be a positive integer \n");
-    return(-1);
+    return(-1); 
   }
 
-  uband = atol(argv[2]);
+  uband = atol(argv[2]); 
   if ((uband <= 0) || (uband >= cols)){
     printf("ERROR: matrix upper bandwidth must be a positive integer, less than number of columns \n");
-    return(-1);
+    return(-1); 
   }
 
-  lband = atol(argv[3]);
+  lband = atol(argv[3]); 
   if ((lband <= 0) || (lband >= cols)){
     printf("ERROR: matrix lower bandwidth must be a positive integer, less than number of columns \n");
-    return(-1);
+    return(-1); 
   }
 
   print_timing = atoi(argv[4]);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
   /* Fill matrix and x vector with uniform random data in [0,1] */
   xdata = N_VGetArrayPointer(x);
   for (j=0; j<cols; j++) {
-
+    
     /* A matrix column */
     colj = SUNBandMatrix_Column(A, j);
     kstart = (j<uband) ? -j : -uband;
@@ -96,13 +96,22 @@ int main(int argc, char *argv[])
 
     /* x entry */
     xdata[j] = (realtype) rand() / (realtype) RAND_MAX;
-
+    
   }
 
   /* Scale/shift matrix to ensure diagonal dominance */
   fails += SUNMatScaleAddI( ONE/(uband+lband+1), A );
   if (fails) {
     printf("FAIL: SUNLinSol SUNMatScaleAddI failure\n");
+
+    /* Free solver, matrix and vectors */
+    SUNLinSolFree(LS);
+    SUNMatDestroy(A);
+    SUNMatDestroy(B);
+    N_VDestroy(x);
+    N_VDestroy(y);
+    N_VDestroy(b);
+
     return(1);
   }
 
@@ -114,17 +123,26 @@ int main(int argc, char *argv[])
   fails = SUNMatMatvec(A, x, b);
   if (fails) {
     printf("FAIL: SUNLinSol SUNMatMatvec failure\n");
+
+    /* Free solver, matrix and vectors */
+    SUNLinSolFree(LS);
+    SUNMatDestroy(A);
+    SUNMatDestroy(B);
+    N_VDestroy(x);
+    N_VDestroy(y);
+    N_VDestroy(b);
+
     return(1);
   }
-
+  
   /* Create banded linear solver */
   LS = SUNBandLinearSolver(x, A);
-
+  
   /* Run Tests */
   fails += Test_SUNLinSolInitialize(LS, 0);
   fails += Test_SUNLinSolSetup(LS, A, 0);
   fails += Test_SUNLinSolSolve(LS, A, x, b, RCONST(1.0e-15), 0);
-
+ 
   fails += Test_SUNLinSolGetType(LS, SUNLINEARSOLVER_DIRECT, 0);
   fails += Test_SUNLinSolLastFlag(LS, 0);
   fails += Test_SUNLinSolSpace(LS, 0);
@@ -150,6 +168,7 @@ int main(int argc, char *argv[])
   SUNMatDestroy(B);
   N_VDestroy(x);
   N_VDestroy(y);
+  N_VDestroy(b);
 
   return(fails);
 }
@@ -162,11 +181,11 @@ int check_vector(N_Vector X, N_Vector Y, realtype tol)
   int failure = 0;
   sunindextype i, local_length;
   realtype *Xdata, *Ydata, maxerr;
-
+  
   Xdata = N_VGetArrayPointer(X);
   Ydata = N_VGetArrayPointer(Y);
   local_length = N_VGetLength_Serial(X);
-
+  
   /* check vector data */
   for(i=0; i < local_length; i++)
     failure += FNEQ(Xdata[i], Ydata[i], tol);

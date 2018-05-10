@@ -3,20 +3,20 @@
 # ---------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
 # For details, see the LICENSE file.
 # LLNS Copyright End
 # ---------------------------------------------------------------
-# xSDK specific CMake variables. If set, these variables will
+# xSDK specific CMake variables. If set, these variables will 
 # overwrite the value in equivalent SUNDIALS CMake variable.
 #
-# Only USE_XSDK_DEFAULTS is created in CACHE by default (set to
+# Only USE_XSDK_DEFAULTS is created in CACHE by default (set to 
 # OFF). The other xSDK variables are left undefined. They can be
-# be set by passing -D<variable_name>=<value> to cmake or can be
+# be set by passing -D<variable_name>=<value> to cmake or can be 
 # enabled in the cmake-gui setting USE_XSDK_DEFAULTS to ON.
 #
 # When USE_XSDK_DEFAULTS is ON the default values are overwritten
@@ -33,7 +33,7 @@ OPTION(USE_XSDK_DEFAULTS "Enable default xSDK settings" OFF)
 IF(USE_XSDK_DEFAULTS)
 
   MESSAGE("Enabeling xSDK defaults")
-
+  
   # set the CMake build type, SUNDIALS does not set a build type by default
   IF(NOT CMAKE_BUILD_TYPE)
     MESSAGE("Setting build type to Debug")
@@ -110,11 +110,11 @@ ENDIF()
 IF(DEFINED XSDK_ENABLE_FORTRAN)
   MESSAGE("Replacing FCMIX_ENABLE with XSDK_ENABLE_FORTRAN")
   SET(DOCSTR "Enable Fortran-C support")
-
+  
   # check that at least one solver with a Fortran interface is built
   IF(NOT BUILD_ARKODE AND NOT BUILD_CVODE AND NOT BUILD_IDA AND NOT BUILD_KINSOL)
     IF(XSDK_ENABLE_FORTRAN)
-      PRINT_WARNING("Enabled packages do not support Fortran"
+      PRINT_WARNING("Enabled packages do not support Fortran" 
                     "Disabeling XSDK_ENABLE_FORTRAN")
       FORCE_VARIABLE(XSDK_ENABLE_FORTRAN BOOL "${DOCSTR}" OFF)
     ENDIF()
@@ -208,7 +208,7 @@ IF(TPL_ENABLE_SUPERLUMT)
 
   MESSAGE("Replacing SUPERLUMT_THREAD_TYPE with TPL_SUPERLUMT_THREAD_TYPE")
   SET(DOCSTR "SuperLU_MT thread type (OpenMP or Pthread)")
-
+  
   SHOW_VARIABLE(TPL_SUPERLUMT_THREAD_TYPE STRING "${DOCSTR}" "PThread")
   FORCE_VARIABLE(SUPERLUMT_THREAD_TYPE STRING "${DOCSTR}" "${TPL_SUPERLUMT_THREAD_TYPE}")
   MARK_AS_ADVANCED(FORCE SUPERLUMT_THREAD_TYPE)

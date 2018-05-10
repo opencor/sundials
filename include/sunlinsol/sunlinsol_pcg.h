@@ -3,33 +3,33 @@
  * Programmer(s): Daniel Reynolds, Ashley Crawford @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the header file for the PCG implementation of the
+ * This is the header file for the PCG implementation of the 
  * SUNLINSOL module.  The PCG algorithm is based on the
  * Preconditioned Conjugate Gradient.
  *
- * The PCG algorithm solves a linear system A x = b where
- * A is a symmetric, real-valued matrix, i.e. A = A' (Matlab
- * notation for the transpose of A).  Preconditioning is allowed,
- * and is applied in a symmetric fashion on both the right and left.
+ * The PCG algorithm solves a linear system A x = b where 
+ * A is a symmetric, real-valued matrix, i.e. A = A' (Matlab 
+ * notation for the transpose of A).  Preconditioning is allowed, 
+ * and is applied in a symmetric fashion on both the right and left.  
  * Scaling is also allowed and is applied symmetrically.  We denote
  * the preconditioner and scaling matrices as follows:
  *   P = preconditioner (assumed symmetric)
- *   S = diagonal matrix of scale factors
- * The matrices A and P are not required explicitly; only routines
- * that provide A and P-inverse as operators are required.  The
+ *   S = diagonal matrix of scale factors 
+ * The matrices A and P are not required explicitly; only routines 
+ * that provide A and P-inverse as operators are required.  The 
  * diagonal of the matrix S is held in a single N_Vector, supplied
  * by the user of this module.
  *
@@ -40,7 +40,7 @@
  *   bbar = S (P-inverse) b , and   xbar = (S-inverse) P x .
  *
  * The scaling matrix must be chosen so that the vectors
- * (S P-inverse b) and (S-inverse P x) have dimensionless
+ * (S P-inverse b) and (S-inverse P x) have dimensionless 
  * components.
  *
  * The stopping test for the PCG iterations is on the L2 norm of
@@ -50,16 +50,16 @@
  *      || S (P-inverse) b - S (P-inverse) A x ||_2  <  delta
  *  <=>
  *      || P-inverse b - (P-inverse) A x ||_S  <  delta
- * where || v ||_S =  sqrt(v' S' S v) with an input test constant
+ * where || v ||_S =  sqrt(v' S' S v) with an input test constant 
  * delta.
  *
  * The usage of this PCG solver involves supplying up to three
- * routines and making a variety of calls.  The user-supplied
+ * routines and making a variety of calls.  The user-supplied 
  * routines are
  *    atimes (A_data, x, y) to compute y = A x, given x,
- *    psolve (P_data, y, x, lr) to solve P1 x = y or P2 x = y for
+ *    psolve (P_data, y, x, lr) to solve P1 x = y or P2 x = y for 
  *           x, given y,
- *    psetup (P_data) to perform any 'setup' operations in
+ *    psetup (P_data) to perform any 'setup' operations in 
  *           preparation for calling psolve.
  * The user calls are:
  *    SUNLinearSolver LS = SUNPCG(y, pretype, maxl);
@@ -69,7 +69,7 @@
  *    flag = SUNLinSolSetPreconditioner(LS, P_data, psetup, psolve);
  *           to *optionally* set the preconditioner setup/apply routines,
  *    flag = SUNLinSolSetScalingVectors(LS, s, NULL);
- *           to *optionally* set the diagonal of the scaling matrix
+ *           to *optionally* set the diagonal of the scaling matrix 
  *           (for PCG, only the first of the two scaling vectors is used)
  *    flag = SUNLinSolInitialize(LS);
  *           to perform internal solver memory allocations,
@@ -78,7 +78,7 @@
  *    flag = SUNLinSolSolve(LS, NULL, x, b, w, tol);
  *           to solve the linear system to the tolerance 'tol'
  *    long int nli = SUNLinSolNumIters(LS);
- *           to *optionally* retrieve the number of linear iterations
+ *           to *optionally* retrieve the number of linear iterations 
  *           performed by the solver,
  *    long int lastflag = SUNLinSolLastFlag(LS);
  *           to *optionally* retrieve the last internal solver error flag,
@@ -86,21 +86,21 @@
  *           to *optionally* retrieve the final linear residual norm,
  *    flag = SUNLinSolFree(LS);
  *           to free the solver memory.
- * Complete details for specifying atimes, psetup and psolve
+ * Complete details for specifying atimes, psetup and psolve 
  * and for the usage calls are given below.
  *
  * -----------------------------------------------------------------
- *
+ * 
  * Part I contains declarations specific to the PCG implementation
  * of the supplied SUNLINSOL module.
- *
+ * 
  * Part II contains the prototype for the constructor SUNPCG as well
  * as implementation-specific prototypes for various useful solver
  * operations.
  *
  * Notes:
  *
- *   - The definition of the generic SUNLinearSolver structure can
+ *   - The definition of the generic SUNLinearSolver structure can 
  *     be found in the header file sundials_linearsolver.h.
  *
  * -----------------------------------------------------------------
@@ -125,7 +125,7 @@ extern "C" {
  * -----------------------------------------------------------------
  * PART I: PCG implementation of SUNLinearSolver
  *
- * The PCG implementation of the SUNLinearSolver 'content'
+ * The PCG implementation of the SUNLinearSolver 'content' 
  * structure contains:
  *     maxl -- number of PCG iterations to use
  *     pretype -- flag for use of preconditioning
@@ -137,15 +137,15 @@ extern "C" {
  *     Psetup -- function pointer to preconditioner setup routine
  *     Psolve -- function pointer to preconditioner solve routine
  *     PData -- pointer to structure for Psetup/Psolve
- *     s -- vector (type N_Vector) which holds the diagonal of the
+ *     s -- vector (type N_Vector) which holds the diagonal of the 
  *         scaling matrix S
- *     r -- vector (type N_Vector) which holds the preconditioned
+ *     r -- vector (type N_Vector) which holds the preconditioned 
  *         linear system residual
  *     p, z and Ap -- vectors (type N_Vector) used for workspace by
  *         the PCG algorithm
  * -----------------------------------------------------------------
  */
-
+ 
 struct _SUNLinearSolverContent_PCG {
   int maxl;
   int pretype;
@@ -168,11 +168,11 @@ struct _SUNLinearSolverContent_PCG {
 
 typedef struct _SUNLinearSolverContent_PCG *SUNLinearSolverContent_PCG;
 
-
+  
 /*
  * -----------------------------------------------------------------
  * PART III: functions exported by sunlinsol_pcg
- *
+ * 
  * CONSTRUCTOR:
  *    SUNPCG creates and allocates memory for a PCG solver
  * -----------------------------------------------------------------
@@ -206,8 +206,8 @@ SUNDIALS_EXPORT int SUNLinSolNumIters_PCG(SUNLinearSolver S);
 SUNDIALS_EXPORT realtype SUNLinSolResNorm_PCG(SUNLinearSolver S);
 SUNDIALS_EXPORT N_Vector SUNLinSolResid_PCG(SUNLinearSolver S);
 SUNDIALS_EXPORT long int SUNLinSolLastFlag_PCG(SUNLinearSolver S);
-SUNDIALS_EXPORT int SUNLinSolSpace_PCG(SUNLinearSolver S,
-                                       long int *lenrwLS,
+SUNDIALS_EXPORT int SUNLinSolSpace_PCG(SUNLinearSolver S, 
+                                       long int *lenrwLS, 
                                        long int *leniwLS);
 SUNDIALS_EXPORT int SUNLinSolFree_PCG(SUNLinearSolver S);
 

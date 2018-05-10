@@ -3,8 +3,8 @@
 # ---------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -12,7 +12,7 @@
 # LLNS Copyright End
 # ---------------------------------------------------------------
 # SUPERLUMT tests for SUNDIALS CMake-based configuration.
-#
+# 
 
 # make sure valid thread type - if not, then warn and return
 STRING(TOUPPER "${SUPERLUMT_THREAD_TYPE}" SUPERLUMT_THREAD_TYPE_UPPER)
@@ -64,11 +64,11 @@ ELSE(SUPERLUMT_THREAD_TYPE_UPPER STREQUAL "OPENMP")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-  endif()
+  endif()  
 ENDIF()
 mark_as_advanced(SUPERLUMT_THREAD_LIBRARY)
 
-# add to SUPERLUMT_LIBRARIES (Note: will be 'not found' if either are not found
+# add to SUPERLUMT_LIBRARIES (Note: will be 'not found' if either are not found 
 set(SUPERLUMT_LIBRARIES ${SUPERLUMT_LIBRARY} ${SUPERLUMT_THREAD_LIBRARY})
 
 # If LAPACK/BLAS not enabled - find BLAS with SUPERLUMT

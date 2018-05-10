@@ -4,8 +4,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -106,8 +106,8 @@ int FKINPSet(N_Vector uu, N_Vector uscale,
   C function FKINPSol is used to interface between FK_PSOL and
   the user-supplied Fortran preconditioner solve routine.
   ------------------------------------------------------------------*/
-int FKINPSol(N_Vector uu, N_Vector uscale,
-             N_Vector fval, N_Vector fscale,
+int FKINPSol(N_Vector uu, N_Vector uscale, 
+             N_Vector fval, N_Vector fscale, 
              N_Vector vv, void *user_data)
 {
   realtype *udata, *uscaledata, *fdata, *fscaledata, *vvdata;

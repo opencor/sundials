@@ -4,8 +4,8 @@
 # -----------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -42,7 +42,7 @@ SET(SUNDIALS_INC_DIR
 # Add path to SUNDIALS header files
 INCLUDE_DIRECTORIES(${SUNDIALS_INC_DIR})
 
-# Set search path for SUNDIALS libraries
+# Set search path for SUNDIALS libraries 
 SET(SUNDIALS_LIB_DIR @libdir@)
 
 # Find the SUNDIALS solver's library
@@ -67,16 +67,16 @@ FIND_LIBRARY(SUNDIALS_NVEC_FLIB
 SET(SUNDIALS_EXTRA_LIB @LIBS@ CACHE STRING "Additional libraries")
 
 # List of all libraries
-SET(SUNDIALS_LIBS
+SET(SUNDIALS_LIBS 
   ${SUNDIALS_SOLVER_FLIB}
-  ${SUNDIALS_SOLVER_LIB}
+  ${SUNDIALS_SOLVER_LIB} 
   ${SUNDIALS_NVEC_FLIB}
-  ${SUNDIALS_NVEC_LIB}
+  ${SUNDIALS_NVEC_LIB} 
   ${SUNDIALS_EXTRA_LIB})
 
 # Build each example one by one
 FOREACH(example ${examples})
-
+  
   # example source files
   ADD_EXECUTABLE(${example} ${example}.f90)
 

@@ -1,10 +1,10 @@
-/* -----------------------------------------------------------------
- * Programmer(s): Slaven Peles @ LLNL
+/* ----------------------------------------------------------------- 
+ * Programmer(s): Slaven Peles @ LLNL                               
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -48,7 +48,7 @@ N_Vector N_VNewEmpty_Raja(sunindextype length)
   v = NULL;
   v = (N_Vector) malloc(sizeof *v);
   if (v == NULL) return(NULL);
-
+  
   /* Create vector operation structure */
   ops = NULL;
   ops = (N_Vector_Ops) malloc(sizeof(struct _generic_N_Vector_Ops));
@@ -91,7 +91,7 @@ N_Vector N_VNewEmpty_Raja(sunindextype length)
   return(v);
 }
 
-
+    
 N_Vector N_VNew_Raja(sunindextype length)
 {
   N_Vector v;
@@ -505,7 +505,8 @@ realtype N_VWrmsNormMask_Raja(N_Vector X, N_Vector W, N_Vector ID)
 
   RAJA::ReduceSum<RAJA::cuda_reduce<128>, realtype> gpu_result(0.0);
   RAJA::forall<RAJA::cuda_exec<128> >(zeroIdx, N, [=] __device__(sunindextype i) {
-    gpu_result += (xdata[i] * wdata[i] * xdata[i] * wdata[i] * iddata[i]);
+      if (iddata[i] > ZERO)
+        gpu_result += (xdata[i] * wdata[i] * xdata[i] * wdata[i]);
   });
 
   return std::sqrt(static_cast<realtype>(gpu_result)/N);

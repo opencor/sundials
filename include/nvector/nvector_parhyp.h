@@ -1,14 +1,14 @@
 /* -----------------------------------------------------------------
  * Programmer(s): Jean M. Sexton @ SMU
  *                Slaven Peles @ LLNL
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Based on work by: Scott D. Cohen, Alan C. Hindmarsh, Radu Serban,
  *                   and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -31,8 +31,8 @@
  *     found in the header file sundials_nvector.h.
  *
  *   - The definition of the type realtype can be found in the
- *     header file sundials_types.h, and it may be changed (at the
- *     configuration stage) according to the user's needs.
+ *     header file sundials_types.h, and it may be changed (at the 
+ *     configuration stage) according to the user's needs. 
  *     The sundials_types.h file also contains the definition
  *     for the type booleantype.
  *
@@ -48,6 +48,7 @@
 #ifndef _NVECTOR_PARHYP_H
 #define _NVECTOR_PARHYP_H
 
+#include <stdio.h>
 #include <mpi.h>
 #include <sundials/sundials_nvector.h>
 #include <sundials/sundials_mpi_types.h>
@@ -62,15 +63,15 @@ extern "C" {
 
 /*
  * -----------------------------------------------------------------
- * PART I: PARALLEL implementation of N_Vector
+ * PART I: PARALLEL implementation of N_Vector               
  * -----------------------------------------------------------------
  */
 
-/*
+/* 
  * Parallel implementation of the N_Vector 'content' structure
  * contains the global and local lengths of the vector, a pointer
  * to an array of 'realtype components', the MPI communicator,
- * and a flag indicating ownership of the data.
+ * and a flag indicating ownership of the data. 
  */
 struct _N_VectorContent_ParHyp {
   sunindextype local_length;      /* local vector length         */
@@ -87,7 +88,7 @@ typedef struct _N_VectorContent_ParHyp *N_VectorContent_ParHyp;
 /*
  * -----------------------------------------------------------------
  * PART II: functions exported by nvector_ParHyp
- *
+ * 
  * CONSTRUCTORS:
  *    N_VNewEmpty_ParHyp
  *    N_VMake_ParHyp
@@ -108,12 +109,12 @@ typedef struct _N_VectorContent_ParHyp *N_VectorContent_ParHyp;
  * -----------------------------------------------------------------
  * Function : N_VNewEmpty_ParHyp
  * -----------------------------------------------------------------
- * This function creates a new hypre vector wrapper without the
+ * This function creates a new hypre vector wrapper without the 
  * hypre vector itself.
  * -----------------------------------------------------------------
  */
 
-SUNDIALS_EXPORT N_Vector N_VNewEmpty_ParHyp(MPI_Comm comm,
+SUNDIALS_EXPORT N_Vector N_VNewEmpty_ParHyp(MPI_Comm comm, 
                                             sunindextype local_length,
                                             sunindextype global_length);
 
@@ -121,7 +122,7 @@ SUNDIALS_EXPORT N_Vector N_VNewEmpty_ParHyp(MPI_Comm comm,
  * -----------------------------------------------------------------
  * Function : N_VMake_ParHyp
  * -----------------------------------------------------------------
- * This function creates a hypre vector wrapper around user-supplied
+ * This function creates a hypre vector wrapper around user-supplied 
  * hypre vector.
  * -----------------------------------------------------------------
  */
@@ -132,7 +133,7 @@ SUNDIALS_EXPORT N_Vector N_VMake_ParHyp(hypre_ParVector *x);
  * -----------------------------------------------------------------
  * Function : N_VCloneVectorArray_ParHyp
  * -----------------------------------------------------------------
- * This function creates an array of 'count' N_Vectors by cloning a
+ * This function creates an array of 'count' N_Vectors by cloning a 
  * given vector w. Both, the wrapper and the underlying hypre vector
  * are cloned.
  * -----------------------------------------------------------------
@@ -155,7 +156,7 @@ SUNDIALS_EXPORT N_Vector *N_VCloneVectorArrayEmpty_ParHyp(int count, N_Vector w)
  * -----------------------------------------------------------------
  * Function : N_VDestroyVectorArray_ParHyp
  * -----------------------------------------------------------------
- * This function frees an array of N_Vector created with
+ * This function frees an array of N_Vector created with 
  * N_VCloneVectorArray_ParHyp or N_VCloneVectorArrayEmpty_ParHyp.
  * -----------------------------------------------------------------
  */

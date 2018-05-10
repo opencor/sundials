@@ -2,23 +2,23 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
- * The C functions FARKJTSetup and FARKJtimes are to interface
- * between the ARKSPILS module and the user-supplied
- * Jacobian-vector product routines FARKJTSETUP and FARKJTIMES.
- * Note the use of the generic names FARK_JTSETUP and FARK_JTIMES
+ * The C functions FARKJTSetup and FARKJtimes are to interface 
+ * between the ARKSPILS module and the user-supplied 
+ * Jacobian-vector product routines FARKJTSETUP and FARKJTIMES. 
+ * Note the use of the generic names FARK_JTSETUP and FARK_JTIMES 
  * in the code below.
  *--------------------------------------------------------------*/
 
@@ -36,11 +36,11 @@
 extern "C" {
 #endif
 
-  extern void FARK_JTSETUP(realtype *T, realtype *Y, realtype *FY,
-                           realtype *H, long int *IPAR,
+  extern void FARK_JTSETUP(realtype *T, realtype *Y, realtype *FY, 
+                           realtype *H, long int *IPAR, 
                            realtype *RPAR, int *IER);
 
-  extern void FARK_JTIMES(realtype *V, realtype *JV, realtype *T,
+  extern void FARK_JTIMES(realtype *V, realtype *JV, realtype *T, 
 			  realtype *Y, realtype *FY, realtype *H,
 			  long int *IPAR, realtype *RPAR,
 			  realtype *WRK, int *IER);
@@ -51,7 +51,7 @@ extern "C" {
 
 /*=============================================================*/
 
-/* Fortran interface to C routine ARKSpilsSetJacTimes; see
+/* Fortran interface to C routine ARKSpilsSetJacTimes; see 
    farkode.h for further information */
 void FARK_SPILSSETJAC(int *flag, int *ier)
 {
@@ -73,30 +73,30 @@ int FARKJTSetup(realtype t, N_Vector y, N_Vector fy, void *user_data)
   realtype h;
   FARKUserData ARK_userdata;
   int ier = 0;
-
+  
   /* Initialize all pointers to NULL */
   ydata = fydata = NULL;
-
+  
   ARKodeGetLastStep(ARK_arkodemem, &h);
   ydata  = N_VGetArrayPointer(y);
   fydata = N_VGetArrayPointer(fy);
   ARK_userdata = (FARKUserData) user_data;
-
-  FARK_JTSETUP(&t, ydata, fydata, &h, ARK_userdata->ipar,
+ 
+  FARK_JTSETUP(&t, ydata, fydata, &h, ARK_userdata->ipar, 
 	      ARK_userdata->rpar, &ier);
   return(ier);
 }
 
 /* C interface to user-supplied Fortran routine FARKJTIMES; see
    farkode.h for further information */
-int FARKJtimes(N_Vector v, N_Vector Jv, realtype t, N_Vector y,
+int FARKJtimes(N_Vector v, N_Vector Jv, realtype t, N_Vector y, 
 	       N_Vector fy, void *user_data, N_Vector work)
 {
   realtype *vdata, *Jvdata, *ydata, *fydata, *wkdata;
   realtype h;
   FARKUserData ARK_userdata;
   int ier = 0;
-
+  
   /* Initialize all pointers to NULL */
   vdata = Jvdata = ydata = fydata = wkdata = NULL;
 
@@ -109,8 +109,8 @@ int FARKJtimes(N_Vector v, N_Vector Jv, realtype t, N_Vector y,
   wkdata = N_VGetArrayPointer(work);
 
   ARK_userdata = (FARKUserData) user_data;
-
-  FARK_JTIMES(vdata, Jvdata, &t, ydata, fydata, &h, ARK_userdata->ipar,
+ 
+  FARK_JTIMES(vdata, Jvdata, &t, ydata, fydata, &h, ARK_userdata->ipar, 
 	      ARK_userdata->rpar, wkdata, &ier);
   return(ier);
 }

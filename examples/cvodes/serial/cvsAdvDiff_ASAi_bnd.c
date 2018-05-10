@@ -56,8 +56,8 @@
 #define MX    40            /* mesh dimensions               */
 #define MY    20
 #define NEQ   MX*MY         /* number of equations           */
-#define ATOL  RCONST(1.e-5)
-#define RTOLB RCONST(1.e-6)
+#define ATOL  RCONST(1.e-5)        
+#define RTOLB RCONST(1.e-6)        
 #define T0    RCONST(0.0)   /* initial time                  */
 #define T1    RCONST(0.1)   /* first output time             */
 #define DTOUT RCONST(0.1)   /* output time increment         */
@@ -73,16 +73,16 @@
 
 /* IJth is defined in order to isolate the translation from the
    mathematical 2-dimensional structure of the dependent variable vector
-   to the underlying 1-dimensional storage.
+   to the underlying 1-dimensional storage. 
    IJth(vdata,i,j) references the element in the vdata array for
    u at mesh point (i,j), where 1 <= i <= MX, 1 <= j <= MY.
    The vdata array is obtained via the call vdata = N_VGetArrayPointer(v),
-   where v is an N_Vector.
+   where v is an N_Vector. 
    The variables are ordered by the y index j, then by the x index i. */
 
 #define IJth(vdata,i,j) (vdata[(j-1) + (i-1)*MY])
 
-/* Type : UserData
+/* Type : UserData 
    contains grid constants */
 
 typedef struct {
@@ -94,12 +94,12 @@ typedef struct {
 static int f(realtype t, N_Vector u, N_Vector udot, void *user_data);
 
 static int Jac(realtype t, N_Vector u, N_Vector fu, SUNMatrix J,
-               void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+               void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3); 
 
 static int fB(realtype tB, N_Vector u, N_Vector uB, N_Vector uBdot, void *user_dataB);
 
 static int JacB(realtype tB, N_Vector u, N_Vector uB, N_Vector fuB, SUNMatrix JB,
-                void *user_dataB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+                void *user_dataB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B); 
 
 /* Prototypes of private functions */
 
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
 
   realtype reltolB, abstolB;
   N_Vector uB;
-
+  
   int flag, ncheck;
 
   data = NULL;
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 
   flag = CVodeSStolerancesB(cvode_mem, indexB, reltolB, abstolB);
   if(check_flag(&flag, "CVodeSStolerancesB", 1)) return(1);
-
+ 
   /* Create banded SUNMatrix for the backward problem */
   AB = SUNBandMatrix(NEQ, MY, MY, 2*MY);
   if(check_flag((void *)AB, "SUNBandMatrix", 0)) return(1);
@@ -371,7 +371,7 @@ static int Jac(realtype t, N_Vector u, N_Vector fu, SUNMatrix J,
  * fB function. Right-hand side of backward ODE.
  */
 
-static int fB(realtype tB, N_Vector u, N_Vector uB, N_Vector uBdot,
+static int fB(realtype tB, N_Vector u, N_Vector uB, N_Vector uBdot, 
               void *user_dataB)
 {
   UserData data;
@@ -460,7 +460,7 @@ static int JacB(realtype tB, N_Vector u, N_Vector uB, N_Vector fuB, SUNMatrix JB
  */
 
 /*
- * Set initial conditions in u vector
+ * Set initial conditions in u vector 
  */
 
 static void SetIC(N_Vector u, UserData data)
@@ -486,12 +486,12 @@ static void SetIC(N_Vector u, UserData data)
       x = i*dx;
       IJth(udata,i,j) = x*(XMAX - x)*y*(YMAX - y)*SUNRexp(RCONST(5.0)*x*y);
     }
-  }
+  }  
 
 }
 
 /*
- * Print results after backward integration
+ * Print results after backward integration 
  */
 
 static void PrintOutput(N_Vector uB, UserData data)
@@ -537,14 +537,14 @@ static void PrintOutput(N_Vector uB, UserData data)
 
 }
 
-/*
+/* 
  * Check function return value.
  *    opt == 0 means SUNDIALS function allocates memory so check if
  *             returned NULL pointer
  *    opt == 1 means SUNDIALS function returns a flag so check if
  *             flag >= 0
  *    opt == 2 means function allocates memory so check if returned
- *             NULL pointer
+ *             NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt)

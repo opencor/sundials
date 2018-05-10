@@ -126,7 +126,7 @@ int FKINgcomm(long int Nloc, N_Vector uu, void *user_data)
 
   /* Get pointers to vector data */
   uloc = N_VGetArrayPointer(uu);
-
+  
   /* Call user-supplied routine */
   FK_COMMFN(&Nloc, uloc, &ier);
 
@@ -137,7 +137,7 @@ int FKINgcomm(long int Nloc, N_Vector uu, void *user_data)
  * ----------------------------------------------------------------
  * Function : FKIN_BBDOPT
  * ----------------------------------------------------------------
- * C function FKIN_BBDOPT is used to access optional outputs
+ * C function FKIN_BBDOPT is used to access optional outputs 
  * realated to the BBD preconditioner.
  * ----------------------------------------------------------------
  */

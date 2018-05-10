@@ -1,27 +1,27 @@
 /*
  * -----------------------------------------------------------------
  * Programmer(s): Daniel Reynolds @ SMU
- * Based on codes <solver>_superlumt.c, written by
+ * Based on codes <solver>_superlumt.c, written by 
  *     Carol S. Woodward @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the implementation file for the SuperLUMT implementation of
+ * This is the implementation file for the SuperLUMT implementation of 
  * the SUNLINSOL package.
  * -----------------------------------------------------------------
- */
+ */ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,7 +38,7 @@ sunindextype GlobalVectorLength_SuperLUMT(N_Vector y);
 
 /*
  * -----------------------------------------------------------------
- * SuperLUMT solver structure accessibility macros:
+ * SuperLUMT solver structure accessibility macros: 
  * -----------------------------------------------------------------
  */
 
@@ -91,12 +91,12 @@ SUNLinearSolver SUNSuperLUMT(N_Vector y, SUNMatrix A, int num_threads)
   VecLength = GlobalVectorLength_SuperLUMT(y);
   if (MatrixRows != VecLength)
     return(NULL);
-
+  
   /* Create linear solver */
   S = NULL;
   S = (SUNLinearSolver) malloc(sizeof *S);
   if (S == NULL) return(NULL);
-
+  
   /* Create linear solver operation structure */
   ops = NULL;
   ops = (SUNLinearSolver_Ops) malloc(sizeof(struct _generic_SUNLinearSolver_Ops));
@@ -177,7 +177,7 @@ SUNLinearSolver SUNSuperLUMT(N_Vector y, SUNMatrix A, int num_threads)
     free(ops); free(S); return(NULL); }
   content->B->Store = NULL;
   xCreate_Dense_Matrix(content->B, MatrixRows, 1, NULL, MatrixRows, SLU_DN, SLU_D, SLU_GE);
-
+  
   content->options = (superlumt_options_t *) malloc(sizeof(superlumt_options_t));
   if (content->options == NULL) {
     free(content->B); free(content->U); free(content->L); free(content->AC);
@@ -199,7 +199,7 @@ SUNLinearSolver SUNSuperLUMT(N_Vector y, SUNMatrix A, int num_threads)
 
 int SUNSuperLUMTSetOrdering(SUNLinearSolver S, int ordering_choice)
 {
-  /* Check for legal ordering_choice */
+  /* Check for legal ordering_choice */ 
   if ((ordering_choice < 0) || (ordering_choice > 3))
     return(SUNLS_ILL_INPUT);
 
@@ -232,7 +232,7 @@ int SUNLinSolInitialize_SuperLUMT(SUNLinearSolver S)
 
   /* Initialize statistics variables */
   StatInit(SIZE(S), NUMTHREADS(S), GSTAT(S));
-
+  
   LASTFLAG(S) = SUNLS_SUCCESS;
   return(LASTFLAG(S));
 }
@@ -247,7 +247,7 @@ int SUNLinSolSetup_SuperLUMT(SUNLinearSolver S, SUNMatrix A)
   trans_t trans;
   yes_no_t refact, usepr;
   void *work;
-
+  
   /* Set option values for SuperLU_MT */
   panel_size = sp_ienv(1);
   relax = sp_ienv(2);
@@ -261,15 +261,15 @@ int SUNLinSolSetup_SuperLUMT(SUNLinearSolver S, SUNMatrix A)
   /* free and reallocate sparse matrix */
   if (SM_A(S)->Store)
     SUPERLU_FREE(SM_A(S)->Store);
-  xCreate_CompCol_Matrix(SM_A(S), SUNSparseMatrix_Rows(A),
+  xCreate_CompCol_Matrix(SM_A(S), SUNSparseMatrix_Rows(A), 
 			 SUNSparseMatrix_Columns(A),
-                         SUNSparseMatrix_NNZ(A),
-                         SUNSparseMatrix_Data(A),
-                         (int_t*) SUNSparseMatrix_IndexValues(A),
-                         (int_t*) SUNSparseMatrix_IndexPointers(A),
+                         SUNSparseMatrix_NNZ(A), 
+                         SUNSparseMatrix_Data(A), 
+                         (int_t*) SUNSparseMatrix_IndexValues(A), 
+                         (int_t*) SUNSparseMatrix_IndexPointers(A), 
 			 SLU_NC, SLU_D, SLU_GE);
 
-  /* On first decomposition, set up reusable pieces */
+  /* On first decomposition, set up reusable pieces */ 
   if (FIRSTFACTORIZE(S)) {
 
     /* Get column permutation vector perm_c[], according to ordering */
@@ -280,17 +280,17 @@ int SUNLinSolSetup_SuperLUMT(SUNLinearSolver S, SUNMatrix A)
   } else {
 
     /* Re-initialize statistics variables */
-    StatInit(SIZE(S), NUMTHREADS(S), GSTAT(S));
+    StatInit(SIZE(S), NUMTHREADS(S), GSTAT(S)); 
     Destroy_CompCol_Permuted(SM_AC(S));
     refact = YES;
-
+    
   }
 
-  /* Initialize the option structure using the user-input parameters.
-     Subsequent calls will re-initialize options.  Apply perm_c to
+  /* Initialize the option structure using the user-input parameters. 
+     Subsequent calls will re-initialize options.  Apply perm_c to 
      columns of original A to form AC */
-  pxgstrf_init(NUMTHREADS(S), fact, trans, refact, panel_size, relax,
-	       DIAGPIVOTTHRESH(S), usepr, drop_tol, (int_t *) PERMC(S), (int_t *) PERMR(S),
+  pxgstrf_init(NUMTHREADS(S), fact, trans, refact, panel_size, relax, 
+	       DIAGPIVOTTHRESH(S), usepr, drop_tol, (int_t *) PERMC(S), (int_t *) PERMR(S), 
                work, lwork, SM_A(S), SM_AC(S), OPTIONS(S), GSTAT(S));
 
   /* Compute the LU factorization of A.
@@ -298,24 +298,24 @@ int SUNLinSolSetup_SuperLUMT(SUNLinearSolver S, SUNMatrix A)
   pxgstrf(OPTIONS(S), SM_AC(S), (int_t *) PERMR(S), SM_L(S), SM_U(S),
           GSTAT(S), &retval);
   if (retval != 0) {
-    LASTFLAG(S) = (retval < 0) ?
+    LASTFLAG(S) = (retval < 0) ? 
       SUNLS_PACKAGE_FAIL_UNREC : SUNLS_PACKAGE_FAIL_REC;
     return(LASTFLAG(S));
   }
-
+  
   LASTFLAG(S) = SUNLS_SUCCESS;
   return(LASTFLAG(S));
 }
 
 
-int SUNLinSolSolve_SuperLUMT(SUNLinearSolver S, SUNMatrix A, N_Vector x,
+int SUNLinSolSolve_SuperLUMT(SUNLinearSolver S, SUNMatrix A, N_Vector x, 
                              N_Vector b, realtype tol)
 {
   int_t retval;
   realtype *xdata;
   DNformat *Bstore;
   trans_t trans;
-
+  
   /* copy b into x */
   N_VScale(ONE, b, x);
 
@@ -328,7 +328,7 @@ int SUNLinSolSolve_SuperLUMT(SUNLinearSolver S, SUNMatrix A, N_Vector x,
 
   Bstore = (DNformat *) (SM_B(S)->Store);
   Bstore->nzval = xdata;
-
+  
   /* Call SuperLUMT to solve the linear system using L and U */
   trans = (SUNSparseMatrix_SparseType(A) == CSC_MAT) ? NOTRANS : TRANS;
   xgstrs(trans, SM_L(S), SM_U(S), (int_t *) PERMR(S), (int_t *) PERMC(S), SM_B(S), GSTAT(S), &retval);
@@ -336,7 +336,7 @@ int SUNLinSolSolve_SuperLUMT(SUNLinearSolver S, SUNMatrix A, N_Vector x,
     LASTFLAG(S) = SUNLS_PACKAGE_FAIL_UNREC;
     return(LASTFLAG(S));
   }
-
+  
   LASTFLAG(S) = SUNLS_SUCCESS;
   return(LASTFLAG(S));
 }
@@ -349,11 +349,11 @@ long int SUNLinSolLastFlag_SuperLUMT(SUNLinearSolver S)
 }
 
 
-int SUNLinSolSpace_SuperLUMT(SUNLinearSolver S,
-                             long int *lenrwLS,
+int SUNLinSolSpace_SuperLUMT(SUNLinearSolver S, 
+                             long int *lenrwLS, 
                              long int *leniwLS)
 {
-  /* since the SuperLU_MT structures are opaque objects, we
+  /* since the SuperLU_MT structures are opaque objects, we 
      omit those from these results */
   *leniwLS = 5 + 2*SIZE(S);
   *lenrwLS = 1;
@@ -365,7 +365,7 @@ int SUNLinSolFree_SuperLUMT(SUNLinearSolver S)
   /* return with success if already freed */
   if (S == NULL)
     return(SUNLS_SUCCESS);
-
+  
   /* delete items from the contents structure (if it exists) */
   if (S->content) {
     pxgstrf_finalize(OPTIONS(S), SM_AC(S));
@@ -376,7 +376,7 @@ int SUNLinSolFree_SuperLUMT(SUNLinearSolver S)
     Destroy_CompCol_NCP(SM_U(S));
     StatFree(GSTAT(S));
     free(GSTAT(S));
-
+  
     Destroy_SuperMatrix_Store(SM_B(S));
     SUPERLU_FREE(SM_A(S)->Store);
 
@@ -386,13 +386,13 @@ int SUNLinSolFree_SuperLUMT(SUNLinearSolver S)
     free(SM_L(S));
     free(SM_U(S));
 
-    free(S->content);
+    free(S->content);  
     S->content = NULL;
   }
-
+  
   /* delete generic structures */
   if (S->ops) {
-    free(S->ops);
+    free(S->ops);  
     S->ops = NULL;
   }
   free(S); S = NULL;
@@ -405,7 +405,7 @@ int SUNLinSolFree_SuperLUMT(SUNLinearSolver S)
  * -----------------------------------------------------------------
  */
 
-/* Inefficient kludge for determining the number of entries in a N_Vector
+/* Inefficient kludge for determining the number of entries in a N_Vector 
    object (replace if such a routine is ever added to the N_Vector API).
 
    Returns "-1" on an error. */

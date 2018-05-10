@@ -53,8 +53,8 @@ typedef struct KINSpilsMemRec {
   long int nfes;      /* nres = total number of calls to F(u)         */
   long int njtimes;   /* njtimes = total number of calls to jtimes    */
 
-  booleantype new_uu; /* flag indicating if the iterate has been
-                         updated - the Jacobian must be updated or
+  booleantype new_uu; /* flag indicating if the iterate has been 
+                         updated - the Jacobian must be updated or 
                          reevaluated (meant to be used by a
                          user-supplied jtimes function                */
 

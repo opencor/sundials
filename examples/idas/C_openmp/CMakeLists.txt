@@ -81,7 +81,7 @@ FOREACH(example_tuple ${IDAS_examples})
   # ENDIF()
 
   # LEB NOTE: This goes away with TestRunner fix for OpenMP
-  IF(NOT ${example} MATCHES "idasFoodWeb_kry_omp")
+  IF(NOT ${example} MATCHES "idasFoodWeb_kry_omp") 
     # add example to regression tests
     SUNDIALS_ADD_TEST(${example} ${example}
       TEST_ARGS ${example_args}

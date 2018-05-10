@@ -2,8 +2,8 @@
  * -----------------------------------------------------------------
  * Programmer(s): Slaven Peles @ LLNL
  * -----------------------------------------------------------------
- * Acknowledgements: This example is based on cvAdvDiff_bnd
- *                   example by Scott D. Cohen, Alan C.
+ * Acknowledgements: This example is based on cvAdvDiff_bnd 
+ *                   example by Scott D. Cohen, Alan C. 
  *                   Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * Example problem:
@@ -68,11 +68,11 @@ __global__ void fKernel(const realtype *u, realtype *udot,
 
   /* Loop over all grid points. */
   tid = blockDim.x * blockIdx.x + threadIdx.x;
-
+  
   if (tid < MX*MY) {
     i = tid/MY;
     j = tid%MY;
-
+    
     uij = u[tid];
     udn = (j ==    0) ? ZERO : u[tid - 1];
     uup = (j == MY-1) ? ZERO : u[tid + 1];
@@ -80,7 +80,7 @@ __global__ void fKernel(const realtype *u, realtype *udot,
     urt = (i == MX-1) ? ZERO : u[tid + MY];
 
     /* Set diffusion and advection terms and load into udot */
-
+    
     hdiff = hordc*(ult - TWO*uij + urt);
     hadv  = horac*(urt - ult);
     vdiff = verdc*(uup - TWO*uij + udn);
@@ -97,13 +97,13 @@ __global__ void jtvKernel(const realtype *vdata, realtype *Jvdata,
 
   /* Loop over all grid points. */
   tid = blockDim.x * blockIdx.x + threadIdx.x;
-
+  
   if (tid < MX*MY) {
-
+      
     i = tid/MY;
     j = tid%MY;
-
-
+      
+      
     /* set the tid-th element of Jv */
 
     Jvdata[tid] = -TWO*(verdc+hordc) * vdata[tid];
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
 
   SetIC(u, data);  /* Initialize u vector */
 
-  /* Call CVodeCreate to create the solver memory and specify the
+  /* Call CVodeCreate to create the solver memory and specify the 
    * Backward Differentiation Formula and the use of a Newton iteration */
   cvode_mem = CVodeCreate(CV_BDF, CV_NEWTON);
   if(check_flag((void *)cvode_mem, "CVodeCreate", 0)) return(1);

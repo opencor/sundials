@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2015, Southern Methodist University and
+ * Copyright (c) 2015, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -16,9 +16,9 @@
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
  * Example problem:
- *
- * The following test simulates a brusselator problem from chemical
- * kinetics.  This is n PDE system with 3 components, Y = [u,v,w],
+ * 
+ * The following test simulates a brusselator problem from chemical 
+ * kinetics.  This is n PDE system with 3 components, Y = [u,v,w], 
  * satisfying the equations,
  *    u_t = du*u_xx + a - (w+1)*u + v*u^2
  *    v_t = dv*v_xx + w*u - v*u^2
@@ -27,22 +27,22 @@
  *    u(0,x) =  a  + 0.1*sin(pi*x)
  *    v(0,x) = b/a + 0.1*sin(pi*x)
  *    w(0,x) =  b  + 0.1*sin(pi*x),
- * and with stationary boundary conditions, i.e.
+ * and with stationary boundary conditions, i.e. 
  *    u_t(t,0) = u_t(t,1) = 0,
  *    v_t(t,0) = v_t(t,1) = 0,
  *    w_t(t,0) = w_t(t,1) = 0.
- * Note: these can also be implemented as Dirichlet boundary
+ * Note: these can also be implemented as Dirichlet boundary 
  * conditions with values identical to the initial conditions.
- *
- * The spatial derivatives are computed using second-order
- * centered differences, with the data distributed over N points
+ * 
+ * The spatial derivatives are computed using second-order 
+ * centered differences, with the data distributed over N points 
  * on a uniform spatial grid.
  *
  * This program solves the problem with the DIRK method, using a
  * Newton iteration with the SUNBAND band linear solver, and a
  * user-supplied Jacobian routine.
  *
- * 100 outputs are printed at equal intervals, and run statistics
+ * 100 outputs are printed at equal intervals, and run statistics 
  * are printed at the end.
  *---------------------------------------------------------------*/
 
@@ -214,7 +214,7 @@ int main()
   if (check_flag((void *)A, "SUNBandMatrix", 0)) return 1;
   LS = SUNBandLinearSolver(y, A);
   if (check_flag((void *)LS, "SUNBandLinearSolver", 0)) return 1;
-
+  
   /* Linear solver interface */
   flag = ARKDlsSetLinearSolver(arkode_mem, LS, A);        /* Attach matrix and linear solver */
   if (check_flag(&flag, "ARKDlsSetLinearSolver", 1)) return 1;
@@ -403,7 +403,7 @@ static int LaplaceMatrix(realtype c, SUNMatrix Jac, UserData udata)
   realtype dx = udata->dx;
   sunindextype i;
 
-  /* iterate over intervals, filling in Jacobian of (L*y) using SM_ELEMENT_B
+  /* iterate over intervals, filling in Jacobian of (L*y) using SM_ELEMENT_B 
      macro (see sunmatrix_band.h) */
   for (i=1; i<N-1; i++) {
     SM_ELEMENT_B(Jac,IDX(i,0),IDX(i-1,0)) += c*udata->du/dx/dx;
@@ -463,7 +463,7 @@ static int ReactionJac(realtype c, N_Vector y, SUNMatrix Jac, UserData udata)
     opt == 1 means SUNDIALS function returns a flag so check if
              flag >= 0
     opt == 2 means function allocates memory so check if returned
-             NULL pointer
+             NULL pointer  
 */
 static int check_flag(void *flagvalue, const char *funcname, int opt)
 {

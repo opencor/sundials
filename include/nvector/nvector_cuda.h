@@ -1,10 +1,10 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): Slaven Peles @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -44,14 +44,15 @@
 #ifndef _NVECTOR_CUDA_H
 #define _NVECTOR_CUDA_H
 
+#include <stdio.h>
 #include <sundials/sundials_nvector.h>
 
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
 #endif
 
-
-
+    
+    
 /*
  * -----------------------------------------------------------------
  * PART I: CUDA implementation of N_Vector
@@ -74,7 +75,7 @@ typedef struct _N_VectorContent_Cuda *N_VectorContent_Cuda;
 /*
  * -----------------------------------------------------------------
  * PART II: functions exported by nvector_cuda
- *
+ * 
  * CONSTRUCTORS:
  *    N_VNew_Cuda
  *    N_VNewEmpty_Cuda
@@ -150,7 +151,7 @@ SUNDIALS_EXPORT N_Vector *N_VCloneVectorArrayEmpty_Cuda(int count, N_Vector w);
  * -----------------------------------------------------------------
  * Function : N_VDestroyVectorArray_Cuda
  * -----------------------------------------------------------------
- * This function frees an array of CUDA vectors created with
+ * This function frees an array of CUDA vectors created with 
  * N_VCloneVectorArray_Cuda or N_VCloneVectorArrayEmpty_Cuda.
  * -----------------------------------------------------------------
  */

@@ -3,8 +3,8 @@
  * -----------------------------------------------------------------
  * Example problem:
  *
- * This simple example problem for IDA, due to Robertson,
- * is from chemical kinetics, and consists of the following three
+ * This simple example problem for IDA, due to Robertson, 
+ * is from chemical kinetics, and consists of the following three 
  * equations:
  *
  *      dy1/dt = -p1*y1 + p2*y2*y3
@@ -20,7 +20,7 @@
  * The sensitivity right hand side is given analytically through the
  * user routine fS (of type SensRhs1Fn).
  * Any of two sensitivity methods (SIMULTANEOUS and STAGGERED can be
- * used and sensitivities may be included in the error test or not
+ * used and sensitivities may be included in the error test or not 
  *(error control set on SUNTRUE or SUNFALSE, respectively).
  *
  * Execution:
@@ -74,10 +74,10 @@ typedef struct {
 
 static int res(realtype t, N_Vector y, N_Vector yp, N_Vector resval, void *user_data);
 
-static int resS(int Ns, realtype t,
+static int resS(int Ns, realtype t, 
                 N_Vector y, N_Vector yp, N_Vector resval,
                 N_Vector *yyS, N_Vector *ypS, N_Vector *resvalS,
-                void *user_data,
+                void *user_data, 
                 N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 
 static int rhsQ(realtype tres, N_Vector yy, N_Vector yp,
@@ -86,12 +86,12 @@ static int rhsQ(realtype tres, N_Vector yy, N_Vector yp,
 /* Prototypes of private functions */
 
 static void ProcessArgs(int argc, char *argv[],
-                        booleantype *sensi, int *sensi_meth,
+                        booleantype *sensi, int *sensi_meth, 
                         booleantype *err_con);
 static void WrongArgs(char *name);
 
 static void PrintIC(N_Vector y, N_Vector yp);
-static void PrintSensIC(N_Vector y, N_Vector yp, N_Vector* yS, N_Vector* ypS);
+static void PrintSensIC(N_Vector y, N_Vector yp, N_Vector* yS, N_Vector* ypS); 
 
 static void PrintOutput(void *ida_mem, realtype t, N_Vector u);
 static void PrintSensOutput(N_Vector *uS);
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
   int iout, flag;
 
   realtype pbar[NS];
-  int is;
+  int is; 
   N_Vector *yS, *ypS;
   booleantype sensi, err_con;
   int sensi_meth;
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
   /* These initial conditions are NOT consistent. See IDACalcIC below. */
   Ith(yp,1) = RCONST(0.1);
   Ith(yp,2) = ZERO;
-  Ith(yp,3) = ZERO;
+  Ith(yp,3) = ZERO;  
 
   /* Create IDAS object */
   ida_mem = IDACreate();
@@ -211,19 +211,19 @@ int main(int argc, char *argv[])
     yS = N_VCloneVectorArray(NS, y);
     if (check_flag((void *)yS, "N_VCloneVectorArray", 0)) return(1);
     for (is=0;is<NS;is++) N_VConst(ZERO, yS[is]);
-
+    
     ypS = N_VCloneVectorArray(NS, y);
     if (check_flag((void *)ypS, "N_VCloneVectorArray", 0)) return(1);
     for (is=0;is<NS;is++) N_VConst(ZERO, ypS[is]);
 
-    /*
-    * Only non-zero sensitivity I.C. are ypS[0]:
+    /* 
+    * Only non-zero sensitivity I.C. are ypS[0]: 
     * - Ith(ypS[0],1) = -ONE;
     * - Ith(ypS[0],2) =  ONE;
     *
     * They are not set. IDACalcIC also computes consistent IC for sensitivities.
     */
-
+    
     flag = IDASensInit(ida_mem, NS, sensi_meth, resS, yS, ypS);
     if(check_flag(&flag, "IDASensInit", 1)) return(1);
 
@@ -237,10 +237,10 @@ int main(int argc, char *argv[])
     if (check_flag(&flag, "IDASetSensParams", 1)) return(1);
 
     printf("Sensitivity: YES ");
-    if(sensi_meth == IDA_SIMULTANEOUS)
+    if(sensi_meth == IDA_SIMULTANEOUS)   
       printf("( SIMULTANEOUS +");
-    else
-      printf("( STAGGERED +");
+    else 
+      printf("( STAGGERED +");   
     if(err_con) printf(" FULL ERROR CONTROL )");
     else        printf(" PARTIAL ERROR CONTROL )");
 
@@ -260,10 +260,12 @@ int main(int argc, char *argv[])
 
   IDAQuadInit(ida_mem, rhsQ, yQ);
 
-  yQS = N_VCloneVectorArray(NS, yQ);
-  for (is=0;is<NS;is++) N_VConst(ZERO, yQS[is]);
+  if (sensi) {
+    yQS = N_VCloneVectorArray(NS, yQ);
+    for (is=0;is<NS;is++) N_VConst(ZERO, yQS[is]);  
 
-  IDAQuadSensInit(ida_mem, NULL, yQS);
+    IDAQuadSensInit(ida_mem, NULL, yQS);
+  }
 
   /* Call IDACalcIC to compute consistent initial conditions. If sensitivity is
      enabled, this function also try to find consistent IC for the sensitivities. */
@@ -278,11 +280,11 @@ int main(int argc, char *argv[])
 
   if(sensi) {
       IDAGetSensConsistentIC(ida_mem, yS, ypS);
-      PrintSensIC(y, yp, yS, ypS);
+      PrintSensIC(y, yp, yS, ypS); 
     }
-
+      
   /* In loop over output points, call IDA, print results, test for error */
-
+  
   printf("\n\n");
   printf("===========================================");
   printf("============================\n");
@@ -292,17 +294,17 @@ int main(int argc, char *argv[])
   printf("============================\n");
 
   for (iout=1, tout=T1; iout <= NOUT; iout++, tout *= TMULT) {
-
+    
     flag = IDASolve(ida_mem, tout, &t, y, yp, IDA_NORMAL);
     if (check_flag(&flag, "IDASolve", 1)) break;
 
     PrintOutput(ida_mem, t, y);
-
+    
     if (sensi) {
       flag = IDAGetSens(ida_mem, &t, yS);
       if (check_flag(&flag, "IDAGetSens", 1)) break;
       PrintSensOutput(yS);
-    }
+    } 
     printf("-----------------------------------------");
     printf("------------------------------\n");
 
@@ -311,7 +313,7 @@ int main(int argc, char *argv[])
   printf("\nQuadrature:\n");
   IDAGetQuad(ida_mem, &t, yQ);
 #if defined(SUNDIALS_EXTENDED_PRECISION)
-  printf("G:      %10.4Le\n", Ith(yQ,1));
+  printf("G:      %10.4Le\n", Ith(yQ,1)); 
 #else
   printf("G:      %10.4e\n", Ith(yQ,1));
 #endif
@@ -336,14 +338,19 @@ int main(int argc, char *argv[])
 
   /* Free memory */
   N_VDestroy(y);
+  N_VDestroy(yp);
+  N_VDestroy(abstol);
+  N_VDestroy(id);
+  N_VDestroy(yQ);
   if (sensi) {
-    N_VDestroyVectorArray(yS, NS);
+    N_VDestroyVectorArray(yS,  NS);
+    N_VDestroyVectorArray(ypS, NS);
+    N_VDestroyVectorArray(yQS, NS);
   }
   free(data);
   IDAFree(&ida_mem);
   SUNLinSolFree(LS);
   SUNMatDestroy(A);
-  N_VDestroy(yQ);
 
   return(0);
 }
@@ -355,7 +362,7 @@ int main(int argc, char *argv[])
  */
 
 /*
- * Residual routine. Compute F(t,y,y',p).
+ * Residual routine. Compute F(t,y,y',p). 
  */
 static int res(realtype t, N_Vector yy, N_Vector yp, N_Vector resval, void *user_data)
 {
@@ -384,15 +391,15 @@ static int res(realtype t, N_Vector yy, N_Vector yp, N_Vector resval, void *user
   return(0);
 }
 
-
-/*
- * resS routine. Compute sensitivity r.h.s.
+ 
+/* 
+ * resS routine. Compute sensitivity r.h.s. 
  */
 
-static int resS(int Ns, realtype t,
+static int resS(int Ns, realtype t, 
                 N_Vector yy, N_Vector yp, N_Vector resval,
                 N_Vector *yyS, N_Vector *ypS, N_Vector *resvalS,
-                void *user_data,
+                void *user_data, 
                 N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
   UserData data;
@@ -444,7 +451,7 @@ static int resS(int Ns, realtype t,
       rs2 += y2*y2;
       break;
     }
-
+  
     Ith(resvalS[is],1) = rs1;
     Ith(resvalS[is],2) = rs2;
     Ith(resvalS[is],3) = rs3;
@@ -454,7 +461,7 @@ static int resS(int Ns, realtype t,
   return(0);
 }
 
-static int rhsQ(realtype t, N_Vector y, N_Vector yp,
+static int rhsQ(realtype t, N_Vector y, N_Vector yp, 
               N_Vector ypQ, void* user_data)
 {
   UserData data;
@@ -462,11 +469,11 @@ static int rhsQ(realtype t, N_Vector y, N_Vector yp,
   data = (UserData) user_data;
 
   Ith(ypQ,1) = Ith(y,3);
-
-  Ith(ypQ,2) = data->coef*( Ith(y,1)*Ith(y,1)+
-                            Ith(y,2)*Ith(y,2)+
+  
+  Ith(ypQ,2) = data->coef*( Ith(y,1)*Ith(y,1)+ 
+                            Ith(y,2)*Ith(y,2)+ 
                             Ith(y,3)*Ith(y,3) );
-
+                    
   return(0);
 }
 
@@ -481,7 +488,7 @@ static int rhsQ(realtype t, N_Vector y, N_Vector yp,
  * Process and verify arguments to idasfwddenx.
  */
 
-static void ProcessArgs(int argc, char *argv[],
+static void ProcessArgs(int argc, char *argv[], 
                         booleantype *sensi, int *sensi_meth, booleantype *err_con)
 {
   *sensi = SUNFALSE;
@@ -496,7 +503,7 @@ static void ProcessArgs(int argc, char *argv[],
     *sensi = SUNTRUE;
   else
     WrongArgs(argv[0]);
-
+  
   if (*sensi) {
 
     if (argc != 4)
@@ -506,7 +513,7 @@ static void ProcessArgs(int argc, char *argv[],
       *sensi_meth = IDA_SIMULTANEOUS;
     else if (strcmp(argv[2],"stg") == 0)
       *sensi_meth = IDA_STAGGERED;
-    else
+    else 
       WrongArgs(argv[0]);
 
     if (strcmp(argv[3],"t") == 0)
@@ -524,7 +531,7 @@ static void WrongArgs(char *name)
     printf("\nUsage: %s [-nosensi] [-sensi sensi_meth err_con]\n",name);
     printf("         sensi_meth = sim or stg\n");
     printf("         err_con    = t or f\n");
-
+    
     exit(0);
 }
 
@@ -634,7 +641,7 @@ static void PrintOutput(void *ida_mem, realtype t, N_Vector u)
   long int nst;
   int qu, flag;
   realtype hu, *udata;
-
+  
   udata = N_VGetArrayPointer(u);
 
   flag = IDAGetNumSteps(ida_mem, &nst);
@@ -664,7 +671,7 @@ static void PrintOutput(void *ida_mem, realtype t, N_Vector u)
 
 }
 
-/*
+/* 
  * Print sensitivities.
 */
 
@@ -682,7 +689,7 @@ static void PrintSensOutput(N_Vector *uS)
 #else
   printf("%12.4e %12.4e %12.4e \n", sdata[0], sdata[1], sdata[2]);
 #endif
-
+  
   sdata = N_VGetArrayPointer(uS[1]);
   printf("                  Sensitivity 2  ");
 
@@ -706,7 +713,7 @@ static void PrintSensOutput(N_Vector *uS)
 #endif
 }
 
-/*
+/* 
  * Print some final statistics from the IDAS memory.
  */
 
@@ -769,14 +776,14 @@ static void PrintFinalStats(void *ida_mem, booleantype sensi)
 
 }
 
-/*
+/* 
  * Check function return value.
  *    opt == 0 means SUNDIALS function allocates memory so check if
  *             returned NULL pointer
  *    opt == 1 means SUNDIALS function returns a flag so check if
  *             flag >= 0
  *    opt == 2 means function allocates memory so check if returned
- *             NULL pointer
+ *             NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt)
@@ -785,7 +792,7 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
 
   /* Check if SUNDIALS function returned NULL pointer - no memory allocated */
   if (opt == 0 && flagvalue == NULL) {
-    fprintf(stderr,
+    fprintf(stderr, 
             "\nSUNDIALS_ERROR: %s() failed - returned NULL pointer\n\n",
 	    funcname);
     return(1); }
@@ -794,14 +801,14 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
   else if (opt == 1) {
     errflag = (int *) flagvalue;
     if (*errflag < 0) {
-      fprintf(stderr,
+      fprintf(stderr, 
               "\nSUNDIALS_ERROR: %s() failed with flag = %d\n\n",
 	      funcname, *errflag);
       return(1); }}
 
   /* Check if function returned NULL pointer - no memory allocated */
   else if (opt == 2 && flagvalue == NULL) {
-    fprintf(stderr,
+    fprintf(stderr, 
             "\nMEMORY_ERROR: %s() failed - returned NULL pointer\n\n",
 	    funcname);
     return(1); }

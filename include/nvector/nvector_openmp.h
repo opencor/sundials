@@ -1,15 +1,15 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): David J. Gardner and Carol S. Woodward @ LLNL
  * -----------------------------------------------------------------
- * Acknowledgements: This NVECTOR module is based on the NVECTOR
- *                   Serial module by Scott D. Cohen, Alan C.
- *                   Hindmarsh, Radu Serban, and Aaron Collier
+ * Acknowledgements: This NVECTOR module is based on the NVECTOR 
+ *                   Serial module by Scott D. Cohen, Alan C. 
+ *                   Hindmarsh, Radu Serban, and Aaron Collier 
  *                   @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -36,8 +36,8 @@
  *     in the header file sundials_nvector.h.
  *
  *   - The definition of the type 'realtype' can be found in the
- *     header file sundials_types.h, and it may be changed (at the
- *     configuration stage) according to the user's needs.
+ *     header file sundials_types.h, and it may be changed (at the 
+ *     configuration stage) according to the user's needs. 
  *     The sundials_types.h file also contains the definition
  *     for the type 'booleantype'.
  *
@@ -53,6 +53,7 @@
 #ifndef _NVECTOR_OPENMP_H
 #define _NVECTOR_OPENMP_H
 
+#include <stdio.h>
 #include <sundials/sundials_nvector.h>
 
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
@@ -143,7 +144,7 @@ typedef struct _N_VectorContent_OpenMP *N_VectorContent_OpenMP;
 /*
  * -----------------------------------------------------------------
  * PART III: functions exported by nvector_OpenMP
- *
+ * 
  * CONSTRUCTORS:
  *    N_VNew_OpenMP
  *    N_VNewEmpty_OpenMP
@@ -218,7 +219,7 @@ SUNDIALS_EXPORT N_Vector *N_VCloneVectorArrayEmpty_OpenMP(int count, N_Vector w)
  * -----------------------------------------------------------------
  * Function : N_VDestroyVectorArray_OpenMP
  * -----------------------------------------------------------------
- * This function frees an array of OPENMP vectors created with
+ * This function frees an array of OPENMP vectors created with 
  * N_VCloneVectorArray_OpenMP or N_VCloneVectorArrayEmpty_OpenMP.
  * -----------------------------------------------------------------
  */

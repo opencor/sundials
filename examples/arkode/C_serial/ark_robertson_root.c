@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2015, Southern Methodist University and
+ * Copyright (c) 2015, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -16,26 +16,26 @@
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
  * Example problem:
- *
- * The following test simulates the Robertson problem,
- * corresponding to the kinetics of an autocatalytic reaction.
+ * 
+ * The following test simulates the Robertson problem, 
+ * corresponding to the kinetics of an autocatalytic reaction.  
  * This is an ODE system with 3 components, Y = [u,v,w], satisfying
  * the equations,
  *    du/dt = -0.04*u + 1e4*v*w
  *    dv/dt = 0.04*u - 1e4*v*w - 3e7*v^2
  *    dw/dt = 3e7*v^2
- * for t in the interval [0.0, 1e11], with initial conditions
+ * for t in the interval [0.0, 1e11], with initial conditions 
  * Y0 = [1,0,0].
  *
- * While integrating the system, we use the rootfinding feature
+ * While integrating the system, we use the rootfinding feature 
  * to find the times at which either u=1e-4 or w=1e-2.
- *
- * This program solves the problem with one of the solvers, ERK,
- * DIRK or ARK.  For DIRK and ARK, implicit subsystems are solved
- * using a Newton iteration with the dense SUNLinearSolver, and a
+ * 
+ * This program solves the problem with one of the solvers, ERK, 
+ * DIRK or ARK.  For DIRK and ARK, implicit subsystems are solved 
+ * using a Newton iteration with the dense SUNLinearSolver, and a  
  * user-supplied Jacobian routine.
  *
- * 100 outputs are printed at equal intervals, and run statistics
+ * 100 outputs are printed at equal intervals, and run statistics 
  * are printed at the end.
  *---------------------------------------------------------------*/
 
@@ -61,7 +61,7 @@
 
 /* User-supplied Functions Called by the Solver */
 static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data);
-static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
+static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J, 
                void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 static int g(realtype t, N_Vector y, realtype *gout, void *user_data);
 
@@ -161,8 +161,8 @@ int main()
   fprintf(UFID,"# t u v w\n");
 
   /* output initial condition to disk */
-  fprintf(UFID," %.16"ESYM" %.16"ESYM" %.16"ESYM" %.16"ESYM"\n",
-	  T0, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));
+  fprintf(UFID," %.16"ESYM" %.16"ESYM" %.16"ESYM" %.16"ESYM"\n", 
+	  T0, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));  
 
   /* Main time-stepping loop: calls ARKode to perform the integration, then
      prints results.  Stops when the final time has been reached */
@@ -179,8 +179,8 @@ int main()
     if (check_flag(&flag, "ARKode", 1)) break;
     printf("  %12.5"ESYM"  %12.5"ESYM"  %12.5"ESYM"  %12.5"ESYM"\n",  t,        /* access/print solution */
         NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));
-    fprintf(UFID," %.16"ESYM" %.16"ESYM" %.16"ESYM" %.16"ESYM"\n",
-	    t, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));
+    fprintf(UFID," %.16"ESYM" %.16"ESYM" %.16"ESYM" %.16"ESYM"\n", 
+	    t, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));  
     if (flag == ARK_ROOT_RETURN) {                          /* check if a root was found */
       rtflag = ARKodeGetRootInfo(arkode_mem, rootsfound);
       if (check_flag(&rtflag, "ARKodeGetRootInfo", 1)) return 1;
@@ -222,7 +222,7 @@ int main()
   check_flag(&flag, "ARKodeGetNumGEvals", 1);
 
   printf("\nFinal Solver Statistics:\n");
-  printf("   Internal solver steps = %li (attempted = %li)\n",
+  printf("   Internal solver steps = %li (attempted = %li)\n", 
 	 nst, nst_a);
   printf("   Total RHS evals:  Fe = %li,  Fi = %li\n", nfe, nfi);
   printf("   Total linear solver setups = %li\n", nsetups);
@@ -235,6 +235,7 @@ int main()
 
   /* Clean up and return with successful completion */
   N_VDestroy(y);               /* Free y vector */
+  N_VDestroy(atols);           /* Free atols vector */
   ARKodeFree(&arkode_mem);     /* Free integrator memory */
   SUNLinSolFree(LS);           /* Free linear solver */
   SUNMatDestroy(A);            /* Free A matrix */
@@ -261,7 +262,7 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 }
 
 /* Jacobian routine to compute J(t,y) = df/dy. */
-static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
+static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J, 
                void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
   realtype v = NV_Ith_S(y,1);    /* access current solution */
@@ -304,7 +305,7 @@ static int g(realtype t, N_Vector y, realtype *gout, void *user_data)
     opt == 1 means SUNDIALS function returns a flag so check if
              flag >= 0
     opt == 2 means function allocates memory so check if returned
-             NULL pointer
+             NULL pointer  
 */
 static int check_flag(void *flagvalue, const char *funcname, int opt)
 {

@@ -1,15 +1,15 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel Reynolds @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -17,7 +17,7 @@
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
  * This is the testing routine to check the SUNLinSol SuperLUMT
- * module implementation.
+ * module implementation. 
  * -----------------------------------------------------------------
  */
 
@@ -35,7 +35,7 @@
 /* ----------------------------------------------------------------------
  * SUNSuperLUMT Linear Solver Testing Routine
  * --------------------------------------------------------------------*/
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
   int             fails = 0;          /* counter for test failures  */
   sunindextype    N;                  /* matrix columns, rows       */
@@ -52,25 +52,25 @@ int main(int argc, char *argv[])
     return(-1);
   }
 
-  N = atol(argv[1]);
+  N = atol(argv[1]); 
   if (N <= 0) {
     printf("ERROR: matrix size must be a positive integer \n");
-    return(-1);
+    return(-1); 
   }
 
   mattype = atoi(argv[2]);
   if ((mattype != 0) && (mattype != 1)) {
     printf("ERROR: matrix type must be 0 or 1 \n");
-    return(-1);
+    return(-1); 
   }
   mattype = (mattype == 0) ? CSC_MAT : CSR_MAT;
-
+  
   num_threads = atoi(argv[3]);
   if (num_threads <= 0) {
     printf("ERROR: number_threads must be a positive integer \n");
-    return(-1);
+    return(-1); 
   }
-
+  
   print_timing = atoi(argv[4]);
   SetTiming(print_timing);
 
@@ -116,15 +116,15 @@ int main(int argc, char *argv[])
     printf("FAIL: SUNLinSol SUNMatMatvec failure\n");
     return(1);
   }
-
+  
   /* Create SuperLUMT linear solver */
   LS = SUNSuperLUMT(x, A, num_threads);
-
+  
   /* Run Tests */
   fails += Test_SUNLinSolInitialize(LS, 0);
   fails += Test_SUNLinSolSetup(LS, A, 0);
   fails += Test_SUNLinSolSolve(LS, A, x, b, 100*UNIT_ROUNDOFF, 0);
-
+ 
   fails += Test_SUNLinSolGetType(LS, SUNLINEARSOLVER_DIRECT, 0);
   fails += Test_SUNLinSolLastFlag(LS, 0);
   fails += Test_SUNLinSolSpace(LS, 0);
@@ -162,11 +162,11 @@ int check_vector(N_Vector X, N_Vector Y, realtype tol)
   int failure = 0;
   sunindextype i, local_length, maxloc;
   realtype *Xdata, *Ydata, maxerr;
-
+  
   Xdata = N_VGetArrayPointer(X);
   Ydata = N_VGetArrayPointer(Y);
   local_length = N_VGetLength_Serial(X);
-
+  
   /* check vector data */
   for(i=0; i < local_length; i++)
     failure += FNEQ(Xdata[i], Ydata[i], tol);

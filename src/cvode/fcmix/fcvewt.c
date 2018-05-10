@@ -1,18 +1,18 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer: Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS Copyright End
  * -----------------------------------------------------------------
- * Fortran/C interface routines for CVODE, for the case of a
+ * Fortran/C interface routines for CVODE, for the case of a 
  * user-supplied error weight calculation routine.
  * -----------------------------------------------------------------
  */
@@ -39,7 +39,7 @@ extern "C" {
 
 /***************************************************************************/
 
-/*
+/* 
  * User-callable function to interface to CVodeSetEwtFn.
  */
 
@@ -52,7 +52,7 @@ void FCV_EWTSET(int *flag, int *ier)
 
 /***************************************************************************/
 
-/*
+/* 
  * C function to interface between CVODE and a Fortran subroutine FCVEWT.
  */
 

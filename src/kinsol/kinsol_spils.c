@@ -93,7 +93,7 @@ int KINSpilsSetLinearSolver(void *kinmem, SUNLinearSolver LS)
   kin_mem->kin_lsetup = kinSpilsSetup;
   kin_mem->kin_lsolve = kinSpilsSolve;
   kin_mem->kin_lfree  = kinSpilsFree;
-
+  
   /* Get memory for KINSpilsMemRec */
   kinspils_mem = NULL;
   kinspils_mem = (KINSpilsMem) malloc(sizeof(struct KINSpilsMemRec));
@@ -189,8 +189,8 @@ int KINSpilsSetPreconditioner(void *kinmem,
   retval = SUNLinSolSetPreconditioner(kinspils_mem->LS, kin_mem,
                                       kinspils_psetup, kinspils_psolve);
   if (retval != SUNLS_SUCCESS) {
-    KINProcessError(kin_mem, KINSPILS_SUNLS_FAIL, "KINSPILS",
-                    "KINSpilsSetPreconditioner",
+    KINProcessError(kin_mem, KINSPILS_SUNLS_FAIL, "KINSPILS", 
+                    "KINSpilsSetPreconditioner", 
                     "Error in calling SUNLinSolSetPreconditioner");
     return(KINSPILS_SUNLS_FAIL);
   }
@@ -221,7 +221,7 @@ int KINSpilsSetJacTimesVecFn(void *kinmem, KINSpilsJacTimesVecFn jtv)
   }
   kinspils_mem = (KINSpilsMem) kin_mem->kin_lmem;
 
-  /* store function pointers for user-supplied routine in KINSpils
+  /* store function pointers for user-supplied routine in KINSpils 
      interface (NULL jtimes implies use of DQ default) */
   if (jtv != NULL) {
     kinspils_mem->jtimesDQ = SUNFALSE;
@@ -233,8 +233,8 @@ int KINSpilsSetJacTimesVecFn(void *kinmem, KINSpilsJacTimesVecFn jtv)
   /* notify iterative linear solver to call KINSpils interface routines */
   retval = SUNLinSolSetATimes(kinspils_mem->LS, kin_mem, KINSpilsATimes);
   if (retval != SUNLS_SUCCESS) {
-    KINProcessError(kin_mem, KINSPILS_SUNLS_FAIL, "KINSPILS",
-                    "KINSpilsSetJacTimes",
+    KINProcessError(kin_mem, KINSPILS_SUNLS_FAIL, "KINSPILS", 
+                    "KINSpilsSetJacTimesVecFn",
                     "Error in calling SUNLinSolSetATimes");
     return(KINSPILS_SUNLS_FAIL);
   }
@@ -346,7 +346,7 @@ int KINSpilsGetNumPrecSolves(void *kinmem, long int *npsolves)
 }
 
 /*------------------------------------------------------------------
-  KINSpilsGetNumLinIters returns the total number of linear
+  KINSpilsGetNumLinIters returns the total number of linear 
   iterations
   ------------------------------------------------------------------*/
 int KINSpilsGetNumLinIters(void *kinmem, long int *nliters)
@@ -374,7 +374,7 @@ int KINSpilsGetNumLinIters(void *kinmem, long int *nliters)
 }
 
 /*------------------------------------------------------------------
-  KINSpilsGetNumConvFails returns the total numbe of convergence
+  KINSpilsGetNumConvFails returns the total numbe of convergence 
   failures
   ------------------------------------------------------------------*/
 int KINSpilsGetNumConvFails(void *kinmem, long int *nlcfails)
@@ -458,7 +458,7 @@ int KINSpilsGetNumFuncEvals(void *kinmem, long int *nfevals)
 }
 
 /*------------------------------------------------------------------
-  KINSpilsGetLastFlag returns the last flag set in the KINSPILS
+  KINSpilsGetLastFlag returns the last flag set in the KINSPILS 
   function
   ------------------------------------------------------------------*/
 int KINSpilsGetLastFlag(void *kinmem, long int *flag)
@@ -530,7 +530,7 @@ char *KINSpilsGetReturnFlagName(long int flag)
 
 /*------------------------------------------------------------------
   KINSpilsATimes
-
+  
   This routine coordinates the generation of the matrix-vector
   product z = J*v by calling either KINSpilsDQJtimes, which uses
   a difference quotient approximation for J*v, or by calling the
@@ -544,13 +544,13 @@ int KINSpilsATimes(void *kinmem, N_Vector v, N_Vector z)
 
   /* Return immediately if kin_mem or kin_mem->kin_lmem are NULL */
   if (kinmem == NULL) {
-    KINProcessError(NULL, KINSPILS_MEM_NULL, "KINSPILS",
+    KINProcessError(NULL, KINSPILS_MEM_NULL, "KINSPILS", 
                     "KINSpilsATimes", MSGS_KINMEM_NULL);
     return(KINSPILS_MEM_NULL);
   }
   kin_mem = (KINMem) kinmem;
   if (kin_mem->kin_lmem == NULL) {
-    KINProcessError(kin_mem, KINSPILS_LMEM_NULL, "KINSPILS",
+    KINProcessError(kin_mem, KINSPILS_LMEM_NULL, "KINSPILS", 
                     "KINSpilsATimes", MSGS_LMEM_NULL);
     return(KINSPILS_LMEM_NULL);
   }
@@ -568,9 +568,9 @@ int KINSpilsATimes(void *kinmem, N_Vector v, N_Vector z)
 /*---------------------------------------------------------------
   KINSpilsPSetup:
 
-  This routine interfaces between the generic iterative linear
-  solvers and the user's psetup routine. It passes to psetup all
-  required state information from kin_mem. Its return value
+  This routine interfaces between the generic iterative linear 
+  solvers and the user's psetup routine. It passes to psetup all 
+  required state information from kin_mem. Its return value 
   is the same as that returned by psetup. Note that the generic
   iterative linear solvers guarantee that KINSpilsPSetup will only
   be called in the case that the user's psetup routine is non-NULL.
@@ -583,13 +583,13 @@ int KINSpilsPSetup(void *kinmem)
 
   /* Return immediately if kin_mem or kin_mem->kin_lmem are NULL */
   if (kinmem == NULL) {
-    KINProcessError(NULL, KINSPILS_MEM_NULL, "KINSPILS",
+    KINProcessError(NULL, KINSPILS_MEM_NULL, "KINSPILS", 
 		    "KINSpilsPSetup", MSGS_KINMEM_NULL);
     return(KINSPILS_MEM_NULL);
   }
   kin_mem = (KINMem) kinmem;
   if (kin_mem->kin_lmem == NULL) {
-    KINProcessError(kin_mem, KINSPILS_LMEM_NULL, "KINSPILS",
+    KINProcessError(kin_mem, KINSPILS_LMEM_NULL, "KINSPILS", 
 		    "KINSpilsPSetup", MSGS_LMEM_NULL);
     return(KINSPILS_LMEM_NULL);
   }
@@ -597,7 +597,7 @@ int KINSpilsPSetup(void *kinmem)
 
   /* Call user pset routine to update preconditioner */
   retval = kinspils_mem->pset(kin_mem->kin_uu, kin_mem->kin_uscale,
-                              kin_mem->kin_fval, kin_mem->kin_fscale,
+                              kin_mem->kin_fval, kin_mem->kin_fscale, 
                               kinspils_mem->pdata);
   kinspils_mem->npe++;
   return(retval);
@@ -624,19 +624,19 @@ int KINSpilsPSolve(void *kinmem, N_Vector r, N_Vector z,
 
   /* Return immediately if kin_mem or kin_mem->kin_lmem are NULL */
   if (kinmem == NULL) {
-    KINProcessError(NULL, KINSPILS_MEM_NULL, "KINSPILS",
+    KINProcessError(NULL, KINSPILS_MEM_NULL, "KINSPILS", 
 		    "KINSpilsPSolve", MSGS_KINMEM_NULL);
     return(KINSPILS_MEM_NULL);
   }
   kin_mem = (KINMem) kinmem;
   if (kin_mem->kin_lmem == NULL) {
-    KINProcessError(kin_mem, KINSPILS_LMEM_NULL, "KINSPILS",
+    KINProcessError(kin_mem, KINSPILS_LMEM_NULL, "KINSPILS", 
 		    "KINSpilsPSolve", MSGS_LMEM_NULL);
     return(KINSPILS_LMEM_NULL);
   }
   kinspils_mem = (KINSpilsMem) kin_mem->kin_lmem;
-
-  /* copy the rhs into z before the psolve call */
+  
+  /* copy the rhs into z before the psolve call */   
   /* Note: z returns with the solution */
   N_VScale(ONE, r, z);
 
@@ -653,21 +653,21 @@ int KINSpilsPSolve(void *kinmem, N_Vector r, N_Vector z,
   KINSpilsDQJtimes
 
   This routine generates the matrix-vector product z = J*v using a
-  difference quotient approximation. The approximation is
+  difference quotient approximation. The approximation is 
   J*v = [func(uu + sigma*v) - func(uu)]/sigma. Here sigma is based
   on the dot products (uscale*uu, uscale*v) and
   (uscale*v, uscale*v), the L1Norm(uscale*v), and on sqrt_relfunc
   (the square root of the relative error in the function). Note
   that v in the argument list has already been both preconditioned
   and unscaled.
-
+ 
   NOTE: Unlike the DQ Jacobian functions for direct linear solvers
         (which are called from within the lsetup function), this
         function is called from within the lsolve function and thus
         a recovery may still be possible even if the system function
         fails (recoverably).
   ------------------------------------------------------------------*/
-int KINSpilsDQJtimes(N_Vector v, N_Vector Jv, N_Vector u,
+int KINSpilsDQJtimes(N_Vector v, N_Vector Jv, N_Vector u, 
                      booleantype *new_u, void *kinmem)
 {
   realtype sigma, sigma_inv, sutsv, sq1norm, sign, vtv;
@@ -677,13 +677,13 @@ int KINSpilsDQJtimes(N_Vector v, N_Vector Jv, N_Vector u,
 
   /* Return immediately if kin_mem or kin_mem->kin_lmem are NULL */
   if (kinmem == NULL) {
-    KINProcessError(NULL, KINSPILS_MEM_NULL, "KINSPILS",
+    KINProcessError(NULL, KINSPILS_MEM_NULL, "KINSPILS", 
 		    "KINSpilsDQJtimes", MSGS_KINMEM_NULL);
     return(KINSPILS_MEM_NULL);
   }
   kin_mem = (KINMem) kinmem;
   if (kin_mem->kin_lmem == NULL) {
-    KINProcessError(kin_mem, KINSPILS_LMEM_NULL, "KINSPILS",
+    KINProcessError(kin_mem, KINSPILS_LMEM_NULL, "KINSPILS", 
 		    "KINSpilsDQJtimes", MSGS_LMEM_NULL);
     return(KINSPILS_LMEM_NULL);
   }
@@ -704,7 +704,7 @@ int KINSpilsDQJtimes(N_Vector v, N_Vector Jv, N_Vector u,
   sq1norm = N_VL1Norm(kin_mem->kin_vtemp1);
 
   sign = (sutsv >= ZERO) ? ONE : -ONE ;
-
+ 
   /* this expression for sigma is from p. 469, Brown and Saad paper */
   sigma = sign*(kin_mem->kin_sqrt_relfunc)*SUNMAX(SUNRabs(sutsv),sq1norm)/vtv;
 
@@ -712,10 +712,10 @@ int KINSpilsDQJtimes(N_Vector v, N_Vector Jv, N_Vector u,
 
   /* compute the u-prime at which to evaluate the function func */
   N_VLinearSum(ONE, u, sigma, v, kin_mem->kin_vtemp1);
-
+ 
   /* call the system function to calculate func(u+sigma*v) */
   retval = kin_mem->kin_func(kin_mem->kin_vtemp1, kin_mem->kin_vtemp2,
-                             kin_mem->kin_user_data);
+                             kin_mem->kin_user_data);    
   kinspils_mem->nfes++;
   if (retval != 0) return(retval);
 
@@ -747,7 +747,7 @@ int kinSpilsInitialize(KINMem kin_mem)
     return(KINSPILS_LMEM_NULL);
   }
   kinspils_mem = (KINSpilsMem) kin_mem->kin_lmem;
-
+  
   /* initialize counters */
   kinSpilsInitializeCounters(kinspils_mem);
 
@@ -768,7 +768,7 @@ int kinSpilsInitialize(KINMem kin_mem)
 
   /* if NOT preconditioning or do NOT need to setup the
      preconditioner, then set the lsetup function to NULL */
-  if ((kinspils_mem->psolve == NULL) ||
+  if ((kinspils_mem->psolve == NULL) || 
       (kinspils_mem->pset == NULL)) {
     kin_mem->kin_lsetup = NULL;
   }
@@ -779,7 +779,7 @@ int kinSpilsInitialize(KINMem kin_mem)
                                       kin_mem->kin_fscale,
                                       kin_mem->kin_fscale);
   if (retval != SUNLS_SUCCESS) {
-    KINProcessError(kin_mem, KINSPILS_SUNLS_FAIL, "KINSPILS", "kinSpilsInitialize",
+    KINProcessError(kin_mem, KINSPILS_SUNLS_FAIL, "KINSPILS", "kinSpilsInitialize", 
 		    "Error in calling SUNLinSolSetScalingVectors");
     return(KINSPILS_SUNLS_FAIL);
   }
@@ -832,7 +832,7 @@ int kinSpilsSolve(KINMem kin_mem, N_Vector xx, N_Vector bb,
   KINSpilsMem kinspils_mem;
   int nli_inc, retval;
   realtype res_norm;
-
+  
   /* Return immediately if kin_mem or kin_mem->kin_lmem are NULL */
   if (kin_mem == NULL) {
     KINProcessError(NULL, KINSPILS_MEM_NULL, "KINSPILS",
@@ -846,9 +846,9 @@ int kinSpilsSolve(KINMem kin_mem, N_Vector xx, N_Vector bb,
   }
   kinspils_mem = (KINSpilsMem) kin_mem->kin_lmem;
 
-  /* Set initial guess x = 0 to LS */
+  /* Set initial guess x = 0 to LS */  
   N_VConst(ZERO, xx);
-
+  
   /* set flag required for user Jacobian routine */
   kinspils_mem->new_uu = SUNTRUE;
 
@@ -859,7 +859,7 @@ int kinSpilsSolve(KINMem kin_mem, N_Vector xx, N_Vector bb,
   res_norm = SUNLinSolResNorm(kinspils_mem->LS);
   nli_inc  = SUNLinSolNumIters(kinspils_mem->LS);
 
-  if (kin_mem->kin_printfl > 2)
+  if (kin_mem->kin_printfl > 2) 
     KINPrintInfo(kin_mem, PRNT_NLI, "KINSPILS", "kinSpilsSolve",
                  INFO_NLI, nli_inc);
 
@@ -871,7 +871,7 @@ int kinSpilsSolve(KINMem kin_mem, N_Vector xx, N_Vector bb,
   kinspils_mem->last_flag = retval;
 
   if ( (retval != 0) && (retval != SUNLS_RES_REDUCED) ) {
-
+    
     switch(retval) {
     case SUNLS_ATIMES_FAIL_REC:
     case SUNLS_PSOLVE_FAIL_REC:
@@ -894,18 +894,18 @@ int kinSpilsSolve(KINMem kin_mem, N_Vector xx, N_Vector bb,
       return(-1);
       break;
     case SUNLS_PACKAGE_FAIL_UNREC:
-      KINProcessError(kin_mem, SUNLS_PACKAGE_FAIL_UNREC, "KINSPILS",
+      KINProcessError(kin_mem, SUNLS_PACKAGE_FAIL_UNREC, "KINSPILS", 
                       "kinSpilsSolve",
                       "Failure in SUNLinSol external package");
       return(-1);
       break;
     case SUNLS_ATIMES_FAIL_UNREC:
-      KINProcessError(kin_mem, SUNLS_ATIMES_FAIL_UNREC, "KINSPILS",
-                      "kinSpilsSolve", MSGS_JTIMES_FAILED);
+      KINProcessError(kin_mem, SUNLS_ATIMES_FAIL_UNREC, "KINSPILS", 
+                      "kinSpilsSolve", MSGS_JTIMES_FAILED);    
       return(-1);
       break;
     case SUNLS_PSOLVE_FAIL_UNREC:
-      KINProcessError(kin_mem, SUNLS_PSOLVE_FAIL_UNREC, "KINSPILS",
+      KINProcessError(kin_mem, SUNLS_PSOLVE_FAIL_UNREC, "KINSPILS", 
                       "kinSpilsSolve", MSGS_PSOLVE_FAILED);
       return(-1);
       break;
@@ -914,7 +914,7 @@ int kinSpilsSolve(KINMem kin_mem, N_Vector xx, N_Vector bb,
 
   /*
     SUNLinSolSolve returned SUNLS_SUCCESS or SUNLS_RES_REDUCED
-
+ 
     Compute the terms sJpnorm and sFdotJp for use in the linesearch
     routine and in KINForcingTerm.  Both of these terms are subsequently
     corrected if the step is reduced by constraints or the linesearch.
@@ -930,7 +930,7 @@ int kinSpilsSolve(KINMem kin_mem, N_Vector xx, N_Vector bb,
   if (retval > 0) {
     kinspils_mem->last_flag = SUNLS_ATIMES_FAIL_REC;
     return(1);
-  }
+  }      
   else if (retval < 0) {
     kinspils_mem->last_flag = SUNLS_ATIMES_FAIL_UNREC;
     return(-1);
@@ -973,7 +973,7 @@ int kinSpilsFree(KINMem kin_mem)
 
 
 /*------------------------------------------------------------------
-  kinSpilsInitializeCounters resets counters for the SPILS interface
+  kinSpilsInitializeCounters resets counters for the SPILS interface 
   ------------------------------------------------------------------*/
 int kinSpilsInitializeCounters(KINSpilsMem kinspils_mem)
 {
@@ -983,6 +983,6 @@ int kinSpilsInitializeCounters(KINSpilsMem kinspils_mem)
   kinspils_mem->ncfl    = 0;
   kinspils_mem->njtimes = 0;
   kinspils_mem->nfes    = 0;
-
+  
   return(0);
 }

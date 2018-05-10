@@ -90,7 +90,7 @@ C     initialize LAPACK dense linear solver module
         STOP
       ENDIF
 
-C     Call FCVMALLOC to create the solver memory and specify the
+C     Call FCVMALLOC to create the solver memory and specify the 
 C     Backward Differentiation Formula and the use of a Newton iteration
       CALL FCVMALLOC(T0, Y, METH, ITMETH, ITOL, RTOL, ATOL,
      1               IOUT, ROUT, IPAR, RPAR, IER)
@@ -232,7 +232,7 @@ C
 
 C     ----------------------------------------------------------------
 
-      SUBROUTINE FCVDJAC(N, T, Y, FY, JAC, H, IPAR, RPAR,
+      SUBROUTINE FCVDJAC(N, T, Y, FY, JAC, H, IPAR, RPAR, 
      1                   V1, V2, V3, IER)
 C     Fortran routine for dense user-supplied Jacobian
       IMPLICIT NONE

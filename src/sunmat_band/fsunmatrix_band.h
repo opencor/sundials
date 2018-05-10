@@ -1,15 +1,15 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel Reynolds @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -49,8 +49,8 @@ extern SUNMatrix F2C_KINSOL_matrix;
 extern SUNMatrix F2C_ARKODE_matrix;
 extern SUNMatrix F2C_ARKODE_mass_matrix;
 
-/*
- * Prototypes of exported functions
+/* 
+ * Prototypes of exported functions 
  *
  * FSUNBANDMAT_INIT - initializes band matrix operations for main problem
  * FSUNBANDMASSMAT_INIT - initializes band matrix operations for mass matrix solve

@@ -4,8 +4,8 @@
 # ---------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -24,7 +24,7 @@ ENDIF()
 
 # Macros to hide/show cached variables.
 # These two macros can be used to "hide" or "show" in the
-# list of cached variables various variables and/or options
+# list of cached variables various variables and/or options 
 # that depend on other options.
 # Note that once a variable is modified, it will preserve its
 # value (hidding it merely makes it internal)

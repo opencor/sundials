@@ -1,36 +1,36 @@
 /*
  * -----------------------------------------------------------------
  * Programmer(s): Daniel Reynolds @ SMU
- * Based on sundials_klu_impl.h and arkode_klu.h/cvode_klu.h/...
+ * Based on sundials_klu_impl.h and arkode_klu.h/cvode_klu.h/... 
  *     code, written by Carol S. Woodward @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the header file for the KLU implementation of the
+ * This is the header file for the KLU implementation of the 
  * SUNLINSOL module.
- *
+ * 
  * Part I contains declarations specific to the KLU implementation
  * of the supplied SUNLINSOL module.
- *
- * Part II contains the prototype for the constructor
- * SUNKLU as well as implementation-specific prototypes
+ * 
+ * Part II contains the prototype for the constructor 
+ * SUNKLU as well as implementation-specific prototypes 
  * for various useful solver operations.
  *
  * Notes:
  *
- *   - The definition of the generic SUNLinearSolver structure can
+ *   - The definition of the generic SUNLinearSolver structure can 
  *     be found in the header file sundials_linearsolver.h.
  *
  * -----------------------------------------------------------------
@@ -90,74 +90,78 @@ extern "C" {
  * -----------------------------------------------------------------
  * PART I: KLU implementation of SUNLinearSolver
  *
- * The KLU implementation of the SUNLinearSolver 'content'
+ * The KLU implementation of the SUNLinearSolver 'content' 
  * structure contains:
  *     last_flag -- last error return flag from internal setup/solve
- *     first_factorize -- flag indicating whether the factorization
+ *     first_factorize -- flag indicating whether the factorization 
  *       has ever been performed
- *     Symbolic -- KLU storage structure for symbolic
+ *     Symbolic -- KLU storage structure for symbolic 
  *       factorization components
  *     Numeric -- KLU storage structure for numeric factorization
  *        components
- *     Common -- storage structure for common KLU solver
+ *     Common -- storage structure for common KLU solver 
  *        components
- *     klu_solver -- ptr to KLU function to handle CSR/CSC
+ *     klu_solver -- ptr to KLU function to handle CSR/CSC.
+ *        We create a typedef for this type of function pointer
+ *        to suppress compiler warning messages about sunindextype 
+ *        vs internal KLU index types.
  * -----------------------------------------------------------------
  */
-
+typedef sunindextype (*KLUSolveFn)(sun_klu_symbolic*, sun_klu_numeric*,
+                                   sunindextype, sunindextype,
+                                   double*, sun_klu_common*);
+ 
 struct _SUNLinearSolverContent_KLU {
   long int         last_flag;
   int              first_factorize;
   sun_klu_symbolic *symbolic;
   sun_klu_numeric  *numeric;
   sun_klu_common   common;
-  sunindextype     (*klu_solver)(sun_klu_symbolic*, sun_klu_numeric*,
-                                 sunindextype, sunindextype,
-                                 double*, sun_klu_common*);
+  KLUSolveFn       klu_solver;
 };
 
 typedef struct _SUNLinearSolverContent_KLU *SUNLinearSolverContent_KLU;
 
-
+  
 /*
  * -----------------------------------------------------------------
  * PART II: functions exported by sunlinsol_klu
- *
+ * 
  * CONSTRUCTOR:
- *    SUNKLU creates and allocates memory for a KLU sparse-direct
+ *    SUNKLU creates and allocates memory for a KLU sparse-direct 
  *      linear solver
  *
  * OTHER:
- *    SUNKLUReInit reinitializes memory and flags for a new
- *      factorization (symbolic and numeric) to be conducted at the
- *      next solver setup call.  This routine is useful in the
- *      cases where the number of nonzeroes has changed or if the
- *      structure of the linear system has changed which would
+ *    SUNKLUReInit reinitializes memory and flags for a new 
+ *      factorization (symbolic and numeric) to be conducted at the 
+ *      next solver setup call.  This routine is useful in the 
+ *      cases where the number of nonzeroes has changed or if the 
+ *      structure of the linear system has changed which would 
  *      require a new symbolic (and numeric factorization).
  *
- *      The reinit_type argument governs the level of
+ *      The reinit_type argument governs the level of 
  *      reinitialization:
  *
- *      reinit_type = 1: The Jacobian matrix will be destroyed and
- *                       a new one will be allocated based on the
- *                       nnz value passed to this call. New
- *                       symbolic and numeric factorizations will
+ *      reinit_type = 1: The Jacobian matrix will be destroyed and 
+ *                       a new one will be allocated based on the 
+ *                       nnz value passed to this call. New 
+ *                       symbolic and numeric factorizations will 
  *                       be completed at the next solver setup.
  *
- *      reinit_type = 2: Only symbolic and numeric factorizations
- *                       will be completed.  It is assumed that the
- *                       Jacobian size has not exceeded the size of
+ *      reinit_type = 2: Only symbolic and numeric factorizations 
+ *                       will be completed.  It is assumed that the 
+ *                       Jacobian size has not exceeded the size of 
  *                       nnz given in the sparse matrix provided to
- *                       the original constructor routine (or the
- *                       previous SUNKLUReInit call)
+ *                       the original constructor routine (or the 
+ *                       previous SUNKLUReInit call) 
  *
- *      This routine assumes no other changes to solver use are
+ *      This routine assumes no other changes to solver use are 
  *      necessary.
  *
- *    SUNKLUSetOrdering sets the ordering used by KLU for reducing
- *      fill in the linear solve.  Options for ordering_choice are:
- *          0 for AMD,
- *          1 for COLAMD, and
+ *    SUNKLUSetOrdering sets the ordering used by KLU for reducing 
+ *      fill in the linear solve.  Options for ordering_choice are: 
+ *          0 for AMD, 
+ *          1 for COLAMD, and 
  *          2 for the natural ordering.
  *      The default is 1 for COLAMD.
  *
@@ -188,7 +192,7 @@ SUNDIALS_EXPORT int SUNLinSolSpace_KLU(SUNLinearSolver S,
                                        long int *lenrwLS,
                                        long int *leniwLS);
 SUNDIALS_EXPORT int SUNLinSolFree_KLU(SUNLinearSolver S);
-
+  
 
 #ifdef __cplusplus
 }

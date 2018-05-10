@@ -3,23 +3,23 @@
  * Programmer(s): Daniel Reynolds, Ashley Crawford @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the implementation file for the dense implementation of
+ * This is the implementation file for the dense implementation of 
  * the SUNLINSOL package.
  * -----------------------------------------------------------------
- */
+ */ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +35,7 @@ sunindextype GlobalVectorLength_DenseLS(N_Vector y);
 
 /*
  * -----------------------------------------------------------------
- * Dense solver structure accessibility macros:
+ * Dense solver structure accessibility macros: 
  * -----------------------------------------------------------------
  */
 
@@ -60,7 +60,7 @@ SUNLinearSolver SUNDenseLinearSolver(N_Vector y, SUNMatrix A)
   SUNLinearSolver_Ops ops;
   SUNLinearSolverContent_Dense content;
   sunindextype MatrixRows, VecLength;
-
+  
   /* Check compatibility with supplied SUNMatrix and N_Vector */
   if (SUNMatGetID(A) != SUNMATRIX_DENSE)
     return(NULL);
@@ -76,12 +76,12 @@ SUNLinearSolver SUNDenseLinearSolver(N_Vector y, SUNMatrix A)
   VecLength = GlobalVectorLength_DenseLS(y);
   if (MatrixRows != VecLength)
     return(NULL);
-
+  
   /* Create linear solver */
   S = NULL;
   S = (SUNLinearSolver) malloc(sizeof *S);
   if (S == NULL) return(NULL);
-
+  
   /* Create linear solver operation structure */
   ops = NULL;
   ops = (SUNLinearSolver_Ops) malloc(sizeof(struct _generic_SUNLinearSolver_Ops));
@@ -115,7 +115,7 @@ SUNLinearSolver SUNDenseLinearSolver(N_Vector y, SUNMatrix A)
   if (content->pivots == NULL) {
     free(content); free(ops); free(S); return(NULL);
   }
-
+  
   /* Attach content and ops */
   S->content = content;
   S->ops     = ops;
@@ -145,17 +145,17 @@ int SUNLinSolSetup_Dense(SUNLinearSolver S, SUNMatrix A)
 {
   realtype **A_cols;
   sunindextype *pivots;
-
+  
   /* check for valid inputs */
-  if ( (A == NULL) || (S == NULL) )
+  if ( (A == NULL) || (S == NULL) ) 
     return(SUNLS_MEM_NULL);
-
+  
   /* Ensure that A is a dense matrix */
   if (SUNMatGetID(A) != SUNMATRIX_DENSE) {
     LASTFLAG(S) = SUNLS_ILL_INPUT;
     return(LASTFLAG(S));
   }
-
+  
   /* access data pointers (return with failure on NULL) */
   A_cols = NULL;
   pivots = NULL;
@@ -165,7 +165,7 @@ int SUNLinSolSetup_Dense(SUNLinearSolver S, SUNMatrix A)
     LASTFLAG(S) = SUNLS_MEM_FAIL;
     return(LASTFLAG(S));
   }
-
+  
   /* perform LU factorization of input matrix */
   LASTFLAG(S) = denseGETRF(A_cols, SUNDenseMatrix_Rows(A),
                            SUNDenseMatrix_Columns(A), pivots);
@@ -176,15 +176,15 @@ int SUNLinSolSetup_Dense(SUNLinearSolver S, SUNMatrix A)
   return(SUNLS_SUCCESS);
 }
 
-int SUNLinSolSolve_Dense(SUNLinearSolver S, SUNMatrix A, N_Vector x,
+int SUNLinSolSolve_Dense(SUNLinearSolver S, SUNMatrix A, N_Vector x, 
                         N_Vector b, realtype tol)
 {
   realtype **A_cols, *xdata;
   sunindextype *pivots;
-
-  if ( (A == NULL) || (S == NULL) || (x == NULL) || (b == NULL) )
+  
+  if ( (A == NULL) || (S == NULL) || (x == NULL) || (b == NULL) ) 
     return(SUNLS_MEM_NULL);
-
+  
   /* copy b into x */
   N_VScale(ONE, b, x);
 
@@ -199,7 +199,7 @@ int SUNLinSolSolve_Dense(SUNLinearSolver S, SUNMatrix A, N_Vector x,
     LASTFLAG(S) = SUNLS_MEM_FAIL;
     return(LASTFLAG(S));
   }
-
+  
   /* solve using LU factors */
   denseGETRS(A_cols, SUNDenseMatrix_Rows(A), pivots, xdata);
   LASTFLAG(S) = SUNLS_SUCCESS;
@@ -212,8 +212,8 @@ long int SUNLinSolLastFlag_Dense(SUNLinearSolver S)
   return(LASTFLAG(S));
 }
 
-int SUNLinSolSpace_Dense(SUNLinearSolver S,
-                         long int *lenrwLS,
+int SUNLinSolSpace_Dense(SUNLinearSolver S, 
+                         long int *lenrwLS, 
                          long int *leniwLS)
 {
   *leniwLS = 2 + DENSE_CONTENT(S)->N;
@@ -233,11 +233,11 @@ int SUNLinSolFree_Dense(SUNLinearSolver S)
       free(PIVOTS(S));
       PIVOTS(S) = NULL;
     }
-    free(S->content);
+    free(S->content);  
     S->content = NULL;
   }
   if (S->ops) {
-    free(S->ops);
+    free(S->ops);  
     S->ops = NULL;
   }
   free(S); S = NULL;
@@ -250,7 +250,7 @@ int SUNLinSolFree_Dense(SUNLinearSolver S)
  * -----------------------------------------------------------------
  */
 
-/* Inefficient kludge for determining the number of entries in a N_Vector
+/* Inefficient kludge for determining the number of entries in a N_Vector 
    object (replace if such a routine is ever added to the N_Vector API).
 
    Returns "-1" on an error. */

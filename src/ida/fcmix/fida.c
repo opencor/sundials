@@ -1,15 +1,15 @@
-/*-----------------------------------------------------------------
+/*----------------------------------------------------------------- 
  * Programmer(s): Daniel R. Reynolds @ SMU
  *                Aaron Collier and Radu Serban @ LLNL
  *-----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -71,7 +71,7 @@ extern "C" {
 
 void FIDA_MALLOC(realtype *t0, realtype *yy0, realtype *yp0,
                  int *iatol, realtype *rtol, realtype *atol,
-                 long int *iout, realtype *rout,
+                 long int *iout, realtype *rout, 
                  long int *ipar, realtype *rpar, int *ier)
 {
   N_Vector Vatol;
@@ -259,7 +259,7 @@ void FIDA_SETIIN(char key_name[], long int *ival, int *ier)
     *ier = IDASetSuppressAlg(IDA_idamem, (booleantype) *ival);
   else if (!strncmp(key_name,"MAX_NSTEPS_IC",13))
     *ier = IDASetMaxNumStepsIC(IDA_idamem, (int) *ival);
-  else if (!strncmp(key_name,"MAX_NITERS_IC",13))
+  else if (!strncmp(key_name,"MAX_NITERS_IC",13)) 
     *ier = IDASetMaxNumItersIC(IDA_idamem, (int) *ival);
   else if (!strncmp(key_name,"MAX_NJE_IC",10))
     *ier = IDASetMaxNumJacsIC(IDA_idamem, (int) *ival);
@@ -367,15 +367,15 @@ void FIDA_CALCIC(int *icopt, realtype *tout1, int *ier)
 
 /*************************************************/
 
-/* Fortran interface to C routine IDADlsSetLinearSolver; see
+/* Fortran interface to C routine IDADlsSetLinearSolver; see 
    fida.h for further details */
 void FIDA_DLSINIT(int *ier) {
-  if ( (IDA_idamem == NULL) || (F2C_IDA_linsol == NULL) ||
+  if ( (IDA_idamem == NULL) || (F2C_IDA_linsol == NULL) || 
        (F2C_IDA_matrix == NULL) ) {
     *ier = -1;
     return;
   }
-  *ier = IDADlsSetLinearSolver(IDA_idamem, F2C_IDA_linsol,
+  *ier = IDADlsSetLinearSolver(IDA_idamem, F2C_IDA_linsol, 
                                F2C_IDA_matrix);
   IDA_ls = IDA_LS_DIRECT;
   return;
@@ -384,7 +384,7 @@ void FIDA_DLSINIT(int *ier) {
 
 /*************************************************/
 
-/* Fortran interface to C routine IDASpilsSetLinearSolver; see
+/* Fortran interface to C routine IDASpilsSetLinearSolver; see 
    fida.h for further details */
 void FIDA_SPILSINIT(int *ier) {
   if ( (IDA_idamem == NULL) || (F2C_IDA_linsol == NULL) ) {
@@ -392,13 +392,14 @@ void FIDA_SPILSINIT(int *ier) {
     return;
   }
   *ier = IDASpilsSetLinearSolver(IDA_idamem, F2C_IDA_linsol);
+  FIDANullMatrix();
   IDA_ls = IDA_LS_ITERATIVE;
   return;
 }
 
 /*************************************************/
 
-/* Fortran interfaces to C "set" routines for the IDASpils solver;
+/* Fortran interfaces to C "set" routines for the IDASpils solver; 
    see fida.h for further details */
 void FIDA_SPILSSETEPSLIN(realtype *eplifac, int *ier) {
   if (IDA_ls == IDA_LS_ITERATIVE)
@@ -458,15 +459,15 @@ void FIDA_SOLVE(realtype *tout, realtype *tret, realtype *yret,
   IDAGetNonlinSolvStats(IDA_idamem,
                         &IDA_iout[6],           /* NNI */
                         &IDA_iout[5]);          /* NCFN */
-  IDAGetNumBacktrackOps(IDA_idamem,
+  IDAGetNumBacktrackOps(IDA_idamem, 
                         &IDA_iout[10]);         /* NBCKTRK */
-  IDAGetTolScaleFactor(IDA_idamem,
+  IDAGetTolScaleFactor(IDA_idamem,    
                        &IDA_rout[4]);           /* TOLSFAC */
-
+  
   /* Root finding is on */
   if (IDA_nrtfn != 0)
     IDAGetNumGEvals(IDA_idamem, &IDA_iout[11]); /* NGE */
-
+  
   switch(IDA_ls) {
   case IDA_LS_DIRECT:
     IDADlsGetWorkSpace(IDA_idamem, &IDA_iout[12], &IDA_iout[13]);   /* LENRWLS, LENIWLS */
@@ -607,7 +608,7 @@ int FIDAresfn(realtype t, N_Vector yy, N_Vector yp,
   IDA_userdata = (FIDAUserData) user_data;
 
   /* Call user-supplied routine */
-  FIDA_RESFUN(&t, yy_data, yp_data, rr_data,
+  FIDA_RESFUN(&t, yy_data, yp_data, rr_data, 
               IDA_userdata->ipar, IDA_userdata->rpar, &ier);
 
   return(ier);

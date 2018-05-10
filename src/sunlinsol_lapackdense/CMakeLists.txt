@@ -2,13 +2,13 @@
 # Programmer:  Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # LLNS/SMU Copyright Start
-# Copyright (c) 2017, Southern Methodist University and
+# Copyright (c) 2017, Southern Methodist University and 
 # Lawrence Livermore National Security
 #
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Southern Methodist University and Lawrence Livermore
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Southern Methodist University and Lawrence Livermore 
 # National Laboratory under Contract DE-AC52-07NA27344.
-# Produced at Southern Methodist University and the Lawrence
+# Produced at Southern Methodist University and the Lawrence 
 # Livermore National Laboratory.
 #
 # All rights reserved.
@@ -31,14 +31,14 @@ SET(shared_SOURCES
 
 # Add variable sunlinsollapackdense_HEADERS with the
 # exported SUNLINSOLLAPACKDENSE header files
-SET(sunlinsollapackdense_HEADERS
+SET(sunlinsollapackdense_HEADERS 
   ${sundials_SOURCE_DIR}/include/sunlinsol/sunlinsol_lapackdense.h
   )
 
 # Add source directory to include directories
 INCLUDE_DIRECTORIES(.)
 
-# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY
+# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY 
 ADD_DEFINITIONS(-DBUILD_SUNDIALS_LIBRARY)
 
 # Rules for building and installing the static library:
@@ -64,7 +64,7 @@ IF(BUILD_SHARED_LIBS)
   TARGET_LINK_LIBRARIES(sundials_sunlinsollapackdense_shared
     sundials_sunmatrixdense_shared
     ${LAPACK_LIBRARIES})
-
+  
   #	if a blas library was provided, assume LAPACK depends on it
   IF(BLAS_FOUND)
     TARGET_LINK_LIBRARIES(sundials_sunlinsollapackdense_shared ${BLAS_LIBRARIES})
@@ -102,7 +102,7 @@ IF(FCMIX_ENABLE AND F77_FOUND)
 
     SET_TARGET_PROPERTIES(sundials_fsunlinsollapackdense_shared
       PROPERTIES OUTPUT_NAME sundials_fsunlinsollapackdense CLEAN_DIRECT_OUTPUT 1)
-    SET_TARGET_PROPERTIES(sundials_fsunlinsollapackdense_shared
+    SET_TARGET_PROPERTIES(sundials_fsunlinsollapackdense_shared 
       PROPERTIES VERSION ${sunlinsollib_VERSION} SOVERSION ${sunlinsollib_SOVERSION})
     INSTALL(TARGETS sundials_fsunlinsollapackdense_shared DESTINATION lib)
   ENDIF(BUILD_SHARED_LIBS)

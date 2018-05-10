@@ -1,10 +1,10 @@
 C     ----------------------------------------------------------------
 C     FCVODE Example Problem: 2D kinetics-transport, precond. Krylov
-C     solver.
-C
+C     solver. 
+C     
 C     An ODE system is generated from the following 2-species diurnal
 C     kinetics advection-diffusion PDE system in 2 space dimensions:
-C
+C     
 C     dc(i)/dt = Kh*(d/dx)**2 c(i) + V*dc(i)/dx + (d/dy)(Kv(y)*dc(i)/dy)
 C                           + Ri(c1,c2,t)      for i = 1,2,   where
 C     R1(c1,c2,t) = -q1*c1*c3 - q2*c1*c2 + 2*q3(t)*c3 + q4(t)*c2 ,
@@ -22,7 +22,7 @@ C     The PDE system is treated by central differences on a uniform
 C     10 x 10 mesh, with simple polynomial initial profiles.
 C     The problem is solved with CVODE, with the BDF/GMRES method and
 C     using the FCVBP banded preconditioner.
-C
+C     
 C     The second and third dimensions of U here must match the values
 C     of MX and MY, for consistency with the output statements below.
 C     ----------------------------------------------------------------
@@ -68,7 +68,7 @@ C
       WRITE(6,10) NEQ
  10   FORMAT('Krylov example problem:'//
      1       ' Kinetics-transport, NEQ = ', I4/)
-C
+C     
 C     Initialize vector specification
       CALL FNVINITS(1, NEQ, IER)
       IF (IER .NE. 0) THEN
@@ -90,7 +90,7 @@ C     Initialize SPGMR linear solver module
  27     FORMAT(///' SUNDIALS_ERROR: FSUNSPGMRSETGSTYPE IER = ', I5)
         STOP
       ENDIF
-C
+C     
 C     Initialize CVODE
       CALL FCVMALLOC(T, U, METH, ITMETH, IATOL, RTOL, ATOL,
      1               IOUT, ROUT, IPAR, RPAR, IER)
@@ -108,24 +108,24 @@ C     attach linear solver module to CVSpils interface
         CALL FCVFREE
         STOP
       ENDIF
-C
+C     
 C     Initialize band preconditioner
       MU = 2
       ML = 2
-      CALL FCVBPINIT(NEQ, MU, ML, IER)
+      CALL FCVBPINIT(NEQ, MU, ML, IER) 
       IF (IER .NE. 0) THEN
          WRITE(6,45) IER
  45      FORMAT(///' SUNDIALS_ERROR: FCVBPINIT returned IER = ', I5)
          CALL FCVFREE
          STOP
       ENDIF
-C
+C     
 C     Loop over output points, call FCVODE, print sample solution values.
       TOUT = TWOHR
       DO 70 JOUT = 1, 12
 C
          CALL FCVODE(TOUT, T, U, ITASK, IER)
-C
+C     
          WRITE(6,50) T, IOUT(LNST), IOUT(LQ), ROUT(LH)
  50      FORMAT(/' t = ', E14.6, 5X, 'no. steps = ', I5,
      1           '   order = ', I3, '   stepsize = ', E14.6)
@@ -141,10 +141,10 @@ C
             CALL FCVFREE
             STOP
          ENDIF
-C
+C     
          TOUT = TOUT + TWOHR
  70   CONTINUE
-
+      
 C     Print final statistics.
       NST = IOUT(LNST)
       NFE = IOUT(LNFE)
@@ -182,7 +182,7 @@ C     Print final statistics.
  82   FORMAT('In CVBANDPRE:'/
      &        ' real/int workspace sizes = ', 2I7/
      &        ' number of f evaluations  = ', I5)
-C
+C     
       CALL FCVFREE
 C
       STOP
@@ -310,7 +310,7 @@ C     Set diurnal rate coefficients.
          Q3 = 0.0D0
          Q4 = 0.0D0
       ENDIF
-C
+C     
 C     Loop over all grid points.
       DO 20 JY = 1, MY
          YDN = 30.0D0 + (JY - 1.5D0) * DY

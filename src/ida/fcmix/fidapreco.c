@@ -34,7 +34,7 @@ extern "C" {
                         realtype* rr, realtype* c_j,  realtype* ewt,
                         realtype* h,  long int* ipar, realtype* rpar,
                         int* ier);
-
+  
   extern void FIDA_PSOL(realtype* t,    realtype* yy,    realtype* yp,
                         realtype* rr,   realtype* r,     realtype* z,
                         realtype* c_j,  realtype* delta, realtype* ewt,
@@ -141,7 +141,7 @@ int FIDAPSol(realtype t, N_Vector yy, N_Vector yp, N_Vector rr,
 
   /* Call user-supplied routine */
   FIDA_PSOL(&t, yy_data, yp_data, rr_data, rdata, zdata,
-	    &c_j, &delta, ewtdata,
+	    &c_j, &delta, ewtdata, 
             IDA_userdata->ipar, IDA_userdata->rpar, &ier);
 
   return(ier);

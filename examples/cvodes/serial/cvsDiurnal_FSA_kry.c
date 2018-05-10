@@ -65,13 +65,13 @@
 #define NOUT         12               /* number of output times */
 #define TWOHR        RCONST(7200.0)   /* number of seconds in two hours  */
 #define HALFDAY      RCONST(4.32e4)   /* number of seconds in a half day */
-#define PI           RCONST(3.1415926535898)   /* pi */
+#define PI           RCONST(3.1415926535898)   /* pi */ 
 
 #define XMIN         RCONST(0.0)      /* grid boundaries in x  */
-#define XMAX         RCONST(20.0)
+#define XMAX         RCONST(20.0)           
 #define ZMIN         RCONST(30.0)     /* grid boundaries in z  */
 #define ZMAX         RCONST(50.0)
-#define XMID         RCONST(10.0)     /* grid midpoints in x,z */
+#define XMID         RCONST(10.0)     /* grid midpoints in x,z */          
 #define ZMID         RCONST(40.0)
 
 #define MX           15               /* MX = number of x mesh points */
@@ -99,12 +99,12 @@
    mathematical 3-dimensional structure of the dependent variable vector
    to the underlying 1-dimensional storage. IJth is defined in order to
    write code which indexes into small dense matrices with a (row,column)
-   pair, where 1 <= row, column <= NUM_SPECIES.
-
+   pair, where 1 <= row, column <= NUM_SPECIES.   
+   
    IJKth(vdata,i,j,k) references the element in the vdata array for
    species i at mesh point (j,k), where 1 <= i <= NUM_SPECIES,
    0 <= j <= MX-1, 0 <= k <= MZ-1. The vdata array is obtained via
-   the call vdata = N_VGetArrayPointer(v), where v is an N_Vector.
+   the call vdata = N_VGetArrayPointer(v), where v is an N_Vector. 
    For each mesh point (j,k), the elements for species i and i+1 are
    contiguous within vdata.
 
@@ -116,8 +116,8 @@
 #define IJKth(vdata,i,j,k) (vdata[i-1 + (j)*NUM_SPECIES + (k)*NSMX])
 #define IJth(a,i,j)        (a[j-1][i-1])
 
-/* Type : UserData
-   contains preconditioner blocks, pivot arrays,
+/* Type : UserData 
+   contains preconditioner blocks, pivot arrays, 
    problem parameters, and problem constants     */
 
 typedef struct {
@@ -195,9 +195,9 @@ int main(int argc, char *argv[])
   y = N_VNew_Serial(NEQ);
   if(check_flag((void *)y, "N_VNew_Serial", 0)) return(1);
   SetInitialProfiles(y, data->dx, data->dz);
-
+  
   /* Tolerances */
-  abstol=ATOL;
+  abstol=ATOL; 
   reltol=RTOL;
 
   /* Create CVODES object */
@@ -264,14 +264,14 @@ int main(int argc, char *argv[])
     if(check_flag(&flag, "CVodeSetSensParams", 1)) return(1);
 
     printf("Sensitivity: YES ");
-    if(sensi_meth == CV_SIMULTANEOUS)
+    if(sensi_meth == CV_SIMULTANEOUS)   
       printf("( SIMULTANEOUS +");
-    else
+    else 
       if(sensi_meth == CV_STAGGERED) printf("( STAGGERED +");
-      else                           printf("( STAGGERED1 +");
+      else                           printf("( STAGGERED1 +");   
     if(err_con) printf(" FULL ERROR CONTROL )");
     else        printf(" PARTIAL ERROR CONTROL )");
-
+    
   } else {
 
     printf("Sensitivity: NO ");
@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
       if(check_flag(&flag, "CVodeGetSens", 1)) break;
       PrintOutputS(uS);
     }
-
+    
     printf("------------------------------------------------------------------------\n");
 
   }
@@ -323,7 +323,7 @@ int main(int argc, char *argv[])
  */
 
 /*
- * f routine. Compute f(t,y).
+ * f routine. Compute f(t,y). 
  */
 
 static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
@@ -387,7 +387,7 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 
       /* Extract c1 and c2, and set kinetic rate terms. */
 
-      c1 = IJKth(ydata,1,jx,jz);
+      c1 = IJKth(ydata,1,jx,jz); 
       c2 = IJKth(ydata,2,jx,jz);
       qq1 = Q1*c1*C3;
       qq2 = Q2*c1*c2;
@@ -409,7 +409,7 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 
       ileft = (jx == 0) ? 1 : -1;
       iright =(jx == MX-1) ? -1 : 1;
-      c1lt = IJKth(ydata,1,jx+ileft,jz);
+      c1lt = IJKth(ydata,1,jx+ileft,jz); 
       c2lt = IJKth(ydata,2,jx+ileft,jz);
       c1rt = IJKth(ydata,1,jx+iright,jz);
       c2rt = IJKth(ydata,2,jx+iright,jz);
@@ -420,7 +420,7 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 
       /* Load all terms into ydot. */
 
-      IJKth(dydata, 1, jx, jz) = vertd1 + hord1 + horad1 + rkin1;
+      IJKth(dydata, 1, jx, jz) = vertd1 + hord1 + horad1 + rkin1; 
       IJKth(dydata, 2, jx, jz) = vertd2 + hord2 + horad2 + rkin2;
     }
   }
@@ -429,7 +429,7 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 }
 
 /*
- * Preconditioner setup routine. Generate and preprocess P.
+ * Preconditioner setup routine. Generate and preprocess P. 
  */
 
 static int Precond(realtype tn, N_Vector y, N_Vector fy, booleantype jok,
@@ -482,7 +482,7 @@ static int Precond(realtype tn, N_Vector y, N_Vector fy, booleantype jok,
   verdco = data->vdco;
   hordco  = data->hdco;
 
-  /* Compute 2x2 diagonal Jacobian blocks (using q4 values
+  /* Compute 2x2 diagonal Jacobian blocks (using q4 values 
      computed on the last f call).  Load into P. */
 
     for (jz=0; jz < MZ; jz++) {
@@ -528,7 +528,7 @@ static int Precond(realtype tn, N_Vector y, N_Vector fy, booleantype jok,
 }
 
 /*
- * Preconditioner solve routine
+ * Preconditioner solve routine 
  */
 
 static int PSolve(realtype tn, N_Vector y, N_Vector fy,
@@ -563,18 +563,18 @@ static int PSolve(realtype tn, N_Vector y, N_Vector fy,
 
   return(0);
 }
-
+ 
 /*
  *--------------------------------------------------------------------
  * PRIVATE FUNCTIONS
  *--------------------------------------------------------------------
  */
 
-/*
+/* 
  * Process and verify arguments to cvsfwdkryx.
  */
 
-static void ProcessArgs(int argc, char *argv[],
+static void ProcessArgs(int argc, char *argv[], 
                         booleantype *sensi, int *sensi_meth, booleantype *err_con)
 {
   *sensi = SUNFALSE;
@@ -589,7 +589,7 @@ static void ProcessArgs(int argc, char *argv[],
     *sensi = SUNTRUE;
   else
     WrongArgs(argv[0]);
-
+  
   if (*sensi) {
 
     if (argc != 4)
@@ -601,7 +601,7 @@ static void ProcessArgs(int argc, char *argv[],
       *sensi_meth = CV_STAGGERED;
     else if (strcmp(argv[2],"stg1") == 0)
       *sensi_meth = CV_STAGGERED1;
-    else
+    else 
       WrongArgs(argv[0]);
 
     if (strcmp(argv[3],"t") == 0)
@@ -619,12 +619,12 @@ static void WrongArgs(char *name)
     printf("\nUsage: %s [-nosensi] [-sensi sensi_meth err_con]\n",name);
     printf("         sensi_meth = sim, stg, or stg1\n");
     printf("         err_con    = t or f\n");
-
+    
     exit(0);
 }
 
 /*
- * Allocate memory for data structure of type UserData
+ * Allocate memory for data structure of type UserData 
  */
 
 static UserData AllocUserData(void)
@@ -648,7 +648,7 @@ static UserData AllocUserData(void)
 }
 
 /*
- * Load problem constants in data
+ * Load problem constants in data 
  */
 
 static void InitUserData(UserData data)
@@ -661,9 +661,9 @@ static void InitUserData(UserData data)
   C3 = RCONST(3.7e16);   /* C3                                      */
   A3 = RCONST(22.62);    /* A3  coefficient in expression for q3(t) */
   A4 = RCONST(7.601);    /* A4  coefficient in expression for q4(t) */
-  KH = RCONST(4.0e-6);   /* KH  horizontal diffusivity Kh           */
+  KH = RCONST(4.0e-6);   /* KH  horizontal diffusivity Kh           */ 
   VEL = RCONST(0.001);   /* VEL advection velocity V                */
-  KV0 = RCONST(1.0e-8);  /* KV0 coefficient in Kv(z)                */
+  KV0 = RCONST(1.0e-8);  /* KV0 coefficient in Kv(z)                */  
 
   data->om = PI/HALFDAY;
   data->dx = (XMAX-XMIN)/(MX-1);
@@ -683,7 +683,7 @@ static void InitUserData(UserData data)
 }
 
 /*
- * Free user data memory
+ * Free user data memory 
  */
 
 static void FreeUserData(UserData data)
@@ -704,7 +704,7 @@ static void FreeUserData(UserData data)
 }
 
 /*
- * Set initial conditions in y
+ * Set initial conditions in y 
  */
 
 static void SetInitialProfiles(N_Vector y, realtype dx, realtype dz)
@@ -727,18 +727,18 @@ static void SetInitialProfiles(N_Vector y, realtype dx, realtype dz)
       x = XMIN + jx*dx;
       cx = SUNSQR(RCONST(0.1)*(x - XMID));
       cx = ONE - cx + RCONST(0.5)*SUNSQR(cx);
-      IJKth(ydata,1,jx,jz) = C1_SCALE*cx*cz;
+      IJKth(ydata,1,jx,jz) = C1_SCALE*cx*cz; 
       IJKth(ydata,2,jx,jz) = C2_SCALE*cx*cz;
     }
   }
 }
 
 /*
- * Print current t, step count, order, stepsize, and sampled c1,c2 values
+ * Print current t, step count, order, stepsize, and sampled c1,c2 values 
  */
 
 static void PrintOutput(void *cvode_mem, realtype t, N_Vector y)
-{
+{  
   long int nst;
   int qu, flag;
   realtype hu;
@@ -763,11 +763,11 @@ static void PrintOutput(void *cvode_mem, realtype t, N_Vector y)
 
   printf("                                Solution       ");
 #if defined(SUNDIALS_EXTENDED_PRECISION)
-  printf("%12.4Le %12.4Le \n", IJKth(ydata,1,0,0), IJKth(ydata,1,MX-1,MZ-1));
+  printf("%12.4Le %12.4Le \n", IJKth(ydata,1,0,0), IJKth(ydata,1,MX-1,MZ-1)); 
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
-  printf("%12.4e %12.4e \n", IJKth(ydata,1,0,0), IJKth(ydata,1,MX-1,MZ-1));
+  printf("%12.4e %12.4e \n", IJKth(ydata,1,0,0), IJKth(ydata,1,MX-1,MZ-1)); 
 #else
-  printf("%12.4e %12.4e \n", IJKth(ydata,1,0,0), IJKth(ydata,1,MX-1,MZ-1));
+  printf("%12.4e %12.4e \n", IJKth(ydata,1,0,0), IJKth(ydata,1,MX-1,MZ-1)); 
 #endif
   printf("                                               ");
 #if defined(SUNDIALS_EXTENDED_PRECISION)
@@ -780,7 +780,7 @@ static void PrintOutput(void *cvode_mem, realtype t, N_Vector y)
 }
 
 /*
- * Print sampled sensitivities
+ * Print sampled sensitivities 
  */
 
 static void PrintOutputS(N_Vector *uS)
@@ -789,14 +789,14 @@ static void PrintOutputS(N_Vector *uS)
 
   sdata = N_VGetArrayPointer(uS[0]);
 
-  printf("                                ----------------------------------------\n");
+  printf("                                ----------------------------------------\n"); 
   printf("                                Sensitivity 1  ");
 #if defined(SUNDIALS_EXTENDED_PRECISION)
-  printf("%12.4Le %12.4Le \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1));
+  printf("%12.4Le %12.4Le \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1)); 
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
-  printf("%12.4e %12.4e \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1));
+  printf("%12.4e %12.4e \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1)); 
 #else
-  printf("%12.4e %12.4e \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1));
+  printf("%12.4e %12.4e \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1)); 
 #endif
   printf("                                               ");
 #if defined(SUNDIALS_EXTENDED_PRECISION)
@@ -809,14 +809,14 @@ static void PrintOutputS(N_Vector *uS)
 
   sdata = N_VGetArrayPointer(uS[1]);
 
-  printf("                                ----------------------------------------\n");
+  printf("                                ----------------------------------------\n"); 
   printf("                                Sensitivity 2  ");
 #if defined(SUNDIALS_EXTENDED_PRECISION)
-  printf("%12.4Le %12.4Le \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1));
+  printf("%12.4Le %12.4Le \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1)); 
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
-  printf("%12.4e %12.4e \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1));
+  printf("%12.4e %12.4e \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1)); 
 #else
-  printf("%12.4e %12.4e \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1));
+  printf("%12.4e %12.4e \n", IJKth(sdata,1,0,0), IJKth(sdata,1,MX-1,MZ-1)); 
 #endif
   printf("                                               ");
 #if defined(SUNDIALS_EXTENDED_PRECISION)
@@ -829,7 +829,7 @@ static void PrintOutputS(N_Vector *uS)
 }
 
 /*
- * Print final statistics contained in iopt
+ * Print final statistics contained in iopt 
  */
 
 static void PrintFinalStats(void *cvode_mem, booleantype sensi)
@@ -903,7 +903,7 @@ static void PrintFinalStats(void *cvode_mem, booleantype sensi)
  *   opt == 1 means SUNDIALS function returns a flag so check if
  *            flag >= 0
  *   opt == 2 means function allocates memory so check if returned
- *            NULL pointer
+ *            NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt)

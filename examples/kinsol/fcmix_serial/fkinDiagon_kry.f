@@ -184,11 +184,11 @@ c
 
       stop
       end
-
+      
 c * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 c     The function defining the system f(u) = 0 must be defined by a Fortran
 c     function with the following name and form.
-
+      
       subroutine fkfun(uu, fval, ier)
 
       implicit none
@@ -207,13 +207,13 @@ c The following declaration specification should match C type long int.
 
       return
       end
-
-
+      
+      
 c * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 c     The routine kpreco is the preconditioner setup routine. It must have
 c     that specific name be used in order that the c code can find and link
 c     to it.  The argument list must also be as illustrated below:
-
+      
       subroutine fkpset(udata, uscale, fdata, fscale, ier)
 
       implicit none
@@ -234,13 +234,13 @@ c The following declaration specification should match C type long int.
 
       return
       end
-
-
+      
+      
 c * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 c     The routine kpsol is the preconditioner solve routine. It must have
 c     that specific name be used in order that the c code can find and link
 c     to it.  The argument list must also be as illustrated below:
-
+      
       subroutine fkpsol(udata, uscale, fdata, fscale, vv, ier)
 
       implicit none

@@ -2,20 +2,20 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
- * Implementation header file for the ARKDLS linear solver
+ * Implementation header file for the ARKDLS linear solver 
  * interface
  *--------------------------------------------------------------*/
 
@@ -40,7 +40,7 @@ extern "C" {
 
 
 /*---------------------------------------------------------------
- Types: ARKDlsMemRec, ARKDlsMem
+ Types: ARKDlsMemRec, ARKDlsMem                             
 
  ARKDlsMem is pointer to a ARKDlsMemRec structure.
 ---------------------------------------------------------------*/
@@ -56,7 +56,7 @@ typedef struct ARKDlsMemRec {
   SUNMatrix savedJ;     /* savedJ = old Jacobian                         */
 
   N_Vector x;           /* solution vector used by SUNLinearSolver       */
-
+  
   long int nstlj;       /* nstlj = nst at last Jacobian eval.            */
 
   long int nje;         /* nje = no. of calls to jac                     */
@@ -64,7 +64,7 @@ typedef struct ARKDlsMemRec {
   long int nfeDQ;       /* no. of calls to f due to DQ Jacobian approx.  */
 
   long int last_flag;   /* last error return flag                        */
-
+  
 } *ARKDlsMem;
 
 
@@ -85,7 +85,7 @@ typedef struct ARKDlsMassMemRec {
   N_Vector x;             /* solution vector used by SUNLinearSolver    */
 
   booleantype time_dependent;  /* flag stating whether M depends on t   */
-
+  
   long int mass_setups;   /* number of mass matrix-solver setup calls   */
 
   long int mass_solves;   /* number of mass matrix solve calls          */
@@ -93,7 +93,7 @@ typedef struct ARKDlsMassMemRec {
   long int mass_mults;    /* number of mass matrix product calls        */
 
   long int last_flag;     /* last error return flag                     */
-
+  
 } *ARKDlsMassMem;
 
 
@@ -102,31 +102,31 @@ typedef struct ARKDlsMassMemRec {
 ---------------------------------------------------------------*/
 
 /* difference-quotient Jacobian approximation routines */
-int arkDlsDQJac(realtype t, N_Vector y, N_Vector fy,
-                SUNMatrix Jac, void *data, N_Vector tmp1,
+int arkDlsDQJac(realtype t, N_Vector y, N_Vector fy, 
+                SUNMatrix Jac, void *data, N_Vector tmp1, 
                 N_Vector tmp2, N_Vector tmp3);
-int arkDlsDenseDQJac(realtype t, N_Vector y, N_Vector fy,
+int arkDlsDenseDQJac(realtype t, N_Vector y, N_Vector fy, 
                      SUNMatrix Jac, ARKodeMem ark_mem, N_Vector tmp1);
-int arkDlsBandDQJac(realtype t, N_Vector y, N_Vector fy,
-                    SUNMatrix Jac, ARKodeMem ark_mem, N_Vector tmp1,
+int arkDlsBandDQJac(realtype t, N_Vector y, N_Vector fy, 
+                    SUNMatrix Jac, ARKodeMem ark_mem, N_Vector tmp1, 
                     N_Vector tmp2);
 
 /* generic linit/lsetup/lsolve/lfree interface routines for ARKode to call */
 int arkDlsInitialize(ARKodeMem ark_mem);
 
 int arkDlsSetup(ARKodeMem ark_mem, int convfail, N_Vector ypred,
-                N_Vector fpred, booleantype *jcurPtr,
-                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+                N_Vector fpred, booleantype *jcurPtr, 
+                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3); 
 
 int arkDlsSolve(ARKodeMem ark_mem, N_Vector b, N_Vector ycur, N_Vector fcur);
 
 int arkDlsFree(ARKodeMem ark_mem);
 
-/* generic minit/msetup/mmult/msolve/mfree routines for ARKode to call */
+/* generic minit/msetup/mmult/msolve/mfree routines for ARKode to call */  
 int arkDlsMassInitialize(ARKodeMem ark_mem);
-
+  
 int arkDlsMassSetup(ARKodeMem ark_mem, N_Vector vtemp1,
-                    N_Vector vtemp2, N_Vector vtemp3);
+                    N_Vector vtemp2, N_Vector vtemp3); 
 
 int arkDlsMassMult(ARKodeMem ark_mem, N_Vector v, N_Vector Mv);
 

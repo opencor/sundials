@@ -2,22 +2,22 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
- * The C functions FARKPSet and FARKPSol are to interface between
- * the ARKSPILS module and the user-supplied preconditioner
- * setup/solve routines FARKPSET and FARKPSOL. Note the use of
+ * The C functions FARKPSet and FARKPSol are to interface between 
+ * the ARKSPILS module and the user-supplied preconditioner 
+ * setup/solve routines FARKPSET and FARKPSOL. Note the use of 
  * the generic names FARK_PSET and FARK_PSOL in the code below.
  *--------------------------------------------------------------*/
 
@@ -40,9 +40,9 @@ extern "C" {
 			realtype *GAMMA, realtype *H,
 			long int *IPAR, realtype *RPAR, int *IER);
   extern void FARK_PSOL(realtype *T, realtype *Y, realtype *FY,
-			realtype *R, realtype *Z,
+			realtype *R, realtype *Z, 
 			realtype *GAMMA, realtype *DELTA,
-			int *LR, long int *IPAR, realtype *RPAR,
+			int *LR, long int *IPAR, realtype *RPAR, 
                         int *IER);
 
 #ifdef __cplusplus
@@ -51,14 +51,14 @@ extern "C" {
 
 /*=============================================================*/
 
-/* Fortran interface to C routine ARKSpilsSetPreconditioner; see
+/* Fortran interface to C routine ARKSpilsSetPreconditioner; see 
    farkode.h for further details */
 void FARK_SPILSSETPREC(int *flag, int *ier)
 {
   if (*flag == 0) {
     *ier = ARKSpilsSetPreconditioner(ARK_arkodemem, NULL, NULL);
   } else {
-    *ier = ARKSpilsSetPreconditioner(ARK_arkodemem,
+    *ier = ARKSpilsSetPreconditioner(ARK_arkodemem, 
 				     FARKPSet, FARKPSol);
   }
   return;
@@ -66,10 +66,10 @@ void FARK_SPILSSETPREC(int *flag, int *ier)
 
 /*=============================================================*/
 
-/* C interface to user-supplied Fortran routine FARKPSET; see
+/* C interface to user-supplied Fortran routine FARKPSET; see 
    farkode.h for further details */
-int FARKPSet(realtype t, N_Vector y, N_Vector fy,
-	     booleantype jok, booleantype *jcurPtr,
+int FARKPSet(realtype t, N_Vector y, N_Vector fy, 
+	     booleantype jok, booleantype *jcurPtr, 
 	     realtype gamma, void *user_data)
 {
   int ier = 0;
@@ -90,9 +90,9 @@ int FARKPSet(realtype t, N_Vector y, N_Vector fy,
 
 /*=============================================================*/
 
-/* C interface to user-supplied Fortran routine FARKPSOL; see
+/* C interface to user-supplied Fortran routine FARKPSOL; see 
    farkode.h for further details */
-int FARKPSol(realtype t, N_Vector y, N_Vector fy, N_Vector r,
+int FARKPSol(realtype t, N_Vector y, N_Vector fy, N_Vector r, 
 	     N_Vector z, realtype gamma, realtype delta,
 	     int lr, void *user_data)
 {
@@ -106,7 +106,7 @@ int FARKPSol(realtype t, N_Vector y, N_Vector fy, N_Vector r,
   zdata  = N_VGetArrayPointer(z);
   ARK_userdata = (FARKUserData) user_data;
 
-  FARK_PSOL(&t, ydata, fydata, rdata, zdata, &gamma, &delta, &lr,
+  FARK_PSOL(&t, ydata, fydata, rdata, zdata, &gamma, &delta, &lr, 
 	    ARK_userdata->ipar, ARK_userdata->rpar, &ier);
   return(ier);
 }

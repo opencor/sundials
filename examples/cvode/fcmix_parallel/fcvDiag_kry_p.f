@@ -24,7 +24,7 @@ C
       DOUBLE PRECISION GERMAX, AVDIM
 C
       DATA ATOL/1.0D-10/, RTOL/1.0D-5/, DTOUT/0.1D0/, NOUT/10/
-      DATA LNST/3/, LNFE/4/, LNETF/5/,  LNCF/6/, LNNI/7/, LNSETUP/8/,
+      DATA LNST/3/, LNFE/4/, LNETF/5/,  LNCF/6/, LNNI/7/, LNSETUP/8/, 
      1     LNPE/18/, LNLI/20/, LNPS/19/, LNCFL/21/
 C
 C     Get NPES and MYPE.  Requires initialization of MPI.
@@ -132,7 +132,7 @@ C     attach linear solver module to CVSpils interface
          CALL MPI_ABORT(MPI_COMM_WORLD, 1, IER)
          STOP
       ENDIF
-C
+C     
 C     attach preconditioner to CVSpils interface
       CALL FCVSPILSSETPREC(1, IER)
 C
@@ -208,7 +208,7 @@ C     Re-initialize to run second case: IPRE = 2 (prec. on right).
       DO 110 I = 1, NLOCAL
  110    Y(I) = 1.0D0
 C
-      IF (MYPE .EQ. 0)  WRITE(6,111)
+      IF (MYPE .EQ. 0)  WRITE(6,111) 
  111  FORMAT(//60('-')///'Preconditioning on right'/)
 C
       CALL FCVREINIT(T, Y, IATOL, RTOL, ATOL, IER)
@@ -259,7 +259,7 @@ C     Get global max. error from MPI_REDUCE call.
          STOP
       ENDIF
       IF (MYPE .EQ. 0) WRITE(6,85) GERMAX
-C
+C     
 C     Print final statistics.
       NST = IOUT(LNST)
       NFE = IOUT(LNFE)

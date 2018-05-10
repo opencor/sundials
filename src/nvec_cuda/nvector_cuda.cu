@@ -348,7 +348,7 @@ void N_VDestroy_Cuda(N_Vector v)
     delete x;
     v->content = NULL;
   }
-
+  
   free(v->ops); v->ops = NULL;
   free(v); v = NULL;
 

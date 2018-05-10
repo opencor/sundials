@@ -4,8 +4,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -21,7 +21,7 @@
                   FKINBBD Interface Package
 
  The FKINBBD Interface Package is a package of C functions which support the
- use of the KINSOL solver and MPI-parallel N_Vector module, along with the
+ use of the KINSOL solver and MPI-parallel N_Vector module, along with the 
  KINBBDPRE preconditioner module, for the solution of nonlinear systems in a
  mixed Fortran/C setting. The combination of KINSOL and KINBBDPRE solves systems
  linear system arising from the solution of f(u) = 0 using a Krylov iterative
@@ -61,7 +61,7 @@
  The usage of combined interface packages FKINSOL and FKINBBD requires calls
  to several interface functions, and a few user-supplied routines which define
  the problem to be solved and indirectly define the preconditioner. These
- function calls and user routines are summarized separately below.
+ function calls and user routines are summarized separately below. 
 
  Some details have been omitted, and the user is referred to the KINSOL User
  Guide for more complete information.
@@ -97,7 +97,7 @@
 
  (3) User-supplied routines to define preconditoner: FKLOCFN and FKCOMMFN
 
-     The routines in the KINBBDPRE (kinbbdpre.c) module provide a preconditioner
+     The routines in the KINBBDPRE (kinbbdpre.c) module provide a preconditioner 
      matrix for KINSOL that is block-diagonal with banded blocks. The blocking
      corresponds to the distribution of the dependent variable vector u
      amongst the processes. Each preconditioner block is generated from the
@@ -111,7 +111,7 @@
        The user must supply a subroutine of the following form:
 
          SUBROUTINE FKLOCFN (NLOC, ULOC, GLOC, IER)
-         DIMENSION ULOC(*), GLOC(*)
+         DIMENSION ULOC(*), GLOC(*) 
 
        The routine is used to compute the function g(u) which approximates the
        system function f(u). This function is to be computed locally, i.e.
@@ -131,7 +131,7 @@
        The routine is used to perform all inter-process communication necessary
        to evaluate the approximate system function g described above. This
        function takes as input the local vector length (NLOC), and the local real
-       dependent variable array ULOC. It is expected to save communicated data in
+       dependent variable array ULOC. It is expected to save communicated data in 
        work space defined by the user, and made available to FKLOCFN. Each call
        to the FKCOMMFN function is preceded by a call to FKFUN with the same
        arguments. Thus FKCOMMFN can omit any communications done by FKFUN if
@@ -147,7 +147,7 @@
 
        The arguments are:
          NLOCAL  = local size of vectors associated with process
-         NGLOBAL = the system size, and the global size of vectors (the sum
+         NGLOBAL = the system size, and the global size of vectors (the sum 
                    of all values of NLOCAL)
          IER     = return completion flag. Values are 0 = success, and
                    -1 = failure.
@@ -176,7 +176,7 @@
 
        Note: See printed message for details in case of failure.
 
- (4.3) Initialize and attach one of the SPILS linear solvers. Make one of the
+ (4.3) Initialize and attach one of the SPILS linear solvers. Make one of the 
        following calls to initialize a solver (see fkinsol.h for more details):
 
          CALL FSUNPCGINIT(3, PRETYPE, MAXL, IER)
@@ -197,13 +197,13 @@
       The arguments are:
         NLOCAL = local vector size on this process [long int, input]
         MUDQ   = upper half-bandwidth to be used in the computation
-                 of the local Jacobian blocks by difference
-                 quotients.  These may be smaller than the true
-                 half-bandwidths of the Jacobian of the local block
-                 of g, when smaller values may provide greater
+                 of the local Jacobian blocks by difference 
+                 quotients.  These may be smaller than the true 
+                 half-bandwidths of the Jacobian of the local block 
+                 of g, when smaller values may provide greater 
                  efficiency [long int, input]
         MLDQ   = lower half-bandwidth to be used in the computation
-                 of the local Jacobian blocks by difference
+                 of the local Jacobian blocks by difference 
                  quotients [long int, input]
         MU     = upper half-bandwidth of the band matrix that is
                  retained as an approximation of the local Jacobian
@@ -214,7 +214,7 @@
         IER    = return completion flag [int, output]:
                     0 = success
                    <0 = an error occurred
-
+ 
  (5) To solve the system, make the following call:
 
        CALL FKINSOL (UU, GLOBALSTRAT, USCALE, FSCALE, IER)

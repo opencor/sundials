@@ -3,15 +3,15 @@
 # ---------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
 # For details, see the LICENSE file.
 # LLNS Copyright End
 # ---------------------------------------------------------------
-# BLAS tests for SUNDIALS CMake-based configuration. Based on
+# BLAS tests for SUNDIALS CMake-based configuration. Based on 
 # SundialsLapack.cmake
 #
 
@@ -46,7 +46,7 @@ if(BLAS_LIBRARIES)
   set(BlasTest_DIR ${PROJECT_BINARY_DIR}/BlasTest)
   file(MAKE_DIRECTORY ${BlasTest_DIR})
 
-  # Create a CMakeLists.txt file
+  # Create a CMakeLists.txt file 
   file(WRITE ${BlasTest_DIR}/CMakeLists.txt
     "CMAKE_MINIMUM_REQUIRED(VERSION 2.4)\n"
     "PROJECT(ltest C)\n"
@@ -76,7 +76,7 @@ if(BLAS_LIBRARIES)
   try_compile(LTEST_OK ${BlasTest_DIR} ${BlasTest_DIR}
     ltest OUTPUT_VARIABLE MY_OUTPUT)
 
-  # To ensure we do not use stuff from the previous attempts,
+  # To ensure we do not use stuff from the previous attempts, 
   # we must remove the CMakeFiles directory.
   file(REMOVE_RECURSE ${BlasTest_DIR}/CMakeFiles)
 

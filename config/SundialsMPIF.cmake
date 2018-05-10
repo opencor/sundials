@@ -3,8 +3,8 @@
 # ---------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -13,7 +13,7 @@
 # ---------------------------------------------------------------
 # MPI-Fortran tests for SUNDIALS CMake-based configuration.
 #
-#
+# 
 
 set(MPIF_FOUND FALSE)
 
@@ -31,8 +31,8 @@ else(MPI_MPIF77)
   # If not already available, search for MPI headers and libraries.
   if(NOT MPI_LIBRARIES)
     find_path(MPI_INCLUDE_PATH mpi.h
-      PATHS /usr/local/include
-      /usr/include
+      PATHS /usr/local/include 
+      /usr/include 
       /usr/include/mpi
       /usr/local/mpi/include
       "$ENV{ProgramFiles}/MPICH/SDK/Include"
@@ -40,17 +40,17 @@ else(MPI_MPIF77)
       "C:/Program Files/MPICH/SDK/Include"
       )
     find_library(MPI_LIBRARIES
-      NAMES mpich2 mpi mpich
+      NAMES mpich2 mpi mpich 
       PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib
       "$ENV{ProgramFiles}/MPICH/SDK/Lib"
       "$ENV{ProgramFiles}/MPICH2/Lib"
-      "C:/Program Files/MPICH/SDK/Lib"
+      "C:/Program Files/MPICH/SDK/Lib" 
       )
-    find_library(MPI_EXTRA_LIBRARIES
+    find_library(MPI_EXTRA_LIBRARIES 
       NAMES mpi++
-      PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib
+      PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib 
       "$ENV{ProgramFiles}/MPICH/SDK/Lib"
-      "C:/Program Files/MPICH/SDK/Lib"
+      "C:/Program Files/MPICH/SDK/Lib" 
       DOC "If a second mpi library is necessary, specify it here.")
     if(MPI_EXTRA_LIBRARIES)
       set(MPI_LIBRARIES ${MPI_LIBRARIES} ${MPI_EXTRA_LIBRARIES})
@@ -91,7 +91,7 @@ if(MPIF_PERFORM_TEST)
   # Create a simple F77 source which only calls the MPI_Init and MPI_Finalize functions
   file(WRITE ${MPITest_DIR}/mpiftest.f
     "       INCLUDE \"mpif.h\"\n"
-    "       INTEGER IER\n"
+    "       INTEGER IER\n" 
     "       CALL MPI_INIT(IER)\n"
     "       CALL MPI_FINALIZE(IER)\n"
     "       STOP\n"
@@ -99,7 +99,7 @@ if(MPIF_PERFORM_TEST)
   # Use TRY_COMPILE to make the target "mpiftest"
   try_compile(MPITEST_OK ${MPITest_DIR} ${MPITest_DIR}
     mpiftest OUTPUT_VARIABLE MY_OUTPUT)
-  # To ensure we do not use stuff from the previous attempts,
+  # To ensure we do not use stuff from the previous attempts, 
   # we must remove the CMakeFiles directory.
   file(REMOVE_RECURSE ${MPITest_DIR}/CMakeFiles)
   # Process test result

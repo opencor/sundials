@@ -12,7 +12,7 @@
     9.00000E+00  8.49543E-01  2.53947E+00  2.49994E+00
     1.00000E+01  1.06497E+00  2.59595E+00  2.49990E+00
    ----------------------------------------------------
-
+   
  Final Solver Statistics:
    Internal solver steps =    907 (attempted =    936)
    Total RHS evals:  Fe =   3748,  Fi =   7536
@@ -22,4 +22,4 @@
    Total number of Newton iterations =   3788
    Total number of nonlinear solver convergence failures =      0
    Total number of error test failures =     29
-
+   

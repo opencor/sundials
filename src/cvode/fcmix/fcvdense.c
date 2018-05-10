@@ -1,16 +1,16 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel R. Reynolds @ SMU
  *                Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -40,7 +40,7 @@ extern "C" {
 #endif
   extern void FCV_DJAC(long int *N, realtype *T, realtype *Y,
                        realtype *FY, realtype *DJAC, realtype *H,
-                       long int *IPAR, realtype *RPAR, realtype *V1,
+                       long int *IPAR, realtype *RPAR, realtype *V1, 
                        realtype *V2, realtype *V3, int *ier);
 #ifdef __cplusplus
 }
@@ -61,7 +61,7 @@ void FCV_DENSESETJAC(int *flag, int *ier)
 
 /* C function CVDenseJac interfaces between CVODE and a Fortran subroutine
    FCVDJAC for solution of a linear system with dense Jacobian approximation.
-   Addresses of arguments are passed to FCVDJAC, using accessor functions
+   Addresses of arguments are passed to FCVDJAC, using accessor functions 
    from the SUNDenseMatrix and N_Vector modules. */
 
 int FCVDenseJac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
@@ -87,9 +87,9 @@ int FCVDenseJac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
 
   CV_userdata = (FCVUserData) user_data;
 
-  FCV_DJAC(&N, &t, ydata, fydata, jacdata, &h,
+  FCV_DJAC(&N, &t, ydata, fydata, jacdata, &h, 
            CV_userdata->ipar, CV_userdata->rpar, v1data,
-           v2data, v3data, &ier);
+           v2data, v3data, &ier); 
   return(ier);
 }
 

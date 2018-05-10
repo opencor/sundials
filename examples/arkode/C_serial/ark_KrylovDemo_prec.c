@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2015, Southern Methodist University and
+ * Copyright (c) 2015, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -17,7 +17,7 @@
  *---------------------------------------------------------------
  * Demonstration program for ARKODE - Krylov linear solver.
  * ODE system from ns-species interaction PDE in 2 dimensions.
- *
+ * 
  * This program solves a stiff ODE system that arises from a system
  * of partial differential equations. The PDE system is a food web
  * population model, with predator-prey interaction and diffusion on
@@ -30,14 +30,14 @@
  *
  *    i               i      i
  *  dc /dt  =  d(i)*(c    + c   )  +  f (x,y,c)  (i=1,...,ns)
- *                    xx     yy        i
+ *                    xx     yy        i   
  *
  * where
  *
  *                 i          ns         j
  *  f (x,y,c)  =  c *(b(i) + sum a(i,j)*c )
- *   i                       j=1
- *
+ *   i                       j=1                                         
+ *                                                                       
  * The number of species is ns = 2*np, with the first np being prey
  * and the last np being predators. The coefficients a(i,j), b(i),
  * d(i) are:
@@ -72,8 +72,8 @@
  * The product preconditoner is applied on the left and on the
  * right. In each case, both the modified and classical Gram-Schmidt
  * options are tested.
- * In the series of runs, ARKodeInit, SUNSPGMR and
- * ARKSpilsSetLinearSolver are called only for the first run, whereas
+ * In the series of runs, ARKodeInit, SUNSPGMR and 
+ * ARKSpilsSetLinearSolver are called only for the first run, whereas 
  * ARKodeReInit, SUNSPGMRSetPrecType, and SUNSPGMRSetGSType are called
  * for each of the remaining three runs.
  *
@@ -84,7 +84,7 @@
  * but there should be no such messages.
  *
  * Note: This program requires the dense linear solver functions
- * newDenseMat, newIndexArray, denseAddIdentity, denseGETRF, denseGETRS,
+ * newDenseMat, newIndexArray, denseAddIdentity, denseGETRF, denseGETRS, 
  * destroyMat and destroyArray.
  *
  * Note: This program assumes the sequential implementation for the
@@ -213,7 +213,7 @@ static void v_zero(realtype u[], int n);
 
 static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data);
 
-static int Precond(realtype tn, N_Vector c, N_Vector fc, booleantype jok,
+static int Precond(realtype tn, N_Vector c, N_Vector fc, booleantype jok, 
                    booleantype *jcurPtr, realtype gamma, void *user_data);
 
 static int PSolve(realtype tn, N_Vector c, N_Vector fc, N_Vector r, N_Vector z,
@@ -256,13 +256,13 @@ int main()
   /* Loop over jpre and gstype (four cases) */
   for (jpre = PREC_LEFT; jpre <= PREC_RIGHT; jpre++) {
     for (gstype = MODIFIED_GS; gstype <= CLASSICAL_GS; gstype++) {
-
+      
       /* Initialize c and print heading */
       CInit(c, wdata);
       PrintHeader(jpre, gstype);
 
       /* Call ARKodeInit or ARKodeReInit, then ARKSpgmr to set up problem */
-
+      
       firstrun = (jpre == PREC_LEFT) && (gstype == MODIFIED_GS);
       if (firstrun) {
         arkode_mem = ARKodeCreate();
@@ -311,10 +311,10 @@ int main()
         if(check_flag(&flag, "SUNSPGMRSetGSType", 1)) return(1);
 
       }
-
+      
       /* Print initial values */
       if (firstrun) PrintAllSpecies(c, ns, mxns, T0);
-
+      
       /* Loop over output points, call ARKode, print sample solution values. */
       tout = T1;
       for (iout = 1; iout <= NOUT; iout++) {
@@ -322,12 +322,12 @@ int main()
         PrintOutput(arkode_mem, t);
         if (firstrun && (iout % 3 == 0)) PrintAllSpecies(c, ns, mxns, t);
         if(check_flag(&flag, "ARKode", 1)) break;
-        if (tout > RCONST(0.9)) tout += DTOUT; else tout *= TOUT_MULT;
+        if (tout > RCONST(0.9)) tout += DTOUT; else tout *= TOUT_MULT; 
       }
-
+      
       /* Print final statistics, and loop for next case */
       PrintFinalStats(arkode_mem);
-
+      
     }
   }
 
@@ -345,7 +345,7 @@ static WebData AllocUserData(void)
   int i, ngrp = NGRP;
   sunindextype ns = NS;
   WebData wdata;
-
+  
   wdata = (WebData) malloc(sizeof *wdata);
   for(i=0; i < ngrp; i++) {
     (wdata->P)[i] = newDenseMat(ns, ns);
@@ -361,14 +361,14 @@ static void InitUserData(WebData wdata)
   int i, j, ns;
   realtype *bcoef, *diff, *cox, *coy, dx, dy;
   realtype (*acoef)[NS];
-
+  
   acoef = wdata->acoef;
   bcoef = wdata->bcoef;
   diff = wdata->diff;
   cox = wdata->cox;
   coy = wdata->coy;
   ns = wdata->ns = NS;
-
+  
   for (j = 0; j < NS; j++) { for (i = 0; i < NS; i++) acoef[i][j] = 0.; }
   for (j = 0; j < NP; j++) {
     for (i = 0; i < NP; i++) {
@@ -426,7 +426,7 @@ static void SetGroups(int m, int ng, int jg[], int jig[], int jr[])
   mper = m/ng; /* does integer division */
   for (ig=0; ig < ng; ig++) jg[ig] = ig*mper;
   jg[ng] = m;
-
+  
   ngm1 = ng - 1;
   len1 = ngm1*mper;
   for (j = 0; j < len1; j++) jig[j] = j/mper;
@@ -441,7 +441,7 @@ static void CInit(N_Vector c, WebData wdata)
 {
   int jx, jy, ns, mxns, ioff, iyoff, i, ici;
   realtype argx, argy, x, y, dx, dy, x_factor, y_factor, *cdata;
-
+  
   cdata = N_VGetArrayPointer(c);
   ns = wdata->ns;
   mxns = wdata->mxns;
@@ -533,7 +533,7 @@ static void PrintAllSpecies(N_Vector c, int ns, int mxns, realtype t)
 {
   int i, jx ,jy;
   realtype *cdata;
-
+  
   cdata = N_VGetArrayPointer(c);
 #if defined(SUNDIALS_EXTENDED_PRECISION)
   printf("c values at t = %Lg:\n\n", t);
@@ -595,7 +595,7 @@ static void PrintFinalStats(void *arkode_mem)
   long int nli, npe, nps, ncfl, nfeLS;
   int flag;
   realtype avdim;
-
+  
   flag = ARKodeGetWorkSpace(arkode_mem, &lenrw, &leniw);
   check_flag(&flag, "ARKodeGetWorkSpace", 1);
   flag = ARKodeGetNumSteps(arkode_mem, &nst);
@@ -664,6 +664,7 @@ static void FreeUserData(WebData wdata)
     destroyArray((wdata->pivot)[i]);
   }
   N_VDestroy_Serial(wdata->rewt);
+  N_VDestroy_Serial(wdata->tmp);
   free(wdata);
 }
 
@@ -678,11 +679,11 @@ static int f(realtype t, N_Vector c, N_Vector cdot,void *user_data)
   realtype dcxli, dcxui, dcyli, dcyui, x, y, *cox, *coy, *fsave, dx, dy;
   realtype *cdata, *cdotdata;
   WebData wdata;
-
+  
   wdata = (WebData) user_data;
   cdata = N_VGetArrayPointer(c);
   cdotdata = N_VGetArrayPointer(cdot);
-
+  
   mxns = wdata->mxns;
   ns = wdata->ns;
   fsave = wdata->fsave;
@@ -691,7 +692,7 @@ static int f(realtype t, N_Vector c, N_Vector cdot,void *user_data)
   mxns = wdata->mxns;
   dx = wdata->dx;
   dy = wdata->dy;
-
+  
   for (jy = 0; jy < MY; jy++) {
     y = jy*dy;
     iyoff = mxns*jy;
@@ -724,7 +725,7 @@ static int f(realtype t, N_Vector c, N_Vector cdot,void *user_data)
 
 /*
   This routine computes the interaction rates for the species
-  c_1, ... ,c_ns (stored in c[0],...,c[ns-1]), at one spatial point
+  c_1, ... ,c_ns (stored in c[0],...,c[ns-1]), at one spatial point 
   and at time t.
 */
 static void WebRates(realtype x, realtype y, realtype t, realtype c[],
@@ -733,20 +734,20 @@ static void WebRates(realtype x, realtype y, realtype t, realtype c[],
   int i, j, ns;
   realtype fac, *bcoef;
   realtype (*acoef)[NS];
-
+  
   ns = wdata->ns;
   acoef = wdata->acoef;
   bcoef = wdata->bcoef;
-
+  
   for (i = 0; i < ns; i++)
     rate[i] = ZERO;
-
-  for (j = 0; j < ns; j++)
-    for (i = 0; i < ns; i++)
+  
+  for (j = 0; j < ns; j++) 
+    for (i = 0; i < ns; i++) 
       rate[i] += c[j] * acoef[i][j];
-
+  
   fac = ONE + ALPH*x*y;
-  for (i = 0; i < ns; i++)
+  for (i = 0; i < ns; i++) 
     rate[i] = c[i]*(bcoef[i]*fac + rate[i]);
 }
 
@@ -762,7 +763,7 @@ static void WebRates(realtype x, realtype y, realtype t, realtype c[],
  This routine can be regarded as a prototype for the general case
  of a block-diagonal preconditioner. The blocks are of size mp, and
  there are ngrp=ngx*ngy blocks computed in the block-grouping scheme.
-*/
+*/ 
 static int Precond(realtype t, N_Vector c, N_Vector fc, booleantype jok,
                    booleantype *jcurPtr, realtype gamma, void *user_data)
 {
@@ -777,7 +778,7 @@ static int Precond(realtype t, N_Vector c, N_Vector fc, booleantype jok,
   WebData wdata;
   void *arkode_mem;
   N_Vector rewt;
-
+  
   wdata = (WebData) user_data;
   arkode_mem = wdata->arkode_mem;
   cdata = N_VGetArrayPointer(c);
@@ -799,28 +800,28 @@ static int Precond(realtype t, N_Vector c, N_Vector fc, booleantype jok,
   ngy = wdata->ngy;
   mxmp = wdata->mxmp;
   fsave = wdata->fsave;
-
+  
   /* Make mp calls to fblock to approximate each diagonal block of Jacobian.
-     Here, fsave contains the base value of the rate vector and
+     Here, fsave contains the base value of the rate vector and 
      r0 is a minimum increment factor for the difference quotient. */
-
+  
   f1 = N_VGetArrayPointer(wdata->tmp);
-
+  
   fac = N_VWrmsNorm (fc, rewt);
   r0 = RCONST(1000.0)*SUNRabs(gamma)*uround*NEQ*fac;
   if (r0 == ZERO) r0 = ONE;
-
+  
   for (igy = 0; igy < ngy; igy++) {
     jy = jyr[igy];
     if00 = jy*mxmp;
-    for (igx = 0; igx < ngx; igx++) {
+    for (igx = 0; igx < ngx; igx++) { 
       jx = jxr[igx];
       if0 = if00 + jx*mp;
-      ig = igx + igy*ngx;
+      ig = igx + igy*ngx; 
       /* Generate ig-th diagonal block */
       for (j = 0; j < mp; j++) {
         /* Generate the jth column as a difference quotient */
-        jj = if0 + j;
+        jj = if0 + j; 
         save = cdata[jj];
         r = SUNMAX(srur*SUNRabs(save),r0/rewtdata[jj]);
         cdata[jj] += r;
@@ -833,15 +834,15 @@ static int Precond(realtype t, N_Vector c, N_Vector fc, booleantype jok,
       }
     }
   }
-
+  
   /* Add identity matrix and do LU decompositions on blocks. */
-
+  
   for (ig = 0; ig < ngrp; ig++) {
     denseAddIdentity(P[ig], mp);
     ier = denseGETRF(P[ig], mp, mp, pivot[ig]);
     if (ier != 0) return(1);
   }
-
+  
   *jcurPtr = SUNTRUE;
   return(0);
 }
@@ -856,7 +857,7 @@ static void fblock(realtype t, realtype cdata[], int jx, int jy,
 {
   int iblok, ic;
   realtype x, y;
-
+  
   iblok = jx + jy*(wdata->mx);
   y = jy*(wdata->dy);
   x = jx*(wdata->dx);
@@ -882,17 +883,17 @@ static int PSolve(realtype tn, N_Vector c, N_Vector fc, N_Vector r, N_Vector z,
   int jx, jy, igx, igy, iv, ig, *jigx, *jigy, mx, my, ngx;
   sunindextype mp;
   WebData wdata;
-
+  
   wdata = (WebData) user_data;
-
+  
   N_VScale(ONE, r, z);
-
+  
   /* call GSIter for Gauss-Seidel iterations */
-
+  
   GSIter(gamma, z, wdata->tmp, wdata);
-
+  
   /* Do backsolves for inverse of block-diagonal preconditioner factor */
-
+  
   P = wdata->P;
   pivot = wdata->pivot;
   mx = wdata->mx;
@@ -901,7 +902,7 @@ static int PSolve(realtype tn, N_Vector c, N_Vector fc, N_Vector r, N_Vector z,
   mp = wdata->mp;
   jigx = wdata->jigx;
   jigy = wdata->jigy;
-
+  
   iv = 0;
   for (jy = 0; jy < my; jy++) {
     igy = jigy[jy];
@@ -912,7 +913,7 @@ static int PSolve(realtype tn, N_Vector c, N_Vector fc, N_Vector r, N_Vector z,
       iv += mp;
     }
   }
-
+  
   return(0);
 }
 
@@ -931,7 +932,7 @@ static void GSIter(realtype gamma, N_Vector z, N_Vector x, WebData wdata)
   int ns, mxns, i, iyoff, ic, iter;
   realtype beta[NS], beta2[NS], cof1[NS], gam[NS], gam2[NS];
   realtype temp, *cox, *coy, *xd, *zd;
-
+  
   xd = N_VGetArrayPointer(x);
   zd = N_VGetArrayPointer(z);
   ns = wdata->ns;
@@ -940,10 +941,10 @@ static void GSIter(realtype gamma, N_Vector z, N_Vector x, WebData wdata)
   mxns = wdata->mxns;
   cox = wdata->cox;
   coy = wdata->coy;
-
+  
   /* Write matrix as P = D - L - U.
      Load local arrays beta, beta2, gam, gam2, and cof1. */
-
+  
   for (i = 0; i < ns; i++) {
     temp = ONE/(ONE + RCONST(2.0)*gamma*(cox[i] + coy[i]));
     beta[i] = gamma*cox[i]*temp;
@@ -952,10 +953,10 @@ static void GSIter(realtype gamma, N_Vector z, N_Vector x, WebData wdata)
     gam2[i] = RCONST(2.0)*gam[i];
     cof1[i] = temp;
   }
-
+  
   /* Begin iteration loop.
      Load vector x with (D-inverse)*z for first iteration. */
-
+  
   for (jy = 0; jy < my; jy++) {
     iyoff = mxns*jy;
     for (jx = 0; jx < mx; jx++) {
@@ -964,13 +965,13 @@ static void GSIter(realtype gamma, N_Vector z, N_Vector x, WebData wdata)
     }
   }
   N_VConst(ZERO, z);
-
+  
   /* Looping point for iterations. */
-
+  
   for (iter=1; iter <= ITMAX; iter++) {
-
+    
     /* Calculate (D-inverse)*U*x if not the first iteration. */
-
+    
     if (iter > 1) {
       for (jy=0; jy < my; jy++) {
         iyoff = mxns*jy;
@@ -979,47 +980,47 @@ static void GSIter(realtype gamma, N_Vector z, N_Vector x, WebData wdata)
           x_loc = (jx == 0) ? 0 : ((jx == mx-1) ? 2 : 1);
           y_loc = (jy == 0) ? 0 : ((jy == my-1) ? 2 : 1);
           switch (3*y_loc+x_loc) {
-          case 0 :
+          case 0 : 
             /* jx == 0, jy == 0 */
             /* x[ic+i] = beta2[i]x[ic+ns+i] + gam2[i]x[ic+mxns+i] */
             v_sum_prods(xd+ic, beta2, xd+ic+ns, gam2, xd+ic+mxns, ns);
             break;
-          case 1 :
+          case 1 : 
             /* 1 <= jx <= mx-2, jy == 0 */
             /* x[ic+i] = beta[i]x[ic+ns+i] + gam2[i]x[ic+mxns+i] */
             v_sum_prods(xd+ic, beta, xd+ic+ns, gam2, xd+ic+mxns, ns);
             break;
-          case 2 :
+          case 2 : 
             /* jx == mx-1, jy == 0 */
             /* x[ic+i] = gam2[i]x[ic+mxns+i] */
             v_prod(xd+ic, gam2, xd+ic+mxns, ns);
             break;
-          case 3 :
+          case 3 : 
             /* jx == 0, 1 <= jy <= my-2 */
             /* x[ic+i] = beta2[i]x[ic+ns+i] + gam[i]x[ic+mxns+i] */
             v_sum_prods(xd+ic, beta2, xd+ic+ns, gam, xd+ic+mxns, ns);
             break;
-          case 4 :
+          case 4 : 
             /* 1 <= jx <= mx-2, 1 <= jy <= my-2 */
             /* x[ic+i] = beta[i]x[ic+ns+i] + gam[i]x[ic+mxns+i] */
             v_sum_prods(xd+ic, beta, xd+ic+ns, gam, xd+ic+mxns, ns);
             break;
-          case 5 :
+          case 5 : 
             /* jx == mx-1, 1 <= jy <= my-2 */
             /* x[ic+i] = gam[i]x[ic+mxns+i] */
             v_prod(xd+ic, gam, xd+ic+mxns, ns);
             break;
-          case 6 :
+          case 6 : 
             /* jx == 0, jy == my-1 */
             /* x[ic+i] = beta2[i]x[ic+ns+i] */
             v_prod(xd+ic, beta2, xd+ic+ns, ns);
             break;
-          case 7 :
+          case 7 : 
             /* 1 <= jx <= mx-2, jy == my-1 */
             /* x[ic+i] = beta[i]x[ic+ns+i] */
             v_prod(xd+ic, beta, xd+ic+ns, ns);
             break;
-          case 8 :
+          case 8 : 
             /* jx == mx-1, jy == my-1 */
             /* x[ic+i] = 0.0 */
             v_zero(xd+ic, ns);
@@ -1028,9 +1029,9 @@ static void GSIter(realtype gamma, N_Vector z, N_Vector x, WebData wdata)
         }
       }
     }  /* end if (iter > 1) */
-
+    
     /* Overwrite x with [(I - (D-inverse)*L)-inverse]*x. */
-
+    
     for (jy=0; jy < my; jy++) {
       iyoff = mxns*jy;
       for (jx=0; jx < mx; jx++) { /* order of loops matters */
@@ -1038,48 +1039,48 @@ static void GSIter(realtype gamma, N_Vector z, N_Vector x, WebData wdata)
         x_loc = (jx == 0) ? 0 : ((jx == mx-1) ? 2 : 1);
         y_loc = (jy == 0) ? 0 : ((jy == my-1) ? 2 : 1);
         switch (3*y_loc+x_loc) {
-        case 0 :
+        case 0 : 
           /* jx == 0, jy == 0 */
           break;
-        case 1 :
+        case 1 : 
           /* 1 <= jx <= mx-2, jy == 0 */
           /* x[ic+i] += beta[i]x[ic-ns+i] */
           v_inc_by_prod(xd+ic, beta, xd+ic-ns, ns);
           break;
-        case 2 :
+        case 2 : 
           /* jx == mx-1, jy == 0 */
           /* x[ic+i] += beta2[i]x[ic-ns+i] */
           v_inc_by_prod(xd+ic, beta2, xd+ic-ns, ns);
           break;
-        case 3 :
+        case 3 : 
           /* jx == 0, 1 <= jy <= my-2 */
           /* x[ic+i] += gam[i]x[ic-mxns+i] */
           v_inc_by_prod(xd+ic, gam, xd+ic-mxns, ns);
           break;
-        case 4 :
+        case 4 : 
           /* 1 <= jx <= mx-2, 1 <= jy <= my-2 */
           /* x[ic+i] += beta[i]x[ic-ns+i] + gam[i]x[ic-mxns+i] */
           v_inc_by_prod(xd+ic, beta, xd+ic-ns, ns);
           v_inc_by_prod(xd+ic, gam, xd+ic-mxns, ns);
           break;
-        case 5 :
+        case 5 : 
           /* jx == mx-1, 1 <= jy <= my-2 */
           /* x[ic+i] += beta2[i]x[ic-ns+i] + gam[i]x[ic-mxns+i] */
           v_inc_by_prod(xd+ic, beta2, xd+ic-ns, ns);
           v_inc_by_prod(xd+ic, gam, xd+ic-mxns, ns);
           break;
-        case 6 :
+        case 6 : 
           /* jx == 0, jy == my-1 */
           /* x[ic+i] += gam2[i]x[ic-mxns+i] */
           v_inc_by_prod(xd+ic, gam2, xd+ic-mxns, ns);
           break;
-        case 7 :
+        case 7 : 
           /* 1 <= jx <= mx-2, jy == my-1 */
           /* x[ic+i] += beta[i]x[ic-ns+i] + gam2[i]x[ic-mxns+i] */
           v_inc_by_prod(xd+ic, beta, xd+ic-ns, ns);
           v_inc_by_prod(xd+ic, gam2, xd+ic-mxns, ns);
           break;
-        case 8 :
+        case 8 : 
           /* jx == mx-1, jy == my-1 */
           /* x[ic+i] += beta2[i]x[ic-ns+i] + gam2[i]x[ic-mxns+i] */
           v_inc_by_prod(xd+ic, beta2, xd+ic-ns, ns);
@@ -1088,36 +1089,36 @@ static void GSIter(realtype gamma, N_Vector z, N_Vector x, WebData wdata)
         }
       }
     }
-
+    
     /* Add increment x to z : z <- z+x */
-
+    
     N_VLinearSum(ONE, z, ONE, x, z);
-
+    
   }
 }
 
 static void v_inc_by_prod(realtype u[], realtype v[], realtype w[], int n)
 {
-  int i;
+  int i;  
   for (i=0; i < n; i++) u[i] += v[i]*w[i];
 }
 
 static void v_sum_prods(realtype u[], realtype p[], realtype q[],
                         realtype v[], realtype w[], int n)
 {
-  int i;
+  int i;  
   for (i=0; i < n; i++) u[i] = p[i]*q[i] + v[i]*w[i];
 }
 
 static void v_prod(realtype u[], realtype v[], realtype w[], int n)
-{
+{ 
   int i;
   for (i=0; i < n; i++) u[i] = v[i]*w[i];
 }
 
 static void v_zero(realtype u[], int n)
 {
-  int i;
+  int i;  
   for (i=0; i < n; i++) u[i] = ZERO;
 }
 

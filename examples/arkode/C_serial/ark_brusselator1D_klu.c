@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2015, Southern Methodist University and
+ * Copyright (c) 2015, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -16,9 +16,9 @@
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
  * Example problem:
- *
- * The following test simulates a brusselator problem from chemical
- * kinetics.  This is n PDE system with 3 components, Y = [u,v,w],
+ * 
+ * The following test simulates a brusselator problem from chemical 
+ * kinetics.  This is n PDE system with 3 components, Y = [u,v,w], 
  * satisfying the equations,
  *    u_t = du*u_xx + a - (w+1)*u + v*u^2
  *    v_t = dv*v_xx + w*u - v*u^2
@@ -27,27 +27,27 @@
  *    u(0,x) =  a  + 0.1*sin(pi*x)
  *    v(0,x) = b/a + 0.1*sin(pi*x)
  *    w(0,x) =  b  + 0.1*sin(pi*x),
- * and with stationary boundary conditions, i.e.
+ * and with stationary boundary conditions, i.e. 
  *    u_t(t,0) = u_t(t,1) = 0,
  *    v_t(t,0) = v_t(t,1) = 0,
  *    w_t(t,0) = w_t(t,1) = 0.
- * Note: these can also be implemented as Dirichlet boundary
+ * Note: these can also be implemented as Dirichlet boundary 
  * conditions with values identical to the initial conditions.
- *
- * The spatial derivatives are computed using second-order
- * centered differences, with the data distributed over N points
+ * 
+ * The spatial derivatives are computed using second-order 
+ * centered differences, with the data distributed over N points 
  * on a uniform spatial grid.
  *
- * The number of spatial points N, the parameters a, b, du, dv,
- * dw and ep, as well as the desired relative and absolute solver
- * tolerances, are provided in the input file
+ * The number of spatial points N, the parameters a, b, du, dv, 
+ * dw and ep, as well as the desired relative and absolute solver 
+ * tolerances, are provided in the input file 
  * input_brusselator1D.txt.
- *
+ * 
  * This program solves the problem with the DIRK method, using a
- * Newton iteration.  The inner linear systems are solved using
+ * Newton iteration.  The inner linear systems are solved using 
  * the SUNKLU linear solver.
  *
- * 100 outputs are printed at equal intervals, and run statistics
+ * 100 outputs are printed at equal intervals, and run statistics 
  * are printed at the end.
  *---------------------------------------------------------------*/
 
@@ -81,7 +81,7 @@
 #define TWO (RCONST(2.0))
 
 /* user data structure */
-typedef struct {
+typedef struct {  
   sunindextype N;  /* number of intervals     */
   realtype dx;     /* mesh spacing            */
   realtype a;      /* constant forcing on u   */
@@ -96,7 +96,7 @@ typedef struct {
 
 /* User-supplied Functions Called by the Solver */
 static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data);
-static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
+static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J, 
 	       void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 
 /* Private function to check function return values */
@@ -168,7 +168,7 @@ int main()
   printf("    N = %li,  NEQ = %li\n", (long int) udata->N, (long int) NEQ);
   printf("    problem parameters:  a = %"GSYM",  b = %"GSYM",  ep = %"GSYM"\n",
 	 udata->a, udata->b, udata->ep);
-  printf("    diffusion coefficients:  du = %"GSYM",  dv = %"GSYM",  dw = %"GSYM"\n",
+  printf("    diffusion coefficients:  du = %"GSYM",  dv = %"GSYM",  dw = %"GSYM"\n", 
 	 udata->du, udata->dv, udata->dw);
   printf("    reltol = %.1"ESYM",  abstol = %.1"ESYM"\n\n", reltol, abstol);
 
@@ -213,7 +213,7 @@ int main()
   /* Create the solver memory */
   arkode_mem = ARKodeCreate();
   if (check_flag((void *) arkode_mem, "ARKodeCreate", 0)) return 1;
-
+  
   /* Call ARKodeInit to initialize the integrator memory and specify the
      right-hand side function in y'=f(t,y), the inital time T0, and
      the initial dependent variable vector y.  Note: since this
@@ -233,13 +233,13 @@ int main()
   if (check_flag((void *)A, "SUNSparseMatrix", 0)) return 1;
   LS = SUNKLU(y, A);
   if (check_flag((void *)LS, "SUNKLU", 0)) return 1;
-
+  
   /* Attach the matrix, linear solver, and Jacobian construction routine to ARKode */
   flag = ARKDlsSetLinearSolver(arkode_mem, LS, A);        /* Attach matrix and LS */
   if (check_flag(&flag, "ARKDlsSetLinearSolver", 1)) return 1;
   flag = ARKDlsSetJacFn(arkode_mem, Jac);                 /* Supply Jac routine */
   if (check_flag(&flag, "ARKDlsSetJacFn", 1)) return 1;
-
+ 
    /* output spatial mesh to disk */
   FID = fopen("bruss_mesh.txt","w");
   for (i=0; i<N; i++)  fprintf(FID,"  %.16"ESYM"\n", udata->dx*i);
@@ -297,7 +297,7 @@ int main()
   fclose(UFID);
   fclose(VFID);
   fclose(WFID);
-
+    
 
   /* Print some final statistics */
   flag = ARKodeGetNumSteps(arkode_mem, &nst);
@@ -409,7 +409,7 @@ static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
     printf("Jacobian calculation error: matrix is the wrong size!\n");
     return 1;
   }
-
+  
   /* Fill in the Laplace matrix */
   if (LaplaceMatrix(J, udata)) {
     printf("Jacobian calculation error in calling LaplaceMatrix!\n");
@@ -426,7 +426,7 @@ static int Jac(realtype t, N_Vector y, N_Vector fy, SUNMatrix J,
       return 1;
     }
   }
-
+      
   /* Compute the Jacobian of the reaction terms */
   if (ReactionJac(y, udata->R, udata)) {
     printf("Jacobian calculation error in calling ReactionJac!\n");
@@ -458,7 +458,7 @@ static int LaplaceMatrix(SUNMatrix Lap, UserData udata)
   sunindextype *colptrs = SUNSparseMatrix_IndexPointers(Lap);
   sunindextype *rowvals = SUNSparseMatrix_IndexValues(Lap);
   realtype *data = SUNSparseMatrix_Data(Lap);
-
+  
   /* clear out matrix */
   SUNMatZero(Lap);
 
@@ -466,7 +466,7 @@ static int LaplaceMatrix(SUNMatrix Lap, UserData udata)
   colptrs[IDX(0,0)] = nz;
   colptrs[IDX(0,1)] = nz;
   colptrs[IDX(0,2)] = nz;
-
+  
   /* iterate over nodes, filling in Laplacian entries depending on these */
   uconst  = (udata->du)/(udata->dx)/(udata->dx);
   uconst2 = -TWO*uconst;
@@ -527,7 +527,7 @@ static int LaplaceMatrix(SUNMatrix Lap, UserData udata)
   colptrs[IDX(N-1,0)] = nz;
   colptrs[IDX(N-1,1)] = nz;
   colptrs[IDX(N-1,2)] = nz;
-
+  
   /* end of data */
   colptrs[IDX(N-1,2)+1] = nz;
 
@@ -556,7 +556,7 @@ static int ReactionJac(N_Vector y, SUNMatrix Jac, UserData udata)
   colptrs[IDX(0,0)] = 0;
   colptrs[IDX(0,1)] = 0;
   colptrs[IDX(0,2)] = 0;
-
+  
   /* iterate over interior nodes, filling in Jacobian entries */
   for (i=1; i<N-1; i++) {
 
@@ -619,7 +619,7 @@ static int ReactionJac(N_Vector y, SUNMatrix Jac, UserData udata)
     opt == 1 means SUNDIALS function returns a flag so check if
              flag >= 0
     opt == 2 means function allocates memory so check if returned
-             NULL pointer
+             NULL pointer  
 */
 static int check_flag(void *flagvalue, const char *funcname, int opt)
 {

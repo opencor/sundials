@@ -5,8 +5,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -15,7 +15,7 @@
  * -----------------------------------------------------------------
  * This file contains implementations of routines for a
  * band-block-diagonal preconditioner, i.e. a block-diagonal
- * matrix with banded blocks, for use with KINSol and the
+ * matrix with banded blocks, for use with KINSol and the 
  * KINSPILS linear solver interface.
  *
  * Note: With only one process, a banded matrix results
@@ -38,11 +38,11 @@
 
 /* Prototypes of functions KINBBDPrecSetup and KINBBDPrecSolve */
 static int KINBBDPrecSetup(N_Vector uu, N_Vector uscale,
-                           N_Vector fval, N_Vector fscale,
+                           N_Vector fval, N_Vector fscale, 
                            void *pdata);
 
 static int KINBBDPrecSolve(N_Vector uu, N_Vector uscale,
-                           N_Vector fval, N_Vector fscale,
+                           N_Vector fval, N_Vector fscale, 
                            N_Vector vv, void *pdata);
 
 /* Prototype for KINBBDPrecFree */
@@ -60,10 +60,10 @@ static int KBBDDQJac(KBBDPrecData pdata,
 /*------------------------------------------------------------------
   KINBBDPrecInit
   ------------------------------------------------------------------*/
-int KINBBDPrecInit(void *kinmem, sunindextype Nlocal,
+int KINBBDPrecInit(void *kinmem, sunindextype Nlocal, 
                    sunindextype mudq, sunindextype mldq,
                    sunindextype mukeep, sunindextype mlkeep,
-                   realtype dq_rel_uu,
+                   realtype dq_rel_uu, 
                    KINBBDLocalFn gloc, KINBBDCommFn gcomm)
 {
   KINMem kin_mem;
@@ -135,7 +135,7 @@ int KINBBDPrecInit(void *kinmem, sunindextype Nlocal,
   if (pdata->zlocal == NULL) {
     SUNMatDestroy(pdata->PP);
     free(pdata); pdata = NULL;
-    KINProcessError(kin_mem, KINSPILS_MEM_FAIL, "KINBBDPRE",
+    KINProcessError(kin_mem, KINSPILS_MEM_FAIL, "KINBBDPRE", 
                     "KINBBDPrecInit", MSGBBD_MEM_FAIL);
     return(KINSPILS_MEM_FAIL);
   }
@@ -306,7 +306,7 @@ int KINBBDPrecGetWorkSpace(void *kinmem,
     KINProcessError(kin_mem, KINSPILS_PMEM_NULL, "KINBBDPRE",
                     "KINBBDPrecGetWorkSpace", MSGBBD_PMEM_NULL);
     return(KINSPILS_PMEM_NULL);
-  }
+  } 
   pdata = (KBBDPrecData) kinspils_mem->pdata;
 
   *lenrwBBDP = pdata->rpwsize;
@@ -343,7 +343,7 @@ int KINBBDPrecGetNumGfnEvals(void *kinmem,
     KINProcessError(kin_mem, KINSPILS_PMEM_NULL, "KINBBDPRE",
                     "KINBBDPrecGetNumGfnEvals", MSGBBD_PMEM_NULL);
     return(KINSPILS_PMEM_NULL);
-  }
+  } 
   pdata = (KBBDPrecData) kinspils_mem->pdata;
 
   *ngevalsBBDP = pdata->nge;
@@ -359,30 +359,30 @@ int KINBBDPrecGetNumGfnEvals(void *kinmem,
   preconditioner matrix on each processor, via calls to the
   user-supplied gloc and gcomm functions. It uses difference
   quotient approximations to the Jacobian elements.
-
+ 
   KINBBDPrecSetup calculates a new Jacobian, stored in banded
   matrix PP and does an LU factorization of P in place in PP.
-
+ 
   The parameters of KINBBDPrecSetup are as follows:
-
+ 
   uu      is the current value of the dependent variable vector,
           namely the solutin to func(uu)=0
-
+ 
   uscale  is the dependent variable scaling vector (i.e. uu)
-
+ 
   fval    is the vector f(u)
-
+ 
   fscale  is the function scaling vector
-
+ 
   bbd_data is the pointer to BBD data set by KINBBDInit.
-
+  
   Note: The value to be returned by the KINBBDPrecSetup function
   is a flag indicating whether it was successful. This value is:
     0 if successful,
     > 0 for a recoverable error - step will be retried.
   ------------------------------------------------------------------*/
 static int KINBBDPrecSetup(N_Vector uu, N_Vector uscale,
-                           N_Vector fval, N_Vector fscale,
+                           N_Vector fval, N_Vector fscale, 
                            void *bbd_data)
 {
   KBBDPrecData pdata;
@@ -421,31 +421,31 @@ static int KINBBDPrecSetup(N_Vector uu, N_Vector uscale,
   banded blocked preconditioner matrix P generated and factored
   by KINBBDPrecSetup. Here, r comes in as vv and z is
   returned in vv as well.
-
+ 
   The parameters for KINBBDPrecSolve are as follows:
-
+ 
   uu     an N_Vector giving the current iterate for the system
-
+ 
   uscale an N_Vector giving the diagonal entries of the
          uu scaling matrix
-
+ 
   fval   an N_Vector giving the current function value
-
+ 
   fscale an N_Vector giving the diagonal entries of the
          function scaling matrix
 
    vv  vector initially set to the right-hand side vector r, but
        which upon return contains a solution of the linear system
        P*z = r
-
+ 
   bbd_data is the pointer to BBD data set by KINBBDInit.
-
+  
   Note: The value returned by the KINBBDPrecSolve function is a
   flag returned from the lienar solver object.
   ------------------------------------------------------------------*/
 
 static int KINBBDPrecSolve(N_Vector uu, N_Vector uscale,
-                           N_Vector fval, N_Vector fscale,
+                           N_Vector fval, N_Vector fscale, 
                            N_Vector vv, void *bbd_data)
 {
   KBBDPrecData pdata;
@@ -463,12 +463,12 @@ static int KINBBDPrecSolve(N_Vector uu, N_Vector uscale,
   N_VSetArrayPointer(vd, pdata->rlocal);
 
   /* Call banded solver object to do the work */
-  retval = SUNLinSolSolve(pdata->LS, pdata->PP, pdata->zlocal,
+  retval = SUNLinSolSolve(pdata->LS, pdata->PP, pdata->zlocal, 
                           pdata->rlocal, ZERO);
 
   /* Copy result into vv */
   for (i=0; i<pdata->n_local; i++)
-    vd[i] = zd[i];
+    vd[i] = zd[i]; 
 
   return(retval);
 }
@@ -481,10 +481,10 @@ static int KINBBDPrecFree(KINMem kin_mem)
 {
   KINSpilsMem kinspils_mem;
   KBBDPrecData pdata;
-
+  
   if (kin_mem->kin_lmem == NULL) return(0);
   kinspils_mem = (KINSpilsMem) kin_mem->kin_lmem;
-
+  
   if (kinspils_mem->pdata == NULL) return(0);
   pdata = (KBBDPrecData) kinspils_mem->pdata;
 

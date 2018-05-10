@@ -2,8 +2,8 @@
  * Programmer(s): Allan Taylor, Alan Hindmarsh and
  *                Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * This simple example problem for IDA, due to Robertson,
- * is from chemical kinetics, and consists of the following three
+ * This simple example problem for IDA, due to Robertson, 
+ * is from chemical kinetics, and consists of the following three 
  * equations:
  *
  *      dy1/dt = -.04*y1 + 1.e4*y2*y3
@@ -47,13 +47,13 @@
 
 /* Prototypes of functions called by IDA */
 
-int resrob(realtype tres, N_Vector yy, N_Vector yp,
+int resrob(realtype tres, N_Vector yy, N_Vector yp, 
            N_Vector resval, void *user_data);
 
 static int grob(realtype t, N_Vector yy, N_Vector yp,
                 realtype *gout, void *user_data);
 
-int jacrob(realtype tt,  realtype cj,
+int jacrob(realtype tt,  realtype cj, 
            N_Vector yy, N_Vector yp, N_Vector resvec,
            SUNMatrix JJ, void *user_data,
            N_Vector tempv1, N_Vector tempv2, N_Vector tempv3);
@@ -106,7 +106,7 @@ int main(void)
   ypval = N_VGetArrayPointer(yp);
   ypval[0]  = RCONST(-0.04);
   ypval[1]  = RCONST(0.04);
-  ypval[2]  = ZERO;
+  ypval[2]  = ZERO;  
 
   rtol = RCONST(1.0e-4);
 
@@ -190,7 +190,7 @@ int main(void)
   N_VDestroy(yp);
 
   return(retval);
-
+  
 }
 
 /*
@@ -200,15 +200,15 @@ int main(void)
  */
 
 /*
- * Define the system residual function.
+ * Define the system residual function. 
  */
 
 int resrob(realtype tres, N_Vector yy, N_Vector yp, N_Vector rr, void *user_data)
 {
   realtype *yval, *ypval, *rval;
 
-  yval = N_VGetArrayPointer(yy);
-  ypval = N_VGetArrayPointer(yp);
+  yval = N_VGetArrayPointer(yy); 
+  ypval = N_VGetArrayPointer(yp); 
   rval = N_VGetArrayPointer(rr);
 
   rval[0]  = RCONST(-0.04)*yval[0] + RCONST(1.0e4)*yval[1]*yval[2];
@@ -220,7 +220,7 @@ int resrob(realtype tres, N_Vector yy, N_Vector yp, N_Vector rr, void *user_data
 }
 
 /*
- * Root function routine. Compute functions g_i(t,y) for i = 0,1.
+ * Root function routine. Compute functions g_i(t,y) for i = 0,1. 
  */
 
 static int grob(realtype t, N_Vector yy, N_Vector yp, realtype *gout,
@@ -228,7 +228,7 @@ static int grob(realtype t, N_Vector yy, N_Vector yp, realtype *gout,
 {
   realtype *yval, y1, y3;
 
-  yval = N_VGetArrayPointer(yy);
+  yval = N_VGetArrayPointer(yy); 
   y1 = yval[0]; y3 = yval[2];
   gout[0] = y1 - RCONST(0.0001);
   gout[1] = y3 - RCONST(0.01);
@@ -237,10 +237,10 @@ static int grob(realtype t, N_Vector yy, N_Vector yp, realtype *gout,
 }
 
 /*
- * Define the Jacobian function.
+ * Define the Jacobian function. 
  */
 
-int jacrob(realtype tt,  realtype cj,
+int jacrob(realtype tt,  realtype cj, 
            N_Vector yy, N_Vector yp, N_Vector resvec,
            SUNMatrix JJ, void *user_data,
            N_Vector tempv1, N_Vector tempv2, N_Vector tempv3)
@@ -268,7 +268,7 @@ int jacrob(realtype tt,  realtype cj,
  *--------------------------------------------------------------------
  */
 
-/*
+/* 
  * Print first lines of output (problem description)
  */
 
@@ -325,13 +325,13 @@ static void PrintOutput(void *mem, realtype t, N_Vector y)
   retval = IDAGetLastStep(mem, &hused);
   check_flag(&retval, "IDAGetLastStep", 1);
 #if defined(SUNDIALS_EXTENDED_PRECISION)
-  printf("%10.4Le %12.4Le %12.4Le %12.4Le | %3ld  %1d %12.4Le\n",
+  printf("%10.4Le %12.4Le %12.4Le %12.4Le | %3ld  %1d %12.4Le\n", 
          t, yval[0], yval[1], yval[2], nst, kused, hused);
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
-  printf("%10.4e %12.4e %12.4e %12.4e | %3ld  %1d %12.4e\n",
+  printf("%10.4e %12.4e %12.4e %12.4e | %3ld  %1d %12.4e\n", 
          t, yval[0], yval[1], yval[2], nst, kused, hused);
 #else
-  printf("%10.4e %12.4e %12.4e %12.4e | %3ld  %1d %12.4e\n",
+  printf("%10.4e %12.4e %12.4e %12.4e | %3ld  %1d %12.4e\n", 
          t, yval[0], yval[1], yval[2], nst, kused, hused);
 #endif
 }
@@ -385,7 +385,7 @@ static void PrintFinalStats(void *mem)
  *   opt == 1 means SUNDIALS function returns a flag so check if
  *            flag >= 0
  *   opt == 2 means function allocates memory so check if returned
- *            NULL pointer
+ *            NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt)
@@ -393,23 +393,23 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
   int *errflag;
   /* Check if SUNDIALS function returned NULL pointer - no memory allocated */
   if (opt == 0 && flagvalue == NULL) {
-    fprintf(stderr,
-            "\nSUNDIALS_ERROR: %s() failed - returned NULL pointer\n\n",
+    fprintf(stderr, 
+            "\nSUNDIALS_ERROR: %s() failed - returned NULL pointer\n\n", 
             funcname);
     return(1);
   } else if (opt == 1) {
     /* Check if flag < 0 */
     errflag = (int *) flagvalue;
     if (*errflag < 0) {
-      fprintf(stderr,
-              "\nSUNDIALS_ERROR: %s() failed with flag = %d\n\n",
+      fprintf(stderr, 
+              "\nSUNDIALS_ERROR: %s() failed with flag = %d\n\n", 
               funcname, *errflag);
-      return(1);
+      return(1); 
     }
   } else if (opt == 2 && flagvalue == NULL) {
     /* Check if function returned NULL pointer - no memory allocated */
-    fprintf(stderr,
-            "\nMEMORY_ERROR: %s() failed - returned NULL pointer\n\n",
+    fprintf(stderr, 
+            "\nMEMORY_ERROR: %s() failed - returned NULL pointer\n\n", 
             funcname);
     return(1);
   }
@@ -421,7 +421,7 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
    using a relative tolerance of 1e-8 and absoltue tolerance of 1e-14 */
 static int check_ans(N_Vector y, realtype t, realtype rtol, N_Vector atol)
 {
-  int      passfail=0;        /* answer pass (0) or fail (1) flag */
+  int      passfail=0;        /* answer pass (0) or fail (1) flag */  
   N_Vector ref;               /* reference solution vector        */
   N_Vector ewt;               /* error weight vector              */
   realtype err;               /* wrms error                       */
@@ -442,14 +442,14 @@ static int check_ans(N_Vector y, realtype t, realtype rtol, N_Vector atol)
     fprintf(stderr, "\nSUNDIALS_ERROR: check_ans failed - ewt <= 0\n\n");
     return(-1);
   }
-  N_VInv(ewt, ewt);
+  N_VInv(ewt, ewt);   
 
   /* compute the solution error */
   N_VLinearSum(ONE, y, -ONE, ref, ref);
   err = N_VWrmsNorm(ref, ewt);
 
   /* is the solution within the tolerances? */
-  passfail = (err < ONE) ? 0 : 1;
+  passfail = (err < ONE) ? 0 : 1; 
 
   if (passfail) {
     fprintf(stdout, "\nSUNDIALS_WARNING: check_ans error=%g \n\n", err);

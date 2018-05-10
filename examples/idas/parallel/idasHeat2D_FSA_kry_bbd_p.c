@@ -7,7 +7,7 @@
  * GMRES, IDABBDPRE.
  *
  * This example solves a discretized 2D heat equation problem and
- * performs forward sensitivity analysis with respect to the
+ * performs forward sensitivity analysis with respect to the 
  * diffusion coefficients. This version uses the Krylov solver
  * SUNSPGMR and BBD preconditioning.
  *
@@ -66,7 +66,7 @@
 
 #define NS           2              /* Number of sensitivities (NS<=2) */
 
-typedef struct {
+typedef struct {  
   realtype p[2];
   int thispe, mx, my, ixsub, jysub, npex, npey, mxsub, mysub;
   sunindextype n_local;
@@ -79,10 +79,10 @@ typedef struct {
 
 static int heatres(realtype tres, N_Vector uu, N_Vector up,
                    N_Vector res, void *user_data);
-static int rescomm(sunindextype Nlocal, realtype tt,
+static int rescomm(sunindextype Nlocal, realtype tt, 
                    N_Vector uu, N_Vector up, void *user_data);
-static int reslocal(sunindextype Nlocal, realtype tres,
-                    N_Vector uu, N_Vector up, N_Vector res,
+static int reslocal(sunindextype Nlocal, realtype tres, 
+                    N_Vector uu, N_Vector up, N_Vector res,  
                     void *user_data);
 static int BSend(MPI_Comm comm, int thispe, int ixsub,
                  int jysub, int dsizex, int dsizey,
@@ -103,7 +103,7 @@ static int SetInitialProfile(N_Vector uu, N_Vector up, N_Vector id,
 static void PrintHeader(sunindextype Neq, realtype rtol, realtype atol,
                         sunindextype mudq, sunindextype mukeep,
                         booleantype sensi, int sensi_meth, int err_con);
-static void PrintOutput(int id, void *ida_mem, realtype t, N_Vector uu,
+static void PrintOutput(int id, void *ida_mem, realtype t, N_Vector uu, 
                         booleantype sensi, N_Vector *uuS);
 static void PrintFinalStats(void *ida_mem);
 
@@ -148,16 +148,16 @@ int main(int argc, char *argv[])
   comm = MPI_COMM_WORLD;
   MPI_Comm_size(comm, &npes);
   MPI_Comm_rank(comm, &thispe);
-
+  
   if (npes != NPEX*NPEY) {
     if (thispe == 0)
-      fprintf(stderr,
-              "\nMPI_ERROR(0): npes = %d is not equal to NPEX*NPEY = %d\n",
+      fprintf(stderr, 
+              "\nMPI_ERROR(0): npes = %d is not equal to NPEX*NPEY = %d\n", 
               npes,NPEX*NPEY);
     MPI_Finalize();
     return(1);
   }
-
+  
   /* Process arguments */
 
   ProcessArgs(argc, argv, thispe, &sensi, &sensi_meth, &err_con);
@@ -243,14 +243,14 @@ int main(int argc, char *argv[])
 
   ier = IDASpilsSetLinearSolver(ida_mem, LS);
   if(check_flag(&ier, "IDASpilsSetLinearSolver", 1, thispe)) MPI_Abort(comm, 1);
-
+  
   /* Call IDABBDPrecInit to initialize BBD preconditioner. */
 
   mudq = MXSUB;
   mldq = MXSUB;
   mukeep = 1;
   mlkeep = 1;
-  ier = IDABBDPrecInit(ida_mem, local_N, mudq, mldq, mukeep, mlkeep,
+  ier = IDABBDPrecInit(ida_mem, local_N, mudq, mldq, mukeep, mlkeep, 
                        ZERO, reslocal, NULL);
   if(check_flag(&ier, "IDABBDPrecInit", 1, thispe)) MPI_Abort(comm, 1);
 
@@ -259,13 +259,13 @@ int main(int argc, char *argv[])
   if( sensi) {
 
     /* Allocate and set pbar, the vector with order of magnitude
-       information for the problem parameters. (Note: this is
+       information for the problem parameters. (Note: this is 
        done here as an illustration only, as the default values
        for pbar, if pbar is not supplied, are anyway 1.0) */
 
     pbar = (realtype *) malloc(NS*sizeof(realtype));
     if (check_flag((void *)pbar, "malloc", 2, thispe)) MPI_Abort(comm, 1);
-    for (is=0; is<NS; is++) pbar[is] = data->p[is];
+    for (is=0; is<NS; is++) pbar[is] = data->p[is]; 
 
     /* Allocate sensitivity solution vectors uuS and upS and set them
        to an initial guess for the sensitivity ICs (the IC for uuS are
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
     if(check_flag(&ier, "IDASensInit", 1, thispe)) MPI_Abort(comm, 1);
 
     /* Indicate the use of internally estimated tolerances for the sensitivity
-       variables (based on the tolerances provided for the states and the
+       variables (based on the tolerances provided for the states and the 
        pbar values) */
 
     ier = IDASensEEtolerances(ida_mem);
@@ -308,9 +308,9 @@ int main(int argc, char *argv[])
     if(check_flag(&ier, "IDASetSensParams", 1, thispe)) MPI_Abort(comm, 1);
 
     /* Compute consistent initial conditions (Note that this is required
-       only if performing SA since uu and up already contain consistent
+       only if performing SA since uu and up already contain consistent 
        initial conditions for the states) */
-
+  
     ier = IDACalcIC(ida_mem, IDA_YA_YDP_INIT, t1);
     if(check_flag(&ier, "IDACalcIC", 1, thispe)) MPI_Abort(comm, 1);
 
@@ -318,12 +318,12 @@ int main(int argc, char *argv[])
 
   /* Print problem description */
 
-  if (thispe == 0 ) PrintHeader(Neq, rtol, atol, mudq, mukeep,
+  if (thispe == 0 ) PrintHeader(Neq, rtol, atol, mudq, mukeep, 
                                 sensi, sensi_meth, err_con);
 
   /* Loop over tout, call IDASolve, print output. */
-  for (tout = t1, iout = 1; iout <= NOUT; iout++, tout *= TWO) {
-
+  for (tout = t1, iout = 1; iout <= NOUT; iout++, tout *= TWO) { 
+    
     ier = IDASolve(ida_mem, tout, &tret, uu, up, IDA_NORMAL);
     if(check_flag(&ier, "IDASolve", 1, thispe)) MPI_Abort(comm, 1);
 
@@ -333,13 +333,13 @@ int main(int argc, char *argv[])
     }
 
     PrintOutput(thispe, ida_mem, tret, uu, sensi, uuS);
-
+    
   }
 
   /* Print final statistics */
 
   if (thispe == 0) PrintFinalStats(ida_mem);
-
+  
   /* Free Memory */
   IDAFree(&ida_mem);
   SUNLinSolFree(LS);
@@ -361,48 +361,48 @@ int main(int argc, char *argv[])
  */
 
 /*
- * heatres: heat equation system residual function
- * This uses 5-point central differencing on the interior points, and
- * includes algebraic equations for the boundary values.
- * So for each interior point, the residual component has the form
- *    res_i = u'_i - (central difference)_i
- * while for each boundary point, it is res_i = u_i.
- *
- * This parallel implementation uses several supporting routines.
+ * heatres: heat equation system residual function                       
+ * This uses 5-point central differencing on the interior points, and    
+ * includes algebraic equations for the boundary values.                 
+ * So for each interior point, the residual component has the form       
+ *    res_i = u'_i - (central difference)_i                              
+ * while for each boundary point, it is res_i = u_i. 
+ *                    
+ * This parallel implementation uses several supporting routines. 
  * First a call is made to rescomm to do communication of subgrid boundary
  * data into array uext.  Then reslocal is called to compute the residual
  * on individual processors and their corresponding domains.  The routines
  * BSend, BRecvPost, and BREcvWait handle interprocessor communication
- * of uu required to calculate the residual.
+ * of uu required to calculate the residual. 
  */
 
-static int heatres(realtype tres, N_Vector uu, N_Vector up,
+static int heatres(realtype tres, N_Vector uu, N_Vector up, 
                    N_Vector res, void *user_data)
 {
   int retval;
   UserData data;
   sunindextype Nlocal;
-
+  
   data = (UserData) user_data;
-
+  
   Nlocal = data->n_local;
 
   /* Call rescomm to do inter-processor communication. */
   retval = rescomm(Nlocal, tres, uu, up, data);
-
+  
   /* Call reslocal to calculate res. */
   retval = reslocal(Nlocal, tres, uu, up, res, data);
-
+  
   return(0);
-
+  
 }
 
-/*
+/* 
  * rescomm routine.  This routine performs all inter-processor
- * communication of data in u needed to calculate G.
+ * communication of data in u needed to calculate G.                 
  */
 
-static int rescomm(sunindextype Nlocal, realtype tt,
+static int rescomm(sunindextype Nlocal, realtype tt, 
                    N_Vector uu, N_Vector up, void *user_data)
 {
   UserData data;
@@ -436,11 +436,11 @@ static int rescomm(sunindextype Nlocal, realtype tt,
 /*
  * reslocal routine.  Compute res = F(t, uu, up).  This routine assumes
  * that all inter-processor communication of data needed to calculate F
- *  has already been done, and that this data is in the work array uext.
+ *  has already been done, and that this data is in the work array uext.  
  */
 
-static int reslocal(sunindextype Nlocal, realtype tres,
-                    N_Vector uu, N_Vector up, N_Vector res,
+static int reslocal(sunindextype Nlocal, realtype tres, 
+                    N_Vector uu, N_Vector up, N_Vector res,  
                     void *user_data)
 {
   realtype *uext, *uuv, *upv, *resv;
@@ -462,15 +462,15 @@ static int reslocal(sunindextype Nlocal, realtype tres,
   ixsub = data->ixsub; jysub = data->jysub;
   mxsub = data->mxsub; mxsub2 = data->mxsub + 2;
   mysub = data->mysub; npex = data->npex; npey = data->npey;
-
+  
   p1 = data->p[0];
   p2 = data->p[1];
 
   /* Initialize all elements of res to uu. This sets the boundary
      elements simply without indexing hassles. */
-
+  
   N_VScale(ONE, uu, res);
-
+  
   /* Copy local segment of u vector into the working extended array uext.
      This completes uext prior to the computation of the res vector.     */
 
@@ -481,18 +481,18 @@ static int reslocal(sunindextype Nlocal, realtype tres,
     offsetu = offsetu + mxsub;
     offsetue = offsetue + mxsub2;
   }
-
+  
   /* Set loop limits for the interior of the local subgrid. */
-
+  
   ixbegin = 0;
   ixend   = mxsub-1;
   jybegin = 0;
   jyend   = mysub-1;
   if (ixsub == 0) ixbegin++; if (ixsub == npex-1) ixend--;
   if (jysub == 0) jybegin++; if (jysub == npey-1) jyend--;
-
+  
   /* Loop over all grid points in local subgrid. */
-
+  
   for (ly = jybegin; ly <=jyend; ly++) {
     for (lx = ixbegin; lx <= ixend; lx++) {
       locu  = lx + ly*mxsub;
@@ -507,7 +507,7 @@ static int reslocal(sunindextype Nlocal, realtype tres,
 }
 
 /*
- * Routine to send boundary data to neighboring PEs.
+ * Routine to send boundary data to neighboring PEs.                     
  */
 
 static int BSend(MPI_Comm comm, int thispe, int ixsub,
@@ -516,52 +516,52 @@ static int BSend(MPI_Comm comm, int thispe, int ixsub,
 {
   int ly, offsetu;
   realtype bufleft[MYSUB], bufright[MYSUB];
-
+  
   /* If jysub > 0, send data from bottom x-line of u. */
-
+  
   if (jysub != 0)
     MPI_Send(&uarray[0], dsizex, PVEC_REAL_MPI_TYPE, thispe-NPEX, 0, comm);
 
   /* If jysub < NPEY-1, send data from top x-line of u. */
-
+  
   if (jysub != NPEY-1) {
     offsetu = (MYSUB-1)*dsizex;
-    MPI_Send(&uarray[offsetu], dsizex, PVEC_REAL_MPI_TYPE,
+    MPI_Send(&uarray[offsetu], dsizex, PVEC_REAL_MPI_TYPE, 
              thispe+NPEX, 0, comm);
   }
-
+  
   /* If ixsub > 0, send data from left y-line of u (via bufleft). */
-
+  
   if (ixsub != 0) {
     for (ly = 0; ly < MYSUB; ly++) {
       offsetu = ly*dsizex;
       bufleft[ly] = uarray[offsetu];
     }
-    MPI_Send(&bufleft[0], dsizey, PVEC_REAL_MPI_TYPE, thispe-1, 0, comm);
+    MPI_Send(&bufleft[0], dsizey, PVEC_REAL_MPI_TYPE, thispe-1, 0, comm);   
   }
 
   /* If ixsub < NPEX-1, send data from right y-line of u (via bufright). */
-
+  
   if (ixsub != NPEX-1) {
     for (ly = 0; ly < MYSUB; ly++) {
       offsetu = ly*MXSUB + (MXSUB-1);
       bufright[ly] = uarray[offsetu];
     }
-    MPI_Send(&bufright[0], dsizey, PVEC_REAL_MPI_TYPE, thispe+1, 0, comm);
+    MPI_Send(&bufright[0], dsizey, PVEC_REAL_MPI_TYPE, thispe+1, 0, comm);   
   }
 
   return(0);
 
 }
 
-/*
+/* 
  * Routine to start receiving boundary data from neighboring PEs.
  * Notes:
  *   1) buffer should be able to hold 2*MYSUB realtype entries, should be
  *      passed to both the BRecvPost and BRecvWait functions, and should not
  *      be manipulated between the two calls.
- *   2) request should have 4 entries, and should be passed in
- *      both calls also.
+ *   2) request should have 4 entries, and should be passed in 
+ *      both calls also. 
  */
 
 static int BRecvPost(MPI_Comm comm, MPI_Request request[], int thispe,
@@ -572,12 +572,12 @@ static int BRecvPost(MPI_Comm comm, MPI_Request request[], int thispe,
   int offsetue;
   /* Have bufleft and bufright use the same buffer. */
   realtype *bufleft = buffer, *bufright = buffer+MYSUB;
-
+  
   /* If jysub > 0, receive data for bottom x-line of uext. */
   if (jysub != 0)
     MPI_Irecv(&uext[1], dsizex, PVEC_REAL_MPI_TYPE,
               thispe-NPEX, 0, comm, &request[0]);
-
+  
   /* If jysub < NPEY-1, receive data for top x-line of uext. */
   if (jysub != NPEY-1) {
     offsetue = (1 + (MYSUB+1)*(MXSUB+2));
@@ -590,13 +590,13 @@ static int BRecvPost(MPI_Comm comm, MPI_Request request[], int thispe,
     MPI_Irecv(&bufleft[0], dsizey, PVEC_REAL_MPI_TYPE,
               thispe-1, 0, comm, &request[2]);
   }
-
+  
   /* If ixsub < NPEX-1, receive data for right y-line of uext (via bufright). */
   if (ixsub != NPEX-1) {
     MPI_Irecv(&bufright[0], dsizey, PVEC_REAL_MPI_TYPE,
               thispe+1, 0, comm, &request[3]);
   }
-
+  
   return(0);
 
 }
@@ -607,8 +607,8 @@ static int BRecvPost(MPI_Comm comm, MPI_Request request[], int thispe,
  *   1) buffer should be able to hold 2*MYSUB realtype entries, should be
  *      passed to both the BRecvPost and BRecvWait functions, and should not
  *      be manipulated between the two calls.
- *   2) request should have four entries, and should be passed in both
- *      calls also.
+ *   2) request should have four entries, and should be passed in both 
+ *      calls also. 
  */
 
 static int BRecvWait(MPI_Request request[], int ixsub,
@@ -618,13 +618,13 @@ static int BRecvWait(MPI_Request request[], int ixsub,
   int ly, dsizex2, offsetue;
   realtype *bufleft = buffer, *bufright = buffer+MYSUB;
   MPI_Status status;
-
+  
   dsizex2 = dsizex + 2;
-
+  
   /* If jysub > 0, receive data for bottom x-line of uext. */
   if (jysub != 0)
     MPI_Wait(&request[0],&status);
-
+  
   /* If jysub < NPEY-1, receive data for top x-line of uext. */
   if (jysub != NPEY-1)
     MPI_Wait(&request[1],&status);
@@ -643,7 +643,7 @@ static int BRecvWait(MPI_Request request[], int ixsub,
   /* If ixsub < NPEX-1, receive data for right y-line of uext (via bufright). */
   if (ixsub != NPEX-1) {
     MPI_Wait(&request[3],&status);
-
+    
     /* Copy the buffer to uext */
     for (ly = 0; ly < MYSUB; ly++) {
       offsetue = (ly+2)*dsizex2 - 1;
@@ -661,7 +661,7 @@ static int BRecvWait(MPI_Request request[], int ixsub,
  */
 
 /*
- * InitUserData initializes the user's data block data.
+ * InitUserData initializes the user's data block data. 
  */
 
 static int InitUserData(int thispe, MPI_Comm comm, UserData data)
@@ -687,42 +687,42 @@ static int InitUserData(int thispe, MPI_Comm comm, UserData data)
   data->p[1] = ONE;
 
   return(0);
-
+  
 }
 
-/*
- * SetInitialProfile sets the initial values for the problem.
+/* 
+ * SetInitialProfile sets the initial values for the problem. 
  */
 
-static int SetInitialProfile(N_Vector uu, N_Vector up,  N_Vector id,
+static int SetInitialProfile(N_Vector uu, N_Vector up,  N_Vector id, 
                              N_Vector res, UserData data)
 {
   int i, iloc, j, jloc, offset, loc, ixsub, jysub;
   int ixbegin, ixend, jybegin, jyend;
   realtype xfact, yfact, *udata, *iddata, dx, dy;
-
-  /* Initialize uu. */
-
+  
+  /* Initialize uu. */ 
+  
   udata = N_VGetArrayPointer_Parallel(uu);
   iddata = N_VGetArrayPointer_Parallel(id);
-
+  
   /* Set mesh spacings and subgrid indices for this PE. */
   dx = data->dx;
   dy = data->dy;
   ixsub = data->ixsub;
   jysub = data->jysub;
-
-  /* Set beginning and ending locations in the global array corresponding
+  
+  /* Set beginning and ending locations in the global array corresponding 
      to the portion of that array assigned to this processor. */
   ixbegin = MXSUB*ixsub;
   ixend   = MXSUB*(ixsub+1) - 1;
   jybegin = MYSUB*jysub;
   jyend   = MYSUB*(jysub+1) - 1;
-
+  
   /* Loop over the local array, computing the initial profile value.
      The global indices are (i,j) and the local indices are (iloc,jloc).
      Also set the id vector to zero for boundary points, one otherwise. */
-
+  
   N_VConst(ONE,id);
   for (j = jybegin, jloc = 0; j <= jyend; j++, jloc++) {
     yfact = data->dy*j;
@@ -734,19 +734,19 @@ static int SetInitialProfile(N_Vector uu, N_Vector up,  N_Vector id,
       if (i == 0 || i == MX-1 || j == 0 || j == MY-1) iddata[loc] = ZERO;
     }
   }
-
+  
   /* Initialize up. */
-
+  
   N_VConst(ZERO, up);    /* Initially set up = 0. */
-
+  
   /* heatres sets res to negative of ODE RHS values at interior points. */
   heatres(ZERO, uu, up, res, data);
-
+  
   /* Copy -res into up to get correct initial up values. */
   N_VScale(-ONE, res, up);
-
+  
   return(0);
-
+  
 }
 
 /*
@@ -777,25 +777,25 @@ static void PrintHeader(sunindextype Neq, realtype rtol, realtype atol,
     printf("SUPPRESSALG = SUNTRUE to suppress local error testing on");
     printf(" all boundary components. \n");
     printf("Linear solver: SUNSPGMR.    ");
-    printf("Preconditioner: IDABBDPRE - Banded-block-diagonal.\n");
+    printf("Preconditioner: IDABBDPRE - Banded-block-diagonal.\n"); 
     printf("Difference quotient half-bandwidths = %ld",(long int) mudq);
     printf("Retained matrix half-bandwidths = %ld \n\n",(long int) mukeep);
 
     if (sensi) {
       printf("Sensitivity: YES ");
-      if(sensi_meth == IDA_SIMULTANEOUS)
+      if(sensi_meth == IDA_SIMULTANEOUS)   
         printf("( SIMULTANEOUS +");
-      else
-        printf("( STAGGERED +");
+      else 
+        printf("( STAGGERED +");   
       if(err_con) printf(" FULL ERROR CONTROL )");
       else        printf(" PARTIAL ERROR CONTROL )");
-
+      
     } else {
-
+      
       printf("Sensitivity: NO ");
-
+      
     }
-
+    
     printf("\n\nOutput Summary: umax = max-norm of solution\n");
     printf("                       max-norm of sensitivity 1\n");
     printf("                       max-norm of sensitivity 2\n\n");
@@ -808,7 +808,7 @@ static void PrintHeader(sunindextype Neq, realtype rtol, realtype atol,
 /*
  * Print integrator statistics and max-norm of solution
  */
-static void PrintOutput(int id, void *ida_mem, realtype t, N_Vector uu,
+static void PrintOutput(int id, void *ida_mem, realtype t, N_Vector uu, 
                         booleantype sensi, N_Vector *uuS)
 {
   realtype umax, hused;
@@ -888,7 +888,7 @@ static void PrintFinalStats(void *ida_mem)
   printf("Linear convergence failures    = %ld\n", ncfl);
 }
 
-/*
+/* 
  * Process and verify command line arguments
  */
 
@@ -907,7 +907,7 @@ static void ProcessArgs(int argc, char *argv[], int my_pe,
     *sensi = SUNTRUE;
   else
     WrongArgs(my_pe, argv[0]);
-
+  
   if (*sensi) {
 
     if (argc != 4)
@@ -917,7 +917,7 @@ static void ProcessArgs(int argc, char *argv[], int my_pe,
       *sensi_meth = IDA_SIMULTANEOUS;
     else if (strcmp(argv[2],"stg") == 0)
       *sensi_meth = IDA_STAGGERED;
-    else
+    else 
       WrongArgs(my_pe, argv[0]);
 
     if (strcmp(argv[3],"t") == 0)
@@ -936,7 +936,7 @@ static void WrongArgs(int my_pe, char *name)
     printf("\nUsage: %s [-nosensi] [-sensi sensi_meth err_con]\n",name);
     printf("         sensi_meth = sim, stg, or stg1\n");
     printf("         err_con    = t or f\n");
-  }
+  }  
   MPI_Finalize();
   exit(0);
 }
@@ -948,7 +948,7 @@ static void WrongArgs(int my_pe, char *name)
  *   opt == 1 means SUNDIALS function returns a flag so check if
  *            flag >= 0
  *   opt == 2 means function allocates memory so check if returned
- *            NULL pointer
+ *            NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt, int id)

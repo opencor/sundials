@@ -1,18 +1,18 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): Slaven Peles @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS Copyright End
  * -----------------------------------------------------------------
- * This is the testing routine to check the NVECTOR Parallel module
- * implementation.
+ * This is the testing routine to check the NVECTOR Parallel module 
+ * implementation. 
  * -----------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -35,7 +35,7 @@ static int Test_N_VMake(Vec* W, int myid);
 /* ----------------------------------------------------------------------
  * Main NVector Testing Routine
  * --------------------------------------------------------------------*/
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
   int            fails = 0;                   /* counter for test failures */
   int            globfails = 0;               /* counter for test failures */
@@ -54,28 +54,28 @@ int main(int argc, char *argv[])
   MPI_Comm_rank(comm, &myid);
   ierr = PetscInitializeNoArguments();
   CHKERRQ(ierr);
-
+  
   /* set local and global lengths */
   local_length = VECLEN;
   global_length = nprocs*local_length;
-
+  
   /* Allocate and initialize PETSc vector */
   VecCreate(comm, &xvec);
   VecSetSizes(xvec, local_length, global_length);
   VecSetFromOptions(xvec);
-
+  
   /* Create vectors */
   W = N_VNewEmpty_Petsc(comm, local_length, global_length);
   if(N_VGetVectorID(W) == SUNDIALS_NVEC_PETSC && myid == 0) {
     /*printf("Testing PETSc vector wrapper...\n");*/
   }
-
+    
 
   /* NVector Test */
 
   /* PETSc specific tests */
   fails += Test_N_VMake(&xvec, myid);
-
+  
   X = N_VMake_Petsc(&xvec);
 
   /* Memory allocation tests */
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
   /* Skipped tests */
   /* fails += Test_N_VSetArrayPointer(W, local_length, myid); */
   /* fails += Test_N_VGetArrayPointer(X, local_length, myid); */
-
+  
   /* Vector operations tests */
   fails += Test_N_VConst(X, local_length, myid);
   fails += Test_N_VLinearSum(X, Y, Z, local_length, myid);
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
        printf("SUCCESS: NVector module passed all tests, Proc %d \n \n",myid);
      }
   }
-
+  
   /* check if any other process failed */
   mpierr = MPI_Allreduce(&fails, &globfails, 1, MPI_INT, MPI_MAX, comm);
 
@@ -173,7 +173,7 @@ void set_element(N_Vector X, sunindextype i, realtype val)
 {
   PetscScalar *a;
   Vec *xv = N_VGetVector_Petsc(X);
-
+  
   VecGetArray(*xv, &a);
   a[i] = val;
   VecRestoreArray(*xv, &a);
@@ -184,12 +184,12 @@ realtype get_element(N_Vector X, sunindextype i)
   PetscScalar *a;
   Vec *xv = N_VGetVector_Petsc(X);
   realtype val;
-
+  
   VecGetArray(*xv, &a);
   val = a[i];
   VecRestoreArray(*xv, &a);
-
-  return val;
+  
+  return val;    
 }
 
 /* ----------------------------------------------------------------------
@@ -203,7 +203,7 @@ static int Test_N_VMake(Vec* W, int myid)
   N_Vector X;
 
   /* clone vector */
-  /* start_time = get_time(); */
+  /* start_time = get_time(); */  
   X = N_VMake_Petsc(W);
   /* stop_time = get_time();  */
 
@@ -212,7 +212,7 @@ static int Test_N_VMake(Vec* W, int myid)
     printf(">>> FAILED test -- N_VMake, Proc %d \n", myid);
     printf("    After N_VMake, X == NULL \n \n");
     return(1);
-  }
+  } 
 
   /* check underlying PETSc vector is correct */
   if (*W != *N_VGetVector_Petsc(X)) {
@@ -220,15 +220,15 @@ static int Test_N_VMake(Vec* W, int myid)
     printf("    PETSc not wrapped correctly \n \n");
     N_VDestroy(X);
     return(1);
-  }
+  }    
 
-  N_VDestroy(X);
+  N_VDestroy(X); 
 
   if (*W == NULL) {
     printf(">>> FAILED test -- N_VMake, Proc %d \n", myid);
     printf("    Destroying wrapper destroyed underlying PETSc vector \n \n");
     return(1);
-  }
+  }    
 
   if (myid == 0) {
     printf("    PASSED test -- N_VMake \n");

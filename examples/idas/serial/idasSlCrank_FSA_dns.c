@@ -3,20 +3,20 @@
  * -----------------------------------------------------------------
  * Simulation of a slider-crank mechanism modelled with 3 generalized
  * coordinates: crank angle, connecting bar angle, and slider location.
- * The mechanism moves under the action of a constant horizontal
- * force applied to the connecting rod and a spring-damper connecting
+ * The mechanism moves under the action of a constant horizontal 
+ * force applied to the connecting rod and a spring-damper connecting 
  * the crank and connecting rod.
  *
  * The equations of motion are formulated as a system of stabilized
  * index-2 DAEs (Gear-Gupta-Leimkuhler formulation).
  *
- * IDAS also computes sensitivities with respect to the problem
- * parameters k (spring constant) and c (damper constant) of the
+ * IDAS also computes sensitivities with respect to the problem 
+ * parameters k (spring constant) and c (damper constant) of the 
  * kinetic energy:
- *   G = int_t0^tend g(t,y,p) dt,
+ *   G = int_t0^tend g(t,y,p) dt, 
  * where
  *   g(t,y,p) = 0.5*J1*v1^2 + 0.5*J2*v3^2 + 0.5*m2*v2^2
- *
+ *              
  * -----------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -66,11 +66,11 @@ typedef struct {
   realtype F;
 } *UserData;
 
-static int ressc(realtype tres, N_Vector yy, N_Vector yp,
+static int ressc(realtype tres, N_Vector yy, N_Vector yp, 
            N_Vector resval, void *user_data);
 static int rhsQ(realtype t, N_Vector yy, N_Vector yp, N_Vector qdot, void *user_data);
 
-static int rhsQS(int Ns, realtype t, N_Vector yy, N_Vector yp,
+static int rhsQS(int Ns, realtype t, N_Vector yy, N_Vector yp, 
                  N_Vector *yyS, N_Vector *ypS, N_Vector rrQ, N_Vector *rhsvalQS,
                  void *user_data,  N_Vector yytmp, N_Vector yptmp, N_Vector tmpQS);
 
@@ -129,7 +129,7 @@ int main(void)
   NV_Ith_S(id, 8) = ZERO;
   NV_Ith_S(id, 7) = ZERO;
   NV_Ith_S(id, 6) = ZERO;
-
+  
   printf("\nSlider-Crank example for IDAS:\n");
 
   /* Consistent IC*/
@@ -166,18 +166,18 @@ int main(void)
   flag = IDASetSensParams(mem, data->params, pbar, NULL);
   flag = IDASensEEtolerances(mem);
   IDASetSensErrCon(mem, SUNTRUE);
-
+  
   N_VConst(ZERO, q);
   flag = IDAQuadInit(mem, rhsQ, q);
   flag = IDAQuadSStolerances(mem, RTOLQ, ATOLQ);
   flag = IDASetQuadErrCon(mem, SUNTRUE);
-
+  
   N_VConst(ZERO, qS[0]);
   flag = IDAQuadSensInit(mem, rhsQS, qS);
   atolS[0] = atolS[1] = ATOLQ;
   flag = IDAQuadSensSStolerances(mem, RTOLQ, atolS);
-  flag = IDASetQuadSensErrCon(mem, SUNTRUE);
-
+  flag = IDASetQuadSensErrCon(mem, SUNTRUE);  
+  
 
   /* Perform forward run */
   printf("\nForward integration ... ");
@@ -195,16 +195,16 @@ int main(void)
   printf("  G = %24.16Lf\n", Ith(q,1));
 #else
   printf("  G = %24.16f\n", Ith(q,1));
-#endif
+#endif  
   printf("--------------------------------------------\n\n");
-
+  
   IDAGetQuadSens(mem, &tret, qS);
   printf("-------------F O R W A R D------------------\n");
 #if defined(SUNDIALS_EXTENDED_PRECISION)
   printf("   dG/dp:  %12.4Le %12.4Le\n", Ith(qS[0],1), Ith(qS[1],1));
 #else
   printf("   dG/dp:  %12.4e %12.4e\n", Ith(qS[0],1), Ith(qS[1],1));
-#endif
+#endif  
   printf("--------------------------------------------\n\n");
 
   IDAFree(&mem);
@@ -317,7 +317,7 @@ int main(void)
   printf("   dG/dp:  %12.4Le %12.4Le\n", (G-Gm[0])/dp, (G-Gm[1])/dp);
 #else
   printf("   dG/dp:  %12.4e %12.4e\n", (G-Gm[0])/dp, (G-Gm[1])/dp);
-#endif
+#endif  
   printf("-----------------------------------------\n\n");
 
   printf("---------------FORWARD-------------------\n");
@@ -325,7 +325,7 @@ int main(void)
   printf("   dG/dp:  %12.4Le %12.4Le\n", (Gp[0]-G)/dp, (Gp[1]-G)/dp);
 #else
   printf("   dG/dp:  %12.4e %12.4e\n", (Gp[0]-G)/dp, (Gp[1]-G)/dp);
-#endif
+#endif  
   printf("-----------------------------------------\n\n");
 
   printf("--------------CENTERED-------------------\n");
@@ -333,7 +333,7 @@ int main(void)
   printf("   dG/dp:  %12.4Le %12.4Le\n", (Gp[0]-Gm[0])/(TWO*dp) ,(Gp[1]-Gm[1])/(TWO*dp));
 #else
   printf("   dG/dp:  %12.4e %12.4e\n", (Gp[0]-Gm[0])/(TWO*dp) ,(Gp[1]-Gm[1])/(TWO*dp));
-#endif
+#endif  
   printf("-----------------------------------------\n\n");
 
 
@@ -345,7 +345,7 @@ int main(void)
   N_VDestroy(yp);
   N_VDestroy(q);
   return(0);
-
+  
 }
 
 static void setIC(N_Vector yy, N_Vector yp, UserData data)
@@ -364,7 +364,7 @@ static void setIC(N_Vector yy, N_Vector yp, UserData data)
   J1 = data->J1;
   m2 = data->m2;
   J2 = data->J2;
-
+  
   q = pi/TWO;
   p = asin(-a);
   x = cos(p);
@@ -372,7 +372,7 @@ static void setIC(N_Vector yy, N_Vector yp, UserData data)
   NV_Ith_S(yy,0) = q;
   NV_Ith_S(yy,1) = x;
   NV_Ith_S(yy,2) = p;
-
+  
   force(yy, Q, data);
 
   NV_Ith_S(yp,3) = Q[0]/J1;
@@ -385,7 +385,7 @@ static void force(N_Vector yy, realtype *Q, UserData data)
 {
   realtype a, k, c, l0, F;
   realtype q, x, p;
-  realtype qd, xd, pd;
+  realtype qd, xd, pd;  
   realtype s1, c1, s2, c2, s21, c21;
   realtype l2, l, ld;
   realtype f, fl;
@@ -432,7 +432,7 @@ static int ressc(realtype tres, N_Vector yy, N_Vector yp, N_Vector rr, void *use
   realtype a, J1, m2, J2;
   realtype *yval, *ypval, *rval;
   realtype q, x, p;
-  realtype qd, xd, pd;
+  realtype qd, xd, pd;  
   realtype lam1, lam2, mu1, mu2;
   realtype s1, c1, s2, c2;
 
@@ -443,8 +443,8 @@ static int ressc(realtype tres, N_Vector yy, N_Vector yp, N_Vector rr, void *use
   m2 = data->m2;
   J2 = data->J2;
 
-  yval = N_VGetArrayPointer(yy);
-  ypval = N_VGetArrayPointer(yp);
+  yval = N_VGetArrayPointer(yy); 
+  ypval = N_VGetArrayPointer(yp); 
   rval = N_VGetArrayPointer(rr);
 
   q = yval[0];
@@ -470,11 +470,11 @@ static int ressc(realtype tres, N_Vector yy, N_Vector yp, N_Vector rr, void *use
 
   rval[0] = ypval[0] - qd + a*s1*mu1 - a*c1*mu2;
   rval[1] = ypval[1] - xd + mu1;
-  rval[2] = ypval[2] - pd + s2*mu1 - c2*mu2;
+  rval[2] = ypval[2] - pd + s2*mu1 - c2*mu2; 
 
   rval[3] = J1*ypval[3] - Q[0] + a*s1*lam1 - a*c1*lam2;
   rval[4] = m2*ypval[4] - Q[1] + lam1;
-  rval[5] = J2*ypval[5] - Q[2] + s2*lam1 - c2*lam2;
+  rval[5] = J2*ypval[5] - Q[2] + s2*lam1 - c2*lam2; 
 
   rval[6] = x - c2 - a*c1;
   rval[7] = -s2 - a*s1;
@@ -490,7 +490,7 @@ static int rhsQ(realtype t, N_Vector yy, N_Vector yp, N_Vector qdot, void *user_
   realtype v1, v2, v3;
   realtype m1, J1, m2, J2, a;
   UserData data;
-
+  
   data = (UserData) user_data;
   J1 = data->J1;
   m1 = data->m1;
@@ -507,7 +507,7 @@ static int rhsQ(realtype t, N_Vector yy, N_Vector yp, N_Vector qdot, void *user_
   return(0);
 }
 
-static int rhsQS(int Ns, realtype t, N_Vector yy, N_Vector yp,
+static int rhsQS(int Ns, realtype t, N_Vector yy, N_Vector yp, 
                  N_Vector *yyS, N_Vector *ypS, N_Vector rrQ, N_Vector *rhsvalQS,
                  void *user_data,  N_Vector yytmp, N_Vector yptmp, N_Vector tmpQS)
 {
@@ -515,7 +515,7 @@ static int rhsQS(int Ns, realtype t, N_Vector yy, N_Vector yp,
   realtype m1, J1, m2, J2, a;
   UserData data;
   realtype s1, s2, s3;
-
+  
   data = (UserData) user_data;
   J1 = data->J1;
   m1 = data->m1;
@@ -526,7 +526,7 @@ static int rhsQS(int Ns, realtype t, N_Vector yy, N_Vector yp,
   v1 = Ith(yy,4);
   v2 = Ith(yy,5);
   v3 = Ith(yy,6);
-
+  
   /* Sensitivities of v. */
   s1 = Ith(yyS[0],4);
   s2 = Ith(yyS[0],5);

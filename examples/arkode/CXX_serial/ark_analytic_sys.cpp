@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2015, Southern Methodist University and
+ * Copyright (c) 2015, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -16,27 +16,27 @@
  * LLNS/SMU Copyright End
  *---------------------------------------------------------------
  * Example problem:
- *
- * The following is a simple example problem with analytical
+ * 
+ * The following is a simple example problem with analytical 
  * solution,
  *    dy/dt = A*y
- * where A = V*D*Vi,
+ * where A = V*D*Vi, 
  *      V = [1 -1 1; -1 2 1; 0 -1 2];
  *      Vi = 0.25*[5 1 -3; 2 2 -2; 1 1 1];
  *      D = [-0.5 0 0; 0 -0.1 0; 0 0 lam];
  * where lam is a large negative number. The analytical solution to
- * this problem is
+ * this problem is 
  *   Y(t) = V*exp(D*t)*Vi*Y0
- * for t in the interval [0.0, 0.05], with initial condition:
+ * for t in the interval [0.0, 0.05], with initial condition: 
  * y(0) = [1,1,1]'.
- *
- * The stiffness of the problem is directly proportional to the
- * value of "lamda".  The value of lamda should be negative to
+ * 
+ * The stiffness of the problem is directly proportional to the 
+ * value of "lamda".  The value of lamda should be negative to 
  * result in a well-posed ODE; for values with magnitude larger than
  * 100 the problem becomes quite stiff.
- *
+ * 
  * In this example, we choose lamda = -100.
- *
+ * 
  * This program solves the problem with the DIRK method,
  * Newton iteration with the dense linear solver, and a
  * user-supplied Jacobian routine.
@@ -51,7 +51,7 @@
 #include <math.h>
 #include <arkode/arkode.h>              // prototypes for ARKode fcts., consts.
 #include <nvector/nvector_serial.h>     // access to serial N_Vector
-#include <sunmatrix/sunmatrix_dense.h>  // access to dense SUNMatrix
+#include <sunmatrix/sunmatrix_dense.h>  // access to dense SUNMatrix 
 #include <sunlinsol/sunlinsol_dense.h>  // access to dense SUNLinearSolver
 #include <arkode/arkode_direct.h>       // access to ARKDls interface
 #include <sundials/sundials_types.h>    // def. of type 'realtype'
@@ -120,7 +120,7 @@ int main()
   // Create the ARKode memory structure
   arkode_mem = ARKodeCreate();
   if (check_flag((void *)arkode_mem, "ARKodeCreate", 0)) return 1;
-
+  
   /* Call ARKodeInit to initialize the integrator memory and specify the
      right-hand side function in y'=f(t,y), the inital time T0, and
      the initial dependent variable vector y.  Note: since this
@@ -148,9 +148,9 @@ int main()
   FILE *UFID = fopen("solution.txt","w");
   fprintf(UFID,"# t y1 y2 y3\n");
 
-  // output initial condition to disk
-  fprintf(UFID," %.16"ESYM" %.16"ESYM" %.16"ESYM" %.16"ESYM"\n",
-	  T0, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));
+  // output initial condition to disk 
+  fprintf(UFID," %.16" ESYM" %.16" ESYM" %.16" ESYM" %.16" ESYM"\n", 
+	  T0, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));  
 
   /* Main time-stepping loop: calls ARKode to perform the integration, then
      prints results.  Stops when the final time has been reached */
@@ -162,10 +162,10 @@ int main()
 
     flag = ARKode(arkode_mem, tout, y, &t, ARK_NORMAL);           // call integrator
     if (check_flag(&flag, "ARKode", 1)) break;
-    printf("  %8.4"FSYM"  %8.5"FSYM"  %8.5"FSYM"  %8.5"FSYM"\n",  // access/print solution
+    printf("  %8.4" FSYM"  %8.5" FSYM"  %8.5" FSYM"  %8.5" FSYM"\n",  // access/print solution
            t, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));
-    fprintf(UFID," %.16"ESYM" %.16"ESYM" %.16"ESYM" %.16"ESYM"\n",
-	    t, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));
+    fprintf(UFID," %.16" ESYM" %.16" ESYM" %.16" ESYM" %.16" ESYM"\n", 
+	    t, NV_Ith_S(y,0), NV_Ith_S(y,1), NV_Ith_S(y,2));  
     if (flag >= 0) {                                              // successful solve: update time
       tout += dTout;
       tout = (tout > Tf) ? Tf : tout;
@@ -302,6 +302,10 @@ static int Jac(realtype t, N_Vector y, N_Vector fy,
   }
   SUNMatCopy(D, J);
 
+  SUNMatDestroy(V);                // Free V matrix
+  SUNMatDestroy(D);                // Free D matrix
+  SUNMatDestroy(Vi);               // Free Vi matrix
+
   return 0;                        // Return with success
 }
 
@@ -344,7 +348,7 @@ static int dense_MM(SUNMatrix A, SUNMatrix B, SUNMatrix C)
     opt == 1 means SUNDIALS function returns a flag so check if
              flag >= 0
     opt == 2 means function allocates memory so check if returned
-             NULL pointer
+             NULL pointer  
 */
 static int check_flag(void *flagvalue, const string funcname, int opt)
 {
@@ -360,10 +364,10 @@ static int check_flag(void *flagvalue, const string funcname, int opt)
     errflag = (int *) flagvalue;
     if (*errflag < 0) {
       cerr << "\nSUNDIALS_ERROR: " << funcname << " failed with flag = " << *errflag << "\n\n";
-      return 1;
+      return 1; 
     }
   }
-
+  
   // Check if function returned NULL pointer - no memory allocated
   else if (opt == 2 && flagvalue == NULL) {
     cerr << "\nMEMORY_ERROR: " << funcname << " failed - returned NULL pointer\n\n";

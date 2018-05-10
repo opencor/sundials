@@ -2,13 +2,13 @@
  * -----------------------------------------------------------------
  * $Revision$
  * $Date$
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -18,18 +18,18 @@
  * This is the interface file for the main CVODES integrator.
  * -----------------------------------------------------------------
  *
- * CVODES is used to solve numerically the ordinary initial value
- * problem:
- *
- *                 y' = f(t,y),
- *                 y(t0) = y0,
- *
- * where t0, y0 in R^N, and f: R x R^N -> R^N are given.
- *
- * Optionally, CVODES can perform forward or adjoint sensitivity
- * analysis to find sensitivities of the solution y with respect
- * to parameters in the right hand side f and/or in the initial
- * conditions y0.
+ * CVODES is used to solve numerically the ordinary initial value    
+ * problem:                                                          
+ *                                                                   
+ *                 y' = f(t,y),                                      
+ *                 y(t0) = y0,                                       
+ *                                                                   
+ * where t0, y0 in R^N, and f: R x R^N -> R^N are given.             
+ *                                                                   
+ * Optionally, CVODES can perform forward or adjoint sensitivity 
+ * analysis to find sensitivities of the solution y with respect 
+ * to parameters in the right hand side f and/or in the initial         
+ * conditions y0.                                                    
  *
  * -----------------------------------------------------------------
  *
@@ -44,7 +44,7 @@
  *     CVErrHandlerFn
  *     CVRhsFnB     CVRhsFnBS
  *     CVQuadRhsFnB CVQuadRhsFnBS
- *
+ *     
  *  3: INITIALIZATION AND DEALLOCATION FUNCTIONS FOR FORWARD PROBLEMS
  *     CVodeCreate
  *     CVodeInit        CVodeReInit
@@ -52,9 +52,9 @@
  *     CVodeSensInit    CVodeSensReInit
  *     CVodeRootInit
  *     CVodeFree          CVodeQuadFree      CVodeSensFree
- *
- *  4: OPTIONAL INPUT FUNCTIONS FOR FORWARD PROBLEMS
- *
+ *    
+ *  4: OPTIONAL INPUT FUNCTIONS FOR FORWARD PROBLEMS   
+ *    
  *  5: MAIN SOLVER FUNCTION FOR FORWARD PROBLEMS
  *     CVode
  *
@@ -66,26 +66,26 @@
  *     CVodeGetSensDky   CVodeGetSensDky1
  *     CVodeGetQuadSens      CVodeGetQuadSens1
  *     CVodeGetQuadSensDky   CVodeGetQuadSensDky1
- *
+ *    
  *  7: OPTIONAL OUTPUT FUNCTIONS FOR FORWARD PROBLEMS
- *
- *  8: INITIALIZATION AND DEALLOCATION FUNCTIONS FOR BACKWARD PROBLEMS
+ *    
+ *  8: INITIALIZATION AND DEALLOCATION FUNCTIONS FOR BACKWARD PROBLEMS  
  *     CVodeAdjInit    CVodeAdjReInit
  *     CVodeAdjFree
  *     CVodeInitB      CVodeInitBS       CVodeReInitB
  *     CVodeQuadInitB  CVodeQuadInitBS   CVodeQuadReInitB
- *
+ *     
  *  9  MAIN SOLVER FUNCTIONS FOR FORWARD PROBLEMS
  *     CVodeF
  *     CVodeB
- *
- * 10: OPTIONAL INPUT FUNCTIONS FOR BACKWARD PROBLEMS
- *
- * 11: EXTRACTION AND DENSE OUTPUT FUNCTIONS FOR BACKWARD PROBLEMS
+ *    
+ * 10: OPTIONAL INPUT FUNCTIONS FOR BACKWARD PROBLEMS  
+ *    
+ * 11: EXTRACTION AND DENSE OUTPUT FUNCTIONS FOR BACKWARD PROBLEMS  
  *     CVodeGetB
  *     CVodeGetQuadB
- *
- * 12: OPTIONAL OUTPUT FUNCTIONS FOR BACKWARD PROBLEMS
+ *    
+ * 12: OPTIONAL OUTPUT FUNCTIONS FOR BACKWARD PROBLEMS   
  *
  * -----------------------------------------------------------------
  */
@@ -184,7 +184,7 @@ extern "C" {
 #define CV_HERMITE        1
 #define CV_POLYNOMIAL     2
 
-/*
+/* 
  * ----------------------------------------
  * CVODES return flags
  * ----------------------------------------
@@ -239,7 +239,7 @@ extern "C" {
 #define CV_REPTD_QSRHSFUNC_ERR  -53
 #define CV_UNREC_QSRHSFUNC_ERR  -54
 
-/*
+/* 
  * ----------------------------------------
  * CVODEA return flags
  * ----------------------------------------
@@ -278,9 +278,9 @@ extern "C" {
  * every time it is called.
  *
  * A CVRhsFn should return 0 if successful, a negative value if
- * an unrecoverable error occured, and a positive value if a
- * recoverable error (e.g. invalid y values) occured.
- * If an unrecoverable occured, the integration is halted.
+ * an unrecoverable error occured, and a positive value if a 
+ * recoverable error (e.g. invalid y values) occured. 
+ * If an unrecoverable occured, the integration is halted. 
  * If a recoverable error occured, then (in most cases) CVODES
  * will try to correct and retry.
  * -----------------------------------------------------------------
@@ -318,11 +318,11 @@ typedef int (*CVRootFn)(realtype t, N_Vector y, realtype *gout, void *user_data)
  * type CVEwtFn.
  * The function e takes as input the current dependent variable y.
  * It must set the vector of error weights used in the WRMS norm:
- *
+ * 
  *   ||y||_WRMS = sqrt [ 1/N * sum ( ewt_i * y_i)^2 ]
  *
  * Typically, the vector ewt has components:
- *
+ * 
  *   ewt_i = 1 / (reltol * |y_i| + abstol_i)
  *
  * The user_data parameter is the same as that passed by the user
@@ -345,17 +345,17 @@ typedef int (*CVEwtFn)(N_Vector y, N_Vector ewt, void *user_data);
  * The function eh takes as input the error code, the name of the
  * module reporting the error, the error message, and a pointer to
  * user data, the same as that passed to CVodeSetUserData.
- *
- * All error codes are negative, except CV_WARNING which indicates
+ * 
+ * All error codes are negative, except CV_WARNING which indicates 
  * a warning (the solver continues).
  *
  * A CVErrHandlerFn has no return value.
  * -----------------------------------------------------------------
  */
-
-typedef void (*CVErrHandlerFn)(int error_code,
-			       const char *module, const char *function,
-			       char *msg, void *user_data);
+  
+typedef void (*CVErrHandlerFn)(int error_code, 
+			       const char *module, const char *function, 
+			       char *msg, void *user_data); 
 
 /*
  * -----------------------------------------------------------------
@@ -375,8 +375,8 @@ typedef void (*CVErrHandlerFn)(int error_code,
  *
  * A CVQuadRhsFn or CVodeQuadRhsFnS should return 0 if successful,
  * a negative value if an unrecoverable error occured, and a positive
- * value if a recoverable error (e.g. invalid y values) occured.
- * If an unrecoverable occured, the integration is halted.
+ * value if a recoverable error (e.g. invalid y values) occured. 
+ * If an unrecoverable occured, the integration is halted. 
  * If a recoverable error occured, then (in most cases) CVODES
  * will try to correct and retry.
  * -----------------------------------------------------------------
@@ -403,9 +403,9 @@ typedef int (*CVQuadRhsFn)(realtype t, N_Vector y,
  * passed to the fS function every time it is called.
  *
  * A CVSensRhsFn should return 0 if successful, a negative value if
- * an unrecoverable error occured, and a positive value if a
- * recoverable error (e.g. invalid y or yS values) occured.
- * If an unrecoverable occured, the integration is halted.
+ * an unrecoverable error occured, and a positive value if a 
+ * recoverable error (e.g. invalid y or yS values) occured. 
+ * If an unrecoverable occured, the integration is halted. 
  * If a recoverable error occured, then (in most cases) CVODES
  * will try to correct and retry.
  * -----------------------------------------------------------------
@@ -435,9 +435,9 @@ typedef int (*CVSensRhsFn)(int Ns, realtype t,
  * passed to the fS1 function every time it is called.
  *
  * A CVSensRhs1Fn should return 0 if successful, a negative value if
- * an unrecoverable error occured, and a positive value if a
- * recoverable error (e.g. invalid y or yS values) occured.
- * If an unrecoverable occured, the integration is halted.
+ * an unrecoverable error occured, and a positive value if a 
+ * recoverable error (e.g. invalid y or yS values) occured. 
+ * If an unrecoverable occured, the integration is halted. 
  * If a recoverable error occured, then (in most cases) CVODES
  * will try to correct and retry.
  * -----------------------------------------------------------------
@@ -458,7 +458,7 @@ typedef int (*CVSensRhs1Fn)(int Ns, realtype t,
  * must have type CVQuadSensRhsFn.
  *
  * fQS takes as input the number of sensitivities Ns (the same as
- * that passed to CVodeQuadSensInit), the independent variable
+ * that passed to CVodeQuadSensInit), the independent variable 
  * value t, the states y and the dependent sensitivity vectors yS,
  * as well as the current value of the quadrature RHS yQdot.
  * It stores the result of fQS in yQSdot.
@@ -466,15 +466,15 @@ typedef int (*CVSensRhs1Fn)(int Ns, realtype t,
  *
  * A CVQuadSensRhsFn should return 0 if successful, a negative
  * value if an unrecoverable error occured, and a positive value
- * if a recoverable error (e.g. invalid y or yS values) occured.
- * If an unrecoverable occured, the integration is halted.
+ * if a recoverable error (e.g. invalid y or yS values) occured. 
+ * If an unrecoverable occured, the integration is halted. 
  * If a recoverable error occured, then (in most cases) CVODES
  * will try to correct and retry.
  * -----------------------------------------------------------------
  */
 
 typedef int (*CVQuadSensRhsFn)(int Ns, realtype t,
-                               N_Vector y, N_Vector *yS,
+                               N_Vector y, N_Vector *yS, 
                                N_Vector yQdot, N_Vector *yQSdot,
                                void *user_data,
                                N_Vector tmp, N_Vector tmpQ);
@@ -494,7 +494,7 @@ typedef int (*CVQuadSensRhsFn)(int Ns, realtype t,
  *    quadrature RHS function must have type CVQuadRhsFnBS.
  * -----------------------------------------------------------------
  */
-
+  
 typedef int (*CVRhsFnB)(realtype t, N_Vector y,
 			N_Vector yB, N_Vector yBdot,
 			void *user_dataB);
@@ -503,7 +503,7 @@ typedef int (*CVRhsFnBS)(realtype t, N_Vector y, N_Vector *yS,
                          N_Vector yB, N_Vector yBdot,
                          void *user_dataB);
 
-
+  
 typedef int (*CVQuadRhsFnB)(realtype t, N_Vector y,
 			    N_Vector yB, N_Vector qBdot,
 			    void *user_dataB);
@@ -516,7 +516,7 @@ typedef int (*CVQuadRhsFnBS)(realtype t, N_Vector y, N_Vector *yS,
 /*
  * =================================================================
  *
- * INITIALIZATION AND DEALLOCATION FUNCTIONS FOR FORWARD PROBLEMS
+ * INITIALIZATION AND DEALLOCATION FUNCTIONS FOR FORWARD PROBLEMS 
  *
  * =================================================================
  */
@@ -600,7 +600,7 @@ SUNDIALS_EXPORT int CVodeReInit(void *cvode_mem, realtype t0, N_Vector y0);
  *
  * CVodeSStolerances specifies scalar relative and absolute tolerances.
  * CVodeSVtolerances specifies scalar relative tolerance and a vector
- *   absolute tolerance (a potentially different absolute tolerance
+ *   absolute tolerance (a potentially different absolute tolerance 
  *   for each vector component).
  * CVodeWFtolerances specifies a user-provides function (of type CVEwtFn)
  *   which will be called to set the error weight vector.
@@ -676,7 +676,7 @@ SUNDIALS_EXPORT int CVodeQuadReInit(void *cvode_mem, N_Vector yQ0);
  *
  * CVodeSStolerances specifies scalar relative and absolute tolerances.
  * CVodeSVtolerances specifies scalar relative tolerance and a vector
- *   absolute tolerance (a potentially different absolute tolerance
+ *   absolute tolerance (a potentially different absolute tolerance 
  *   for each vector component).
  *
  * Return values:
@@ -696,12 +696,12 @@ SUNDIALS_EXPORT int CVodeQuadSVtolerances(void *cvode_mem, realtype reltolQ, N_V
  * Function : CVodeSensInit, CVSensInit1, and CVodeSensReInit
  * -----------------------------------------------------------------
  * CVodeSensInit and CVSensInit1 allocate and initialize memory
- * related to sensitivity computations. They only differ in the
+ * related to sensitivity computations. They only differ in the 
  * type of the sensitivity RHS function: CVodeSensInit specifies
  * fS of type CVSensRhsFn (i.e. a function that evaluates all
  * sensitivity RHS simultaneously), while CVodeSensInit1 specifies
  * fS of type CVSensRhs1Fn (i.e. a function that evaluates one
- * sensitivity RHS at a time). Recall that ism=CV_STAGGERED1 is
+ * sensitivity RHS at a time). Recall that ism=CV_STAGGERED1 is 
  * compatible ONLY with a CVSensRhs1Fn. As such, this value for
  * ism cannot be passed to CVodeSensInit.
  *
@@ -925,11 +925,11 @@ SUNDIALS_EXPORT void CVodeQuadSensFree(void *cvode_mem);
  * CVodeSetErrFile         | the file pointer for an error file
  *                         | where all CVODE warning and error
  *                         | messages will be written if the default
- *                         | internal error handling function is used.
- *                         | This parameter can be stdout (standard
- *                         | output), stderr (standard error), or a
- *                         | file pointer (corresponding to a user
- *                         | error file opened for writing) returned
+ *                         | internal error handling function is used. 
+ *                         | This parameter can be stdout (standard 
+ *                         | output), stderr (standard error), or a 
+ *                         | file pointer (corresponding to a user 
+ *                         | error file opened for writing) returned 
  *                         | by fopen.
  *                         | If not called, then all messages will
  *                         | be written to the standard error stream.
@@ -1008,7 +1008,7 @@ SUNDIALS_EXPORT void CVodeQuadSensFree(void *cvode_mem);
  *                            |
  * CVodeSetNoInactiveRootWarn | disable warning about possible
  *                            | g==0 at beginning of integration
- *                            |
+ *                            | 
  * -----------------------------------------------------------------
  * Return flag:
  *   CV_SUCCESS   if successful
@@ -1052,7 +1052,7 @@ SUNDIALS_EXPORT int CVodeSetNoInactiveRootWarn(void *cvode_mem);
  * CVodeSetQuadErrCon   | are quadrature variables considered in
  *                      | the error control?
  *                      | If yes, tolerances for quadrature are
- *                      | required (see CVodeQuad**tolerances)
+ *                      | required (see CVodeQuad**tolerances) 
  *                      | [errconQ = SUNFALSE]
  *                      |
  * -----------------------------------------------------------------
@@ -1062,7 +1062,7 @@ SUNDIALS_EXPORT int CVodeSetNoInactiveRootWarn(void *cvode_mem);
  * -----------------------------------------------------------------
  */
 
-SUNDIALS_EXPORT int CVodeSetQuadErrCon(void *cvode_mem, booleantype errconQ);
+SUNDIALS_EXPORT int CVodeSetQuadErrCon(void *cvode_mem, booleantype errconQ); 
 
 /*
  * -----------------------------------------------------------------
@@ -1077,7 +1077,7 @@ SUNDIALS_EXPORT int CVodeSetQuadErrCon(void *cvode_mem, booleantype errconQ);
  * CVodeSetSensDQMethod       | controls the selection of finite
  *                            | difference schemes used in evaluating
  *                            | the sensitivity right hand sides:
- *                            | (centered vs. forward and
+ *                            | (centered vs. forward and 
  *                            | simultaneous vs. separate)
  *                            | [DQtype=CV_CENTERED]
  *                            | [DQrhomax=0.0]
@@ -1087,8 +1087,8 @@ SUNDIALS_EXPORT int CVodeSetQuadErrCon(void *cvode_mem, booleantype errconQ);
  *                            | plist: list of parameters with respect
  *                            |        to which sensitivities are to be
  *                            |        computed.
- *                            | pbar: order of magnitude info.
- *                            |       Typically, if p[plist[i]] is nonzero,
+ *                            | pbar: order of magnitude info. 
+ *                            |       Typically, if p[plist[i]] is nonzero, 
  *                            |       pbar[i]=p[plist[i]].
  *                            | [p=NULL]
  *                            | [plist=NULL]
@@ -1135,17 +1135,17 @@ SUNDIALS_EXPORT int CVodeSetSensParams(void *cvode_mem, realtype *p, realtype *p
  * -----------------------------------------------------------------
  */
 
-SUNDIALS_EXPORT int CVodeSetQuadSensErrCon(void *cvode_mem, booleantype errconQS);
+SUNDIALS_EXPORT int CVodeSetQuadSensErrCon(void *cvode_mem, booleantype errconQS); 
 
 /*
  * -----------------------------------------------------------------
  * Function : CVodeSensToggleOff
  * -----------------------------------------------------------------
  * CVodeSensToggleOff deactivates sensitivity calculations.
- * It does NOT deallocate sensitivity-related memory so that
+ * It does NOT deallocate sensitivity-related memory so that 
  * sensitivity computations can be later toggled ON (through
  * CVodeSensReInit).
- *
+ * 
  * The return value is equal to CV_SUCCESS = 0 if there were no
  * errors or CV_MEM_NULL if cvode_mem was NULL
  * -----------------------------------------------------------------
@@ -1177,7 +1177,7 @@ SUNDIALS_EXPORT int CVodeSensToggleOff(void *cvode_mem);
  * integration and the rough scale of the problem. If tstop is
  * enabled (through a call to CVodeSetStopTime), then CVode returns
  * the solution at tstop. Once the integrator returns at a tstop
- * time, any future testing for tstop is disabled (and can be
+ * time, any future testing for tstop is disabled (and can be 
  * reenabled only though a new call to CVodeSetStopTime).
  * The time reached by the solver is placed in (*tret). The
  * user is responsible for allocating the memory for this value.
@@ -1236,7 +1236,7 @@ SUNDIALS_EXPORT int CVodeSensToggleOff(void *cvode_mem);
  *                 times (= MXNCF = 10) during one internal time
  *                 step or occurred with |h| = hmin.
  *
- * CV_LINIT_FAIL:  The linear solver's initialization function
+ * CV_LINIT_FAIL:  The linear solver's initialization function 
  *                 failed.
  *
  * CV_LSETUP_FAIL: The linear solver's setup routine failed in an
@@ -1312,7 +1312,7 @@ SUNDIALS_EXPORT int CVodeGetDky(void *cvode_mem, realtype t, int k, N_Vector dky
  * CVodeGetQuad returns the quadrature variables at the same time
  *   as that at which CVode returned the solution.
  *
- * CVodeGetQuadDky returns the quadrature variables (or their
+ * CVodeGetQuadDky returns the quadrature variables (or their 
  *   derivatives up to the current method order) at any time within
  *   the last integration step (dense output). See CVodeGetQuad for
  *   more information.
@@ -1331,9 +1331,9 @@ SUNDIALS_EXPORT int CVodeGetQuadDky(void *cvode_mem, realtype t, int k, N_Vector
  * -----------------------------------------------------------------
  * The following functions can be called to obtain the sensitivity
  * variables after a successful integration step.
- *
+ * 
  * CVodeGetSens and CVodeGetSens1 return all the sensitivity vectors
- *   or only one of them, respectively, at the same time as that at
+ *   or only one of them, respectively, at the same time as that at 
  *   which CVode returned the solution.
  *   The array of output vectors or output vector ySout must be
  *   allocated by the user.
@@ -1374,7 +1374,7 @@ SUNDIALS_EXPORT int CVodeGetSensDky1(void *cvode_mem, realtype t, int k, int is,
  * -----------------------------------------------------------------
  * The following functions can be called to obtain the quadrature
  * sensitivity variables after a successful integration step.
- *
+ * 
  * CVodeGetQuadSens and CVodeGetQuadSens1 return all the quadrature
  *   sensitivity vectors or only one of them, respectively, at the
  *   same time as that at which CVode returned the solution.
@@ -1383,7 +1383,7 @@ SUNDIALS_EXPORT int CVodeGetSensDky1(void *cvode_mem, realtype t, int k, int is,
  *
  * CVodeGetQuadSensDky1 computes the kth derivative of the is-th
  *   quadrature sensitivity (is=1, 2, ..., Ns) at time t, where
- *   tn-hu <= t <= tn, tn denotes the current internal time
+ *   tn-hu <= t <= tn, tn denotes the current internal time 
  *   reached, and hu is the last internal step size successfully
  *   used by the solver. The user may request  k=0, 1, ..., qu,
  *   where qu is the current order.
@@ -1459,9 +1459,9 @@ SUNDIALS_EXPORT int CVodeGetQuadSensDky1(void *cvode_mem, realtype t, int k, int
  *                  errors. The user must allocate space for ele.
  * CVodeGetNumGEvals returns the number of calls to the user's
  *                  g function (for rootfinding)
- * CVodeGetRootInfo returns the indices for which g_i was found to
- *                  have a root. The user must allocate space for
- *                  rootsfound. For i = 0 ... nrtfn-1,
+ * CVodeGetRootInfo returns the indices for which g_i was found to 
+ *                  have a root. The user must allocate space for 
+ *                  rootsfound. For i = 0 ... nrtfn-1, 
  *                  rootsfound[i] = 1 if g_i has a root, and = 0 if not.
  *
  * CVodeGet* return values:
@@ -1532,7 +1532,7 @@ SUNDIALS_EXPORT int CVodeGetNonlinSolvStats(void *cvode_mem, long int *nniters,
 
 /*
  * -----------------------------------------------------------------
- * The following function returns the name of the constant
+ * The following function returns the name of the constant 
  * associated with a CVODES return flag
  * -----------------------------------------------------------------
  */
@@ -1581,7 +1581,7 @@ SUNDIALS_EXPORT int CVodeGetQuadStats(void *cvode_mem, long int *nfQevals,
  * CVodeGetSensNumRhsEvals returns the number of calls to the
  *   sensitivity right hand side routine.
  * CVodeGetNumRhsEvalsSens returns the number of calls to the
- *   user f routine due to finite difference evaluations of the
+ *   user f routine due to finite difference evaluations of the 
  *   sensitivity equations.
  * CVodeGetSensNumErrTestFails returns the number of local error
  *   test failures for sensitivity variables.
@@ -1620,10 +1620,10 @@ SUNDIALS_EXPORT int CVodeGetSensStats(void *cvode_mem, long int *nfSevals, long 
  * CVodeGetSensNumNonlinSolvConvFails returns the total number
  *   of nonlinear convergence failures for sensitivity variables
  * CVodeGetStgrSensNumNonlinSolvIters returns a vector of Ns
- *   nonlinear iteration counters for sensitivity variables in
+ *   nonlinear iteration counters for sensitivity variables in 
  *   the CV_STAGGERED1 method.
  * CVodeGetStgrSensNumNonlinSolvConvFails returns a vector of Ns
- *   nonlinear solver convergence failure counters for sensitivity
+ *   nonlinear solver convergence failure counters for sensitivity 
  *   variables in the CV_STAGGERED1 method.
  * -----------------------------------------------------------------
  */
@@ -1631,13 +1631,13 @@ SUNDIALS_EXPORT int CVodeGetSensStats(void *cvode_mem, long int *nfSevals, long 
 SUNDIALS_EXPORT int CVodeGetSensNumNonlinSolvIters(void *cvode_mem, long int *nSniters);
 SUNDIALS_EXPORT int CVodeGetSensNumNonlinSolvConvFails(void *cvode_mem, long int *nSncfails);
 SUNDIALS_EXPORT int CVodeGetStgrSensNumNonlinSolvIters(void *cvode_mem, long int *nSTGR1niters);
-SUNDIALS_EXPORT int CVodeGetStgrSensNumNonlinSolvConvFails(void *cvode_mem,
+SUNDIALS_EXPORT int CVodeGetStgrSensNumNonlinSolvConvFails(void *cvode_mem, 
 							   long int *nSTGR1ncfails);
 
 /*
  * -----------------------------------------------------------------
- * As a convenience, the following function provides the
- * optional outputs in groups.
+ * As a convenience, the following function provides the      
+ * optional outputs in groups.                                    
  * -----------------------------------------------------------------
  */
 
@@ -1653,7 +1653,7 @@ SUNDIALS_EXPORT int CVodeGetSensNonlinSolvStats(void *cvode_mem, long int *nSnit
  * statistics related to the integration of quadrature sensitivitiess.
  * -----------------------------------------------------------------
  * CVodeGetQuadSensNumRhsEvals returns the number of calls to the
- *       user function fQS defining the right hand side of the
+ *       user function fQS defining the right hand side of the 
  *       quadrature sensitivity equations.
  * CVodeGetQuadSensNumErrTestFails returns the number of local error
  *       test failures for quadrature sensitivity variables.
@@ -1682,7 +1682,7 @@ SUNDIALS_EXPORT int CVodeGetQuadSensStats(void *cvode_mem,
 /*
  * =================================================================
  *
- * INITIALIZATION AND DEALLOCATION FUNCTIONS FOR BACKWARD PROBLEMS
+ * INITIALIZATION AND DEALLOCATION FUNCTIONS FOR BACKWARD PROBLEMS 
  *
  * =================================================================
  */
@@ -1695,7 +1695,7 @@ SUNDIALS_EXPORT int CVodeGetQuadSensStats(void *cvode_mem,
  * and allocates space for the adjoint memory structure.
  * -----------------------------------------------------------------
  */
-
+  
 SUNDIALS_EXPORT int CVodeAdjInit(void *cvode_mem, long int steps, int interp);
 
 /*
@@ -1707,8 +1707,8 @@ SUNDIALS_EXPORT int CVodeAdjInit(void *cvode_mem, long int steps, int interp);
  * type of interpolation remained unchanged. The list of check points
  * (and associated memory) is deleted. The list of backward problems
  * is kept (however, new backward problems can be added to this list
- * by calling CVodeCreateB). The CVODES memory for the forward and
- * backward problems can be reinitialized separately by calling
+ * by calling CVodeCreateB). The CVODES memory for the forward and 
+ * backward problems can be reinitialized separately by calling 
  * CVodeReInit and CVodeReInitB, respectively.
  * NOTE: if a entirely new list of backward problems is desired,
  *   then simply free the adjoint memory (by calling CVodeAdjFree)
@@ -1726,20 +1726,20 @@ SUNDIALS_EXPORT int CVodeAdjReInit(void *cvode_mem);
  * It is typically called by CVodeFree.
  * -----------------------------------------------------------------
  */
-
+  
 SUNDIALS_EXPORT void CVodeAdjFree(void *cvode_mem);
-
+  
 
 /*
  * -----------------------------------------------------------------
  * Interfaces to CVODES functions for setting-up backward problems.
  * -----------------------------------------------------------------
- * CVodeCreateB,
+ * CVodeCreateB, 
  *
  * CVodeInitB, CVodeInitBS, CVodeReInitB
- *
+ * 
  * CVodeQuadInitB, CVodeQuadInitBS, CVodeQuadReInitB
- *
+ * 
  * -----------------------------------------------------------------
  */
 
@@ -1802,14 +1802,14 @@ SUNDIALS_EXPORT int CVodeF(void *cvode_mem, realtype tout, N_Vector yout,
  * -----------------------------------------------------------------
  * CVodeB performs the integration of all backward problems specified
  * through calls to CVodeCreateB through a sequence of forward-backward
- * runs in between consecutive check points. CVodeB can be called
+ * runs in between consecutive check points. CVodeB can be called 
  * either in CV_NORMAL or CV_ONE_STEP mode. After a successful return
  * from CVodeB, the solution and quadrature variables at the current
  * return time for any given backward problem can be obtained by
  * calling CVodeGetB and CVodeGetQuadB, respectively.
  * -----------------------------------------------------------------
  */
-
+  
 SUNDIALS_EXPORT int CVodeB(void *cvode_mem, realtype tBout, int itaskB);
 
 /*
@@ -1846,7 +1846,7 @@ SUNDIALS_EXPORT int CVodeSetStabLimDetB(void *cvode_mem, int which, booleantype 
 SUNDIALS_EXPORT int CVodeSetInitStepB(void *cvode_mem, int which, realtype hinB);
 SUNDIALS_EXPORT int CVodeSetMinStepB(void *cvode_mem, int which, realtype hminB);
 SUNDIALS_EXPORT int CVodeSetMaxStepB(void *cvode_mem, int which, realtype hmaxB);
-
+      
 SUNDIALS_EXPORT int CVodeSetQuadErrConB(void *cvode_mem, int which, booleantype errconQB);
 
 /*
@@ -1856,22 +1856,22 @@ SUNDIALS_EXPORT int CVodeSetQuadErrConB(void *cvode_mem, int which, booleantype 
  *
  * =================================================================
  */
-
+  
 /*
  * -----------------------------------------------------------------
  * CVodeGetB and CVodeGetQuadB
  * -----------------------------------------------------------------
- * Extraction functions for the solution and quadratures for a given
+ * Extraction functions for the solution and quadratures for a given 
  * backward problem. They return their corresponding output vector
  * at the current time reached by the integration of the backward
  * problem. To obtain the solution or quadratures associated with
- * a given backward problem at some other time within the last
+ * a given backward problem at some other time within the last 
  * integration step (dense output), first obtain a pointer to the
  * proper CVODES memory by calling CVodeGetAdjCVodeBmem and then use it
- * to call CVodeGetDky and CVodeGetQuadDky.
+ * to call CVodeGetDky and CVodeGetQuadDky.  
  * -----------------------------------------------------------------
  */
-
+  
 SUNDIALS_EXPORT int CVodeGetB(void *cvode_mem, int which,
                               realtype *tBret, N_Vector yB);
 SUNDIALS_EXPORT int CVodeGetQuadB(void *cvode_mem, int which,
@@ -1897,7 +1897,7 @@ SUNDIALS_EXPORT int CVodeGetQuadB(void *cvode_mem, int which,
  * extract optional output for the backward integration phase.
  * -----------------------------------------------------------------
  */
-
+  
 SUNDIALS_EXPORT void *CVodeGetAdjCVodeBmem(void *cvode_mem, int which);
 
 
@@ -1936,12 +1936,12 @@ SUNDIALS_EXPORT int CVodeGetAdjCheckPointsInfo(void *cvode_mem, CVadjCheckPointR
 /*
  * -----------------------------------------------------------------
  * CVodeGetAdjDataPointHermite
- *    Returns the 2 vectors stored for cubic Hermite interpolation
+ *    Returns the 2 vectors stored for cubic Hermite interpolation 
  *    at the data point 'which'. The user must allocate space for
  *    y and yd. Returns CV_MEM_NULL if cvode_mem is NULL.
  *    Returns CV_ILL_INPUT if interpType != CV_HERMITE.
  * CVodeGetAdjDataPointPolynomial
- *    Returns the vector stored for polynomial interpolation
+ *    Returns the vector stored for polynomial interpolation 
  *    at the data point 'which'. The user must allocate space for
  *    y. Returns CV_MEM_NULL if cvode_mem is NULL.
  *    Returns CV_ILL_INPUT if interpType != CV_POLYNOMIAL.
@@ -1950,7 +1950,7 @@ SUNDIALS_EXPORT int CVodeGetAdjCheckPointsInfo(void *cvode_mem, CVadjCheckPointR
 
 SUNDIALS_EXPORT int CVodeGetAdjDataPointHermite(void *cvode_mem, int which,
                                                 realtype *t, N_Vector y, N_Vector yd);
-
+  
 SUNDIALS_EXPORT int CVodeGetAdjDataPointPolynomial(void *cvode_mem, int which,
                                                    realtype *t, int *order, N_Vector y);
 

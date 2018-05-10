@@ -31,17 +31,17 @@
  * components of an N_Vector. It works for any size N=NEQ, but
  * due to efficiency concerns it should only by used when the
  * problem size is small. The Problem 1 right hand side and
- * Jacobian functions f1 and Jac1 both use NV_Ith_S. The
- * N_VGetArrayPointer function gives the user access to the
- * memory used for the component storage of an N_Vector. In the
- * sequential case, the user may assume that this is one contiguous
+ * Jacobian functions f1 and Jac1 both use NV_Ith_S. The 
+ * N_VGetArrayPointer function gives the user access to the 
+ * memory used for the component storage of an N_Vector. In the 
+ * sequential case, the user may assume that this is one contiguous 
  * array of reals. The N_VGetArrayPointer function
  * gives a more efficient means (than the NV_Ith_S macro) to
  * access the components of an N_Vector and should be used when the
  * problem size is large. The Problem 2 right hand side function f2
- * uses the N_VGetArrayPointer function. The SM_ELEMENT_D macro
- * used in Jac1 gives access to an element of a dense SUNMatrix. It
- * should be used only when the problem size is small (the
+ * uses the N_VGetArrayPointer function. The SM_ELEMENT_D macro 
+ * used in Jac1 gives access to an element of a dense SUNMatrix. It 
+ * should be used only when the problem size is small (the 
  * size of a Dense SUNMatrix is NEQ x NEQ) due to efficiency concerns. For
  * larger problem sizes, the macro SM_COLUMN_D can be used in order
  * to work directly with a column of a Dense SUNMatrix. The SM_COLUMN_B and
@@ -115,7 +115,7 @@ static void PrintIntro2(void);
 static void PrintHeader2(void);
 static void PrintOutput2(realtype t, realtype erm, int qu, realtype hu);
 static realtype MaxError(N_Vector y, realtype t);
-static int PrepareNextRun(void *cvode_mem, int lmm, int miter, N_Vector y,
+static int PrepareNextRun(void *cvode_mem, int lmm, int miter, N_Vector y, 
                           SUNMatrix A, sunindextype mu, sunindextype ml,
                           SUNLinearSolver LS);
 static void PrintErrOutput(realtype tol_factor);
@@ -190,7 +190,7 @@ static int Problem1(void)
       flag = CVodeReInit(cvode_mem, P1_T0, y);
       if(check_flag(&flag, "CVodeReInit", 1)) return(1);
     }
-
+      
     flag = PrepareNextRun(cvode_mem, CV_ADAMS, miter, y, A, 0, 0, LS);
     if(check_flag(&flag, "PrepareNextRun", 1)) return(1);
 
@@ -217,7 +217,7 @@ static int Problem1(void)
         }
       }
     }
-
+    
     PrintFinalStats(cvode_mem, miter, ero);
   }
 
@@ -230,7 +230,7 @@ static int Problem1(void)
     ero = ZERO;
     NV_Ith_S(y,0) = TWO;
     NV_Ith_S(y,1) = ZERO;
-
+      
     firstrun = (miter==FUNC);
     if (firstrun) {
       flag = CVodeInit(cvode_mem, f1, P1_T0, y);
@@ -243,12 +243,12 @@ static int Problem1(void)
       flag = CVodeReInit(cvode_mem, P1_T0, y);
       if(check_flag(&flag, "CVodeReInit", 1)) return(1);
     }
-
-    flag = PrepareNextRun(cvode_mem, CV_BDF, miter, y, A, 0, 0, LS);
+      
+    flag = PrepareNextRun(cvode_mem, CV_BDF, miter, y, A, 0, 0, LS);     
     if(check_flag(&flag, "PrepareNextRun", 1)) return(1);
 
     PrintHeader1();
-
+      
     for(iout=1, tout=P1_T1; iout <= P1_NOUT; iout++, tout += P1_DTOUT) {
       flag = CVode(cvode_mem, tout, y, &t, CV_NORMAL);
       check_flag(&flag, "CVode", 1);
@@ -270,7 +270,7 @@ static int Problem1(void)
         }
       }
     }
-
+    
     PrintFinalStats(cvode_mem, miter, ero);
   }
 
@@ -321,7 +321,7 @@ static void PrintOutput1(realtype t, realtype y0, realtype y1, int qu, realtype 
 static int f1(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 {
   realtype y0, y1;
-
+  
   y0 = NV_Ith_S(y,0);
   y1 = NV_Ith_S(y,1);
 
@@ -329,9 +329,9 @@ static int f1(realtype t, N_Vector y, N_Vector ydot, void *user_data)
   NV_Ith_S(ydot,1) = (ONE - SUNSQR(y0))* P1_ETA * y1 - y0;
 
   return(0);
-}
+} 
 
-static int Jac1(realtype tn, N_Vector y, N_Vector fy, SUNMatrix J,
+static int Jac1(realtype tn, N_Vector y, N_Vector fy, SUNMatrix J, 
                 void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
   realtype y0, y1;
@@ -376,7 +376,7 @@ static int Problem2(void)
     ero = ZERO;
     N_VConst(ZERO, y);
     NV_Ith_S(y,0) = ONE;
-
+      
     firstrun = (miter==FUNC);
     if (firstrun) {
       flag = CVodeInit(cvode_mem, f2, P2_T0, y);
@@ -389,7 +389,7 @@ static int Problem2(void)
       flag = CVodeReInit(cvode_mem, P2_T0, y);
       if(check_flag(&flag, "CVodeReInit", 1)) return(1);
     }
-
+      
     flag = PrepareNextRun(cvode_mem, CV_ADAMS, miter, y, A, P2_MU, P2_ML, LS);
     if(check_flag(&flag, "PrepareNextRun", 1)) return(1);
 
@@ -415,7 +415,7 @@ static int Problem2(void)
           PrintErrOutput(P2_TOL_FACTOR);
         }
     }
-
+    
     PrintFinalStats(cvode_mem, miter, ero);
   }
 
@@ -429,7 +429,7 @@ static int Problem2(void)
     ero = ZERO;
     N_VConst(ZERO, y);
     NV_Ith_S(y,0) = ONE;
-
+      
     firstrun = (miter==FUNC);
     if (firstrun) {
       flag = CVodeInit(cvode_mem, f2, P2_T0, y);
@@ -447,7 +447,7 @@ static int Problem2(void)
     if(check_flag(&flag, "PrepareNextRun", 1)) return(1);
 
     PrintHeader2();
-
+      
     for(iout=1, tout=P2_T1; iout <= P2_NOUT; iout++, tout*=P2_TOUT_MULT) {
       flag = CVode(cvode_mem, tout, y, &t, CV_NORMAL);
       check_flag(&flag, "CVode", 1);
@@ -468,7 +468,7 @@ static int Problem2(void)
           PrintErrOutput(P2_TOL_FACTOR);
         }
     }
-
+    
     PrintFinalStats(cvode_mem, miter, ero);
   }
 
@@ -519,12 +519,12 @@ static int f2(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 {
   sunindextype i, j, k;
   realtype d, *ydata, *dydata;
-
+  
   ydata = N_VGetArrayPointer(y);
   dydata = N_VGetArrayPointer(ydot);
 
   /*
-     Excluding boundaries,
+     Excluding boundaries, 
 
      ydot    = f    = -2 y    + alpha1 * y      + alpha2 * y
          i,j    i,j       i,j             i-1,j             i,j-1
@@ -543,7 +543,7 @@ static int f2(realtype t, N_Vector y, N_Vector ydot, void *user_data)
   return(0);
 }
 
-static int Jac2(realtype tn, N_Vector y, N_Vector fy, SUNMatrix J,
+static int Jac2(realtype tn, N_Vector y, N_Vector fy, SUNMatrix J, 
                 void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
   int i, j, k;
@@ -552,7 +552,7 @@ static int Jac2(realtype tn, N_Vector y, N_Vector fy, SUNMatrix J,
   /*
      The components of f(t,y) which depend on y    are
                                                i,j
-     f    , f      , and f      :
+     f    , f      , and f      : 
       i,j    i+1,j        i,j+1
 
      f    = -2 y    + alpha1 * y      + alpha2 * y
@@ -582,12 +582,12 @@ static realtype MaxError(N_Vector y, realtype t)
 {
   sunindextype i, j, k;
   realtype *ydata, er, ex=ZERO, yt, maxError=ZERO, ifact_inv, jfact_inv=ONE;
-
+  
   if (t == ZERO) return(ZERO);
 
   ydata = N_VGetArrayPointer(y);
   if (t <= THIRTY) ex = SUNRexp(-TWO*t);
-
+  
   for (j = 0; j < P2_MESHY; j++) {
     ifact_inv = ONE;
     for (i = 0; i < P2_MESHX; i++) {
@@ -602,21 +602,21 @@ static realtype MaxError(N_Vector y, realtype t)
   return(maxError);
 }
 
-static int PrepareNextRun(void *cvode_mem, int lmm, int miter, N_Vector y,
+static int PrepareNextRun(void *cvode_mem, int lmm, int miter, N_Vector y, 
                           SUNMatrix A, sunindextype mu, sunindextype ml,
                           SUNLinearSolver LS)
 {
   int flag = CV_SUCCESS;
-
+  
   printf("\n\n-------------------------------------------------------------");
-
+  
   printf("\n\nLinear Multistep Method : ");
   if (lmm == CV_ADAMS) {
     printf("ADAMS\n");
   } else {
     printf("BDF\n");
   }
-
+  
   printf("Iteration               : ");
   if (miter == FUNC) {
     printf("FUNCTIONAL\n");
@@ -626,7 +626,7 @@ static int PrepareNextRun(void *cvode_mem, int lmm, int miter, N_Vector y,
 
     switch(miter) {
 
-    case DENSE_USER :
+    case DENSE_USER : 
       printf("Dense, User-Supplied Jacobian\n");
 
       /* Create dense SUNMatrix for use in linear solves */
@@ -646,7 +646,7 @@ static int PrepareNextRun(void *cvode_mem, int lmm, int miter, N_Vector y,
       if(check_flag(&flag, "CVDlsSetJacFn", 1)) return(1);
       break;
 
-    case DENSE_DQ :
+    case DENSE_DQ : 
       printf("Dense, Difference Quotient Jacobian\n");
 
       /* Create dense SUNMatrix for use in linear solves */
@@ -666,15 +666,15 @@ static int PrepareNextRun(void *cvode_mem, int lmm, int miter, N_Vector y,
       if(check_flag(&flag, "CVDlsSetJacFn", 1)) return(1);
       break;
 
-    case DIAG :
+    case DIAG : 
       printf("Diagonal Jacobian\n");
-
+     
       /* Call CVDiag to initialize and attach the CVode-specific diagonal linear solver */
       flag = CVDiag(cvode_mem);
       if(check_flag(&flag, "CVDiag", 1)) return(1);
       break;
 
-    case BAND_USER :
+    case BAND_USER : 
       printf("Band, User-Supplied Jacobian\n");
 
       /* Create band SUNMatrix for use in linear solves */
@@ -694,7 +694,7 @@ static int PrepareNextRun(void *cvode_mem, int lmm, int miter, N_Vector y,
       if(check_flag(&flag, "CVDlsSetJacFn", 1)) return(1);
       break;
 
-    case BAND_DQ  :
+    case BAND_DQ  :   
       printf("Band, Difference Quotient Jacobian\n");
 
       /* Create band SUNMatrix for use in linear solves */
@@ -762,7 +762,7 @@ static void PrintFinalStats(void *cvode_mem, int miter, realtype ero)
   printf(" Number of nonlinear iterations           = %4ld \n",  nni);
   printf(" Number of nonlinear convergence failures = %4ld \n",  ncfn);
   printf(" Number of error test failures            = %4ld \n\n",netf);
-
+  
   if (miter != FUNC) {
     if (miter != DIAG) {
       flag = CVDlsGetNumJacEvals(cvode_mem, &nje);
@@ -783,7 +783,7 @@ static void PrintFinalStats(void *cvode_mem, int miter, realtype ero)
     printf(" Number of Jacobian evaluations           = %4ld \n", nje);
     printf(" Number of f evals. in linear solver      = %4ld \n\n", nfeLS);
   }
-
+  
 #if defined(SUNDIALS_EXTENDED_PRECISION)
   printf(" Error overrun = %.3Lf \n", ero);
 #else

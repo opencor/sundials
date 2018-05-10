@@ -1,24 +1,24 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel Reynolds @ SMU
  *                David Gardner @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the testing routine to check the SUNMatrix Band module
- * implementation.
+ * This is the testing routine to check the SUNMatrix Band module 
+ * implementation. 
  * -----------------------------------------------------------------
  */
 
@@ -35,7 +35,7 @@
 /* ----------------------------------------------------------------------
  * Main SUNMatrix Testing Routine
  * --------------------------------------------------------------------*/
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
   int          fails = 0;            /* counter for test failures  */
   sunindextype cols, uband, lband;   /* matrix columns, bandwidths */
@@ -51,22 +51,22 @@ int main(int argc, char *argv[])
     return(-1);
   }
 
-  cols = atol(argv[1]);
+  cols = atol(argv[1]); 
   if (cols <= 0) {
     printf("ERROR: number of matrix columns must be a positive integer \n");
-    return(-1);
+    return(-1); 
   }
 
-  uband = atol(argv[2]);
+  uband = atol(argv[2]); 
   if ((uband <= 0) || (uband >= cols)){
     printf("ERROR: matrix upper bandwidth must be a positive integer, less than number of columns \n");
-    return(-1);
+    return(-1); 
   }
 
-  lband = atol(argv[3]);
+  lband = atol(argv[3]); 
   if ((lband <= 0) || (lband >= cols)){
     printf("ERROR: matrix lower bandwidth must be a positive integer, less than number of columns \n");
-    return(-1);
+    return(-1); 
   }
 
   print_timing = atoi(argv[4]);
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
   xdata = N_VGetArrayPointer(x);
   ydata = N_VGetArrayPointer(y);
   for (j=0; j<cols; j++) {
-
+    
     /* identity matrix */
     colj = SUNBandMatrix_Column(I, j);
     colj[0] = RCONST(1.0);
@@ -166,7 +166,7 @@ int check_matrix(SUNMatrix A, SUNMatrix B, realtype tol)
     return 1;
   if (SUNBandMatrix_UpperBandwidth(A) != SUNBandMatrix_UpperBandwidth(B))
     return 1;
-
+  
   /* check matrix data */
   for (j=0; j<SUNBandMatrix_Columns(A); j++) {
 
@@ -189,7 +189,7 @@ int check_matrix(SUNMatrix A, SUNMatrix B, realtype tol)
     SUNBandMatrix_Print(B, stdout);
   }
 
-
+    
   if (failure > ZERO)
     return(1);
   else
@@ -232,16 +232,16 @@ int check_vector(N_Vector X, N_Vector Y, realtype tol)
   int failure = 0;
   sunindextype i, local_length;
   realtype *Xdata, *Ydata;
-
+  
   Xdata = N_VGetArrayPointer(X);
   Ydata = N_VGetArrayPointer(Y);
   local_length = N_VGetLength_Serial(X);
-
+  
   /* check vector data */
   for(i=0; i < local_length; i++) {
     failure += FNEQ(Xdata[i], Ydata[i], tol);
   }
-
+  
   if (failure > ZERO)
     return(1);
   else

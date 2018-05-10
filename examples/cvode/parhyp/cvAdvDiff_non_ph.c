@@ -25,10 +25,10 @@
  * Output is printed at t = .5, 1.0, ..., 5.
  * Run statistics (optional outputs) are printed at the end.
  *
- * This example uses Hypre vector with "IJ" interface and MPI
- * parallelization. User is expected to be familiar with the Hypre
- * library.
- *
+ * This example uses Hypre vector with "IJ" interface and MPI 
+ * parallelization. User is expected to be familiar with the Hypre 
+ * library. 
+ * 
  * Execute with Number of Processors = N,  with 1 <= N <= MX.
  * -----------------------------------------------------------------
  */
@@ -60,7 +60,7 @@
 #define DTOUT RCONST(0.5)    /* output time increment     */
 #define NOUT  10             /* number of output times    */
 
-/* Type : UserData
+/* Type : UserData 
    contains grid constants, parhyp machine parameters, work array. */
 
 typedef struct {
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
   nrem = NEQ - npes*nperpe;
   local_N = (my_pe < nrem) ? nperpe+1 : nperpe;
   my_base = (my_pe < nrem) ? my_pe*local_N : my_pe*nperpe + nrem;
-
+  
   /* Allocate hypre vector */
   HYPRE_IJVectorCreate(comm, my_base, my_base + local_N - 1, &Uij);
   HYPRE_IJVectorSetObjectType(Uij, HYPRE_PARCSR);
@@ -148,8 +148,8 @@ int main(int argc, char *argv[])
 
   u = N_VMake_ParHyp(Upar);  /* Create wrapper u around hypre vector */
   if(check_flag((void *)u, "N_VNew", 0, my_pe)) MPI_Abort(comm, 1);
-
-  /* Call CVodeCreate to create the solver memory and specify the
+  
+  /* Call CVodeCreate to create the solver memory and specify the 
    * Adams-Moulton LMM and the use of a functional iteration */
   cvode_mem = CVodeCreate(CV_ADAMS, CV_FUNCTIONAL);
   if(check_flag((void *)cvode_mem, "CVodeCreate", 0, my_pe)) MPI_Abort(comm, 1);
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
     if (my_pe == 0) PrintData(t, umax, nst);
   }
 
-  if (my_pe == 0)
+  if (my_pe == 0) 
     PrintFinalStats(cvode_mem);  /* Print some final statistics */
 
   N_VDestroy(u);              /* Free hypre vector wrapper */
@@ -260,7 +260,7 @@ static void PrintFinalStats(void *cvode_mem)
 {
   long int nst, nfe, nni, ncfn, netf;
   int flag;
-
+  
   flag = CVodeGetNumSteps(cvode_mem, &nst);
   check_flag(&flag, "CVodeGetNumSteps", 1, 0);
   flag = CVodeGetNumRhsEvals(cvode_mem, &nfe);
@@ -293,10 +293,10 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
   HYPRE_ParVector uhyp;
   HYPRE_ParVector udothyp;
 
-  /* Extract hypre vectors */
+  /* Extract hypre vectors */  
   uhyp  = N_VGetVector_ParHyp(u);
   udothyp  = N_VGetVector_ParHyp(udot);
-
+  
   /* Access hypre vectors local data */
   udata = hypre_VectorData(hypre_ParVectorLocalVector(uhyp));
   udotdata = hypre_VectorData(hypre_ParVectorLocalVector(udothyp));
@@ -308,10 +308,10 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
 
   /* Extract parameters for parhyp computation. */
   comm = data->comm;
-  npes = data->npes;                           /* Number of processes    */
+  npes = data->npes;                           /* Number of processes    */ 
   my_pe = data->my_pe;                         /* Current process number */
   my_length =  hypre_ParVectorLastIndex(uhyp)  /* Local length of uhyp   */
-             - hypre_ParVectorFirstIndex(uhyp) + 1;
+             - hypre_ParVectorFirstIndex(uhyp) + 1;  
   z = data->z;
 
   /* Compute related parameters. */
@@ -327,17 +327,17 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
   if (my_pe != 0)
     MPI_Send(&z[1], 1, PVEC_REAL_MPI_TYPE, my_pe_m1, 0, comm);
   if (my_pe != last_pe)
-    MPI_Send(&z[my_length], 1, PVEC_REAL_MPI_TYPE, my_pe_p1, 0, comm);
+    MPI_Send(&z[my_length], 1, PVEC_REAL_MPI_TYPE, my_pe_p1, 0, comm);   
 
   /* Receive needed data from processes before and after current process. */
   if (my_pe != 0)
     MPI_Recv(&z[0], 1, PVEC_REAL_MPI_TYPE, my_pe_m1, 0, comm, &status);
-  else
+  else 
     z[0] = ZERO;
   if (my_pe != last_pe)
     MPI_Recv(&z[my_length+1], 1, PVEC_REAL_MPI_TYPE, my_pe_p1, 0, comm,
-             &status);
-  else
+             &status);   
+  else 
     z[my_length + 1] = ZERO;
 
   /* Loop over all grid points in current process. */

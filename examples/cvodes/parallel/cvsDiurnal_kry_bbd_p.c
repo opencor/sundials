@@ -72,7 +72,7 @@
 #define KH           RCONST(4.0e-6)    /* horizontal diffusivity Kh */
 #define VEL          RCONST(0.001)     /* advection velocity V      */
 #define KV0          RCONST(1.0e-8)    /* coefficient in Kv(y)      */
-#define Q1           RCONST(1.63e-16)  /* coefficients q1, q2, c3   */
+#define Q1           RCONST(1.63e-16)  /* coefficients q1, q2, c3   */ 
 #define Q2           RCONST(4.66e-16)
 #define C3           RCONST(3.7e16)
 #define A3           RCONST(22.62)     /* coefficient in expression for q3(t) */
@@ -84,7 +84,7 @@
 #define NOUT         12                  /* number of output times */
 #define TWOHR        RCONST(7200.0)      /* number of seconds in two hours  */
 #define HALFDAY      RCONST(4.32e4)      /* number of seconds in a half day */
-#define PI       RCONST(3.1415926535898) /* pi */
+#define PI       RCONST(3.1415926535898) /* pi */ 
 
 #define XMIN         ZERO                /* grid boundaries in x  */
 #define XMAX         RCONST(20.0)
@@ -107,7 +107,7 @@
                                   /* change from relative to absolute      */
 #define ATOL    (RTOL*FLOOR)      /* scalar absolute tolerance */
 
-/* Type : UserData
+/* Type : UserData 
    contains problem constants, extended dependent variable array,
    grid constants, processor indices, MPI communicator */
 
@@ -129,16 +129,16 @@ static void PrintIntro(int npes, sunindextype mudq, sunindextype mldq,
 static void PrintOutput(void *cvode_mem, int my_pe, MPI_Comm comm,
                         N_Vector u, realtype t);
 static void PrintFinalStats(void *cvode_mem);
-static void BSend(MPI_Comm comm,
-                  int my_pe, int isubx, int isuby,
+static void BSend(MPI_Comm comm, 
+                  int my_pe, int isubx, int isuby, 
                   sunindextype dsizex, sunindextype dsizey,
                   realtype uarray[]);
-static void BRecvPost(MPI_Comm comm, MPI_Request request[],
+static void BRecvPost(MPI_Comm comm, MPI_Request request[], 
                       int my_pe, int isubx, int isuby,
 		      sunindextype dsizex, sunindextype dsizey,
 		      realtype uext[], realtype buffer[]);
-static void BRecvWait(MPI_Request request[],
-                      int isubx, int isuby,
+static void BRecvWait(MPI_Request request[], 
+                      int isubx, int isuby, 
                       sunindextype dsizex, realtype uext[],
                       realtype buffer[]);
 
@@ -200,14 +200,14 @@ int main(int argc, char *argv[])
   if(check_flag((void *)data, "malloc", 2, my_pe)) MPI_Abort(comm, 1);
   InitUserData(my_pe, local_N, comm, data);
 
-  /* Allocate and initialize u, and set tolerances */
+  /* Allocate and initialize u, and set tolerances */ 
   u = N_VNew_Parallel(comm, local_N, neq);
   if(check_flag((void *)u, "N_VNew_Parallel", 0, my_pe)) MPI_Abort(comm, 1);
   SetInitialProfiles(u, data);
   abstol = ATOL;
   reltol = RTOL;
 
-  /* Call CVodeCreate to create the solver memory and specify the
+  /* Call CVodeCreate to create the solver memory and specify the 
    * Backward Differentiation Formula and the use of a Newton iteration */
   cvode_mem = CVodeCreate(CV_BDF, CV_NEWTON);
   if(check_flag((void *)cvode_mem, "CVodeCreate", 0, my_pe)) MPI_Abort(comm, 1);
@@ -227,11 +227,11 @@ int main(int argc, char *argv[])
   flag = CVodeSStolerances(cvode_mem, reltol, abstol);
   if (check_flag(&flag, "CVodeSStolerances", 1, my_pe)) return(1);
 
-  /* Create SPGMR solver structure -- use left preconditioning
+  /* Create SPGMR solver structure -- use left preconditioning 
      and the default Krylov dimension maxl */
   LS = SUNSPGMR(u, PREC_LEFT, 0);
   if (check_flag((void *)LS, "SUNSPGMR", 0, my_pe)) MPI_Abort(comm, 1);
-
+  
   /* Attach the linear solver to the CVSpils interface */
   flag = CVSpilsSetLinearSolver(cvode_mem, LS);
   if(check_flag(&flag, "CVSpilsSetLinearSolver", 1, my_pe)) MPI_Abort(comm, 1);
@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
   /* Initialize BBD preconditioner */
   mudq = mldq = NVARS*MXSUB;
   mukeep = mlkeep = NVARS;
-  flag = CVBBDPrecInit(cvode_mem, local_N, mudq, mldq,
+  flag = CVBBDPrecInit(cvode_mem, local_N, mudq, mldq, 
                        mukeep, mlkeep, ZERO, flocal, NULL);
   if(check_flag(&flag, "CVBBDPrecAlloc", 1, my_pe)) MPI_Abort(comm, 1);
 
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
   /* Loop over jpre (= PREC_LEFT, PREC_RIGHT), and solve the problem */
   for (jpre = PREC_LEFT; jpre <= PREC_RIGHT; jpre++) {
 
-  /* On second run, re-initialize u, the integrator, CVBBDPRE,
+  /* On second run, re-initialize u, the integrator, CVBBDPRE, 
      and preconditioning type */
 
   if (jpre == PREC_RIGHT) {
@@ -370,7 +370,7 @@ static void SetInitialProfiles(N_Vector u, UserData data)
       x = XMIN + jx*dx;
       cx = SUNSQR(RCONST(0.1)*(x - xmid));
       cx = RCONST(1.0) - cx + RCONST(0.5)*SUNSQR(cx);
-      uarray[offset  ] = C1_SCALE*cx*cy;
+      uarray[offset  ] = C1_SCALE*cx*cy; 
       uarray[offset+1] = C2_SCALE*cx*cy;
       offset = offset + 2;
     }
@@ -395,7 +395,7 @@ static void PrintIntro(int npes, sunindextype mudq, sunindextype mldq,
 
 /* Print current t, step count, order, stepsize, and sampled c1,c2 values */
 
-static void PrintOutput(void *cvode_mem, int my_pe, MPI_Comm comm,
+static void PrintOutput(void *cvode_mem, int my_pe, MPI_Comm comm, 
                         N_Vector u, realtype t)
 {
   int qu, flag, npelast;
@@ -420,7 +420,7 @@ static void PrintOutput(void *cvode_mem, int my_pe, MPI_Comm comm,
   }
 
   /* On PE 0, receive c1,c2 at top right, then print performance data
-     and sampled solution values */
+     and sampled solution values */ 
   if (my_pe == 0) {
     if (npelast != 0)
       MPI_Recv(&tempu[0], 2, PVEC_REAL_MPI_TYPE, npelast, 0, comm, &status);
@@ -503,14 +503,14 @@ static void PrintFinalStats(void *cvode_mem)
   flag = CVBBDPrecGetNumGfnEvals(cvode_mem, &ngevalsBBDP);
   check_flag(&flag, "CVBBDPrecGetNumGfnEvals", 1, 0);
   printf("In CVBBDPRE: real/integer local work space sizes = %ld, %ld\n",
-	 lenrwBBDP, leniwBBDP);
+	 lenrwBBDP, leniwBBDP);  
   printf("             no. flocal evals. = %ld\n",ngevalsBBDP);
 }
-
+ 
 /* Routine to send boundary data to neighboring PEs */
 
-static void BSend(MPI_Comm comm,
-                  int my_pe, int isubx, int isuby,
+static void BSend(MPI_Comm comm, 
+                  int my_pe, int isubx, int isuby, 
                   sunindextype dsizex, sunindextype dsizey,
                   realtype uarray[])
 {
@@ -539,7 +539,7 @@ static void BSend(MPI_Comm comm,
       for (i = 0; i < NVARS; i++)
         bufleft[offsetbuf+i] = uarray[offsetu+i];
     }
-    MPI_Send(&bufleft[0], dsizey, PVEC_REAL_MPI_TYPE, my_pe-1, 0, comm);
+    MPI_Send(&bufleft[0], dsizey, PVEC_REAL_MPI_TYPE, my_pe-1, 0, comm);   
   }
 
   /* If isubx < NPEX-1, send data from right y-line of u (via bufright) */
@@ -551,11 +551,11 @@ static void BSend(MPI_Comm comm,
       for (i = 0; i < NVARS; i++)
         bufright[offsetbuf+i] = uarray[offsetu+i];
     }
-    MPI_Send(&bufright[0], dsizey, PVEC_REAL_MPI_TYPE, my_pe+1, 0, comm);
+    MPI_Send(&bufright[0], dsizey, PVEC_REAL_MPI_TYPE, my_pe+1, 0, comm);   
   }
 
 }
-
+ 
 /* Routine to start receiving boundary data from neighboring PEs.
    Notes:
    1) buffer should be able to hold 2*NVARS*MYSUB realtype entries, should be
@@ -563,7 +563,7 @@ static void BSend(MPI_Comm comm,
    be manipulated between the two calls.
    2) request should have 4 entries, and should be passed in both calls also. */
 
-static void BRecvPost(MPI_Comm comm, MPI_Request request[],
+static void BRecvPost(MPI_Comm comm, MPI_Request request[], 
                       int my_pe, int isubx, int isuby,
 		      sunindextype dsizex, sunindextype dsizey,
 		      realtype uext[], realtype buffer[])
@@ -605,8 +605,8 @@ static void BRecvPost(MPI_Comm comm, MPI_Request request[],
    be manipulated between the two calls.
    2) request should have 4 entries, and should be passed in both calls also. */
 
-static void BRecvWait(MPI_Request request[],
-                      int isubx, int isuby,
+static void BRecvWait(MPI_Request request[], 
+                      int isubx, int isuby, 
                       sunindextype dsizex, realtype uext[],
                       realtype buffer[])
 {
@@ -690,7 +690,7 @@ static void fucomm(realtype t, N_Vector u, void *user_data)
 
 /***************** Function called by the solver **************************/
 
-/* f routine.  Evaluate f(t,y).  First call fucomm to do communication of
+/* f routine.  Evaluate f(t,y).  First call fucomm to do communication of 
    subgrid boundary data into uext.  Then calculate f by a call to flocal. */
 
 static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
@@ -790,7 +790,7 @@ static int flocal(sunindextype Nlocal, realtype t, N_Vector u,
   hordco = data->hdco;
   horaco = data->haco;
 
-  /* Set diurnal rate coefficients as functions of t, and save q4 in
+  /* Set diurnal rate coefficients as functions of t, and save q4 in 
   data block for use by preconditioner evaluation routine            */
 
   s = sin((data->om)*t);
@@ -855,7 +855,7 @@ static int flocal(sunindextype Nlocal, realtype t, N_Vector u,
       /* Load all terms into duarray */
 
       offsetu = lx*NVARS + ly*nvmxsub;
-      duarray[offsetu]   = vertd1 + hord1 + horad1 + rkin1;
+      duarray[offsetu]   = vertd1 + hord1 + horad1 + rkin1; 
       duarray[offsetu+1] = vertd2 + hord2 + horad2 + rkin2;
     }
   }

@@ -35,11 +35,11 @@
 extern "C" {
 #endif
 
-  extern void FARK_BMASS(long int *N, long int *MU,
-                         long int *ML, long int *EBAND,
+  extern void FARK_BMASS(long int *N, long int *MU, 
+                         long int *ML, long int *EBAND, 
                          realtype *T, realtype *BMASS,
                          long int *IPAR, realtype *RPAR,
-                         realtype *V1, realtype *V2, realtype *V3,
+                         realtype *V1, realtype *V2, realtype *V3, 
                          int *IER);
 
 #ifdef __cplusplus

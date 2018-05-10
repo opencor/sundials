@@ -2,27 +2,27 @@
  * -----------------------------------------------------------------
  * Programmer(s): Daniel Reynolds @ SMU
  *                David Gardner @ LLNL
- * Based on code sundials_dense.c by: Scott D. Cohen,
+ * Based on code sundials_dense.c by: Scott D. Cohen, 
  *     Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the implementation file for the dense implementation of
+ * This is the implementation file for the dense implementation of 
  * the SUNMATRIX package.
  * -----------------------------------------------------------------
- */
+ */ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +63,7 @@ SUNMatrix SUNDenseMatrix(sunindextype M, sunindextype N)
   A = NULL;
   A = (SUNMatrix) malloc(sizeof *A);
   if (A == NULL) return(NULL);
-
+  
   /* Create matrix operation structure */
   ops = NULL;
   ops = (SUNMatrix_Ops) malloc(sizeof(struct _generic_SUNMatrix_Ops));
@@ -100,7 +100,7 @@ SUNMatrix SUNDenseMatrix(sunindextype M, sunindextype N)
     free(content->data); free(content); free(ops); free(A); return(NULL);
   }
   for (j=0; j<N; j++) content->cols[j] = content->data + j * M;
-
+  
   /* Attach content and ops */
   A->content = content;
   A->ops     = ops;
@@ -110,14 +110,14 @@ SUNMatrix SUNDenseMatrix(sunindextype M, sunindextype N)
 
 
 /* ----------------------------------------------------------------------------
- * Function to print the dense matrix
+ * Function to print the dense matrix 
  */
-
+ 
 void SUNDenseMatrix_Print(SUNMatrix A, FILE* outfile)
 {
   sunindextype i, j;
-
-  /* should not be called unless A is a dense matrix;
+  
+  /* should not be called unless A is a dense matrix; 
      otherwise return immediately */
   if (SUNMatGetID(A) != SUNMATRIX_DENSE)
     return;
@@ -257,7 +257,7 @@ int SUNMatScaleAddI_Dense(realtype c, SUNMatrix A)
   for (j=0; j<SM_COLUMNS_D(A); j++)
     for (i=0; i<SM_ROWS_D(A); i++) {
       SM_ELEMENT_D(A,i,j) *= c;
-      if (i == j)
+      if (i == j) 
         SM_ELEMENT_D(A,i,j) += ONE;
     }
   return 0;
@@ -282,7 +282,7 @@ int SUNMatMatvec_Dense(SUNMatrix A, N_Vector x, N_Vector y)
 {
   sunindextype i, j;
   realtype *col_j, *xd, *yd;
-
+  
   /* Verify that A, x and y are compatible */
   if (!SMCompatible2_Dense(A, x, y))
     return 1;
@@ -338,13 +338,13 @@ static booleantype SMCompatible_Dense(SUNMatrix A, SUNMatrix B)
 
 static booleantype SMCompatible2_Dense(SUNMatrix A, N_Vector x, N_Vector y)
 {
-  /*   vectors must be one of {SERIAL, OPENMP, PTHREADS} */
+  /*   vectors must be one of {SERIAL, OPENMP, PTHREADS} */ 
   if ( (N_VGetVectorID(x) != SUNDIALS_NVEC_SERIAL) &&
        (N_VGetVectorID(x) != SUNDIALS_NVEC_OPENMP) &&
        (N_VGetVectorID(x) != SUNDIALS_NVEC_PTHREADS) )
     return SUNFALSE;
 
-  /* Optimally we would verify that the dimensions of A, x and y agree,
+  /* Optimally we would verify that the dimensions of A, x and y agree, 
    but since there is no generic 'length' routine for N_Vectors we cannot */
 
   return SUNTRUE;

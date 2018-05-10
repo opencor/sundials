@@ -3,32 +3,32 @@
  * Programmer(s): Daniel Reynolds @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the header file for the LAPACK band implementation of the
+ * This is the header file for the LAPACK band implementation of the 
  * SUNLINSOL module.
- *
- * Part I contains declarations specific to the LAPACK band
+ * 
+ * Part I contains declarations specific to the LAPACK band 
  * implementation of the supplied SUNLINSOL module.
- *
- * Part II contains the prototype for the constructor
- * SUNLapackBand as well as implementation-specific prototypes
+ * 
+ * Part II contains the prototype for the constructor 
+ * SUNLapackBand as well as implementation-specific prototypes 
  * for various useful solver operations.
  *
  * Notes:
  *
- *   - The definition of the generic SUNLinearSolver structure can
+ *   - The definition of the generic SUNLinearSolver structure can 
  *     be found in the header file sundials_linearsolver.h.
  *
  * -----------------------------------------------------------------
@@ -68,14 +68,14 @@ extern "C" {
  * -----------------------------------------------------------------
  * PART I: LAPACK band implementation of SUNLinearSolver
  *
- * The LAPACK band implementation of the SUNLinearSolver 'content'
+ * The LAPACK band implementation of the SUNLinearSolver 'content' 
  * structure contains:
  *     N -- size of the linear system
  *     pivots -- index array for partial pivoting in LU factorization
  *     last_flag -- last error return flag from internal setup/solve
  * -----------------------------------------------------------------
  */
-
+  
 struct _SUNLinearSolverContent_LapackBand {
   sunindextype N;
   sunindextype *pivots;
@@ -84,13 +84,13 @@ struct _SUNLinearSolverContent_LapackBand {
 
 typedef struct _SUNLinearSolverContent_LapackBand *SUNLinearSolverContent_LapackBand;
 
-
+  
 /*
  * -----------------------------------------------------------------
  * PART II: functions exported by sunlinsol_lapackband
- *
+ * 
  * CONSTRUCTOR:
- *    SUNLapackBand creates and allocates memory for a LAPACK banded
+ *    SUNLapackBand creates and allocates memory for a LAPACK banded 
  *      matrix solver
  *
  * OTHER:
@@ -115,7 +115,7 @@ SUNDIALS_EXPORT int SUNLinSolSpace_LapackBand(SUNLinearSolver S,
                                               long int *lenrwLS,
                                               long int *leniwLS);
 SUNDIALS_EXPORT int SUNLinSolFree_LapackBand(SUNLinearSolver S);
-
+  
 #ifdef __cplusplus
 }
 #endif

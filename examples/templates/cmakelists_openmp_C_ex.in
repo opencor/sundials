@@ -5,8 +5,8 @@
 # -----------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -52,7 +52,7 @@ SET(SUNDIALS_INC_DIR
 # Add path to SUNDIALS header files
 INCLUDE_DIRECTORIES(${SUNDIALS_INC_DIR})
 
-# Set search path for SUNDIALS libraries
+# Set search path for SUNDIALS libraries 
 SET(SUNDIALS_LIB_DIR @libdir@)
 
 # Find the SUNDIALS solver's library
@@ -119,7 +119,7 @@ IF(LAPACK_LIBRARIES)
 
     # example source files
     ADD_EXECUTABLE(${example} ${example}.c ${examples_dependencies_bl})
-
+  
     # libraries to link against
     TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_LIBS})
     TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_SUNLINSOLLAPACKBAND_LIB})
@@ -145,7 +145,7 @@ IF(KLU_LIBRARIES)
 
     # example source files
     ADD_EXECUTABLE(${example} ${example}.c ${examples_dependencies_klu})
-
+  
     # libraries to link against
     TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_LIBS})
     TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_SUNLINSOLKLU_LIB})
@@ -166,7 +166,7 @@ IF(SUPERLUMT_LIBRARIES)
 
     # example source files
     ADD_EXECUTABLE(${example} ${example}.c ${examples_dependencies_slumt})
-
+  
     # libraries to link against
     TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_LIBS})
     TARGET_LINK_LIBRARIES(${example} ${SUNDIALS_SUNLINSOLSLUMT_LIB})

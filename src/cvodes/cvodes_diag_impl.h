@@ -1,11 +1,11 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -44,7 +44,7 @@ typedef struct {
 
   N_Vector di_bitcomp; /* temporary storage vector                  */
 
-  long int di_nfeDI;   /* no. of calls to f due to difference
+  long int di_nfeDI;   /* no. of calls to f due to difference 
 			  quotient diagonal Jacobian approximation  */
 
   long int di_last_flag; /* last error return flag                  */

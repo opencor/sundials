@@ -4,23 +4,23 @@
  * Based on codes <solver>_lapack.c by: Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the implementation file for the LAPACK dense
+ * This is the implementation file for the LAPACK dense 
  * implementation of the SUNLINSOL package.
  * -----------------------------------------------------------------
- */
+ */ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +36,7 @@ sunindextype GlobalVectorLength_LapDense(N_Vector y);
 
 /*
  * -----------------------------------------------------------------
- * LapackDense solver structure accessibility macros:
+ * LapackDense solver structure accessibility macros: 
  * -----------------------------------------------------------------
  */
 
@@ -60,7 +60,7 @@ SUNLinearSolver SUNLapackDense(N_Vector y, SUNMatrix A)
   SUNLinearSolver_Ops ops;
   SUNLinearSolverContent_LapackDense content;
   sunindextype MatrixRows, VecLength;
-
+  
   /* Check compatibility with supplied SUNMatrix and N_Vector */
   if (SUNMatGetID(A) != SUNMATRIX_DENSE)
     return(NULL);
@@ -76,12 +76,12 @@ SUNLinearSolver SUNLapackDense(N_Vector y, SUNMatrix A)
   VecLength = GlobalVectorLength_LapDense(y);
   if (MatrixRows != VecLength)
     return(NULL);
-
+  
   /* Create linear solver */
   S = NULL;
   S = (SUNLinearSolver) malloc(sizeof *S);
   if (S == NULL) return(NULL);
-
+  
   /* Create linear solver operation structure */
   ops = NULL;
   ops = (SUNLinearSolver_Ops) malloc(sizeof(struct _generic_SUNLinearSolver_Ops));
@@ -116,7 +116,7 @@ SUNLinearSolver SUNLapackDense(N_Vector y, SUNMatrix A)
   if (content->pivots == NULL) {
     free(content); free(ops); free(S); return(NULL);
   }
-
+  
   /* Attach content and ops */
   S->content = content;
   S->ops     = ops;
@@ -150,34 +150,34 @@ int SUNLinSolSetup_LapackDense(SUNLinearSolver S, SUNMatrix A)
   int n, ier;
 
   /* check for valid inputs */
-  if ( (A == NULL) || (S == NULL) )
+  if ( (A == NULL) || (S == NULL) ) 
     return(SUNLS_MEM_NULL);
-
+  
   /* Ensure that A is a dense matrix */
   if (SUNMatGetID(A) != SUNMATRIX_DENSE) {
     LASTFLAG(S) = SUNLS_ILL_INPUT;
     return(LASTFLAG(S));
   }
-
+  
   /* Call LAPACK to do LU factorization of A */
   n = SUNDenseMatrix_Rows(A);
   xgetrf_f77(&n, &n, SUNDenseMatrix_Data(A), &n, PIVOTS(S), &ier);
   LASTFLAG(S) = (long int) ier;
-  if (ier > 0)
+  if (ier > 0) 
     return(SUNLS_LUFACT_FAIL);
-  if (ier < 0)
+  if (ier < 0) 
     return(SUNLS_PACKAGE_FAIL_UNREC);
   return(SUNLS_SUCCESS);
 }
 
 
-int SUNLinSolSolve_LapackDense(SUNLinearSolver S, SUNMatrix A, N_Vector x,
+int SUNLinSolSolve_LapackDense(SUNLinearSolver S, SUNMatrix A, N_Vector x, 
                               N_Vector b, realtype tol)
 {
   int n, one, ier;
   realtype *xdata;
-
-  if ( (A == NULL) || (S == NULL) || (x == NULL) || (b == NULL) )
+  
+  if ( (A == NULL) || (S == NULL) || (x == NULL) || (b == NULL) ) 
     return(SUNLS_MEM_NULL);
 
   /* copy b into x */
@@ -189,14 +189,14 @@ int SUNLinSolSolve_LapackDense(SUNLinearSolver S, SUNMatrix A, N_Vector x,
     LASTFLAG(S) = SUNLS_MEM_FAIL;
     return(LASTFLAG(S));
   }
-
+  
   /* Call LAPACK to solve the linear system */
   n = SUNDenseMatrix_Rows(A);
   one = 1;
-  xgetrs_f77("N", &n, &one, SUNDenseMatrix_Data(A),
+  xgetrs_f77("N", &n, &one, SUNDenseMatrix_Data(A), 
 	     &n, PIVOTS(S), xdata, &n, &ier, 1);
   LASTFLAG(S) = (long int) ier;
-  if (ier < 0)
+  if (ier < 0) 
     return(SUNLS_PACKAGE_FAIL_UNREC);
 
   LASTFLAG(S) = SUNLS_SUCCESS;
@@ -211,8 +211,8 @@ long int SUNLinSolLastFlag_LapackDense(SUNLinearSolver S)
 }
 
 
-int SUNLinSolSpace_LapackDense(SUNLinearSolver S,
-                               long int *lenrwLS,
+int SUNLinSolSpace_LapackDense(SUNLinearSolver S, 
+                               long int *lenrwLS, 
                                long int *leniwLS)
 {
   *lenrwLS = 0;
@@ -232,11 +232,11 @@ int SUNLinSolFree_LapackDense(SUNLinearSolver S)
       free(PIVOTS(S));
       PIVOTS(S) = NULL;
     }
-    free(S->content);
+    free(S->content);  
     S->content = NULL;
   }
   if (S->ops) {
-    free(S->ops);
+    free(S->ops);  
     S->ops = NULL;
   }
   free(S); S = NULL;
@@ -249,7 +249,7 @@ int SUNLinSolFree_LapackDense(SUNLinearSolver S)
  * -----------------------------------------------------------------
  */
 
-/* Inefficient kludge for determining the number of entries in a N_Vector
+/* Inefficient kludge for determining the number of entries in a N_Vector 
    object (replace if such a routine is ever added to the N_Vector API).
 
    Returns "-1" on an error. */

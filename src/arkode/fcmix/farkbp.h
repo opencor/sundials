@@ -33,7 +33,7 @@
  using a Krylov iterative linear solver via the ARKSPILS
  interface, and with a banded difference quotient Jacobian-based
  preconditioner.
-
+ 
  The user-callable functions in this package, with the
  corresponding ARKODE and ARKBBDPRE functions, are as follows:
 
@@ -42,7 +42,7 @@
    FARKBPINIT           ARKBandPrecInit
    FARKBPOPT            (accesses optional outputs)
    -------------        ---------------------------
-
+ 
  In addition to the Fortran implicit right-hand side function
  FARKIFUN, the user may (optionally) supply routines FARKJTSETUP
  and FARKJTIMES that are called by the C interface function
@@ -96,15 +96,15 @@
                   0 if successful,
                  >0 if a recoverable error occurred,
                  <0 if an unrecoverable error ocurred.
-
- (2) Optional user-supplied Jacobian-vector setup and product
+ 
+ (2) Optional user-supplied Jacobian-vector setup and product 
      functions: FARKJTSETUP and FARKJTIMES
 
      As an option, the user may supply a routine that computes
      the product of the system Jacobian  J = dfi(t,y)/dy and a
      given vector v.  If supplied, a 'setup' routine to prepare
      any user data structures must exist, and have the form:
-
+ 
        SUBROUTINE FARKJTSETUP(T, Y, FY, H, IPAR, RPAR, IER)
 
      Typically this routine will use only T and Y.  It must perform any
@@ -123,7 +123,7 @@
        IER  -- return flag [int, output]:
                   0 if successful,
                   nonzero if an error.
-
+ 
      The accompanying Jacobian matrix-vector product routine must
      have the following form:
 
@@ -153,7 +153,7 @@
  (3) Initialization:  FNVINITS / FNVINITOMP / FNVINITPTS,
      generic linear solver initialization, FARKMALLOC, FARKSPILSINIT,
      and FARKBPINIT.
-
+ 
  (3.1) To initialize the vector specification, the user must make
      one of the following calls:
 
@@ -169,11 +169,11 @@
         NEQ = size of vectors [long int, input]
         NUM_THREADS = number of threads
         IER = return completion flag [int, output]:
-	          0 = success,
+	          0 = success, 
 		 -1 = failure.
-
- (3.2) To initialize a generic iterative linear solver structure for
-     solving linear systems arising from implicit or IMEX treatment
+ 
+ (3.2) To initialize a generic iterative linear solver structure for 
+     solving linear systems arising from implicit or IMEX treatment 
      of the IVP, the user must make one of the following calls:
 
           CALL FSUNPCGINIT(4, PRETYPE, MAXL, IER)
@@ -182,12 +182,12 @@
           CALL FSUNSPGMRINIT(4, PRETYPE, MAXL, IER)
           CALL FSUNSPTFQMRINIT(4, PRETYPE, MAXL, IER)
 
-     In each of these, one argument is an int containing the ARKODE solver
-     ID (4).
+     In each of these, one argument is an int containing the ARKODE solver 
+     ID (4). 
 
      The other arguments are:
 
-        PRETYPE = type of preconditioning to perform (0=none, 1=left,
+        PRETYPE = type of preconditioning to perform (0=none, 1=left, 
            2=right, 3=both) [int, input]
         MAXL = maximum Krylov subspace dimension [int, input]
 	IER = return completion flag [int, output]:
@@ -264,11 +264,11 @@
 
         CALL FARKSPILSSETJAC(FLAG, IER)
 
-     with the int FLAG=1 to specify that FARKJTSETUP and FARKJTIMES
-     are provided (FLAG=0 specifies to use and internal finite
+     with the int FLAG=1 to specify that FARKJTSETUP and FARKJTIMES 
+     are provided (FLAG=0 specifies to use and internal finite 
      difference approximation to this product).  The int return
      flag IER=0 if successful, and nonzero otherwise.
-
+ 
  (4) The integrator: FARKODE
 
      Carrying out the integration is accomplished by making calls

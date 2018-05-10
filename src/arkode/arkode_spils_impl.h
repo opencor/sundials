@@ -2,13 +2,13 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -50,11 +50,11 @@ typedef struct ARKSpilsMemRec {
   long int ncfl;      /* ncfl = total number of convergence failures  */
   long int njtsetup;  /* njtsetup = total number of calls to jtsetup  */
   long int njtimes;   /* njtimes = total number of calls to jtimes    */
-  long int nfes;      /* nfeSG = total number of calls to f for
+  long int nfes;      /* nfeSG = total number of calls to f for     
                          difference quotient Jacobian-vector products */
 
   SUNLinearSolver LS; /* generic iterative linear solver object       */
-
+  
   N_Vector ytemp;     /* temp vector passed to jtimes and psolve      */
   N_Vector x;         /* solution vector used by SUNLinearSolver      */
   N_Vector ycur;      /* ARKODE current y vector in Newton Iteration  */
@@ -111,7 +111,7 @@ typedef struct ARKSpilsMassMemRec {
   SUNLinearSolver LS; /* generic iterative linear solver object       */
 
   booleantype time_dependent;  /* flag stating whether M depends on t */
-
+  
   N_Vector x;         /* solution vector used by SUNLinearSolver      */
   N_Vector ycur;      /* ARKODE current y vector                      */
 
@@ -131,7 +131,7 @@ typedef struct ARKSpilsMassMemRec {
   ARKSpilsMassTimesSetupFn mtsetup;
   ARKSpilsMassTimesVecFn mtimes;
   void *mt_data;
-
+  
   long int last_flag; /* last error flag returned by any function     */
 
 } *ARKSpilsMassMem;
@@ -162,18 +162,18 @@ int ARKSpilsDQJtimes(N_Vector v, N_Vector Jv, realtype t,
 int arkSpilsInitialize(ARKodeMem ark_mem);
 
 int arkSpilsSetup(ARKodeMem ark_mem, int convfail, N_Vector ypred,
-                  N_Vector fpred, booleantype *jcurPtr,
-                  N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+                  N_Vector fpred, booleantype *jcurPtr, 
+                  N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3); 
 
 int arkSpilsSolve(ARKodeMem ark_mem, N_Vector b, N_Vector ycur, N_Vector fcur);
 
 int arkSpilsFree(ARKodeMem ark_mem);
 
-/* Generic minit/msetup/mmult/msolve/mfree routines for ARKode to call */
+/* Generic minit/msetup/mmult/msolve/mfree routines for ARKode to call */  
 int arkSpilsMassInitialize(ARKodeMem ark_mem);
-
+  
 int arkSpilsMassSetup(ARKodeMem ark_mem, N_Vector vtemp1,
-                      N_Vector vtemp2, N_Vector vtemp3);
+                      N_Vector vtemp2, N_Vector vtemp3); 
 
 int arkSpilsMassMult(ARKodeMem ark_mem, N_Vector v, N_Vector Mv);
 

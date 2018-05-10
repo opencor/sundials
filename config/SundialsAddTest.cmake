@@ -3,8 +3,8 @@
 # ---------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2013, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -13,7 +13,7 @@
 # ---------------------------------------------------------------
 #
 # SUNDIALS_ADD_TEST(<test name> <executable>)
-#
+# 
 # CMake macro to add a Sundials regression test. Keyword input
 # arguments can be added after <executable> to set regression
 # test options (see oneValueArgs and multiValueArgs below).
@@ -70,7 +70,7 @@ MACRO(SUNDIALS_ADD_TEST NAME EXECUTABLE)
   # command line arguments for the test runner script
   SET(TEST_ARGS
     "--verbose"
-    "--testname=${NAME}"
+    "--testname=${NAME}" 
     "--executablename=$<TARGET_FILE:${EXECUTABLE}>"
     "--outputdir=${CMAKE_BINARY_DIR}/Testing/output"
     )
@@ -90,13 +90,13 @@ MACRO(SUNDIALS_ADD_TEST NAME EXECUTABLE)
       ELSE(MPI_RUN_COMMAND MATCHES "srun")
 	SET(RUN_COMMAND "${MPI_RUN_COMMAND} -n ${SUNDIALS_ADD_TEST_MPI_NPROCS}")
       ENDIF(MPI_RUN_COMMAND MATCHES "srun")
-
+      
       LIST(APPEND TEST_ARGS "--runcommand=\"${RUN_COMMAND}\"")
 
     ENDIF(MPI_ENABLE)
 
   ENDIF()
-
+  
   # set the test input args
   IF("${SUNDIALS_ADD_TEST_TEST_ARGS}" STREQUAL "")
   ELSE()
@@ -158,14 +158,14 @@ MACRO(SUNDIALS_ADD_TEST_INSTALL SOLVER EXECUTABLE)
 
   # command line arguments for the test runner script
   set(TEST_ARGS
-    "--testname=${EXECUTABLE}"
+    "--testname=${EXECUTABLE}" 
     "--executablename=./${EXECUTABLE}"
     "--outputdir=${TEST_INSTALL_DIR}/${SOLVER}"
     "--builddir=${SUNDIALS_ADD_TEST_INSTALL_EXAMPLE_DIR}"
     "--buildcmd=${CMAKE_COMMAND}"
     "--nodiff"
     )
-
+  
   # add test_install target for this solver
   ADD_CUSTOM_TARGET(${SOLVER}_test_install
     COMMAND ${PYTHON_EXECUTABLE} ${TESTRUNNER} ${TEST_ARGS}

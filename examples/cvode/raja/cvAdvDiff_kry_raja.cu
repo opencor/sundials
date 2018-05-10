@@ -2,8 +2,8 @@
  * -----------------------------------------------------------------
  * Programmer(s): Slaven Peles @ LLNL
  * -----------------------------------------------------------------
- * Acknowledgements: This example is based on cvAdvDiff_bnd
- *                   example by Scott D. Cohen, Alan C.
+ * Acknowledgements: This example is based on cvAdvDiff_bnd 
+ *                   example by Scott D. Cohen, Alan C. 
  *                   Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * Example problem:
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 
   SetIC(u, data);  /* Initialize u vector */
 
-  /* Call CVodeCreate to create the solver memory and specify the
+  /* Call CVodeCreate to create the solver memory and specify the 
    * Backward Differentiation Formula and the use of a Newton iteration */
   cvode_mem = CVodeCreate(CV_BDF, CV_NEWTON);
   if(check_flag((void *)cvode_mem, "CVodeCreate", 0)) return(1);
@@ -329,7 +329,7 @@ static int jtv(N_Vector v, N_Vector Jv, realtype t,
     if (j !=    0) Jvdata[index] += verdc * vdata[index-1];
     if (j != MY-1) Jvdata[index] += verdc * vdata[index+1];
   });
-
+  
   return(0);
 }
 

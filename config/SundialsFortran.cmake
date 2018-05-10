@@ -3,8 +3,8 @@
 # ---------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -15,7 +15,7 @@
 #
 # Determining the name-mangling scheme
 # ------------------------------------
-# In general, names of symbols with and without underscore may be mangled
+# In general, names of symbols with and without underscore may be mangled 
 # differently (e.g. g77 mangles mysub to mysub_ and my_sub to my_sub__),
 # we have to consider both cases.
 # Method:
@@ -42,7 +42,7 @@ if(CMAKE_Fortran_COMPILER)
   # If Fortran compiler flags are set using environemnt variables and both FFLAGS
   # and FCFLAGS are used, then check if the variables are the same. If they are
   # not the same then a fatal error occurs.
-  #
+  # 
   # NOTE: This check must occur before 'enable_language(Fortran)' as it will use
   # the value of FFLAGS to set CMAKE_Fortran_FLAGS
   SET(ENV_FFLAGS "$ENV{FFLAGS}")
@@ -129,7 +129,7 @@ if(CMAKE_Fortran_COMPILER)
   try_compile(FTEST_OK ${FortranTest_DIR} ${FortranTest_DIR}
     ftest OUTPUT_VARIABLE MY_OUTPUT)
 
-  # To ensure we do not use stuff from the previous attempts,
+  # To ensure we do not use stuff from the previous attempts, 
   # we must remove the CMakeFiles directory.
   file(REMOVE_RECURSE ${FortranTest_DIR}/CMakeFiles)
 
@@ -162,7 +162,7 @@ if(CMAKE_Fortran_COMPILER)
 
     # We will attempt to sucessfully generate the "ctest1" executable as long as
     # there still are entries in the "options" list
-    while(${iopt} LESS ${imax})
+    while(${iopt} LESS ${imax})   
       # Get the current list entry (current scheme)
       list(GET options ${iopt} opt)
       # Generate C source which calls the "mysub" function using the current scheme
@@ -171,11 +171,11 @@ if(CMAKE_Fortran_COMPILER)
       # and linking to the previously created "flib" library.
       try_compile(CTEST_OK ${FortranTest_DIR} ${FortranTest_DIR}
         ctest1 OUTPUT_VARIABLE MY_OUTPUT)
-      # To ensure we do not use stuff from the previous attempts,
+      # To ensure we do not use stuff from the previous attempts, 
       # we must remove the CMakeFiles directory.
       file(REMOVE_RECURSE ${FortranTest_DIR}/CMakeFiles)
       # Test if we successfully created the "ctest" executable.
-      # If yes, save the current scheme, and set the counter "iopt" to "imax"
+      # If yes, save the current scheme, and set the counter "iopt" to "imax" 
       # so that we exit the while loop.
       # Otherwise, increment the counter "iopt" and go back in the while loop.
       if(CTEST_OK)
@@ -184,7 +184,7 @@ if(CMAKE_Fortran_COMPILER)
       else(CTEST_OK)
         math(EXPR iopt ${iopt}+1)
       endif(CTEST_OK)
-    endwhile(${iopt} LESS ${imax})
+    endwhile(${iopt} LESS ${imax})   
 
     # Infer Fortran name-mangling scheme for symbols WITH underscores.
     # Practically a duplicate of the previous steps.
@@ -205,7 +205,7 @@ if(CMAKE_Fortran_COMPILER)
     set(options my_sub my_sub_ my_sub__ MY_SUB MY_SUB_ MY_SUB__)
     list(LENGTH options imax)
     set(iopt 0)
-    while(${iopt} LESS ${imax})
+    while(${iopt} LESS ${imax})   
       list(GET options ${iopt} opt)
       file(WRITE ${FortranTest_DIR}/ctest2.c "int main(){${opt}();return(0);}\n")
       try_compile(CTEST_OK ${FortranTest_DIR} ${FortranTest_DIR}
@@ -217,7 +217,7 @@ if(CMAKE_Fortran_COMPILER)
       else(CTEST_OK)
         math(EXPR iopt ${iopt}+1)
       endif(CTEST_OK)
-    endwhile(${iopt} LESS ${imax})
+    endwhile(${iopt} LESS ${imax})   
 
     # Proceed based on whether the previous tests were successfull or not
     if(CMAKE_Fortran_SCHEME_NO_UNDERSCORES AND CMAKE_Fortran_SCHEME_WITH_UNDERSCORES)
@@ -226,7 +226,7 @@ if(CMAKE_Fortran_COMPILER)
     else(CMAKE_Fortran_SCHEME_NO_UNDERSCORES AND CMAKE_Fortran_SCHEME_WITH_UNDERSCORES)
       message(STATUS "Determining Fortran name-mangling scheme... FAILED")
     endif(CMAKE_Fortran_SCHEME_NO_UNDERSCORES AND CMAKE_Fortran_SCHEME_WITH_UNDERSCORES)
-
+    
   else(FTEST_OK)
     message(STATUS "Trying to compile and link a simple Fortran program... FAILED")
   endif(FTEST_OK)

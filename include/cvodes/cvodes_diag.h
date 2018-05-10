@@ -1,11 +1,11 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -54,7 +54,7 @@ extern "C" {
 
 #define CVDIAG_NO_ADJ          -101
 
-/*
+/* 
  * -----------------------------------------------------------------
  * PART I - forward problems
  * -----------------------------------------------------------------
@@ -79,7 +79,7 @@ extern "C" {
  */
 
 SUNDIALS_EXPORT int CVDiag(void *cvode_mem);
-
+  
 /*
  * -----------------------------------------------------------------
  * Optional outputs from the CVDIAG linear solver
@@ -110,14 +110,14 @@ SUNDIALS_EXPORT int CVDiagGetLastFlag(void *cvode_mem, long int *flag);
 
 /*
  * -----------------------------------------------------------------
- * The following function returns the name of the constant
+ * The following function returns the name of the constant 
  * associated with a CVDIAG return flag
  * -----------------------------------------------------------------
  */
-
+  
 SUNDIALS_EXPORT char *CVDiagGetReturnFlagName(long int flag);
 
-/*
+/* 
  * -----------------------------------------------------------------
  * PART II - backward problems
  * -----------------------------------------------------------------
@@ -132,9 +132,9 @@ SUNDIALS_EXPORT char *CVDiagGetReturnFlagName(long int flag);
  * The 'which' argument is the int returned by CVodeCreateB.
  * -----------------------------------------------------------------
  */
-
+  
 SUNDIALS_EXPORT int CVDiagB(void *cvode_mem, int which);
-
+  
 
 #ifdef __cplusplus
 }

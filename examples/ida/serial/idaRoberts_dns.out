@@ -3,7 +3,7 @@ idaRoberts_dns: Robertson kinetics DAE serial example problem for IDA
          Three equation chemical kinetics problem.
 
 Linear solver: DENSE, with user-supplied Jacobian.
-Tolerance parameters:  rtol = 0.0001   atol = 1e-08 1e-14 1e-06
+Tolerance parameters:  rtol = 0.0001   atol = 1e-08 1e-14 1e-06 
 Initial conditions y0 = (1 0 0)
 Constraints and id not used.
 
@@ -27,7 +27,7 @@ Constraints and id not used.
 4.0000e+09   5.2291e-07   2.0916e-12   1.0000e+00 | 483  3   4.5703e+08
 4.0000e+10   5.1012e-08   2.0405e-13   1.0000e+00 | 503  2   6.5812e+09
 
-Final Run Statistics:
+Final Run Statistics: 
 
 Number of steps                    = 503
 Number of residual evaluations     = 707

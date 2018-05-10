@@ -3,13 +3,13 @@
  * Programmer(s): Daniel Reynolds @ SMU
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -37,7 +37,7 @@ SUNMatrix F2C_ARKODE_mass_matrix;
 
 /* Fortran callable interfaces */
 
-void FSUNBANDMAT_INIT(int *code, long int *N, long int *mu,
+void FSUNBANDMAT_INIT(int *code, long int *N, long int *mu, 
                       long int *ml, long int *smu, int *ier)
 {
   *ier = 0;
@@ -73,7 +73,7 @@ void FSUNBANDMAT_INIT(int *code, long int *N, long int *mu,
 }
 
 
-void FSUNBANDMASSMAT_INIT(long int *N, long int *mu,
+void FSUNBANDMASSMAT_INIT(long int *N, long int *mu, 
                           long int *ml, long int *smu, int *ier)
 {
   *ier = 0;

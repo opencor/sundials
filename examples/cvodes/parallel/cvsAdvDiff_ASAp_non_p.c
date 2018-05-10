@@ -84,7 +84,7 @@ typedef struct {
 /* Prototypes of user-supplied funcitons */
 
 static int f(realtype t, N_Vector u, N_Vector udot, void *user_data);
-static int fB(realtype t, N_Vector u,
+static int fB(realtype t, N_Vector u, 
               N_Vector uB, N_Vector uBdot, void *user_dataB);
 
 /* Prototypes of private functions */
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
   UserData data;
 
   void *cvode_mem;
-
+  
   N_Vector u;
   realtype reltol, abstol;
 
@@ -177,10 +177,10 @@ int main(int argc, char *argv[])
   data->nrem = nrem;
   data->local_N = local_N;
 
-  /*-------------------------
+  /*------------------------- 
     Forward integration phase
     -------------------------*/
-
+  
   /* Set relative and absolute tolerances for forward phase */
   reltol = ZERO;
   abstol = ATOL;
@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
     ---------------------------*/
   g_val = Compute_g(u, data);
 
-  /*--------------------------
+  /*-------------------------- 
     Backward integration phase
     --------------------------*/
 
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
   /* Free memory */
   N_VDestroy_Parallel(u);
   N_VDestroy_Parallel(uB);
-  CVodeFree(&cvode_mem);
+  CVodeFree(&cvode_mem);  
 
   if (my_pe != npes) {
     free(data->z1);
@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
  */
 
 /*
- * f routine. Compute f(t,u) for forward phase.
+ * f routine. Compute f(t,u) for forward phase. 
  */
 
 static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
@@ -303,7 +303,7 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
   comm = data->comm;
   npes = data->npes;
   my_pe = data->my_pe;
-
+  
   /* If this process is inactive, return now */
   if (my_pe == npes) return(0);
 
@@ -326,7 +326,7 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
    if (my_pe != 0)
      MPI_Send(&udata[0], 1, PVEC_REAL_MPI_TYPE, my_pe_m1, 0, comm);
    if (my_pe != last_pe)
-     MPI_Send(&udata[my_length-1], 1, PVEC_REAL_MPI_TYPE, my_pe_p1, 0, comm);
+     MPI_Send(&udata[my_length-1], 1, PVEC_REAL_MPI_TYPE, my_pe_p1, 0, comm);   
 
   /* Receive needed data from processes before and after current process. */
    if (my_pe != 0)
@@ -334,7 +334,7 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
    else uLeft = ZERO;
    if (my_pe != last_pe)
      MPI_Recv(&uRight, 1, PVEC_REAL_MPI_TYPE, my_pe_p1, 0, comm,
-              &status);
+              &status);   
    else uRight = ZERO;
 
   /* Loop over all grid points in current process. */
@@ -355,10 +355,10 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
 }
 
 /*
- * fB routine. Compute right hand side of backward problem
+ * fB routine. Compute right hand side of backward problem 
  */
 
-static int fB(realtype t, N_Vector u,
+static int fB(realtype t, N_Vector u, 
               N_Vector uB, N_Vector uBdot, void *user_dataB)
 {
   realtype *uBdata, *duBdata, *udata;
@@ -389,9 +389,9 @@ static int fB(realtype t, N_Vector u,
     duBdata[0] = ZERO;
     duBdata[1] = ZERO;
     for (i=0; i<npes; i++) {
-      MPI_Recv(&intgr1, 1, PVEC_REAL_MPI_TYPE, i, 0, comm, &status);
+      MPI_Recv(&intgr1, 1, PVEC_REAL_MPI_TYPE, i, 0, comm, &status); 
       duBdata[0] += intgr1;
-      MPI_Recv(&intgr2, 1, PVEC_REAL_MPI_TYPE, i, 0, comm, &status);
+      MPI_Recv(&intgr2, 1, PVEC_REAL_MPI_TYPE, i, 0, comm, &status); 
       duBdata[1] += intgr2;
     }
 
@@ -420,7 +420,7 @@ static int fB(realtype t, N_Vector u,
     if (my_pe != 0) {
       data_out[0] = udata[0];
       data_out[1] = uBdata[0];
-
+    
       MPI_Send(data_out, 2, PVEC_REAL_MPI_TYPE, my_pe_m1, 0, comm);
     }
     if (my_pe != last_pe) {
@@ -429,11 +429,11 @@ static int fB(realtype t, N_Vector u,
 
       MPI_Send(data_out, 2, PVEC_REAL_MPI_TYPE, my_pe_p1, 0, comm);
     }
-
+    
     /* Receive needed data from processes before and after current process. */
     if (my_pe != 0) {
       MPI_Recv(data_in, 2, PVEC_REAL_MPI_TYPE, my_pe_m1, 0, comm, &status);
-
+      
       uLeft = data_in[0];
       uBLeft = data_in[1];
     } else {
@@ -452,12 +452,12 @@ static int fB(realtype t, N_Vector u,
 
     /* Loop over all grid points in current process. */
     for (i=0; i<my_length; i++) {
-
+      
       /* Extract uB at x_i and two neighboring points */
       uBi = uBdata[i];
       uBlt = (i==0) ? uBLeft: uBdata[i-1];
       uBrt = (i==my_length-1) ? uBRight : uBdata[i+1];
-
+      
       /* Set diffusion and advection terms and load into udot */
       hdiff = hordc*(uBlt - TWO*uBi + uBrt);
       hadv = horac*(uBrt - uBlt);
@@ -493,8 +493,8 @@ static int fB(realtype t, N_Vector u,
  *--------------------------------------------------------------------
  */
 
-/*
- * Set initial conditions in u vector
+/* 
+ * Set initial conditions in u vector 
  */
 
 static void SetIC(N_Vector u, realtype dx, sunindextype my_length, sunindextype my_base)
@@ -513,11 +513,11 @@ static void SetIC(N_Vector u, realtype dx, sunindextype my_length, sunindextype 
     iglobal = my_base + i;
     x = iglobal*dx;
     udata[i-1] = x*(XMAX - x)*SUNRexp(TWO*x);
-  }
+  }  
 }
 
-/*
- * Set final conditions in uB vector
+/* 
+ * Set final conditions in uB vector 
  */
 
 static void SetICback(N_Vector uB, sunindextype my_base)
@@ -536,7 +536,7 @@ static void SetICback(N_Vector uB, sunindextype my_base)
 }
 
 /*
- * Compute local value of the space integral int_x z(x) dx
+ * Compute local value of the space integral int_x z(x) dx 
  */
 
 static realtype Xintgr(realtype *z, sunindextype l, realtype dx)
@@ -546,14 +546,14 @@ static realtype Xintgr(realtype *z, sunindextype l, realtype dx)
 
   my_intgr = RCONST(0.5)*(z[0] + z[l-1]);
   for (i = 1; i < l-1; i++)
-    my_intgr += z[i];
+    my_intgr += z[i]; 
   my_intgr *= dx;
 
   return(my_intgr);
 }
 
 /*
- * Compute value of g(u)
+ * Compute value of g(u) 
  */
 
 static realtype Compute_g(N_Vector u, UserData data)
@@ -574,7 +574,7 @@ static realtype Compute_g(N_Vector u, UserData data)
   if (my_pe == npes) {  /* Loop over all other processes and sum */
     intgr = ZERO;
     for (i=0; i<npes; i++) {
-      MPI_Recv(&my_intgr, 1, PVEC_REAL_MPI_TYPE, i, 0, comm, &status);
+      MPI_Recv(&my_intgr, 1, PVEC_REAL_MPI_TYPE, i, 0, comm, &status); 
       intgr += my_intgr;
     }
     return(intgr);
@@ -587,7 +587,7 @@ static realtype Compute_g(N_Vector u, UserData data)
   }
 }
 
-/*
+/* 
  * Print output after backward integration
  */
 
@@ -655,14 +655,14 @@ static void PrintOutput(realtype g_val, N_Vector uB, UserData data)
 
 }
 
-/*
+/* 
  * Check function return value.
  *    opt == 0 means SUNDIALS function allocates memory so check if
  *             returned NULL pointer
  *    opt == 1 means SUNDIALS function returns a flag so check if
  *             flag >= 0
  *    opt == 2 means function allocates memory so check if returned
- *             NULL pointer
+ *             NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt, int id)

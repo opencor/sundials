@@ -2,13 +2,13 @@
 # Programmer:  Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # LLNS/SMU Copyright Start
-# Copyright (c) 2017, Southern Methodist University and
+# Copyright (c) 2017, Southern Methodist University and 
 # Lawrence Livermore National Security
 #
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Southern Methodist University and Lawrence Livermore
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Southern Methodist University and Lawrence Livermore 
 # National Laboratory under Contract DE-AC52-07NA27344.
-# Produced at Southern Methodist University and the Lawrence
+# Produced at Southern Methodist University and the Lawrence 
 # Livermore National Laboratory.
 #
 # All rights reserved.
@@ -25,7 +25,7 @@ SET(arkode_SOURCES
   arkode_bandpre.c
   arkode_bbdpre.c
   arkode_butcher.c
-  arkode_direct.c
+  arkode_direct.c        
   arkode_io.c
   arkode_spils.c
   )
@@ -82,14 +82,14 @@ ADD_PREFIX(${sundials_SOURCE_DIR}/include/arkode/ arkode_HEADERS)
 INCLUDE_DIRECTORIES(.)
 INCLUDE_DIRECTORIES(../sundials)
 
-# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY
+# Define C preprocessor flag -DBUILD_SUNDIALS_LIBRARY 
 ADD_DEFINITIONS(-DBUILD_SUNDIALS_LIBRARY)
 
 # Build the static library
 IF(BUILD_STATIC_LIBS)
 
   # Add the build target for the static ARKODE library
-  ADD_LIBRARY(sundials_arkode_static STATIC
+  ADD_LIBRARY(sundials_arkode_static STATIC 
     ${arkode_SOURCES} ${shared_SOURCES} ${sunmatrix_SOURCES} ${sunlinsol_SOURCES})
 
   # Set the library name and make sure it is not deleted
@@ -105,7 +105,7 @@ ENDIF(BUILD_STATIC_LIBS)
 IF(BUILD_SHARED_LIBS)
 
   # Add the build target for the ARKODE library
-  ADD_LIBRARY(sundials_arkode_shared SHARED
+  ADD_LIBRARY(sundials_arkode_shared SHARED 
     ${arkode_SOURCES} ${shared_SOURCES} ${sunmatrix_SOURCES} ${sunlinsol_SOURCES})
 
   IF(UNIX)

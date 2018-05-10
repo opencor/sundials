@@ -42,7 +42,7 @@ ARKode solver parameters:
     9.00000E+00  5.45196E-01  3.49456E+00  1.99999E+00
     1.00000E+01  5.65426E-01  3.49094E+00  1.99999E+00
    ----------------------------------------------------
-
+   
  Final Solver Statistics:
     Internal solver steps =                   104  (attempted =                  104 )
     Total RHS evals:  Fe =                     0   Fi =                  1733
@@ -53,4 +53,4 @@ ARKode solver parameters:
     Total number of nonlinear solver convergence failures =                     0
     Total number of error test failures =                     0
     Total number of mass matrix evaluations =                     1
-
+   

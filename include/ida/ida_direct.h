@@ -4,13 +4,13 @@
  *                Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -58,56 +58,56 @@ extern "C" {
   Type: IDADlsJacFn
 
   A Jacobian approximation function Jac must be of type IDADlsJacFn.
-  Its parameters are:
-
+  Its parameters are:                     
+                                                                 
   t   is the current value of the independent variable.
-
-  y   is the current value of the dependent variable vector,
-      namely the predicted value of y(t).
-
-  yp  is the current value of the derivative vector y',
-      namely the predicted value of y'(t).
-
-  r   is the residual vector F(tt,yy,yp).
-
-  c_j is the scalar in the system Jacobian, proportional to
+                                                                 
+  y   is the current value of the dependent variable vector,     
+      namely the predicted value of y(t).                     
+                                                                 
+  yp  is the current value of the derivative vector y',          
+      namely the predicted value of y'(t).                    
+                                                                 
+  r   is the residual vector F(tt,yy,yp).                     
+                                                                 
+  c_j is the scalar in the system Jacobian, proportional to 
       the inverse of the step size h.
-
-  user_data is a pointer to user Jacobian data - the same as the
-      user_data parameter passed to IDASetUserData.
-
-  Jac is the SUNMatrix to be loaded by an IDADlsJacFn routine
-      with an approximation to the system Jacobian matrix
+                                                                 
+  user_data is a pointer to user Jacobian data - the same as the    
+      user_data parameter passed to IDASetUserData.                     
+                                                                 
+  Jac is the SUNMatrix to be loaded by an IDADlsJacFn routine 
+      with an approximation to the system Jacobian matrix                                  
              J = dF/dy + c_j *dF/dy'
-      at the given point (t,y,y'), where the ODE system is given
-      by F(t,y,y') = 0.
+      at the given point (t,y,y'), where the ODE system is given 
+      by F(t,y,y') = 0.   
 
       Note that Jac is NOT preset to zero!
-
-  tmp1, tmp2, tmp3 are pointers to memory allocated for
-      N_Vectors which can be used by an IDADlsDenseJacFn routine
-      as temporary storage or work space.
-
-  A IDADlsDenseJacFn should return
-      0 if successful,
-      a positive int if a recoverable error occurred, or
-      a negative int if a nonrecoverable error occurred.
-  In the case of a recoverable error return, the integrator will
+                                                                 
+  tmp1, tmp2, tmp3 are pointers to memory allocated for          
+      N_Vectors which can be used by an IDADlsDenseJacFn routine 
+      as temporary storage or work space.                     
+                                                                 
+  A IDADlsDenseJacFn should return                                
+      0 if successful,                                           
+      a positive int if a recoverable error occurred, or         
+      a negative int if a nonrecoverable error occurred.         
+  In the case of a recoverable error return, the integrator will 
   attempt to recover by reducing the stepsize (which changes c_j).
-
+ 
   NOTE: See the relevant SUNMatrix implementation header files
-      and documentation for mechanisms to inquire about matrix
+      and documentation for mechanisms to inquire about matrix 
       dimensions, and for efficient ways to set matrix entries.
-
-
-  NOTE: If the user's Jacobian routine needs other quantities,
+                                                                
+                                                                
+  NOTE: If the user's Jacobian routine needs other quantities,   
       they are accessible as follows: hcur (the current stepsize)
-      and ewt (the error weight vector) are accessible through
+      and ewt (the error weight vector) are accessible through   
       IDAGetCurrentStep and IDAGetErrWeights, respectively, but this
       requires including in user_data a pointer to the solver memory.
       The unit roundoff is available as UNIT_ROUNDOFF defined in
       sundials_types.h.
-
+ 
   -----------------------------------------------------------------*/
 typedef int (*IDADlsJacFn)(realtype t, realtype c_j, N_Vector y,
                            N_Vector yp, N_Vector r, SUNMatrix Jac,
@@ -122,7 +122,7 @@ typedef int (*IDADlsJacFn)(realtype t, realtype c_j, N_Vector y,
 /*-----------------------------------------------------------------
   Required inputs for the IDADLS linear solver interface:
 
-  IDADlsSetLinearSolver specifies the direct SUNLinearSolver
+  IDADlsSetLinearSolver specifies the direct SUNLinearSolver 
   object that IDA should use.
 
   The return value is one of:
@@ -130,7 +130,7 @@ typedef int (*IDADlsJacFn)(realtype t, realtype c_j, N_Vector y,
     IDADLS_MEM_NULL  if the IDA memory was NULL
     IDADLS_ILL_INPUT if the arguments are incompatible
 ---------------------------------------------------------------*/
-SUNDIALS_EXPORT int IDADlsSetLinearSolver(void *ida_mem,
+SUNDIALS_EXPORT int IDADlsSetLinearSolver(void *ida_mem, 
                                           SUNLinearSolver LS,
                                           SUNMatrix A);
 
@@ -140,11 +140,11 @@ SUNDIALS_EXPORT int IDADlsSetLinearSolver(void *ida_mem,
 
  IDADlsSetJacFn specifies the dense Jacobian approximation
  routine to be used for a direct dense linear solver.
-
- By default, a difference quotient approximation is used for
- dense and band; no default exists for sparse (so this must
+ 
+ By default, a difference quotient approximation is used for 
+ dense and band; no default exists for sparse (so this must 
  be user-supplied).
-
+ 
  The return value is one of:
     IDADLS_SUCCESS   if successful
     IDADLS_MEM_NULL  if the IDA memory was NULL
@@ -152,7 +152,7 @@ SUNDIALS_EXPORT int IDADlsSetLinearSolver(void *ida_mem,
 ---------------------------------------------------------------*/
 SUNDIALS_EXPORT int IDADlsSetJacFn(void *ida_mem, IDADlsJacFn jac);
 
-
+  
 /*---------------------------------------------------------------
  Optional outputs from the IDADLS linear solver
 
@@ -183,7 +183,7 @@ SUNDIALS_EXPORT int IDADlsGetLastFlag(void *ida_mem,
 
 
 /*---------------------------------------------------------------
- The following function returns the name of the constant
+ The following function returns the name of the constant 
  associated with a IDADLS return flag
 ---------------------------------------------------------------*/
 SUNDIALS_EXPORT char *IDADlsGetReturnFlagName(long int flag);

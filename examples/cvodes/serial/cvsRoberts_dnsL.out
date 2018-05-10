@@ -1,4 +1,4 @@
-
+ 
 3-species kinetics problem
 
 At t = 2.6391e-01      y =  9.899653e-01    3.470564e-05    1.000000e-02
@@ -21,4 +21,4 @@ At t = 4.0000e+10      y =  6.934511e-08    2.773804e-13    9.999999e-01
 Final Statistics:
 nst = 542    nfe  = 755    nsetups = 107    nfeLS = 0      nje = 11
 nni = 751    ncfn = 0      netf = 22     nge = 570
-
+ 

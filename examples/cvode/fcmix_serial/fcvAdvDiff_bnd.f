@@ -13,7 +13,7 @@ C     u(x,y,t=0) = x(2-x)y(1-y)exp(5xy) .
 C     The PDE is discretized on a uniform MX+2 by MY+2 grid with
 C     central differencing, and with boundary values eliminated,
 C     leaving an ODE system of size NEQ = MX*MY.
-C     This program solves this problem with CVODE, using the Fortran/C
+C     This program solves this problem with CVODE, using the Fortran/C 
 C     interface routine package. This solution uses the BDF method,
 C     a user-supplied banded Jacobian routine, and scalar relative and
 C     absolute tolerances. It prints results at t = .1, .2, ..., 1.0.
@@ -25,7 +25,7 @@ C
       INTEGER*4 MX, MY, MXMY
       PARAMETER (MX=10, MY=5)
       PARAMETER (MXMY=MX*MY)
-C
+C     
       DOUBLE PRECISION XMAX, YMAX
       DATA XMAX/2.0D0/, YMAX/1.0D0/
 C
@@ -33,10 +33,10 @@ C
       INTEGER*4 IER, METH, ITMETH, IATOL, ITASK, JOUT
 C The following declaration specification should match C type long int.
       INTEGER*8 NEQ, IOUT(25), IPAR(2), MU, ML
-      DOUBLE PRECISION RTOL, ATOL, T0, T, TOUT, DTOUT, UNORM
+      DOUBLE PRECISION RTOL, ATOL, T0, T, TOUT, DTOUT, UNORM 
       DOUBLE PRECISION U(MXMY), ROUT(10), RPAR(5)
 C
-      DATA LNST/3/, LNFE/4/, LNETF/5/,  LNCF/6/, LNNI/7/, LNSETUP/8/,
+      DATA LNST/3/, LNFE/4/, LNETF/5/,  LNCF/6/, LNNI/7/, LNSETUP/8/, 
      1     LNJE/17/
 C
       CALL INITBX(XMAX, YMAX, MX, MY, U, IPAR, RPAR)
@@ -302,6 +302,6 @@ C
  20     CONTINUE
 C
         IER = 0
-C
+C     
       RETURN
       END

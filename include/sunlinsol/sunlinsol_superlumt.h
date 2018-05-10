@@ -5,32 +5,32 @@
  *     written by Carol S. Woodward @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the header file for the SuperLUMT implementation of the
+ * This is the header file for the SuperLUMT implementation of the 
  * SUNLINSOL module.
- *
- * Part I contains declarations specific to the SuperLUMT
+ * 
+ * Part I contains declarations specific to the SuperLUMT 
  * implementation of the supplied SUNLINSOL module.
- *
- * Part II contains the prototype for the constructor
- * SUNSuperLUMT as well as implementation-specific prototypes
+ * 
+ * Part II contains the prototype for the constructor 
+ * SUNSuperLUMT as well as implementation-specific prototypes 
  * for various useful solver operations.
  *
  * Notes:
  *
- *   - The definition of the generic SUNLinearSolver structure can
+ *   - The definition of the generic SUNLinearSolver structure can 
  *     be found in the header file sundials_linearsolver.h.
  *
  * -----------------------------------------------------------------
@@ -44,7 +44,7 @@
 #include <sundials/sundials_nvector.h>
 #include <sunmatrix/sunmatrix_sparse.h>
 
-/* assume SuperLU_MT library was built with compatible index type */
+/* assume SuperLU_MT library was built with compatible index type */  
 #if defined(SUNDIALS_INT64_T)
 #define _LONGINT
 #endif
@@ -81,15 +81,15 @@ extern "C" {
 #error  Incompatible realtype for SuperLUMT
 #endif
 
-
+  
 /*
  * -----------------------------------------------------------------
  * PART I: SuperLUMT implementation of SUNLinearSolver
  *
- * The SuperLUMT implementation of the SUNLinearSolver 'content'
+ * The SuperLUMT implementation of the SUNLinearSolver 'content' 
  * structure contains:
  *     last_flag -- last error return flag from internal setup/solve
- *     first_factorize -- flag indicating whether the factorization
+ *     first_factorize -- flag indicating whether the factorization 
  *       has ever been performed
  *     A, AC, L, U, B -- SuperMatrix pointers used in solve
  *     Gstat -- GStat_t object used in solve
@@ -101,7 +101,7 @@ extern "C" {
  *     options -- pointer to SuperLUMT options structure
  * -----------------------------------------------------------------
  */
-
+  
 struct _SUNLinearSolverContent_SuperLUMT {
   long int     last_flag;
   int          first_factorize;
@@ -110,25 +110,25 @@ struct _SUNLinearSolverContent_SuperLUMT {
   sunindextype *perm_r, *perm_c;
   sunindextype N;
   int          num_threads;
-  realtype     diag_pivot_thresh;
+  realtype     diag_pivot_thresh; 
   int          ordering;
   superlumt_options_t *options;
 };
 
 typedef struct _SUNLinearSolverContent_SuperLUMT *SUNLinearSolverContent_SuperLUMT;
 
-
+  
 /*
  * -----------------------------------------------------------------
  * PART II: functions exported by sunlinsol_slumt
- *
+ * 
  * CONSTRUCTOR:
- *    SUNSuperLUMT creates and allocates memory for a SuperLUMT sparse-direct
+ *    SUNSuperLUMT creates and allocates memory for a SuperLUMT sparse-direct 
  *      linear solver
  *
  * OTHER:
- *    SUNSuperLUMTSetOrdering sets the ordering used by SuperLUMT for reducing
- *      fill in the linear solve.  Options for ordering_choice are:
+ *    SUNSuperLUMTSetOrdering sets the ordering used by SuperLUMT for reducing 
+ *      fill in the linear solve.  Options for ordering_choice are: 
  *         0 for natural ordering
  *         1 for minimal degree ordering on A'*A
  *         2 for minimal degree ordering on A'+A
@@ -156,11 +156,11 @@ SUNDIALS_EXPORT int SUNLinSolSetup_SuperLUMT(SUNLinearSolver S, SUNMatrix A);
 SUNDIALS_EXPORT int SUNLinSolSolve_SuperLUMT(SUNLinearSolver S, SUNMatrix A,
                                        N_Vector x, N_Vector b, realtype tol);
 SUNDIALS_EXPORT long int SUNLinSolLastFlag_SuperLUMT(SUNLinearSolver S);
-SUNDIALS_EXPORT int SUNLinSolSpace_SuperLUMT(SUNLinearSolver S,
-                                             long int *lenrwLS,
+SUNDIALS_EXPORT int SUNLinSolSpace_SuperLUMT(SUNLinearSolver S, 
+                                             long int *lenrwLS, 
                                              long int *leniwLS);
 SUNDIALS_EXPORT int SUNLinSolFree_SuperLUMT(SUNLinearSolver S);
-
+  
 
 #ifdef __cplusplus
 }

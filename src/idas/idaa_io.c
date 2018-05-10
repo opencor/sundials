@@ -7,8 +7,8 @@
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -21,7 +21,7 @@
  */
 
 
-/*
+/* 
  * =================================================================
  * IMPORTED HEADER FILES
  * =================================================================
@@ -33,15 +33,15 @@
 #include "idas_impl.h"
 #include <sundials/sundials_types.h>
 
-/*
+/* 
  * =================================================================
  * IDAA PRIVATE CONSTANTS
  * =================================================================
  */
 
-#define ONE         RCONST(1.0)
+#define ONE         RCONST(1.0) 
 
-/*
+/* 
  * -----------------------------------------------------------------
  * Optional input functions for ASA
  * -----------------------------------------------------------------
@@ -59,7 +59,7 @@ SUNDIALS_EXPORT int IDAAdjSetNoSensi(void *ida_mem)
 {
   IDAMem IDA_mem;
   IDAadjMem IDAADJ_mem;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDAAdjSetNoSensi", MSGAM_NULL_IDAMEM);
@@ -75,7 +75,7 @@ SUNDIALS_EXPORT int IDAAdjSetNoSensi(void *ida_mem)
   IDAADJ_mem = IDA_mem->ida_adj_mem;
 
   IDAADJ_mem->ia_storeSensi = SUNFALSE;
-
+  
   return(IDA_SUCCESS);
 }
 
@@ -84,7 +84,7 @@ int IDASetUserDataB(void *ida_mem, int which, void *user_dataB)
   IDAMem IDA_mem;
   IDAadjMem IDAADJ_mem;
   IDABMem IDAB_mem;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDASetUserDataB", MSGAM_NULL_IDAMEM);
@@ -104,7 +104,7 @@ int IDASetUserDataB(void *ida_mem, int which, void *user_dataB)
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDASetUserDataB", MSGAM_BAD_WHICH);
     return(IDA_ILL_INPUT);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {
@@ -125,7 +125,7 @@ int IDASetMaxOrdB(void *ida_mem, int which, int maxordB)
   IDAadjMem IDAADJ_mem;
   IDABMem IDAB_mem;
   void *ida_memB;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDASetMaxOrdB", MSGAM_NULL_IDAMEM);
@@ -145,7 +145,7 @@ int IDASetMaxOrdB(void *ida_mem, int which, int maxordB)
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDASetMaxOrdB", MSGAM_BAD_WHICH);
     return(IDA_ILL_INPUT);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {
@@ -164,7 +164,7 @@ int IDASetMaxNumStepsB(void *ida_mem, int which, long int mxstepsB)
   IDAadjMem IDAADJ_mem;
   IDABMem IDAB_mem;
   void *ida_memB;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDASetMaxNumStepsB", MSGAM_NULL_IDAMEM);
@@ -184,7 +184,7 @@ int IDASetMaxNumStepsB(void *ida_mem, int which, long int mxstepsB)
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDASetMaxNumStepsB", MSGAM_BAD_WHICH);
     return(IDA_ILL_INPUT);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {
@@ -203,7 +203,7 @@ int IDASetInitStepB(void *ida_mem, int which, realtype hinB)
   IDAadjMem IDAADJ_mem;
   IDABMem IDAB_mem;
   void *ida_memB;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDASetInitStepB", MSGAM_NULL_IDAMEM);
@@ -223,7 +223,7 @@ int IDASetInitStepB(void *ida_mem, int which, realtype hinB)
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDASetInitStepB", MSGAM_BAD_WHICH);
     return(IDA_ILL_INPUT);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {
@@ -232,7 +232,7 @@ int IDASetInitStepB(void *ida_mem, int which, realtype hinB)
     IDAB_mem = IDAB_mem->ida_next;
   }
   ida_memB = (void *) IDAB_mem->IDA_mem;
-
+  
   return IDASetInitStep(ida_memB, hinB);
 }
 
@@ -242,7 +242,7 @@ int IDASetMaxStepB(void *ida_mem, int which, realtype hmaxB)
   IDAadjMem IDAADJ_mem;
   IDABMem IDAB_mem;
   void *ida_memB;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDASetMaxStepB", MSGAM_NULL_IDAMEM);
@@ -262,7 +262,7 @@ int IDASetMaxStepB(void *ida_mem, int which, realtype hmaxB)
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDASetMaxStepB", MSGAM_BAD_WHICH);
     return(IDA_ILL_INPUT);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {
@@ -271,7 +271,7 @@ int IDASetMaxStepB(void *ida_mem, int which, realtype hmaxB)
     IDAB_mem = IDAB_mem->ida_next;
   }
   ida_memB = (void *) IDAB_mem->IDA_mem;
-
+  
   return IDASetMaxStep(ida_memB, hmaxB);
 }
 
@@ -281,7 +281,7 @@ int IDASetSuppressAlgB(void *ida_mem, int which,  booleantype suppressalgB)
   IDAadjMem IDAADJ_mem;
   IDABMem IDAB_mem;
   void *ida_memB;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDASetSuppressAlgB", MSGAM_NULL_IDAMEM);
@@ -301,7 +301,7 @@ int IDASetSuppressAlgB(void *ida_mem, int which,  booleantype suppressalgB)
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDASetSuppressAlgB", MSGAM_BAD_WHICH);
     return(IDA_ILL_INPUT);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {
@@ -310,7 +310,7 @@ int IDASetSuppressAlgB(void *ida_mem, int which,  booleantype suppressalgB)
     IDAB_mem = IDAB_mem->ida_next;
   }
   ida_memB = (void *) IDAB_mem->IDA_mem;
-
+  
   return IDASetSuppressAlg(ida_memB, suppressalgB);
 }
 
@@ -320,7 +320,7 @@ int IDASetIdB(void *ida_mem, int which,  N_Vector idB)
   IDAadjMem IDAADJ_mem;
   IDABMem IDAB_mem;
   void *ida_memB;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDASetIdB", MSGAM_NULL_IDAMEM);
@@ -340,7 +340,7 @@ int IDASetIdB(void *ida_mem, int which,  N_Vector idB)
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDASetIdB", MSGAM_BAD_WHICH);
     return(IDA_ILL_INPUT);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {
@@ -349,7 +349,7 @@ int IDASetIdB(void *ida_mem, int which,  N_Vector idB)
     IDAB_mem = IDAB_mem->ida_next;
   }
   ida_memB = (void *) IDAB_mem->IDA_mem;
-
+  
   return IDASetId(ida_memB, idB);
 }
 
@@ -359,7 +359,7 @@ int IDASetConstraintsB(void *ida_mem, int which,  N_Vector constraintsB)
   IDAadjMem IDAADJ_mem;
   IDABMem IDAB_mem;
   void *ida_memB;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDASetConstraintsB", MSGAM_NULL_IDAMEM);
@@ -379,7 +379,7 @@ int IDASetConstraintsB(void *ida_mem, int which,  N_Vector constraintsB)
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDASetConstraintsB", MSGAM_BAD_WHICH);
     return(IDA_ILL_INPUT);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {
@@ -388,7 +388,7 @@ int IDASetConstraintsB(void *ida_mem, int which,  N_Vector constraintsB)
     IDAB_mem = IDAB_mem->ida_next;
   }
   ida_memB = (void *) IDAB_mem->IDA_mem;
-
+  
   return IDASetConstraints(ida_memB, constraintsB);
 }
 /*
@@ -403,7 +403,7 @@ int IDASetQuadErrConB(void *ida_mem, int which, int errconQB)
   IDAadjMem IDAADJ_mem;
   IDABMem IDAB_mem;
   void *ida_memB;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDASetQuadErrConB", MSGAM_NULL_IDAMEM);
@@ -423,7 +423,7 @@ int IDASetQuadErrConB(void *ida_mem, int which, int errconQB)
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDASetQuadErrConB", MSGAM_BAD_WHICH);
     return(IDA_ILL_INPUT);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {
@@ -432,12 +432,12 @@ int IDASetQuadErrConB(void *ida_mem, int which, int errconQB)
     IDAB_mem = IDAB_mem->ida_next;
   }
   ida_memB = (void *) IDAB_mem->IDA_mem;
-
+  
   return IDASetQuadErrCon(ida_memB, errconQB);
 
 }
 
-/*
+/* 
  * -----------------------------------------------------------------
  * Optional output functions for backward integration
  * -----------------------------------------------------------------
@@ -446,9 +446,9 @@ int IDASetQuadErrConB(void *ida_mem, int which, int errconQB)
 /*
  * IDAGetAdjIDABmem
  *
- * This function returns a (void *) pointer to the IDAS
- * memory allocated for the backward problem. This pointer can
- * then be used to call any of the IDAGet* IDAS routines to
+ * This function returns a (void *) pointer to the IDAS     
+ * memory allocated for the backward problem. This pointer can    
+ * then be used to call any of the IDAGet* IDAS routines to  
  * extract optional output for the backward integration phase.
  */
 
@@ -458,13 +458,13 @@ SUNDIALS_EXPORT void *IDAGetAdjIDABmem(void *ida_mem, int which)
   IDAadjMem IDAADJ_mem;
   IDABMem IDAB_mem;
   void *ida_memB;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, 0, "IDAA", "IDAGetAdjIDABmem", MSGAM_NULL_IDAMEM);
     return(NULL);
   }
-  IDA_mem = (IDAMem) ida_mem;
+  IDA_mem = (IDAMem) ida_mem; 
 
   /* Is ASA initialized? */
   if (IDA_mem->ida_adjMallocDone == SUNFALSE) {
@@ -478,7 +478,7 @@ SUNDIALS_EXPORT void *IDAGetAdjIDABmem(void *ida_mem, int which)
     IDAProcessError(IDA_mem, 0, "IDAA", "IDAGetAdjIDABmem", MSGAM_BAD_WHICH);
     return(NULL);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {
@@ -506,13 +506,13 @@ int IDAGetAdjCheckPointsInfo(void *ida_mem, IDAadjCheckPointRec *ckpnt)
   IDAadjMem IDAADJ_mem;
   CkpntMem ck_mem;
   int i;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDAGetAdjCheckPointsInfo", MSGAM_NULL_IDAMEM);
     return(IDA_MEM_NULL);
   }
-  IDA_mem = (IDAMem) ida_mem;
+  IDA_mem = (IDAMem) ida_mem; 
 
   /* Is ASA initialized? */
   if (IDA_mem->ida_adjMallocDone == SUNFALSE) {
@@ -524,7 +524,7 @@ int IDAGetAdjCheckPointsInfo(void *ida_mem, IDAadjCheckPointRec *ckpnt)
   i=0;
   ck_mem = IDAADJ_mem->ck_mem;
   while (ck_mem != NULL) {
-
+    
     ckpnt[i].my_addr = (void *) ck_mem;
     ckpnt[i].next_addr = (void *) ck_mem->ck_next;
     ckpnt[i].t0 = ck_mem->ck_t0;
@@ -546,9 +546,9 @@ int IDAGetAdjCheckPointsInfo(void *ida_mem, IDAadjCheckPointRec *ckpnt)
  * -----------------------------------------------------------------
  * Returns the 2 vectors stored for cubic Hermite interpolation at
  * the data point 'which'. The user must allocate space for yy and
- * yd.
+ * yd. 
  *
- * Returns IDA_MEM_NULL if ida_mem is NULL, IDA_ILL_INPUT if the
+ * Returns IDA_MEM_NULL if ida_mem is NULL, IDA_ILL_INPUT if the 
  * interpolation type previously specified is not IDA_HERMITE or
  * IDA_SUCCESS otherwise.
  *
@@ -567,7 +567,7 @@ int IDAGetAdjDataPointHermite(void *ida_mem, int which,
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDAGetAdjDataPointHermite", MSGAM_NULL_IDAMEM);
     return(IDA_MEM_NULL);
   }
-  IDA_mem = (IDAMem) ida_mem;
+  IDA_mem = (IDAMem) ida_mem; 
 
   /* Is ASA initialized? */
   if (IDA_mem->ida_adjMallocDone == SUNFALSE) {
@@ -580,7 +580,7 @@ int IDAGetAdjDataPointHermite(void *ida_mem, int which,
 
   if (IDAADJ_mem->ia_interpType != IDA_HERMITE) {
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDAGetAdjDataPointHermite",  MSGAM_WRONG_INTERP);
-    return(IDA_ILL_INPUT);
+    return(IDA_ILL_INPUT);    
   }
 
   *t = dt_mem[which]->t;
@@ -594,11 +594,11 @@ int IDAGetAdjDataPointHermite(void *ida_mem, int which,
 
 /*
  * IDAGetAdjDataPointPolynomial
- *
+ * 
  * Returns the vector stored for polynomial interpolation at the
  * data point 'which'. The user must allocate space for y.
  *
- * Returns IDA_MEM_NULL if ida_mem is NULL, IDA_ILL_INPUT if the
+ * Returns IDA_MEM_NULL if ida_mem is NULL, IDA_ILL_INPUT if the 
  * interpolation type previously specified is not IDA_POLYNOMIAL or
  * IDA_SUCCESS otherwise.
  */
@@ -616,7 +616,7 @@ int IDAGetAdjDataPointPolynomial(void *ida_mem, int which,
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDAGetAdjDataPointPolynomial", MSGAM_NULL_IDAMEM);
     return(IDA_MEM_NULL);
   }
-  IDA_mem = (IDAMem) ida_mem;
+  IDA_mem = (IDAMem) ida_mem; 
 
   /* Is ASA initialized? */
   if (IDA_mem->ida_adjMallocDone == SUNFALSE) {
@@ -629,13 +629,13 @@ int IDAGetAdjDataPointPolynomial(void *ida_mem, int which,
 
   if (IDAADJ_mem->ia_interpType != IDA_POLYNOMIAL) {
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDAGetAdjDataPointPolynomial", MSGAM_WRONG_INTERP);
-    return(IDA_ILL_INPUT);
+    return(IDA_ILL_INPUT);    
   }
 
   *t = dt_mem[which]->t;
   content = (PolynomialDataMem) dt_mem[which]->content;
-
-  if (y != NULL) N_VScale(ONE, content->y, y);
+ 
+  if (y != NULL) N_VScale(ONE, content->y, y); 
 
   *order = content->order;
 
@@ -644,7 +644,7 @@ int IDAGetAdjDataPointPolynomial(void *ida_mem, int which,
 
 /*
  * IDAGetAdjCurrentCheckPoint
- *
+ * 
  * Returns the address of the 'active' check point.
  */
 
@@ -657,7 +657,7 @@ SUNDIALS_EXPORT int IDAGetAdjCurrentCheckPoint(void *ida_mem, void **addr)
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDAGetAdjCurrentCheckPoint", MSGAM_NULL_IDAMEM);
     return(IDA_MEM_NULL);
   }
-  IDA_mem = (IDAMem) ida_mem;
+  IDA_mem = (IDAMem) ida_mem; 
 
   /* Is ASA initialized? */
   if (IDA_mem->ida_adjMallocDone == SUNFALSE) {
@@ -688,7 +688,7 @@ int IDAGetConsistentICB(void *ida_mem, int which, N_Vector yyB0_mod, N_Vector yp
   IDABMem IDAB_mem;
   void *ida_memB;
   int flag;
-
+  
   /* Is ida_mem valid? */
   if (ida_mem == NULL) {
     IDAProcessError(NULL, IDA_MEM_NULL, "IDAA", "IDAGetConsistentICB", MSGAM_NULL_IDAMEM);
@@ -708,7 +708,7 @@ int IDAGetConsistentICB(void *ida_mem, int which, N_Vector yyB0_mod, N_Vector yp
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDAGetConsistentICB", MSGAM_BAD_WHICH);
     return(IDA_ILL_INPUT);
   }
-
+  
   /* Find the IDABMem entry in the linked list corresponding to 'which'. */
   IDAB_mem = IDAADJ_mem->IDAB_mem;
   while (IDAB_mem != NULL) {

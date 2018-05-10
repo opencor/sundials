@@ -1,24 +1,24 @@
 /*
  * -----------------------------------------------------------------
  * Programmer(s): Daniel Reynolds @ SMU
- * Based on code sundials_spgmr.h by: Scott D. Cohen,
+ * Based on code sundials_spgmr.h by: Scott D. Cohen, 
  *      Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the header file for the SPGMR implementation of the
+ * This is the header file for the SPGMR implementation of the 
  * SUNLINSOL module.  The SPGMR algorithm is based on the
  * Scaled Preconditioned GMRES (Generalized Minimal Residual)
  * method.
@@ -58,9 +58,9 @@
  * The usage of this SPGMR solver involves supplying three routines
  * and making a variety of calls.  The user-supplied routines are
  *    atimes (A_data, x, y) to compute y = A x, given x,
- *    psolve (P_data, y, x, lr) to solve P1 x = y or P2 x = y for
+ *    psolve (P_data, y, x, lr) to solve P1 x = y or P2 x = y for 
  *           x, given y,
- *    psetup (P_data) to perform any 'setup' operations in
+ *    psetup (P_data) to perform any 'setup' operations in 
  *           preparation for calling psolve.
  * The user calls are:
  *    SUNLinearSolver LS = SUNSPGMR(y, pretype, maxl);
@@ -76,27 +76,27 @@
  *    flag = SUNLinSolSolve(LS, NULL, x, b, w, tol);
  *           to solve the linear system to the tolerance 'tol'
  *    long int nli = SUNLinSolNumIters(LS);
- *           to *optionally* retrieve the number of linear iterations
+ *           to *optionally* retrieve the number of linear iterations 
  *           performed by the solver,
  *    long int lastflag = SUNLinSolLastFlag(LS);
  *           to *optionally* retrieve the last internal solver error flag,
  *    flag = SUNLinSolFree(LS);
  *           to free the solver memory.
- * Complete details for specifying atimes, psetup and psolve
+ * Complete details for specifying atimes, psetup and psolve 
  * and for the usage calls are given below.
  *
  * -----------------------------------------------------------------
- *
+ * 
  * Part I contains declarations specific to the SPGMR implementation
  * of the supplied SUNLINSOL module.
- *
- * Part II contains the prototype for the constructor
- * SUNSPGMR as well as implementation-specific prototypes
+ * 
+ * Part II contains the prototype for the constructor 
+ * SUNSPGMR as well as implementation-specific prototypes 
  * for various useful solver operations.
  *
  * Notes:
  *
- *   - The definition of the generic SUNLinearSolver structure can
+ *   - The definition of the generic SUNLinearSolver structure can 
  *     be found in the header file sundials_linearsolver.h.
  *
  * -----------------------------------------------------------------
@@ -123,7 +123,7 @@ extern "C" {
  * -----------------------------------------------------------------
  * PART I: SPGMR implementation of SUNLinearSolver
  *
- * The SPGMR implementation of the SUNLinearSolver 'content'
+ * The SPGMR implementation of the SUNLinearSolver 'content' 
  * structure contains:
  *     maxl -- number of GMRES basis vectors to use
  *     pretype -- flag for type of preconditioning to employ
@@ -139,12 +139,12 @@ extern "C" {
  *     PData -- pointer to structure for Psetup/Psolve
  *     s1, s2 -- vector pointers for supplied scaling matrices
  *     V -- the array of Krylov basis vectors v_1, ..., v_(maxl+1),
- *         stored in V[0], ..., V[maxl]. Each v_i is a vector of
+ *         stored in V[0], ..., V[maxl]. Each v_i is a vector of 
  *         type N_Vector.
  *     Hes -- the (maxl+1) x maxl Hessenberg matrix. It is stored
  *         row-wise so that the (i,j)th element is given by Hes[i][j].
- *     givens -- a length 2*max array which represents the Givens
- *         rotation matrices that arise in the algorithm. The Givens
+ *     givens -- a length 2*max array which represents the Givens 
+ *         rotation matrices that arise in the algorithm. The Givens 
  *         rotation matrices F_0, F_1, ..., F_j, where F_i is
  *
  *             1
@@ -164,7 +164,7 @@ extern "C" {
  *     vtemp -- a vector used as temporary vector storage
  * -----------------------------------------------------------------
  */
-
+  
 struct _SUNLinearSolverContent_SPGMR {
   int maxl;
   int pretype;
@@ -195,20 +195,20 @@ typedef struct _SUNLinearSolverContent_SPGMR *SUNLinearSolverContent_SPGMR;
 /*
  * -----------------------------------------------------------------
  * PART II: functions exported by sunlinsol_spgmr
- *
+ * 
  * CONSTRUCTOR:
  *    SUNSPGMR creates and allocates memory for a SPGMR solver
  *
  * "SET" ROUTINES:
- *    SUNSPGMRSetPrecType updates the type of preconditioning to
- *       use.  Supported values are PREC_NONE, PREC_LEFT, PREC_RIGHT
+ *    SUNSPGMRSetPrecType updates the type of preconditioning to 
+ *       use.  Supported values are PREC_NONE, PREC_LEFT, PREC_RIGHT 
  *       and PREC_BOTH.
- *    SUNSPGMRSetGSType sets the type of Gram-Schmidt
- *       orthogonalization to use.  Supported values are MODIFIED_GS
+ *    SUNSPGMRSetGSType sets the type of Gram-Schmidt 
+ *       orthogonalization to use.  Supported values are MODIFIED_GS 
  *       and CLASSICAL_GS.
- *    SUNSPGMRSetMaxRestarts sets the number of GMRES restarts to
+ *    SUNSPGMRSetMaxRestarts sets the number of GMRES restarts to 
  *       allow.  A negative input will result in the default of 0.
- *
+ * 
  * -----------------------------------------------------------------
  */
 
@@ -241,8 +241,8 @@ SUNDIALS_EXPORT int SUNLinSolNumIters_SPGMR(SUNLinearSolver S);
 SUNDIALS_EXPORT realtype SUNLinSolResNorm_SPGMR(SUNLinearSolver S);
 SUNDIALS_EXPORT N_Vector SUNLinSolResid_SPGMR(SUNLinearSolver S);
 SUNDIALS_EXPORT long int SUNLinSolLastFlag_SPGMR(SUNLinearSolver S);
-SUNDIALS_EXPORT int SUNLinSolSpace_SPGMR(SUNLinearSolver S,
-                                         long int *lenrwLS,
+SUNDIALS_EXPORT int SUNLinSolSpace_SPGMR(SUNLinearSolver S, 
+                                         long int *lenrwLS, 
                                          long int *leniwLS);
 SUNDIALS_EXPORT int SUNLinSolFree_SPGMR(SUNLinearSolver S);
 

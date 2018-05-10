@@ -4,20 +4,20 @@
  * Based on code sundials_sptfqmr.h by: Aaron Collier @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the header file for the SPTFQMR implementation of the
+ * This is the header file for the SPTFQMR implementation of the 
  * SUNLINSOL module.  The SPTFQMR algorithm is based on the
  * Scaled Preconditioned Transpose-free Quasi-Minimum Residual method.
  *
@@ -53,12 +53,12 @@
  *      || bbar - Abar xbar ||_2  <  delta
  * with an input test constant delta.
  *
- * The usage of this SPTFQMR solver involves supplying up to three
+ * The usage of this SPTFQMR solver involves supplying up to three 
  * routines and making a variety of calls.  The user-supplied routines are
  *    atimes (A_data, x, y) to compute y = A x, given x,
- *    psolve (P_data, y, x, lr) to solve P1 x = y or P2 x = y for
+ *    psolve (P_data, y, x, lr) to solve P1 x = y or P2 x = y for 
  *           x, given y,
- *    psetup (P_data) to perform any 'setup' operations in
+ *    psetup (P_data) to perform any 'setup' operations in 
  *           preparation for calling psolve.
  * The three user calls are:
  *    SUNLinearSolver LS = SUNSPTFQMR(y, pretype, maxl);
@@ -74,27 +74,27 @@
  *    flag = SUNLinSolSolve(LS, NULL, x, b, w, tol);
  *           to solve the linear system to the tolerance 'tol'
  *    long int nli = SUNLinSolNumIters(LS);
- *           to *optionally* retrieve the number of linear iterations
+ *           to *optionally* retrieve the number of linear iterations 
  *           performed by the solver,
  *    long int lastflag = SUNLinSolLastFlag(LS);
  *           to *optionally* retrieve the last internal solver error flag,
  *    flag = SUNLinSolFree(LS);
  *           to free the solver memory.
- * Complete details for specifying atimes, psetup and psolve
+ * Complete details for specifying atimes, psetup and psolve 
  * and for the usage calls are given below.
  *
  * -----------------------------------------------------------------
- *
+ * 
  * Part I contains declarations specific to the SPTFQMR implementation
  * of the supplied SUNLINSOL module.
- *
- * Part II contains the prototype for the constructor
- * SUNSPTFQMR as well as implementation-specific prototypes
+ * 
+ * Part II contains the prototype for the constructor 
+ * SUNSPTFQMR as well as implementation-specific prototypes 
  * for various useful solver operations.
  *
  * Notes:
  *
- *   - The definition of the generic SUNLinearSolver structure can
+ *   - The definition of the generic SUNLinearSolver structure can 
  *     be found in the header file sundials_linearsolver.h.
  *
  * -----------------------------------------------------------------
@@ -119,7 +119,7 @@ extern "C" {
  * -----------------------------------------------------------------
  * PART I: SPTFQMR implementation of SUNLinearSolver
  *
- * The SPTFQMR implementation of the SUNLinearSolver 'content'
+ * The SPTFQMR implementation of the SUNLinearSolver 'content' 
  * structure contains:
  *     maxl -- number of BiCGStab iterations to allow
  *     pretype -- flag for type of preconditioning to employ
@@ -132,17 +132,17 @@ extern "C" {
  *     Psolve -- function pointer to preconditioner solve routine
  *     PData -- pointer to structure for Psetup/Psolve
  *     s1, s2 -- vector pointers for supplied scaling matrices
- *     r_star -- a vector (type N_Vector) which holds the initial
+ *     r_star -- a vector (type N_Vector) which holds the initial 
  *         scaled, preconditioned linear system residual
- *     q, d, v, p and u -- vectors (type N_Vector) used for
+ *     q, d, v, p and u -- vectors (type N_Vector) used for 
  *         workspace by the SPTFQMR algorithm
- *     r -- array of vectors (type N_Vector) used for workspace
+ *     r -- array of vectors (type N_Vector) used for workspace 
  *         within the SPTFQMR algorithm
  *     vtemp1/vtemp2/vtemp3 -- scratch vectors (type N_Vector) used
  *         as temporary vector storage during calculations.
  * -----------------------------------------------------------------
  */
-
+  
 struct _SUNLinearSolverContent_SPTFQMR {
   int maxl;
   int pretype;
@@ -175,15 +175,15 @@ typedef struct _SUNLinearSolverContent_SPTFQMR *SUNLinearSolverContent_SPTFQMR;
 /*
  * -----------------------------------------------------------------
  * PART II: functions exported by sunlinsol_sptfqmr
- *
+ * 
  * CONSTRUCTOR:
  *    SUNSPTFQMR creates and allocates memory for a SPTFQMR solver
  *
  * "SET" ROUTINES:
- *    SUNSPTFQMRSSetPrecType updates the type of preconditioning to
- *       use.  Supported values are PREC_NONE, PREC_LEFT, PREC_RIGHT
+ *    SUNSPTFQMRSSetPrecType updates the type of preconditioning to 
+ *       use.  Supported values are PREC_NONE, PREC_LEFT, PREC_RIGHT 
  *       and PREC_BOTH.
- *    SUNSPTFQMRSetMaxl updates the maximum number of iterations to
+ *    SUNSPTFQMRSetMaxl updates the maximum number of iterations to 
  *       allow in the solver.
  * -----------------------------------------------------------------
  */
@@ -216,8 +216,8 @@ SUNDIALS_EXPORT int SUNLinSolNumIters_SPTFQMR(SUNLinearSolver S);
 SUNDIALS_EXPORT realtype SUNLinSolResNorm_SPTFQMR(SUNLinearSolver S);
 SUNDIALS_EXPORT N_Vector SUNLinSolResid_SPTFQMR(SUNLinearSolver S);
 SUNDIALS_EXPORT long int SUNLinSolLastFlag_SPTFQMR(SUNLinearSolver S);
-SUNDIALS_EXPORT int SUNLinSolSpace_SPTFQMR(SUNLinearSolver S,
-                                           long int *lenrwLS,
+SUNDIALS_EXPORT int SUNLinSolSpace_SPTFQMR(SUNLinearSolver S, 
+                                           long int *lenrwLS, 
                                            long int *leniwLS);
 SUNDIALS_EXPORT int SUNLinSolFree_SPTFQMR(SUNLinearSolver S);
 

@@ -5,31 +5,31 @@
  * Based on code sundials_direct.h by: Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
  * For details, see the LICENSE file.
  * LLNS/SMU Copyright End
  * -----------------------------------------------------------------
- * This is the header file for the band implementation of the
+ * This is the header file for the band implementation of the 
  * SUNMATRIX module.
- *
+ * 
  * Part I contains declarations specific to the band implementation
  * of the supplied SUNMATRIX module.
- *
- * Part II defines accessor macros that allow the user to
+ * 
+ * Part II defines accessor macros that allow the user to 
  * efficiently use this SUNMatrix type without making explicit
  * references to the underlying data structure.
  *
- * Part III contains the prototype for the constructor
- * SUNBandMatrix as well as implementation-specific prototypes
+ * Part III contains the prototype for the constructor 
+ * SUNBandMatrix as well as implementation-specific prototypes 
  * for various useful matrix operations.
  *
  * Notes:
@@ -38,8 +38,8 @@
  *     in the header file sundials_matrix.h.
  *
  *   - The definition of the type 'realtype' can be found in the
- *     header file sundials_types.h, and it may be changed (at the
- *     configuration stage) according to the user's needs.
+ *     header file sundials_types.h, and it may be changed (at the 
+ *     configuration stage) according to the user's needs. 
  *     The sundials_types.h file also contains the definition
  *     for the type 'booleantype' and 'indextype'.
  *
@@ -49,6 +49,7 @@
 #ifndef _SUNMATRIX_BAND_H
 #define _SUNMATRIX_BAND_H
 
+#include <stdio.h>
 #include <sundials/sundials_matrix.h>
 
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
@@ -66,24 +67,24 @@ extern "C" {
  *   mu    - upper bandwidth, 0 <= mu <= min(M,N)
  *   ml    - lower bandwidth, 0 <= ml <= min(M,N)
  *   s_mu  - storage upper bandwidth, mu <= s_mu <= N-1.
- *           The dgbtrf routine writes the LU factors into the storage
- *           for A. The upper triangular factor U, however, may have
- *           an upper bandwidth as big as MIN(N-1,mu+ml) because of
- *           partial pivoting. The s_mu field holds the upper
+ *           The dgbtrf routine writes the LU factors into the storage 
+ *           for A. The upper triangular factor U, however, may have 
+ *           an upper bandwidth as big as MIN(N-1,mu+ml) because of 
+ *           partial pivoting. The s_mu field holds the upper 
  *           bandwidth allocated for A.
  *   ldim  - leading dimension (ldim >= s_mu)
  *   data  - pointer to a contiguous block of realtype variables
  *   ldata - length of the data array = ldim*(s_mu+ml+1)
- *   cols  - array of pointers. cols[j] points to the first element
+ *   cols  - array of pointers. cols[j] points to the first element 
  *           of the j-th column of the matrix in the array data.
- * The elements of a band matrix are stored columnwise (i.e. columns
- * are stored one on top of the other in memory); i.e. if A is a
- * SUNMatrix_Band object, then the (i,j)th element of A (with
+ * The elements of a band matrix are stored columnwise (i.e. columns 
+ * are stored one on top of the other in memory); i.e. if A is a 
+ * SUNMatrix_Band object, then the (i,j)th element of A (with 
  * 0 <= i < M and 0 <= j < N) is given by ???
  *
  * -----------------------------------------------------------------
  */
-
+  
 struct _SUNMatrixContent_Band {
   sunindextype M;
   sunindextype N;
@@ -98,11 +99,11 @@ struct _SUNMatrixContent_Band {
 
 typedef struct _SUNMatrixContent_Band *SUNMatrixContent_Band;
 
-
+  
 /*
  * -----------------------------------------------------------------
- * PART II: macros SM_CONTENT_B, SM_DATA_B, SM_ROWS_B, SM_COLUMNS_B,
- *          SM_UBAND_B, SM_LBAND_B, SM_SUBAND_B, SM_LDIM_B, SM_COLS_B,
+ * PART II: macros SM_CONTENT_B, SM_DATA_B, SM_ROWS_B, SM_COLUMNS_B, 
+ *          SM_UBAND_B, SM_LBAND_B, SM_SUBAND_B, SM_LDIM_B, SM_COLS_B, 
  *          SM_COLUMN_B, SM_COLUMN_ELEMENT_B, and SM_ELEMENT_B
  * -----------------------------------------------------------------
  * In the descriptions below, the following user declarations
@@ -121,14 +122,14 @@ typedef struct _SUNMatrixContent_Band *SUNMatrixContent_Band;
  *     The assignment A_cont = SM_CONTENT_B(A) sets A_cont to be
  *     a pointer to the band SUNMatrix content structure.
  *
- * (2) SM_DATA_B, SM_ROWS_B, SM_COLUMNS_B, SM_LDATA_B, SM_LDIM_B,
+ * (2) SM_DATA_B, SM_ROWS_B, SM_COLUMNS_B, SM_LDATA_B, SM_LDIM_B, 
  *     SM_UBAND_B, SM_LBAND_B and SM_SUBAND_B
  *
  *     These macros give access to the individual parts of
  *     the content structure of a band SUNMatrix.
  *
  *     The assignment A_data = SM_DATA_B(A) sets A_data to be
- *     a pointer to the first component of A.
+ *     a pointer to the first component of A. 
  *
  *     The assignment A_cols = SM_COLS_B(A) sets A_cols to be
  *     a pointer to the content's 'cols' entry.
@@ -136,7 +137,7 @@ typedef struct _SUNMatrixContent_Band *SUNMatrixContent_Band;
  *     The assignment A_rows = SM_ROWS_B(A) sets A_rows to be
  *     the number of rows in A.
  *
- *     The assignment A_columns = SM_COLUMNS_B(A) sets A_columns
+ *     The assignment A_columns = SM_COLUMNS_B(A) sets A_columns 
  *     to be the number of columns in A.
  *
  *     The assignment A_ldata = SM_LDATA_B(A) sets A_ldata to be
@@ -156,30 +157,30 @@ typedef struct _SUNMatrixContent_Band *SUNMatrixContent_Band;
  *
  * (3) SM_COLUMN_B, SM_COLUMN_ELEMENT_B and SM_ELEMENT_B
  *
- *     These macros give access to the individual columns and
- *     elements of a band SUNMatrix, respectively.  In the
- *     following, the entries of a SUNMatrix are indexed (i,j)
+ *     These macros give access to the individual columns and 
+ *     elements of a band SUNMatrix, respectively.  In the 
+ *     following, the entries of a SUNMatrix are indexed (i,j) 
  *     where i=0,...,M-1 and j=0,...,N-1.
- *
- *     The assignment A_col_j = SM_COLUMN_B(A,j) sets A_col_j to
+ *     
+ *     The assignment A_col_j = SM_COLUMN_B(A,j) sets A_col_j to 
  *     be a pointer to the jth column of the M-by-N band
- *     matrix A, 0 <= j < N.  After the assignment, A_col_j may
+ *     matrix A, 0 <= j < N.  After the assignment, A_col_j may 
  *     be treated as an array indexed from -mu to ml.
  *     The (i,j)-th element of A is thus referenced by col_j[i-j].
  *
- *     The assignment A_ij = SM_COLUMN_ELEMENT_B(SM_COLUMN_B(A),i,j)
- *     sets A_ij to the value of the (i,j)th element of the band
- *     M-by-N matrix A, when used in conjunction with SM_COLUMN_B.
- *     The index (i,j) should satisfy j-mu <= i <= j+ml, with
- *     0 <= i < M and 0 <= j < N.  Similarly, the assignment
- *     SM_COLUMN_ELEMENT_B(SM_COLUMN_B(A),i,j) = A_ij sets the value
+ *     The assignment A_ij = SM_COLUMN_ELEMENT_B(SM_COLUMN_B(A),i,j) 
+ *     sets A_ij to the value of the (i,j)th element of the band 
+ *     M-by-N matrix A, when used in conjunction with SM_COLUMN_B.  
+ *     The index (i,j) should satisfy j-mu <= i <= j+ml, with 
+ *     0 <= i < M and 0 <= j < N.  Similarly, the assignment  
+ *     SM_COLUMN_ELEMENT_B(SM_COLUMN_B(A),i,j) = A_ij sets the value 
  *     of A_ij into the (i,j) location of the matrix A.
  *
- *     The assignment A_ij = SM_ELEMENT_B(A,i,j) sets A_ij to
+ *     The assignment A_ij = SM_ELEMENT_B(A,i,j) sets A_ij to 
  *     the value of the (i,j)th element of the band M-by-N matrix
- *     A.  The location (i,j) should satisfy j-mu <= i <= j+ml,
- *     with 0 <= i < M ; 0 <= j < N.  Similarly, the assignment
- *     SM_ELEMENT_B(A,i,j) = A_ij sets the value of A_ij into the
+ *     A.  The location (i,j) should satisfy j-mu <= i <= j+ml, 
+ *     with 0 <= i < M ; 0 <= j < N.  Similarly, the assignment 
+ *     SM_ELEMENT_B(A,i,j) = A_ij sets the value of A_ij into the 
  *     (i,j) location of the matrix A.
  *
  * -----------------------------------------------------------------
@@ -215,7 +216,7 @@ typedef struct _SUNMatrixContent_Band *SUNMatrixContent_Band;
 /*
  * -----------------------------------------------------------------
  * PART III: functions exported by sunmatrix_band
- *
+ * 
  * CONSTRUCTORS:
  *    SUNBandMatrix
  * OTHER:
@@ -237,9 +238,9 @@ typedef struct _SUNMatrixContent_Band *SUNMatrixContent_Band;
  * -----------------------------------------------------------------
  * Function: SUNBandMatrix
  * -----------------------------------------------------------------
- * SUNBandMatrix creates and allocates memory for an M-by-N
- * band matrix with upper bandwidth mu, lower bandwidth ml, and
- * storage upper bandwidth smu. Pass smu as follows depending on
+ * SUNBandMatrix creates and allocates memory for an M-by-N 
+ * band matrix with upper bandwidth mu, lower bandwidth ml, and 
+ * storage upper bandwidth smu. Pass smu as follows depending on 
  * whether A will be LU factored:
  *
  * (1) Pass smu = mu if A will not be factored.
@@ -258,7 +259,7 @@ SUNDIALS_EXPORT SUNMatrix SUNBandMatrix(sunindextype N, sunindextype mu,
  * This function prints the content of a M-by-N band matrix A to
  * a file pointer as it would normally appear on paper.
  * It is intended as debugging tools with small values of M and N.
- * The elements are printed using the %g/%lg/%Lg option.
+ * The elements are printed using the %g/%lg/%Lg option. 
  * A blank line is printed before and after the matrix.
  * -----------------------------------------------------------------
  */
@@ -268,7 +269,7 @@ SUNDIALS_EXPORT void SUNBandMatrix_Print(SUNMatrix A, FILE* outfile);
 
 /*
  * -----------------------------------------------------------------
- * Accessor Functions:
+ * Accessor Functions: 
  *
  * SUNBandMatrix_Rows
  *    Returns the number of rows in the banded matrix
@@ -296,7 +297,7 @@ SUNDIALS_EXPORT void SUNBandMatrix_Print(SUNMatrix A, FILE* outfile);
  *
  * SUNBandMatrix_Column
  *    Returns a pointer to the diagonal entry of jth column of the
- *    banded matrix.  The resulting pointer should be indexed over
+ *    banded matrix.  The resulting pointer should be indexed over 
  *    the range -mu to ml.
  * -----------------------------------------------------------------
  */
@@ -326,7 +327,7 @@ SUNDIALS_EXPORT int SUNMatScaleAdd_Band(realtype c, SUNMatrix A, SUNMatrix B);
 SUNDIALS_EXPORT int SUNMatScaleAddI_Band(realtype c, SUNMatrix A);
 SUNDIALS_EXPORT int SUNMatMatvec_Band(SUNMatrix A, N_Vector x, N_Vector y);
 SUNDIALS_EXPORT int SUNMatSpace_Band(SUNMatrix A, long int *lenrw, long int *leniw);
-
+  
 #ifdef __cplusplus
 }
 #endif

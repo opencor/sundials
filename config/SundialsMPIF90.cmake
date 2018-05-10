@@ -2,13 +2,13 @@
 # Programmer:  Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # LLNS/SMU Copyright Start
-# Copyright (c) 2014, Southern Methodist University and
+# Copyright (c) 2014, Southern Methodist University and 
 # Lawrence Livermore National Security
 #
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Southern Methodist University and Lawrence Livermore
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Southern Methodist University and Lawrence Livermore 
 # National Laboratory under Contract DE-AC52-07NA27344.
-# Produced at Southern Methodist University and the Lawrence
+# Produced at Southern Methodist University and the Lawrence 
 # Livermore National Laboratory.
 #
 # All rights reserved.
@@ -33,8 +33,8 @@ else(MPI_MPIF90)
   # If not already available, search for MPI headers and libraries.
   if(NOT MPI_LIBRARIES)
     find_path(MPI_INCLUDE_PATH mpi.h
-      PATHS /usr/local/include
-      /usr/include
+      PATHS /usr/local/include 
+      /usr/include 
       /usr/include/mpi
       /usr/local/mpi/include
       "$ENV{ProgramFiles}/MPICH/SDK/Include"
@@ -42,17 +42,17 @@ else(MPI_MPIF90)
       "C:/Program Files/MPICH/SDK/Include"
       )
     find_library(MPI_LIBRARIES
-      NAMES mpich2 mpi mpich
+      NAMES mpich2 mpi mpich 
       PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib
       "$ENV{ProgramFiles}/MPICH/SDK/Lib"
       "$ENV{ProgramFiles}/MPICH2/Lib"
-      "C:/Program Files/MPICH/SDK/Lib"
+      "C:/Program Files/MPICH/SDK/Lib" 
       )
-    find_library(MPI_EXTRA_LIBRARIES
+    find_library(MPI_EXTRA_LIBRARIES 
       NAMES mpi++
-      PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib
+      PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib 
       "$ENV{ProgramFiles}/MPICH/SDK/Lib"
-      "C:/Program Files/MPICH/SDK/Lib"
+      "C:/Program Files/MPICH/SDK/Lib" 
       DOC "If a second mpi library is necessary, specify it here.")
     if(MPI_EXTRA_LIBRARIES)
       set(MPI_LIBRARIES ${MPI_LIBRARIES} ${MPI_EXTRA_LIBRARIES})
@@ -94,7 +94,7 @@ if(MPIF90_PERFORM_TEST)
   file(WRITE ${MPITest_DIR}/mpif90test.f90
     "program test\n"
     "include \"mpif.h\"\n"
-    "integer :: ier\n"
+    "integer :: ier\n" 
     "call MPI_Init(ier)\n"
     "call MPI_Finalize(ier)\n"
     "stop\n"
@@ -102,7 +102,7 @@ if(MPIF90_PERFORM_TEST)
   # Use TRY_COMPILE to make the target "mpif90test"
   try_compile(MPITEST_OK ${MPITest_DIR} ${MPITest_DIR}
     mpif90test OUTPUT_VARIABLE MY_OUTPUT)
-  # To ensure we do not use stuff from the previous attempts,
+  # To ensure we do not use stuff from the previous attempts, 
   # we must remove the CMakeFiles directory.
   file(REMOVE_RECURSE ${MPITest_DIR}/CMakeFiles)
   # Process test result

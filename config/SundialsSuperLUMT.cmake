@@ -3,8 +3,8 @@
 # ---------------------------------------------------------------
 # LLNS Copyright Start
 # Copyright (c) 2014, Lawrence Livermore National Security
-# This work was performed under the auspices of the U.S. Department
-# of Energy by Lawrence Livermore National Laboratory in part under
+# This work was performed under the auspices of the U.S. Department 
+# of Energy by Lawrence Livermore National Laboratory in part under 
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
 # Produced at the Lawrence Livermore National Laboratory.
 # All rights reserved.
@@ -35,7 +35,7 @@ if(SUPERLUMT_LIBRARY AND SUPERLUMT_LIBRARIES)
   set(SUPERLUMT_TEST_DIR ${PROJECT_BINARY_DIR}/SUPERLUMT_TEST)
   file(MAKE_DIRECTORY ${SUPERLUMT_TEST_DIR})
 
-  # Create a CMakeLists.txt file
+  # Create a CMakeLists.txt file 
   file(WRITE ${SUPERLUMT_TEST_DIR}/CMakeLists.txt
     "CMAKE_MINIMUM_REQUIRED(VERSION 2.4)\n"
     "PROJECT(ltest C)\n"
@@ -48,7 +48,7 @@ if(SUPERLUMT_LIBRARY AND SUPERLUMT_LIBRARIES)
     "SET(CMAKE_C_FLAGS_MINSIZE \"${CMAKE_C_FLAGS_MINSIZE}\")\n"
     "INCLUDE_DIRECTORIES(${SUPERLUMT_INCLUDE_DIR})\n"
     "ADD_EXECUTABLE(ltest ltest.c)\n"
-    "TARGET_LINK_LIBRARIES(ltest ${SUPERLUMT_LIBRARIES})\n")
+    "TARGET_LINK_LIBRARIES(ltest ${SUPERLUMT_LIBRARIES})\n")    
 
   # Create a C source file which calls a SUPERLUMT function
   file(WRITE ${SUPERLUMT_TEST_DIR}/ltest.c
@@ -56,14 +56,14 @@ if(SUPERLUMT_LIBRARY AND SUPERLUMT_LIBRARIES)
 #    "\#include \"pdsp_defs.h\"\n"
     "int main(){\n"
     "SuperMatrix A;\n"
-    "NCformat *Astore;\n"
+    "NCformat *Astore;\n" 
     "return(0);\n"
     "}\n")
 
   # Attempt to link the "ltest" executable
   try_compile(LTEST_OK ${SUPERLUMT_TEST_DIR} ${SUPERLUMT_TEST_DIR} ltest OUTPUT_VARIABLE MY_OUTPUT)
-
-  # To ensure we do not use stuff from the previous attempts,
+      
+  # To ensure we do not use stuff from the previous attempts, 
   # we must remove the CMakeFiles directory.
   file(REMOVE_RECURSE ${SUPERLUMT_TEST_DIR}/CMakeFiles)
 

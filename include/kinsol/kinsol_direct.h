@@ -1,16 +1,16 @@
 /*
- * -----------------------------------------------------------------
+ * ----------------------------------------------------------------- 
  * Programmer(s): Daniel R. Reynolds @ SMU
  *                Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -39,9 +39,9 @@ extern "C" {
  * =================================================================
  */
 
-/*
+/* 
  * -----------------------------------------------------------------
- * KINDLS return values
+ * KINDLS return values 
  * -----------------------------------------------------------------
  */
 
@@ -77,7 +77,7 @@ extern "C" {
  *            fu = F(u) [input]
  *
  * J        - SUNMatrix that will be loaded by a KINDlsJacFn with
- *            an approximation to the Jacobian matrix
+ *            an approximation to the Jacobian matrix 
  *            J = (dF_i/dy_j).
  *
  * user_data  - pointer to user data - the same as the user_data
@@ -91,20 +91,20 @@ extern "C" {
  * -----------------------------------------------------------------
  *
  * NOTE: See the relevant SUNMatrix implementation header files and
- *     documentation for mechanisms to inquire about matrix
+ *     documentation for mechanisms to inquire about matrix 
  *     dimensions, and for efficient ways to set matrix entries.
- *
+ *                                                                
  * -----------------------------------------------------------------
  */
-
+  
 typedef int (*KINDlsJacFn)(N_Vector u, N_Vector fu, SUNMatrix J,
                            void *user_data, N_Vector tmp1,
                            N_Vector tmp2);
-
+  
 
 /*
  * =================================================================
- *            E X P O R T E D    F U N C T I O N S
+ *            E X P O R T E D    F U N C T I O N S 
  * =================================================================
  */
 
@@ -114,9 +114,9 @@ typedef int (*KINDlsJacFn)(N_Vector u, N_Vector fu, SUNMatrix J,
  * -----------------------------------------------------------------
  *
  * KINDlsSetLinearSolver specifies the direct SUNLinearSolver object
- * that should be used.  This is required if KINSOL is solving a
- * problem using the Newton or Picard nonlinear solvers with a
- * direct linear solver  (i.e. not the fixed point or accelerated
+ * that should be used.  This is required if KINSOL is solving a 
+ * problem using the Newton or Picard nonlinear solvers with a 
+ * direct linear solver  (i.e. not the fixed point or accelerated 
  * fixed-point solvers).
  *
  * The return value is one of:
@@ -126,7 +126,7 @@ typedef int (*KINDlsJacFn)(N_Vector u, N_Vector fu, SUNMatrix J,
  * -----------------------------------------------------------------
  */
 
-SUNDIALS_EXPORT int KINDlsSetLinearSolver(void *kinmem,
+SUNDIALS_EXPORT int KINDlsSetLinearSolver(void *kinmem, 
                                           SUNLinearSolver LS,
                                           SUNMatrix A);
 /*
@@ -134,11 +134,11 @@ SUNDIALS_EXPORT int KINDlsSetLinearSolver(void *kinmem,
  * Optional inputs to the KINDLS linear solver
  * -----------------------------------------------------------------
  *
- * KINDlsSetJacFn specifies the dense/band/sparse Jacobian
+ * KINDlsSetJacFn specifies the dense/band/sparse Jacobian 
  * approximation routine to be used for a direct linear solver.
  *
  * By default, a difference quotient approximation is used for
- * dense/band; no default exists for sparse (so this must
+ * dense/band; no default exists for sparse (so this must 
  * be user-supplied).
  *
  * The return value is one of:

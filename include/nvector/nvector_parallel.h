@@ -1,11 +1,11 @@
-/* -----------------------------------------------------------------
+/* ----------------------------------------------------------------- 
  * Programmer(s): Scott D. Cohen, Alan C. Hindmarsh, Radu Serban,
  *                and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
  * LLNS Copyright Start
  * Copyright (c) 2014, Lawrence Livermore National Security
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Lawrence Livermore National Laboratory in part under
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
@@ -32,8 +32,8 @@
  *     found in the header file sundials_nvector.h.
  *
  *   - The definition of the type realtype can be found in the
- *     header file sundials_types.h, and it may be changed (at the
- *     configuration stage) according to the user's needs.
+ *     header file sundials_types.h, and it may be changed (at the 
+ *     configuration stage) according to the user's needs. 
  *     The sundials_types.h file also contains the definition
  *     for the type booleantype.
  *
@@ -49,6 +49,7 @@
 #ifndef _NVECTOR_PARALLEL_H
 #define _NVECTOR_PARALLEL_H
 
+#include <stdio.h>
 #include <mpi.h>
 #include <sundials/sundials_nvector.h>
 #include <sundials/sundials_mpi_types.h>
@@ -60,7 +61,7 @@ extern "C" {
 
 /*
  * -----------------------------------------------------------------
- * PART I: PARALLEL implementation of N_Vector
+ * PART I: PARALLEL implementation of N_Vector               
  * -----------------------------------------------------------------
  */
 
@@ -160,7 +161,7 @@ typedef struct _N_VectorContent_Parallel *N_VectorContent_Parallel;
 /*
  * -----------------------------------------------------------------
  * PART III: functions exported by nvector_parallel
- *
+ * 
  * CONSTRUCTORS:
  *    N_VNew_Parallel
  *    N_VNewEmpty_Parallel
@@ -186,7 +187,7 @@ typedef struct _N_VectorContent_Parallel *N_VectorContent_Parallel;
  * -----------------------------------------------------------------
  */
 
-SUNDIALS_EXPORT N_Vector N_VNew_Parallel(MPI_Comm comm,
+SUNDIALS_EXPORT N_Vector N_VNew_Parallel(MPI_Comm comm, 
                                          sunindextype local_length,
                                          sunindextype global_length);
 
@@ -199,7 +200,7 @@ SUNDIALS_EXPORT N_Vector N_VNew_Parallel(MPI_Comm comm,
  * -----------------------------------------------------------------
  */
 
-SUNDIALS_EXPORT N_Vector N_VNewEmpty_Parallel(MPI_Comm comm,
+SUNDIALS_EXPORT N_Vector N_VNewEmpty_Parallel(MPI_Comm comm, 
                                               sunindextype local_length,
                                               sunindextype global_length);
 
@@ -212,7 +213,7 @@ SUNDIALS_EXPORT N_Vector N_VNewEmpty_Parallel(MPI_Comm comm,
  * -----------------------------------------------------------------
  */
 
-SUNDIALS_EXPORT N_Vector N_VMake_Parallel(MPI_Comm comm,
+SUNDIALS_EXPORT N_Vector N_VMake_Parallel(MPI_Comm comm, 
                                           sunindextype local_length,
                                           sunindextype global_length,
                                           realtype *v_data);
@@ -232,7 +233,7 @@ SUNDIALS_EXPORT N_Vector *N_VCloneVectorArray_Parallel(int count, N_Vector w);
  * -----------------------------------------------------------------
  * Function : N_VCloneVectorArrayEmpty_Parallel
  * -----------------------------------------------------------------
- * This function creates an array of 'count' PARALLEL vectors each
+ * This function creates an array of 'count' PARALLEL vectors each 
  * with an empty (NULL) data array by cloning w.
  * -----------------------------------------------------------------
  */
@@ -243,7 +244,7 @@ SUNDIALS_EXPORT N_Vector *N_VCloneVectorArrayEmpty_Parallel(int count, N_Vector 
  * -----------------------------------------------------------------
  * Function : N_VDestroyVectorArray_Parallel
  * -----------------------------------------------------------------
- * This function frees an array of N_Vector created with
+ * This function frees an array of N_Vector created with 
  * N_VCloneVectorArray_Parallel or N_VCloneVectorArrayEmpty_Parallel.
  * -----------------------------------------------------------------
  */
@@ -254,8 +255,8 @@ SUNDIALS_EXPORT void N_VDestroyVectorArray_Parallel(N_Vector *vs, int count);
  * -----------------------------------------------------------------
  * Function : N_VGetLength_Parallel
  * -----------------------------------------------------------------
- * This function returns number of vector elements (global vector
- * length). It returns locally stored integer, and is therefore
+ * This function returns number of vector elements (global vector 
+ * length). It returns locally stored integer, and is therefore 
  * a local call.
  * -----------------------------------------------------------------
  */

@@ -35,8 +35,8 @@
 extern "C" {
 #endif
 
-  extern void FARK_BJAC(long int *N, long int *MU,
-                        long int *ML, long int *EBAND,
+  extern void FARK_BJAC(long int *N, long int *MU, 
+                        long int *ML, long int *EBAND, 
                         realtype *T, realtype *Y, realtype *FY,
   			realtype *BJAC, realtype *H,
   			long int *IPAR, realtype *RPAR,

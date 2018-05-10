@@ -17,7 +17,7 @@ Forward integration ... done ( nst = 766 )
 ncheck = 5
 
 --------------------------------------------------------
-G:            3.9983e+07
+G:            3.9983e+07 
 --------------------------------------------------------
 
 Create and allocate CVODES memory for backward run

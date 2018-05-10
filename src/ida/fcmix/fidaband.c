@@ -3,13 +3,13 @@
  *                Aaron Collier @ LLNL
  *-----------------------------------------------------------------
  * LLNS/SMU Copyright Start
- * Copyright (c) 2017, Southern Methodist University and
+ * Copyright (c) 2017, Southern Methodist University and 
  * Lawrence Livermore National Security
  *
- * This work was performed under the auspices of the U.S. Department
- * of Energy by Southern Methodist University and Lawrence Livermore
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Southern Methodist University and Lawrence Livermore 
  * National Laboratory under Contract DE-AC52-07NA27344.
- * Produced at Southern Methodist University and the Lawrence
+ * Produced at Southern Methodist University and the Lawrence 
  * Livermore National Laboratory.
  *
  * All rights reserved.
@@ -39,7 +39,7 @@ extern "C" {
                         long int* EBAND, realtype* T, realtype* Y,
                         realtype* YP, realtype* R, realtype* CJ,
                         realtype* J, realtype* EWT, realtype* H,
-                        long int* IPAR, realtype* RPAR, realtype* V1,
+                        long int* IPAR, realtype* RPAR, realtype* V1, 
                         realtype* V2, realtype* V3, int* IER);
 #ifdef __cplusplus
 }
@@ -66,7 +66,7 @@ void FIDA_BANDSETJAC(int *flag, int *ier)
 
 /*************************************************/
 
-int FIDABandJac(realtype t, realtype c_j, N_Vector yy,
+int FIDABandJac(realtype t, realtype c_j, N_Vector yy,  
 		N_Vector yp, N_Vector rr, SUNMatrix J,
 		void *user_data, N_Vector vtemp1,
                 N_Vector vtemp2, N_Vector vtemp3)
@@ -110,7 +110,7 @@ int FIDABandJac(realtype t, realtype c_j, N_Vector yy,
 
   /* Call user-supplied routine */
   FIDA_BJAC(&N, &mupper, &mlower, &eband, &t, yy_data, yp_data,
-            rr_data, &c_j, jacdata, ewtdata, &h,
+            rr_data, &c_j, jacdata, ewtdata, &h, 
             IDA_userdata->ipar, IDA_userdata->rpar,
             v1data, v2data, v3data, &ier);
 

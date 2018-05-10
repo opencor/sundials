@@ -112,7 +112,7 @@ C     number of threads to use in factorization
         STOP
       ENDIF
 
-C     Call FCVMALLOC to create the solver memory and specify the
+C     Call FCVMALLOC to create the solver memory and specify the 
 C     Backward Differentiation Formula and the use of a Newton iteration
       CALL FCVMALLOC(T0, Y, METH, ITMETH, ITOL, RTOL, ATOL,
      1               IOUT, ROUT, IPAR, RPAR, IER)
@@ -147,7 +147,7 @@ C     max no. of error test failures
         WRITE(6,31) IER
         STOP
       ENDIF
-
+      
 C     initial step size
       H0 = 1.0D-4 * RTOL
       CALL FCVSETRIN('INIT_STEP', H0, IER)
@@ -156,7 +156,7 @@ C     initial step size
  32     FORMAT(///' SUNDIALS_ERROR: FCVSETRIN returned IER = ', I5)
         STOP
       ENDIF
-
+      
 C     coefficient in the nonlinear convergence test
       NLCONV = 1.0D-7
       CALL FCVSETRIN('NLCONV_COEF', NLCONV, IER)
@@ -337,7 +337,7 @@ C
       JRVALS(5) = 1
       JDATA(6) = 6.0D7 * Y2
       JRVALS(6) = 2
-
+      
       JDATA(7) = 1.0D4 * Y2
       JRVALS(7) = 0
       JDATA(8) = -1.0D4 * Y2

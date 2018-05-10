@@ -63,7 +63,7 @@
 
 #define ZERO  RCONST(0.0)
 
-/* Type : UserData
+/* Type : UserData 
    contains problem parameters, grid constants, work array. */
 
 typedef struct {
@@ -183,11 +183,11 @@ int main(int argc, char *argv[])
     if(check_flag(&flag, "CVodeSetSensParams", 1)) return(1);
 
     printf("Sensitivity: YES ");
-    if(sensi_meth == CV_SIMULTANEOUS)
+    if(sensi_meth == CV_SIMULTANEOUS)   
       printf("( SIMULTANEOUS +");
-    else
+    else 
       if(sensi_meth == CV_STAGGERED) printf("( STAGGERED +");
-      else                           printf("( STAGGERED1 +");
+      else                           printf("( STAGGERED1 +");   
     if(err_con) printf(" FULL ERROR CONTROL )");
     else        printf(" PARTIAL ERROR CONTROL )");
 
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
       flag = CVodeGetSens(cvode_mem, &t, uS);
       if(check_flag(&flag, "CVodeGetSens", 1)) break;
       PrintOutputS(uS);
-    }
+    } 
     printf("------------------------------------------------------------\n");
   }
 
@@ -239,8 +239,8 @@ int main(int argc, char *argv[])
  *--------------------------------------------------------------------
  */
 
-/*
- * f routine. Compute f(t,u).
+/* 
+ * f routine. Compute f(t,u). 
  */
 
 static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
@@ -265,7 +265,7 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
 
     /* Extract u at x_i and two neighboring points */
     ui = udata[i];
-    if(i!=0)
+    if(i!=0) 
       ult = udata[i-1];
     else
       ult = ZERO;
@@ -289,11 +289,11 @@ static int f(realtype t, N_Vector u, N_Vector udot, void *user_data)
  *--------------------------------------------------------------------
  */
 
-/*
+/* 
  * Process and verify arguments.
  */
 
-static void ProcessArgs(int argc, char *argv[],
+static void ProcessArgs(int argc, char *argv[], 
                         booleantype *sensi, int *sensi_meth, booleantype *err_con)
 {
   *sensi = SUNFALSE;
@@ -308,7 +308,7 @@ static void ProcessArgs(int argc, char *argv[],
     *sensi = SUNTRUE;
   else
     WrongArgs(argv[0]);
-
+  
   if (*sensi) {
 
     if (argc != 4)
@@ -320,7 +320,7 @@ static void ProcessArgs(int argc, char *argv[],
       *sensi_meth = CV_STAGGERED;
     else if (strcmp(argv[2],"stg1") == 0)
       *sensi_meth = CV_STAGGERED1;
-    else
+    else 
       WrongArgs(argv[0]);
 
     if (strcmp(argv[3],"t") == 0)
@@ -338,11 +338,11 @@ static void WrongArgs(char *name)
     printf("\nUsage: %s [-nosensi] [-sensi sensi_meth err_con]\n",name);
     printf("         sensi_meth = sim, stg, or stg1\n");
     printf("         err_con    = t or f\n");
-
+    
     exit(0);
 }
 
-/*
+/* 
  * Set initial conditions in u vector.
  */
 
@@ -359,11 +359,11 @@ static void SetIC(N_Vector u, realtype dx)
   for (i=0; i<NEQ; i++) {
     x = (i+1)*dx;
     udata[i] = x*(XMAX - x)*SUNRexp(RCONST(2.0)*x);
-  }
+  }  
 }
 
 /*
- * Print current t, step count, order, stepsize, and max norm of solution
+ * Print current t, step count, order, stepsize, and max norm of solution  
  */
 
 static void PrintOutput(void *cvode_mem, realtype t, N_Vector u)
@@ -399,7 +399,7 @@ static void PrintOutput(void *cvode_mem, realtype t, N_Vector u)
 }
 
 /*
- * Print max norm of sensitivities
+ * Print max norm of sensitivities 
  */
 
 static void PrintOutputS(N_Vector *uS)
@@ -485,7 +485,7 @@ static void PrintFinalStats(void *cvode_mem, booleantype sensi)
  *   opt == 1 means SUNDIALS function returns a flag so check if
  *            flag >= 0
  *   opt == 2 means function allocates memory so check if returned
- *            NULL pointer
+ *            NULL pointer 
  */
 
 static int check_flag(void *flagvalue, const char *funcname, int opt)
@@ -494,8 +494,8 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
 
   /* Check if SUNDIALS function returned NULL pointer - no memory allocated */
   if (opt == 0 && flagvalue == NULL) {
-    fprintf(stderr,
-            "\nSUNDIALS_ERROR: %s() failed - returned NULL pointer\n\n",
+    fprintf(stderr, 
+            "\nSUNDIALS_ERROR: %s() failed - returned NULL pointer\n\n", 
             funcname);
     return(1); }
 
@@ -503,15 +503,15 @@ static int check_flag(void *flagvalue, const char *funcname, int opt)
   else if (opt == 1) {
     errflag = (int *) flagvalue;
     if (*errflag < 0) {
-      fprintf(stderr,
-              "\nSUNDIALS_ERROR: %s() failed with flag = %d\n\n",
+      fprintf(stderr, 
+              "\nSUNDIALS_ERROR: %s() failed with flag = %d\n\n", 
               funcname, *errflag);
       return(1); }}
 
   /* Check if function returned NULL pointer - no memory allocated */
   else if (opt == 2 && flagvalue == NULL) {
-    fprintf(stderr,
-            "\nMEMORY_ERROR: %s() failed - returned NULL pointer\n\n",
+    fprintf(stderr, 
+            "\nMEMORY_ERROR: %s() failed - returned NULL pointer\n\n", 
             funcname);
     return(1); }
 
