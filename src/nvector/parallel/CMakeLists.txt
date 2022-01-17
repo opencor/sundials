@@ -2,7 +2,7 @@
 # Programmer(s): Radu Serban @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -47,21 +47,4 @@ message(STATUS "Added NVECTOR_PARALLEL module")
 # Add F2003 module if the interface is enabled
 if(BUILD_FORTRAN_MODULE_INTERFACE)
   add_subdirectory(fmod)
-endif()
-
-# If FCMIX is enabled, build and install the Fortran77 library
-if(BUILD_FORTRAN77_INTERFACE)
-  sundials_add_library(sundials_fnvecparallel
-    SOURCES
-      fnvector_parallel.c
-    LINK_LIBRARIES
-      PRIVATE sundials_nvecparallel
-    OUTPUT_NAME
-      sundials_fnvecparallel
-    VERSION
-      ${nveclib_VERSION}
-    SOVERSION
-      ${nveclib_SOVERSION}
-  )
-  message(STATUS "Added NVECTOR_PARALLEL F77 interface")
 endif()

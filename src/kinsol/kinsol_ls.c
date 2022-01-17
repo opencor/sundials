@@ -3,7 +3,7 @@
  *                David J. Gardner, Radu Serban and Aaron Collier @ LLNL
  *-----------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2021, Lawrence Livermore National Security
+ * Copyright (c) 2002-2022, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -262,8 +262,8 @@ int KINSetPreconditioner(void *kinmem,
 {
   KINMem   kin_mem;
   KINLsMem kinls_mem;
-  PSetupFn kinls_psetup;
-  PSolveFn kinls_psolve;
+  SUNPSetupFn kinls_psetup;
+  SUNPSolveFn kinls_psolve;
   int      retval;
 
   /* access KINLsMem structure */

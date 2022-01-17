@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -15,7 +15,12 @@
 # ---------------------------------------------------------------
 
 # ---------------------------------------------------------------
-# Find MPI.
+# Setup MPI, OpenMP, and OpenMP offload first as other TPLs may
+# need targets or variables corresponding to these TPLs.
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+# Find MPI
 # ---------------------------------------------------------------
 
 if(ENABLE_MPI)
@@ -42,12 +47,34 @@ if(ENABLE_OPENMP_DEVICE)
 endif()
 
 # ---------------------------------------------------------------
-# Find PThreads
+# Setup other TPLs (listed in alphabetical order)
 # ---------------------------------------------------------------
 
-if(ENABLE_PTHREAD)
-  include(SundialsPthread)
-  list(APPEND SUNDIALS_TPL_LIST "PTHREAD")
+# ---------------------------------------------------------------
+# Find (and test) the Caliper libraries
+# ---------------------------------------------------------------
+
+if(ENABLE_CALIPER)
+  include(SundialsCaliper)
+  list(APPEND SUNDIALS_TPL_LIST "CALIPER")
+endif()
+
+# ---------------------------------------------------------------
+# Find (and test) the hypre libraries
+# ---------------------------------------------------------------
+
+if(ENABLE_HYPRE)
+  include(SundialsHypre)
+  list(APPEND SUNDIALS_TPL_LIST "HYPRE")
+endif()
+
+# ---------------------------------------------------------------
+# Find (and test) the KLU libraries
+# ---------------------------------------------------------------
+
+if(ENABLE_KLU)
+  include(SundialsKLU)
+  list(APPEND SUNDIALS_TPL_LIST "KLU")
 endif()
 
 # ---------------------------------------------------------------
@@ -78,6 +105,33 @@ if(ENABLE_ONEMKL)
 endif()
 
 # ---------------------------------------------------------------
+# Find (and test) the PETSc libraries
+# ---------------------------------------------------------------
+
+if(ENABLE_PETSC)
+  include(SundialsPETSC)
+  list(APPEND SUNDIALS_TPL_LIST "PETSC")
+endif()
+
+# ---------------------------------------------------------------
+# Find PThreads
+# ---------------------------------------------------------------
+
+if(ENABLE_PTHREAD)
+  include(SundialsPthread)
+  list(APPEND SUNDIALS_TPL_LIST "PTHREAD")
+endif()
+
+# -------------------------------------------------------------
+# Find (and test) RAJA
+# -------------------------------------------------------------
+
+if(ENABLE_RAJA)
+  include(SundialsRAJA)
+  list(APPEND SUNDIALS_TPL_LIST "RAJA")
+endif()
+
+# ---------------------------------------------------------------
 # Find (and test) the SuperLUDIST libraries
 # ---------------------------------------------------------------
 
@@ -93,42 +147,6 @@ endif()
 if(ENABLE_SUPERLUMT)
   include(SundialsSuperLUMT)
   list(APPEND SUNDIALS_TPL_LIST "SUPERLUMT")
-endif()
-
-# ---------------------------------------------------------------
-# Find (and test) the KLU libraries
-# ---------------------------------------------------------------
-
-if(ENABLE_KLU)
-  include(SundialsKLU)
-  list(APPEND SUNDIALS_TPL_LIST "KLU")
-endif()
-
-# ---------------------------------------------------------------
-# Find (and test) the hypre libraries
-# ---------------------------------------------------------------
-
-if(ENABLE_HYPRE)
-  include(SundialsHypre)
-  list(APPEND SUNDIALS_TPL_LIST "HYPRE")
-endif()
-
-# ---------------------------------------------------------------
-# Find (and test) the PETSc libraries
-# ---------------------------------------------------------------
-
-if(ENABLE_PETSC)
-  include(SundialsPETSC)
-  list(APPEND SUNDIALS_TPL_LIST "PETSC")
-endif()
-
-# -------------------------------------------------------------
-# Find (and test) RAJA
-# -------------------------------------------------------------
-
-if(ENABLE_RAJA)
-  include(SundialsRAJA)
-  list(APPEND SUNDIALS_TPL_LIST "RAJA")
 endif()
 
 # -------------------------------------------------------------
@@ -148,9 +166,3 @@ if(ENABLE_XBRAID)
   include(SundialsXBRAID)
   list(APPEND SUNDIALS_TPL_LIST "XBRAID")
 endif()
-
-# ---------------------------------------------------------------
-# Check for POSIX timers
-# ---------------------------------------------------------------
-
-include(SundialsPOSIXTimers)

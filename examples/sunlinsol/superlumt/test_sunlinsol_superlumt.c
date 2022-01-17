@@ -3,7 +3,7 @@
  * Programmer(s): Daniel Reynolds @ SMU
  * -----------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2021, Lawrence Livermore National Security
+ * Copyright (c) 2002-2022, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -41,6 +41,12 @@ int main(int argc, char *argv[])
   realtype        *matdata, *xdata;
   int             mattype, num_threads, print_timing;
   sunindextype    i, j, k;
+  SUNContext      sunctx;
+
+  if (SUNContext_Create(NULL, &sunctx)) {
+    printf("ERROR: SUNContext_Create failed\n");
+    return(-1);
+  }
 
   /* check input and set matrix dimensions */
   if (argc < 5){
@@ -74,10 +80,10 @@ int main(int argc, char *argv[])
          (long int) N, mattype, num_threads);
 
   /* Create matrices and vectors */
-  B = SUNDenseMatrix(N, N);
-  x = N_VNew_Serial(N);
-  y = N_VNew_Serial(N);
-  b = N_VNew_Serial(N);
+  B = SUNDenseMatrix(N, N, sunctx);
+  x = N_VNew_Serial(N, sunctx);
+  y = N_VNew_Serial(N, sunctx);
+  b = N_VNew_Serial(N, sunctx);
 
   /* Fill matrix with uniform random data in [0,1/N] */
   for (k=0; k<5*N; k++) {
@@ -114,7 +120,7 @@ int main(int argc, char *argv[])
   }
 
   /* Create SuperLUMT linear solver */
-  LS = SUNLinSol_SuperLUMT(x, A, num_threads);
+  LS = SUNLinSol_SuperLUMT(x, A, num_threads, sunctx);
 
   /* Run Tests */
   fails += Test_SUNLinSolInitialize(LS, 0);
@@ -147,6 +153,7 @@ int main(int argc, char *argv[])
   N_VDestroy(x);
   N_VDestroy(y);
   N_VDestroy(b);
+  SUNContext_Free(&sunctx);
 
   return(fails);
 }

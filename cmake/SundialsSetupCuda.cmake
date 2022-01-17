@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -28,7 +28,7 @@ endif()
 # Configure the CUDA flags
 # ===============================================================
 
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda --expt-relaxed-constexpr")
 
 if(${CMAKE_VERSION} VERSION_LESS "3.18.0")
   if(CMAKE_CUDA_ARCHITECTURES)
@@ -104,3 +104,14 @@ message(STATUS "CUDA Compile Flags:         ${CMAKE_CUDA_FLAGS}")
 message(STATUS "CUDA Link Flags:            ${CMAKE_CUDA_LINK_FLAGS}")
 message(STATUS "CUDA Link Executable:       ${CMAKE_CUDA_LINK_EXECUTABLE}")
 message(STATUS "CUDA Separable Compilation: ${CMAKE_CUDA_SEPARABLE_COMPILATION}")
+
+
+# ===============================================================
+# Configure compiler for installed examples
+# ===============================================================
+
+if(SUNDIALS_BUILD_WITH_PROFILING AND ENABLE_MPI)
+  set(_EXAMPLES_CUDA_HOST_COMPILER "${MPI_CXX_COMPILER}" CACHE INTERNAL "${lang} compiler for installed examples")
+else()
+  set(_EXAMPLES_CUDA_HOST_COMPILER "${CMAKE_CUDA_HOST_COMPILER}" CACHE INTERNAL "${lang} compiler for installed examples")
+endif()

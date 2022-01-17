@@ -2,7 +2,7 @@
 # Programmer(s): Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -79,9 +79,8 @@ foreach(test_tuple ${ARKODE_unit_tests})
   endif()
 
   # add test to regression tests
-  sundials_add_test(${test_name} ${test}
-    TEST_ARGS ${test_args}
-    MPI_NPROCS ${number_of_tasks}
-    NODIFF)
+  add_test(NAME ${test_name} COMMAND ${MPIEXEC_EXECUTABLE} -n ${number_of_tasks} ${test} ${test_args})
 
 endforeach()
+
+message(STATUS "Added ARKODE CXX parallel units tests")

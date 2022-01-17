@@ -3,7 +3,7 @@
 #                David J. Gardner @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -25,6 +25,9 @@ set(KINSOL_examples
   "kinAnalytic_fp\;--m_aa 2\;"
   "kinAnalytic_fp\;--m_aa 2 --delay_aa 2\;"
   "kinAnalytic_fp\;--m_aa 2 --damping_aa 0.5\;develop"
+  "kinAnalytic_fp\;--m_aa 2 --orth_aa 1\;"
+  "kinAnalytic_fp\;--m_aa 2 --orth_aa 2\;"
+  "kinAnalytic_fp\;--m_aa 2 --orth_aa 3\;"
   "kinFerTron_dns\;\;develop"
   "kinFoodWeb_kry\;\;develop"
   "kinKrylovDemo_ls\;\;develop"

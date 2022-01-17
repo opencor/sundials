@@ -2,7 +2,7 @@
  * Programmer(s): Daniel McGreer, and Cody J. Balos @ LLNL
  * -----------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2021, Lawrence Livermore National Security
+ * Copyright (c) 2002-2022, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -27,7 +27,7 @@
 
 /* hip vector variants */
 enum mem_type { UNMANAGED, MANAGED, SUNMEMORY };
-enum pol_type { DEFAULT_POL, DEFAULT_POL_W_STREAM, GRID_STRIDE };
+enum pol_type { DEFAULT_POL, DEFAULT_POL_W_STREAM, GRID_STRIDE, LDS_REDUCTIONS };
 
 /* ----------------------------------------------------------------------
  * Main NVector Testing Routine
@@ -43,30 +43,31 @@ int main(int argc, char *argv[])
   hipStream_t     stream;            /* hip stream                */
   int             memtype, policy;
 
+  Test_Init(NULL);
 
   /* check input and set vector length */
   if (argc < 4){
     printf("ERROR: THREE (3) Inputs required: vector length, hip threads per block (0 for default), print timing \n");
-    return(-1);
+    Test_Abort(1);
   }
 
   length = (sunindextype) atol(argv[1]);
   if (length <= 0) {
     printf("ERROR: length of vector must be a positive integer\n");
-    return(-1);
+    Test_Abort(1);
   }
 
   threadsPerBlock = (int) atoi(argv[2]);
   if (threadsPerBlock < 0 || threadsPerBlock % warpSize) {
     printf("ERROR: hip threads per block must be 0 to use the default or a multiple of %d\n", warpSize);
-    return(-1);
+    Test_Abort(1);
   }
 
   print_timing = atoi(argv[3]);
   SetTiming(print_timing, 0);
 
   /* test with all policy variants */
-  for (policy=DEFAULT_POL; policy<=GRID_STRIDE; ++policy) {
+  for (policy=DEFAULT_POL; policy<=LDS_REDUCTIONS; ++policy) {
     int actualThreadsPerBlock = threadsPerBlock ? threadsPerBlock : 512;
     SUNHipExecPolicy* stream_exec_policy = NULL;
     SUNHipExecPolicy* reduce_exec_policy = NULL;
@@ -74,10 +75,13 @@ int main(int argc, char *argv[])
 
     if (policy == DEFAULT_POL_W_STREAM) {
       stream_exec_policy = new SUNHipThreadDirectExecPolicy(actualThreadsPerBlock, stream);
-      reduce_exec_policy = new SUNHipBlockReduceExecPolicy(actualThreadsPerBlock, 0, stream);
+      reduce_exec_policy = new SUNHipBlockReduceAtomicExecPolicy(actualThreadsPerBlock, 0, stream);
     } else if (policy == GRID_STRIDE) {
       stream_exec_policy = new SUNHipGridStrideExecPolicy(actualThreadsPerBlock, 1);
-      reduce_exec_policy = new SUNHipBlockReduceExecPolicy(actualThreadsPerBlock, 1);
+      reduce_exec_policy = new SUNHipBlockReduceAtomicExecPolicy(actualThreadsPerBlock, 1);
+    } else if (policy == LDS_REDUCTIONS) {
+      stream_exec_policy = new SUNHipThreadDirectExecPolicy(actualThreadsPerBlock);
+      reduce_exec_policy = new SUNHipBlockReduceExecPolicy(actualThreadsPerBlock);
     }
 
     /* test with all memory variants */
@@ -92,23 +96,23 @@ int main(int argc, char *argv[])
         printf("Testing HIP N_Vector with managed memory, policy %d\n", policy);
       } else if (memtype==SUNMEMORY) {
         printf("Testing HIP N_Vector with SUNMemoryHelper, policy %d\n", policy);
-        mem_helper = MyMemoryHelper();
+        mem_helper = MyMemoryHelper(sunctx);
       }
       printf("Vector length: %ld \n", (long int) length);
 
       /* Create new vectors */
       if (memtype == UNMANAGED)
-        X = N_VNew_Hip(length);
+        X = N_VNew_Hip(length, sunctx);
       else if (memtype == MANAGED)
-        X = N_VNewManaged_Hip(length);
+        X = N_VNewManaged_Hip(length, sunctx);
       else if (memtype == SUNMEMORY)
-        X = N_VNewWithMemHelp_Hip(length, SUNFALSE, mem_helper);
+        X = N_VNewWithMemHelp_Hip(length, SUNFALSE, mem_helper, sunctx);
       if (X == NULL) {
         delete stream_exec_policy;
         delete reduce_exec_policy;
         if (mem_helper) SUNMemoryHelper_Destroy(mem_helper);
         printf("FAIL: Unable to create a new vector \n\n");
-        return(1);
+        Test_Abort(1);
       }
 
       if (stream_exec_policy != NULL && reduce_exec_policy != NULL) {
@@ -118,7 +122,7 @@ int main(int argc, char *argv[])
           delete reduce_exec_policy;
           if (mem_helper) SUNMemoryHelper_Destroy(mem_helper);
           printf("FAIL: Unable to set kernel execution policy \n\n");
-          return(1);
+          Test_Abort(1);
         }
         printf("Using non-default kernel execution policy\n");
         printf("Threads per block: %d\n\n", actualThreadsPerBlock);
@@ -138,7 +142,7 @@ int main(int argc, char *argv[])
         delete stream_exec_policy;
         delete reduce_exec_policy;
         if (mem_helper) SUNMemoryHelper_Destroy(mem_helper);
-        return(1);
+        Test_Abort(1);
       }
 
       Z = N_VClone(X);
@@ -149,7 +153,7 @@ int main(int argc, char *argv[])
         delete reduce_exec_policy;
         if (mem_helper) SUNMemoryHelper_Destroy(mem_helper);
         printf("FAIL: Unable to create a new vector \n\n");
-        return(1);
+        Test_Abort(1);
       }
 
       /* Fill vectors with uniform random data in [-1,1] */
@@ -217,7 +221,7 @@ int main(int argc, char *argv[])
         delete reduce_exec_policy;
         if (mem_helper) SUNMemoryHelper_Destroy(mem_helper);
         printf("FAIL: Unable to create a new vector \n\n");
-        return(1);
+        Test_Abort(1);
       }
       retval = N_VEnableFusedOps_Hip(U, SUNFALSE);
       if (retval != 0) {
@@ -229,7 +233,7 @@ int main(int argc, char *argv[])
         delete reduce_exec_policy;
         if (mem_helper) SUNMemoryHelper_Destroy(mem_helper);
         printf("FAIL: Unable to create a new vector \n\n");
-        return(1);
+        Test_Abort(1);
       }
 
       /* fused operations */
@@ -261,7 +265,7 @@ int main(int argc, char *argv[])
         delete reduce_exec_policy;
         if (mem_helper) SUNMemoryHelper_Destroy(mem_helper);
         printf("FAIL: Unable to create a new vector \n\n");
-        return(1);
+        Test_Abort(1);
       }
       if (retval != 0) {
         N_VDestroy(X);
@@ -273,7 +277,7 @@ int main(int argc, char *argv[])
         delete reduce_exec_policy;
         if (mem_helper) SUNMemoryHelper_Destroy(mem_helper);
         printf("FAIL: Unable to create a new vector \n\n");
-        return(1);
+        Test_Abort(1);
       }
 
       /* fused operations */
@@ -302,6 +306,10 @@ int main(int argc, char *argv[])
       fails += Test_N_VInvTestLocal(X, Z, length, 0);
       if (length >= 7) fails += Test_N_VConstrMaskLocal(X, Y, Z, length, 0);
       fails += Test_N_VMinQuotientLocal(X, Y, length, 0);
+
+      /* local fused reduction operations */
+      printf("\nTesting local fused reduction operations:\n\n");
+      fails += Test_N_VDotProdMultiLocal(V, length, 0);
 
       /* XBraid interface operations */
       printf("\nTesting XBraid interface operations:\n\n");
@@ -341,6 +349,7 @@ int main(int argc, char *argv[])
 
   hipDeviceSynchronize();
   hipDeviceReset();
+  Test_Finalize();
   return(fails);
 }
 

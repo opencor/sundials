@@ -3,7 +3,7 @@
 #                and Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -40,21 +40,4 @@ message(STATUS "Added SUNLINSOL_SPBCGS module")
 # Add F90 module if F2003 interface is enabled
 if(BUILD_FORTRAN_MODULE_INTERFACE)
   add_subdirectory(fmod)
-endif()
-
-# If FCMIX is enabled, build and install the Fortran77 library
-if(BUILD_FORTRAN77_INTERFACE)
-  sundials_add_library(sundials_fsunlinsolspbcgs
-    SOURCES
-      fsunlinsol_spbcgs.c
-    LINK_LIBRARIES
-      PRIVATE sundials_sunlinsolspbcgs
-    OUTPUT_NAME
-      sundials_fsunlinsolspbcgs
-    VERSION
-      ${sunlinsollib_VERSION}
-    SOVERSION
-      ${sunlinsollib_SOVERSION}
-  )
-  message(STATUS "Added SUNLINSOL_SPBCGS F77 interface")
 endif()

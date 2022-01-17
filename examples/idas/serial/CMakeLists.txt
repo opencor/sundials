@@ -3,7 +3,7 @@
 #                David J. Gardner @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -320,7 +320,7 @@ if(EXAMPLES_INSTALL)
       set(THREAD_LIBRARY_SLUMT "")
     endif()
   else()
-    set(EXAMPLES_SLUMTU "")
+    set(EXAMPLES_SLUMT "")
     set(THREAD_LIBRARY_SLUMT "")
   endif()
 

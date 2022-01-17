@@ -2,7 +2,7 @@
  * Programmer(s): Cody J. Balos @ LLNL
  * -----------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2021, Lawrence Livermore National Security
+ * Copyright (c) 2002-2022, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -21,12 +21,12 @@
 #include "sundials_hip.h"
 
 
-SUNMemoryHelper SUNMemoryHelper_Hip()
+SUNMemoryHelper SUNMemoryHelper_Hip(SUNContext sunctx)
 {
   SUNMemoryHelper helper;
 
   /* Allocate the helper */
-  helper = SUNMemoryHelper_NewEmpty();
+  helper = SUNMemoryHelper_NewEmpty(sunctx);
 
   /* Set the ops */
   helper->ops->alloc     = SUNMemoryHelper_Alloc_Hip;
@@ -41,7 +41,8 @@ SUNMemoryHelper SUNMemoryHelper_Hip()
 }
 
 int SUNMemoryHelper_Alloc_Hip(SUNMemoryHelper helper, SUNMemory* memptr,
-                              size_t mem_size, SUNMemoryType mem_type)
+                              size_t mem_size, SUNMemoryType mem_type,
+                              void* queue)
 {
   SUNMemory mem = SUNMemoryNewEmpty();
 
@@ -61,9 +62,9 @@ int SUNMemoryHelper_Alloc_Hip(SUNMemoryHelper helper, SUNMemory* memptr,
   }
   else if (mem_type == SUNMEMTYPE_PINNED)
   {
-    if (!SUNDIALS_HIP_VERIFY(hipMallocHost(&(mem->ptr), mem_size)))
+    if (!SUNDIALS_HIP_VERIFY(hipHostMalloc(&(mem->ptr), mem_size, hipHostMallocDefault)))
     {
-      SUNDIALS_DEBUG_PRINT("ERROR in SUNMemoryHelper_Alloc_Hip: hipMallocHost failed\n");
+      SUNDIALS_DEBUG_PRINT("ERROR in SUNMemoryHelper_Alloc_Hip: hipHostMalloc failed\n");
       free(mem);
       return(-1);
     }
@@ -97,7 +98,8 @@ int SUNMemoryHelper_Alloc_Hip(SUNMemoryHelper helper, SUNMemory* memptr,
   return(0);
 }
 
-int SUNMemoryHelper_Dealloc_Hip(SUNMemoryHelper helper, SUNMemory mem)
+int SUNMemoryHelper_Dealloc_Hip(SUNMemoryHelper helper, SUNMemory mem,
+                                void* queue)
 {
   if (mem == NULL) return(0);
 
@@ -110,9 +112,9 @@ int SUNMemoryHelper_Dealloc_Hip(SUNMemoryHelper helper, SUNMemory mem)
     }
     else if (mem->type == SUNMEMTYPE_PINNED)
     {
-      if (!SUNDIALS_HIP_VERIFY(hipFreeHost(mem->ptr)))
+      if (!SUNDIALS_HIP_VERIFY(hipHostFree(mem->ptr)))
       {
-        SUNDIALS_DEBUG_PRINT("ERROR in SUNMemoryHelper_Dealloc_Hip: hipFreeHost failed\n");
+        SUNDIALS_DEBUG_PRINT("ERROR in SUNMemoryHelper_Dealloc_Hip: hipHostFree failed\n");
         return(-1);
       }
       mem->ptr = NULL;
@@ -139,7 +141,7 @@ int SUNMemoryHelper_Dealloc_Hip(SUNMemoryHelper helper, SUNMemory mem)
 }
 
 int SUNMemoryHelper_Copy_Hip(SUNMemoryHelper helper, SUNMemory dst,
-                             SUNMemory src, size_t memory_size)
+                             SUNMemory src, size_t memory_size, void* queue)
 {
   int retval = 0;
   hipError_t cuerr = hipSuccess;
@@ -190,15 +192,15 @@ int SUNMemoryHelper_Copy_Hip(SUNMemoryHelper helper, SUNMemory dst,
 
 int SUNMemoryHelper_CopyAsync_Hip(SUNMemoryHelper helper, SUNMemory dst,
                                   SUNMemory src, size_t memory_size,
-                                  void* ctx)
+                                  void* queue)
 {
   int retval = 0;
   hipError_t cuerr = hipSuccess;
   hipStream_t stream = 0;
 
-  if (ctx != NULL)
+  if (queue != NULL)
   {
-    stream = *((hipStream_t*) ctx);
+    stream = *((hipStream_t*) queue);
   }
 
   switch(src->type)

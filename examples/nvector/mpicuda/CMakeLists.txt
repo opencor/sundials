@@ -2,7 +2,7 @@
 # Programmer(s): Slaven Peles and Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -33,11 +33,6 @@ set(nvector_examples_dependencies
 # Add source directory to include directories
 include_directories(. ..)
 
-# use MPI wrapper as the compiler
-set(CMAKE_C_COMPILER ${MPI_C_COMPILER})
-set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
-set(CMAKE_CUDA_HOST_COMPILER ${MPI_CXX_COMPILER})
-
 # Specify libraries to link against
 set(NVECS_LIB sundials_nvecmpiplusx sundials_nveccuda)
 
@@ -58,15 +53,20 @@ foreach(example_tuple ${nvector_cuda_examples})
   # example source files once for testing with different inputs
   if(NOT TARGET ${example})
     # example source files
-    add_executable(${example} ${example}.cu
-      ../test_nvector.c
-      ../test_mpinvector.c)
+    add_executable(${example} ${example}.cu)
+
+    # link vector test utilties
+    target_link_libraries(${example} PRIVATE test_nvector_obj test_nvectormpi_obj)
 
     # folder to organize targets in an IDE
     set_target_properties(${example} PROPERTIES FOLDER "Examples")
 
+    # Workaround bug in CMake < 3.17.3 when using MPI::MPI_CXX
+    target_include_directories(${example} PRIVATE ${MPI_CXX_INCLUDE_DIRS})
+    target_link_libraries(${example} PRIVATE ${MPI_CXX_LIBRARIES})
+
     # libraries to link against
-    target_link_libraries(${example} PRIVATE ${SUNDIALS_LIBS} ${MPI_CXX_LIBRARIES})
+    target_link_libraries(${example} PRIVATE ${SUNDIALS_LIBS})
   endif()
 
   # check if example args are provided and set the test name

@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -75,3 +75,5 @@ foreach(test_tuple ${ARKODE_unit_tests})
   add_test(NAME ${test_name} COMMAND ${test} ${test_args})
 
 endforeach()
+
+message(STATUS "Added ARKODE C serial units tests")

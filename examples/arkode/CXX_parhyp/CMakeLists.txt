@@ -2,7 +2,7 @@
 # Programmer(s): Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -21,6 +21,8 @@
 set(ARKODE_examples
   "ark_heat2D_hypre_ls\;--np 2 2\;1\;4\;develop"
   "ark_heat2D_hypre_pfmg\;--np 2 2\;1\;4\;develop"
+  "ark_heat2D_hypre_pfmg_mri\;--np 2 2\;1\;4\;develop"
+  "ark_heat2D_hypre_pfmg_imex\;--np 2 2\;1\;4\;develop"
   )
 
 # Auxiliary files to install

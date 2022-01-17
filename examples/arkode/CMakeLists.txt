@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner and Slaven Peles @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -49,26 +49,6 @@ if(EXAMPLES_ENABLE_CXX)
   endif()
   if(ENABLE_XBRAID)
     add_subdirectory(CXX_xbraid)
-  endif()
-endif()
-
-# F77 examples
-if(BUILD_FORTRAN77_INTERFACE AND EXAMPLES_ENABLE_F77)
-  add_subdirectory(F77_serial)
-  if(ENABLE_MPI AND MPI_Fortran_FOUND)
-    add_subdirectory(F77_parallel)
-  endif()
-endif()
-
-# F90 examples
-if(BUILD_FORTRAN77_INTERFACE AND EXAMPLES_ENABLE_F90)
-  add_subdirectory(F90_serial)
-  if(ENABLE_MPI AND MPI_Fortran_FOUND)
-    # currently the only F90_parallel example
-    # does not support anything but double precision
-    if(SUNDIALS_PRECISION MATCHES "DOUBLE")
-      add_subdirectory(F90_parallel)
-    endif()
   endif()
 endif()
 

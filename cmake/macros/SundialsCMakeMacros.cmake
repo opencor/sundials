@@ -3,7 +3,7 @@
 #                Radu Serban @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -130,7 +130,7 @@ function(sundials_git_version)
 endfunction()
 
 # Macros from other files
-
+include(SundialsAddExecutable)
 include(SundialsAddLibrary)
 include(SundialsAddTest)
 include(SundialsAddTestInstall)

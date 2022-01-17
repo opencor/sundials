@@ -4,7 +4,7 @@
  * Based on work by Donald Wilcox @ LBNL
  * ----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2021, Lawrence Livermore National Security
+ * Copyright (c) 2002-2022, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -60,7 +60,7 @@
  * ----------------------------------------------------------------------------
  */
 
-SUNLinearSolver SUNLinSol_cuSolverSp_batchQR(N_Vector y, SUNMatrix A, cusolverSpHandle_t cusol_handle)
+SUNLinearSolver SUNLinSol_cuSolverSp_batchQR(N_Vector y, SUNMatrix A, cusolverSpHandle_t cusol_handle, SUNContext sunctx)
 {
   /* Check that required arguments are not NULL */
   if (y == NULL || A == NULL)
@@ -87,7 +87,7 @@ SUNLinearSolver SUNLinSol_cuSolverSp_batchQR(N_Vector y, SUNMatrix A, cusolverSp
   SUNLinearSolver S;
 
   S = NULL;
-  S = SUNLinSolNewEmpty();
+  S = SUNLinSolNewEmpty(sunctx);
   if (S == NULL)
   {
     return NULL;

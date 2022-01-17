@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # -----------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -62,11 +62,12 @@ if(SUPERLUMT_FOUND AND (NOT SUPERLUMT_WORKS))
 
   # Create a CMakeLists.txt file
   file(WRITE ${SUPERLUMT_TEST_DIR}/CMakeLists.txt
-    "CMAKE_MINIMUM_REQUIRED(VERSION 3.1.3)\n"
+    "CMAKE_MINIMUM_REQUIRED(VERSION ${CMAKE_VERSION})\n"
     "PROJECT(ltest C)\n"
     "SET(CMAKE_VERBOSE_MAKEFILE ON)\n"
     "SET(CMAKE_BUILD_TYPE \"${CMAKE_BUILD_TYPE}\")\n"
     "SET(CMAKE_C_COMPILER \"${CMAKE_C_COMPILER}\")\n"
+    "SET(CMAKE_C_STANDARD ${CMAKE_C_STANDARD})\n"
     "SET(CMAKE_C_FLAGS \"${CMAKE_C_FLAGS}\")\n"
     "SET(CMAKE_C_FLAGS_RELEASE \"${CMAKE_C_FLAGS_RELEASE}\")\n"
     "SET(CMAKE_C_FLAGS_DEBUG \"${CMAKE_C_FLAGS_DEBUG}\")\n"

@@ -3,7 +3,7 @@
 #                and Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -42,21 +42,4 @@ message(STATUS "Added SUNLINSOL_DENSE module")
 # Add F90 module if F2003 interface is enabled
 if(BUILD_FORTRAN_MODULE_INTERFACE)
   add_subdirectory(fmod)
-endif()
-
-# If FCMIX is enabled, build and install the Fortran77 library
-if(BUILD_FORTRAN77_INTERFACE)
-  sundials_add_library(sundials_fsunlinsoldense
-    SOURCES
-      fsunlinsol_dense.c
-    LINK_LIBRARIES
-      PRIVATE sundials_fnvecserial sundials_fsunmatrixdense sundials_sunlinsoldense
-    OUTPUT_NAME
-      sundials_fsunlinsoldense
-    VERSION
-      ${sunlinsollib_VERSION}
-    SOVERSION
-      ${sunlinsollib_SOVERSION}
-  )
-  message(STATUS "Added SUNLINSOL_DENSE F77 interface")
 endif()

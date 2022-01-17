@@ -2,7 +2,7 @@
  * Programmer(s): Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2021, Lawrence Livermore National Security
+ * Copyright (c) 2002-2022, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -21,6 +21,7 @@
 #include <stdarg.h>
 
 #include "idas/idas.h"
+#include "sundials_context_impl.h"
 
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
@@ -70,6 +71,8 @@ extern "C" {
  */
 
 typedef struct IDAMemRec {
+
+  SUNContext ida_sunctx;
 
   realtype ida_uround;    /* machine unit roundoff */
 
@@ -983,6 +986,7 @@ int IDASensResDQ(int Ns, realtype t,
 /* General errors */
 
 #define MSG_MEM_FAIL       "A memory request failed."
+#define MSG_NULL_SUNCTX    "sunctx = NULL illegal."
 #define MSG_NO_MEM         "ida_mem = NULL illegal."
 #define MSG_NO_MALLOC      "Attempt to call before IDAMalloc."
 #define MSG_BAD_NVECTOR    "A required vector operation is not implemented."

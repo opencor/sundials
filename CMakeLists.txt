@@ -3,7 +3,7 @@
 #                and Slaven Peles @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -34,13 +34,15 @@ set(CMAKE_MODULE_PATH
 
 # MACRO definitions
 include(SundialsCMakeMacros)
-include(FindPackageHandleStandardArgs)
 include(CMakePrintHelpers)
+include(CheckCSourceCompiles)
+include(FindPackageHandleStandardArgs)
+
 
 # Set some variables with info on the SUNDIALS project
 set(PACKAGE_BUGREPORT "sundials-users@llnl.gov")
 set(PACKAGE_NAME "SUNDIALS")
-set(PACKAGE_STRING "SUNDIALS 5.8.0")
+set(PACKAGE_STRING "SUNDIALS 6.1.0")
 set(PACKAGE_TARNAME "sundials")
 
 # Set SUNDIALS version numbers
@@ -48,8 +50,8 @@ sundials_git_version() # sets SUNDIALS_GIT_VERSION
 message(STATUS "SUNDIALS_GIT_VERSION: ${SUNDIALS_GIT_VERSION}")
 
 # (use "" for the version label if none is needed)
-set(PACKAGE_VERSION_MAJOR "5")
-set(PACKAGE_VERSION_MINOR "8")
+set(PACKAGE_VERSION_MAJOR "6")
+set(PACKAGE_VERSION_MINOR "1")
 set(PACKAGE_VERSION_PATCH "0")
 set(PACKAGE_VERSION_LABEL "")
 
@@ -65,38 +67,38 @@ endif()
 
 # Specify the VERSION and SOVERSION for shared libraries
 
-set(arkodelib_VERSION "4.8.0")
-set(arkodelib_SOVERSION "4")
+set(arkodelib_VERSION "5.1.0")
+set(arkodelib_SOVERSION "5")
 
-set(cvodelib_VERSION "5.8.0")
-set(cvodelib_SOVERSION "5")
+set(cvodelib_VERSION "6.1.0")
+set(cvodelib_SOVERSION "6")
 
-set(cvodeslib_VERSION "5.8.0")
-set(cvodeslib_SOVERSION "5")
+set(cvodeslib_VERSION "6.1.0")
+set(cvodeslib_SOVERSION "6")
 
-set(idalib_VERSION "5.8.0")
-set(idalib_SOVERSION "5")
+set(idalib_VERSION "6.1.0")
+set(idalib_SOVERSION "6")
 
-set(idaslib_VERSION "4.8.0")
-set(idaslib_SOVERSION "4")
+set(idaslib_VERSION "5.1.0")
+set(idaslib_SOVERSION "5")
 
-set(kinsollib_VERSION "5.8.0")
-set(kinsollib_SOVERSION "5")
+set(kinsollib_VERSION "6.1.0")
+set(kinsollib_SOVERSION "6")
 
 set(cpodeslib_VERSION "0.0.0")
 set(cpodeslib_SOVERSION "0")
 
-set(nveclib_VERSION "5.8.0")
-set(nveclib_SOVERSION "5")
+set(nveclib_VERSION "6.1.0")
+set(nveclib_SOVERSION "6")
 
-set(sunmatrixlib_VERSION "3.8.0")
-set(sunmatrixlib_SOVERSION "3")
+set(sunmatrixlib_VERSION "4.1.0")
+set(sunmatrixlib_SOVERSION "4")
 
-set(sunlinsollib_VERSION "3.8.0")
-set(sunlinsollib_SOVERSION "3")
+set(sunlinsollib_VERSION "4.1.0")
+set(sunlinsollib_SOVERSION "4")
 
-set(sunnonlinsollib_VERSION "2.8.0")
-set(sunnonlinsollib_SOVERSION "2")
+set(sunnonlinsollib_VERSION "3.1.0")
+set(sunnonlinsollib_SOVERSION "3")
 
 set(sundialslib_VERSION
     "${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}.${PACKAGE_VERSION_PATCH}"
@@ -193,6 +195,11 @@ if(_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
+# Add benchmarks to the build
+if(BUILD_BENCHMARKS)
+  add_subdirectory(benchmarks)
+endif()
+
 # ===============================================================
 # Install configuration header files and license file.
 # ===============================================================
@@ -204,11 +211,6 @@ install(FILES "${PROJECT_BINARY_DIR}/include/sundials/sundials_export.h"
 
 # install configured header file
 install(FILES "${PROJECT_BINARY_DIR}/include/sundials/sundials_config.h"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sundials"
-)
-
-# install configured header file for Fortran 90
-install(FILES "${PROJECT_BINARY_DIR}/include/sundials/sundials_fconfig.h"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sundials"
 )
 
@@ -261,4 +263,11 @@ configure_package_config_file(
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/SUNDIALSConfig.cmake"
               "${CMAKE_CURRENT_BINARY_DIR}/SUNDIALSConfigVersion.cmake"
         DESTINATION "${SUNDIALS_INSTALL_CMAKEDIR}"
+)
+
+# Export targets so build directory can be used directly
+export(
+  EXPORT sundials-targets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/SUNDIALSTargets.cmake"
+  NAMESPACE SUNDIALS::
 )

@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -151,6 +151,9 @@ sundials_option(KLU_WORKS BOOL "Set to ON to force CMake to accept a given KLU c
 # ---------------------------------------------------------------
 sundials_option(ENABLE_HYPRE BOOL "Enable hypre support" OFF)
 
+sundials_option(HYPRE_DIR PATH "Path to hypre installation" "${HYPRE_DIR}"
+                SHOW_IF ENABLE_HYPRE)
+
 sundials_option(HYPRE_INCLUDE_DIR PATH "HYPRE include directory" "${HYPRE_INCLUDE_DIR}"
                 SHOW_IF ENABLE_HYPRE)
 
@@ -261,6 +264,23 @@ sundials_option(XBRAID_WORKS BOOL "Set to ON to force CMake to accept a given XB
 
 sundials_option(ENABLE_ONEMKL BOOL "Enable oneMKL support" OFF)
 
+sundials_option(ONEMKL_DIR PATH "Path to root of oneMKL installation" "${ONEMKL_DIR}"
+                SHOW_IF ENABLE_ONEMKL)
+
 sundials_option(ONEMKL_WORKS BOOL "Set to ON to force CMake to accept a given oneMKL configuration" OFF
                 SHOW_IF ENABLE_ONEMKL
+                ADVANCED)
+
+# ---------------------------------------------------------------
+# Enable Caliper support?
+# ---------------------------------------------------------------
+
+sundials_option(ENABLE_CALIPER BOOL "Enable CALIPER support" OFF
+                DEPENDS_ON SUNDIALS_BUILD_WITH_PROFILING)
+
+sundials_option(CALIPER_DIR PATH "Path to the root of an CALIPER installation" "${CALIPER_DIR}"
+                DEPENDS_ON ENABLE_CALIPER)
+
+sundials_option(CALIPER_WORKS BOOL "Set to ON to force CMake to accept a given CALIPER configuration" OFF
+                DEPENDS_ON ENABLE_CALIPER
                 ADVANCED)

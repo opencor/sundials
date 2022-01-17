@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -85,6 +85,10 @@ macro(sundials_install_examples MODULE EXAMPLES_VAR)
   set(EXAMPLES_DEPENDENCIES "${sundials_install_examples_EXAMPLES_DEPENDENCIES}")
   set(EXTRA_INCLUDES "${sundials_install_examples_EXTRA_INCLUDES}")
   examples2string(${EXAMPLES_VAR} EXAMPLES)
+
+  # components for find_package
+  list2string(sundials_install_examples_SUNDIALS_TARGETS
+    EXAMPLES_CMAKE_COMPONENTS)
 
   set(target_list "")
   foreach(target ${sundials_install_examples_SUNDIALS_TARGETS})

@@ -4,7 +4,7 @@
 # Based on the FindPETSC module by Jed Brown.
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -735,7 +735,6 @@ show :
 
 endif ()
 
-include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (PETSC
   REQUIRED_VARS PETSC_EXECUTABLE_RUNS
   VERSION_VAR PETSC_VERSION

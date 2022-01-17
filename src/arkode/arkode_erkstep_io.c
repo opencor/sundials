@@ -2,7 +2,7 @@
  * Programmer(s): Daniel R. Reynolds @ SMU
  *---------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2021, Lawrence Livermore National Security
+ * Copyright (c) 2002-2022, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -25,12 +25,6 @@
 #include "arkode_erkstep_impl.h"
 #include <sundials/sundials_math.h>
 #include <sundials/sundials_types.h>
-
-#if defined(SUNDIALS_EXTENDED_PRECISION)
-#define RSYM "Lg"
-#else
-#define RSYM "g"
-#endif
 
 
 /*===============================================================
@@ -309,7 +303,7 @@ int ERKStepSetTable(void *arkode_mem, ARKodeButcherTable B)
   based on the integer flag passed to ARKodeButcherTable_LoadERK()
   within the file arkode_butcher_erk.c.
   ---------------------------------------------------------------*/
-int ERKStepSetTableNum(void *arkode_mem, int itable)
+int ERKStepSetTableNum(void *arkode_mem, ARKODE_ERKTableID itable)
 {
   ARKodeMem ark_mem;
   ARKodeERKStepMem step_mem;
@@ -322,7 +316,7 @@ int ERKStepSetTableNum(void *arkode_mem, int itable)
   if (retval != ARK_SUCCESS) return(retval);
 
   /* check that argument specifies an explicit table */
-  if (itable<MIN_ERK_NUM || itable>MAX_ERK_NUM) {
+  if (itable<ARKODE_MIN_ERK_NUM || itable>ARKODE_MAX_ERK_NUM) {
     arkProcessError(ark_mem, ARK_MEM_NULL, "ARKode::ERKStep",
                     "ERKStepSetTableNum",
                     "Illegal ERK table number");

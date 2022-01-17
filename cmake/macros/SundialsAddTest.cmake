@@ -2,7 +2,7 @@
 # Programmer(s): Steven Smith and David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -128,7 +128,7 @@ macro(SUNDIALS_ADD_TEST NAME EXECUTABLE)
       # check if this test is run with MPI and set the MPI run command
       if((SUNDIALS_ADD_TEST_MPI_NPROCS) AND (MPIEXEC_EXECUTABLE))
         if(MPIEXEC_EXECUTABLE MATCHES "srun")
-          set(RUN_COMMAND "srun -N1 -n${SUNDIALS_ADD_TEST_MPI_NPROCS} -ppdebug")
+          set(RUN_COMMAND "srun -n${SUNDIALS_ADD_TEST_MPI_NPROCS} -ppdebug")
         else()
           set(RUN_COMMAND "${MPIEXEC_EXECUTABLE} -n ${SUNDIALS_ADD_TEST_MPI_NPROCS}")
         endif()

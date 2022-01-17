@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner and Slaven Peles @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2022, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -13,6 +13,11 @@
 # ---------------------------------------------------------------
 # examples/sunlinsol level CMakeLists.txt for SUNDIALS
 # ---------------------------------------------------------------
+
+if(ENABLE_CALIPER AND SUNDIALS_BUILD_WITH_PROFILING)
+  include_directories(${caliper_INCLUDE_DIR})
+  set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} caliper)
+endif()
 
 # Always add the serial sunlinearsolver dense and band examples
 add_subdirectory(band)
