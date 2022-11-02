@@ -86,7 +86,7 @@ struct UserData
   sunindextype nx = 512;
 
   // Mesh spacing
-  realtype dx = (xu - xl) / nx;
+  realtype dx = (xu - xl) / (nx - 1);
 
   // Number of equations
   sunindextype neq = NSPECIES * nx;
@@ -129,6 +129,7 @@ struct UserOptions
   // Method order
   int order      = 3;
   int order_fast = 3;
+  bool ark_dirk  = false;
 
   // Relative and absolute tolerances
   realtype rtol      = RCONST(1.e-4);
@@ -595,6 +596,7 @@ void InputHelp()
   cout << "  --integrator <int>       : integrator option\n";
   cout << "  --order <int>            : method order\n";
   cout << "  --order_fast <int>       : MRI fast method order\n";
+  cout << "  --ark_dirk               : Use DIRK method from ARK method\n";
   cout << "  --rtol <real>            : relative tolerance\n";
   cout << "  --atol <real>            : absoltue tolerance\n";
   cout << "  --rtol_fast <real>       : MRI fast relative tolerance\n";
@@ -698,6 +700,7 @@ int ReadInputs(vector<string> &args, UserData &udata, UserOptions &uopts,
   find_arg(args, "--integrator", uopts.integrator);
   find_arg(args, "--order", uopts.order);
   find_arg(args, "--order_fast", uopts.order_fast);
+  find_arg(args, "--ark_dirk", uopts.ark_dirk);
   find_arg(args, "--rtol", uopts.rtol);
   find_arg(args, "--atol", uopts.atol);
   find_arg(args, "--rtol_fast", uopts.rtol_fast);
@@ -719,7 +722,7 @@ int ReadInputs(vector<string> &args, UserData &udata, UserOptions &uopts,
   find_arg(args, "--nout", uopts.nout);
 
   // Recompute mesh spacing and total number of nodes
-  udata.dx  = (udata.xu - udata.xl) / udata.nx;
+  udata.dx  = (udata.xu - udata.xl) / (udata.nx - 1);
   udata.neq = NSPECIES * udata.nx;
 
   // Create workspace
@@ -806,16 +809,6 @@ int PrintSetup(UserData &udata, UserOptions &uopts)
   cout << endl;
   cout << "Problem parameters and options:"     << endl;
   cout << " --------------------------------- " << endl;
-  if (udata.advection)
-    cout << "  advection        = ON"  << endl;
-  else
-    cout << "  advection        = OFF" << endl;
-  if (udata.diffusion)
-    cout << "  diffusion        = ON"  << endl;
-  else
-    cout << "  diffusion        = OFF" << endl;
-  cout << "  splitting        = " << udata.splitting << endl;
-  cout << " --------------------------------- " << endl;
   cout << "  c                = " << udata.c << endl;
   cout << "  d                = " << udata.d << endl;
   cout << "  A                = " << udata.A << endl;
@@ -827,20 +820,267 @@ int PrintSetup(UserData &udata, UserOptions &uopts)
   cout << "  nx               = " << udata.nx << endl;
   cout << "  dx               = " << udata.dx << endl;
   cout << " --------------------------------- " << endl;
+
   if (uopts.integrator == 0)
+  {
     cout << "  integrator       = ERK" << endl;
+    if (udata.advection)
+      cout << "  advection        = Explicit" << endl;
+    else
+      cout << "  advection        = OFF" << endl;
+    if (udata.diffusion)
+      cout << "  diffusion        = Explicit" << endl;
+    else
+      cout << "  diffusion        = OFF" << endl;
+    cout << "  reaction         = Explicit" << endl;
+  }
   else if (uopts.integrator == 1)
+  {
     cout << "  integrator       = ARK" << endl;
+    // advection-diffusion-reaction
+    if (udata.diffusion && udata.advection)
+    {
+      switch(udata.splitting)
+      {
+      case(0):
+        // ERK -- fully explicit
+        cout << "  advection        = Explicit" << endl;
+        cout << "  diffusion        = Explicit" << endl;
+        cout << "  reaction         = Explicit" << endl;
+        break;
+      case(1):
+        // IMEX -- explicit advection-diffusion, implicit reaction
+        cout << "  advection        = Explicit" << endl;
+        cout << "  diffusion        = Explicit" << endl;
+        cout << "  reaction         = Implicit" << endl;
+        break;
+      case(2):
+        // IMEX -- explicit advection-reaction, implicit diffusion
+        cout << "  advection        = Explicit" << endl;
+        cout << "  diffusion        = Implicit" << endl;
+        cout << "  reaction         = Explicit" << endl;
+        break;
+      case(3):
+        // IMEX -- explicit advection, implicit diffusion-reaction
+        cout << "  advection        = Explicit" << endl;
+        cout << "  diffusion        = Implicit" << endl;
+        cout << "  reaction         = Implicit" << endl;
+        break;
+      case(4):
+        // IMEX -- explicit diffusion-reaction, implicit advection
+        cout << "  advection        = Implicit" << endl;
+        cout << "  diffusion        = Explicit" << endl;
+        cout << "  reaction         = Explicit" << endl;
+        break;
+      case(5):
+        // IMEX -- explicit diffusion, implicit advection-reaction
+        cout << "  advection        = Implicit" << endl;
+        cout << "  diffusion        = Explicit" << endl;
+        cout << "  reaction         = Implicit" << endl;
+        break;
+      case(6):
+        // IMEX -- explicit reaction, implicit advection-diffusion
+        cout << "  advection        = Implicit" << endl;
+        cout << "  diffusion        = Implicit" << endl;
+        cout << "  reaction         = Explicit" << endl;
+        break;
+      case(7):
+        // DIRK -- fully implicit
+        cout << "  advection        = Implicit" << endl;
+        cout << "  diffusion        = Implicit" << endl;
+        cout << "  reaction         = Implicit" << endl;
+        break;
+      default:
+        cerr << "ERROR: Invalid splitting option" << endl;
+        return -1;
+        break;
+      }
+    }
+    // advection-reaction
+    else if (!udata.diffusion && udata.advection)
+    {
+      switch(udata.splitting)
+      {
+      case(0):
+        // ERK -- fully explicit
+        cout << "  advection        = Explicit" << endl;
+        cout << "  diffusion        = OFF" << endl;
+        cout << "  reaction         = Explicit" << endl;
+        break;
+      case(1):
+        // IMEX -- explicit advection, implicit reaction
+        cout << "  advection        = Explicit" << endl;
+        cout << "  diffusion        = OFF" << endl;
+        cout << "  reaction         = Implicit" << endl;
+        break;
+      case(2):
+        // IMEX -- explicit reaction, implicit advection
+        cout << "  advection        = Implicit" << endl;
+        cout << "  diffusion        = OFF" << endl;
+        cout << "  reaction         = Explicit" << endl;
+        break;
+      case(3):
+        // DIRK -- fully implicit
+        cout << "  advection        = Implicit" << endl;
+        cout << "  diffusion        = OFF" << endl;
+        cout << "  reaction         = Implicit" << endl;
+        break;
+      default:
+        cerr << "ERROR: Invalid splitting option" << endl;
+        return -1;
+        break;
+      }
+    }
+    // diffusion-reaction
+    else if (udata.diffusion && !udata.advection)
+    {
+      switch(udata.splitting)
+      {
+      case(0):
+        // ERK -- fully explicit
+        cout << "  advection        = OFF" << endl;
+        cout << "  diffusion        = Explicit" << endl;
+        cout << "  reaction         = Explicit" << endl;
+        break;
+      case(1):
+        // IMEX -- explicit diffusion, implicit reaction
+        cout << "  advection        = OFF" << endl;
+        cout << "  diffusion        = Explicit" << endl;
+        cout << "  reaction         = Implicit" << endl;
+        break;
+      case(2):
+        // IMEX -- explicit reaction, implicit diffusion
+        cout << "  advection        = OFF" << endl;
+        cout << "  diffusion        = Implicit" << endl;
+        cout << "  reaction         = Explicit" << endl;
+        break;
+      case(4):
+        // DIRK -- fully implicit
+        cout << "  advection        = OFF" << endl;
+        cout << "  diffusion        = Implicit" << endl;
+        cout << "  reaction         = Implicit" << endl;
+        break;
+      default:
+        cerr << "ERROR: Invalid splitting option" << endl;
+        return -1;
+        break;
+      }
+    }
+    else
+    {
+      cerr << "ERROR: Invalid problem configuration" << endl;
+      return -1;
+    }
+  }
+  else if (uopts.integrator == 2)
+  {
+    cout << "  integrator       = MRI + ARK" << endl;
+    if (udata.diffusion && udata.advection)
+    {
+      // IMEX slow -- advection-diffusion
+      cout << "  advection        = Slow-Explicit" << endl;
+      cout << "  diffusion        = Slow-Implicit" << endl;
+      if (udata.splitting)
+        cout << "  reaction         = Fast-Implicit" << endl;
+      else
+        cout << "  reaction         = Fast-Explicit" << endl;
+    }
+    else if (!udata.diffusion && udata.advection)
+    {
+      // Explicit slow -- advection
+      cout << "  advection        = Slow-Explicit" << endl;
+      cout << "  diffusion        = OFF" << endl;
+      if (udata.splitting)
+        cout << "  reaction         = Fast-Implicit" << endl;
+      else
+        cout << "  reaction         = Fast-Explicit" << endl;
+    }
+    else if (udata.diffusion && !udata.advection)
+    {
+      cout << "  advection        = OFF" << endl;
+      cout << "  diffusion        = Implicit" << endl;
+      if (udata.splitting)
+        cout << "  reaction         = Fast-Implicit" << endl;
+      else
+        cout << "  reaction         = Fast-Explicit" << endl;
+    }
+    else
+    {
+      // No slow time scale
+      cerr << "ERROR: Invalid problem configuration" << endl;
+      return -1;
+    }
+  }
+  else if (uopts.integrator == 3)
+  {
+    cout << "  integrator       = MRI + CVODE" << endl;
+    // Slow time scale
+    if (udata.diffusion && udata.advection)
+    {
+      // IMEX slow -- advection-diffusion
+      cout << "  advection        = Slow-Explicit" << endl;
+      cout << "  diffusion        = Slow-Implicit" << endl;
+      cout << "  reaction         = Fast-Implicit" << endl;
+    }
+    else if (!udata.diffusion && udata.advection)
+    {
+      // Explicit slow -- advection
+      cout << "  advection        = Slow-Explicit" << endl;
+      cout << "  diffusion        = OFF" << endl;
+      cout << "  reaction         = Fast-Implicit" << endl;
+    }
+    else if (udata.diffusion && !udata.advection)
+    {
+      // Implicit slow -- diffusion
+      cout << "  advection        = OFF" << endl;
+      cout << "  diffusion        = Slow-Implicit" << endl;
+      cout << "  reaction         = Fast-Implicit" << endl;
+    }
+    else
+    {
+      // No slow time scale
+      cerr << "ERROR: Invalid problem configuration" << endl;
+      return -1;
+    }
+  }
   else
-    cout << "  integrator       = MRI" << endl;
-  cout << "  order            = " << uopts.order << endl;
+  {
+    cerr << "ERROR: Invalid integrator option" << endl;
+    return -1;
+  }
+  if (uopts.ark_dirk)
+    cout << "  order (ark_dirk) = " << uopts.order << endl;
+  else
+    cout << "  order            = " << uopts.order << endl;
   cout << "  rtol             = " << uopts.rtol << endl;
   cout << "  atol             = " << uopts.atol << endl;
   cout << "  fixed h          = " << uopts.fixed_h << endl;
-  cout << "  controller       = " << uopts.controller << endl;
+  if (uopts.controller <= 0)
+    cout << "  controller       = PID" << endl;
+  else if (uopts.controller == 1)
+    cout << "  controller       = PI" << endl;
+  else if (uopts.controller == 2)
+    cout << "  controller       = I" << endl;
+  else if (uopts.controller == 3)
+    cout << "  controller       = explicit Gustafsson" << endl;
+  else if (uopts.controller == 4)
+    cout << "  controller       = implicit Gustafsson" << endl;
+  else if (uopts.controller == 5)
+    cout << "  controller       = IMEX Gustafsson" << endl;
+  else
+    cout << "  controller       = " << uopts.controller << endl;
   if (uopts.integrator > 0)
   {
-    cout << "  predictor        = " << uopts.predictor << endl;
+    if (uopts.predictor == 0)
+      cout << "  predictor        = trivial" << endl;
+    else if (uopts.predictor == 1)
+      cout << "  predictor        = max order" << endl;
+    else if (uopts.predictor == 2)
+      cout << "  predictor        = variable order" << endl;
+    else if (uopts.predictor == 3)
+      cout << "  predictor        = cutoff order" << endl;
+    else
+      cout << "  predictor        = " << uopts.predictor << endl;
     cout << "  ls setup freq    = " << uopts.ls_setup_freq << endl;
     cout << "  linear           = " << uopts.linear << endl;
   }
@@ -852,8 +1092,30 @@ int PrintSetup(UserData &udata, UserOptions &uopts)
     cout << "  atol             = " << uopts.atol_fast << endl;
     cout << "  order            = " << uopts.order_fast << endl;
     cout << "  fixed h          = " << uopts.fixed_h_fast << endl;
-    cout << "  controller       = " << uopts.controller << endl;
-    cout << "  predictor        = " << uopts.predictor << endl;
+    if (uopts.controller <= 0)
+      cout << "  controller       = PID" << endl;
+    else if (uopts.controller == 1)
+      cout << "  controller       = PI" << endl;
+    else if (uopts.controller == 2)
+      cout << "  controller       = I" << endl;
+    else if (uopts.controller == 3)
+      cout << "  controller       = explicit Gustafsson" << endl;
+    else if (uopts.controller == 4)
+      cout << "  controller       = implicit Gustafsson" << endl;
+    else if (uopts.controller == 5)
+      cout << "  controller       = IMEX Gustafsson" << endl;
+    else
+      cout << "  controller       = " << uopts.controller << endl;
+    if (uopts.predictor == 0)
+      cout << "  predictor        = trivial" << endl;
+    else if (uopts.predictor == 1)
+      cout << "  predictor        = max order" << endl;
+    else if (uopts.predictor == 2)
+      cout << "  predictor        = variable order" << endl;
+    else if (uopts.predictor == 3)
+      cout << "  predictor        = cutoff order" << endl;
+    else
+      cout << "  predictor        = " << uopts.predictor << endl;
     cout << "  ls setup freq    = " << uopts.ls_setup_freq << endl;
   }
   else if (uopts.integrator == 3)

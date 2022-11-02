@@ -983,15 +983,17 @@ Optional inputs for IVP method selection
 .. _ARKODE.Usage.ERKStep.ERKStepMethodInputTable:
 .. table:: Optional inputs for IVP method selection
 
-   +----------------------------------+---------------------------------+------------------+
-   | Optional input                   | Function name                   | Default          |
-   +----------------------------------+---------------------------------+------------------+
-   | Set integrator method order      | :c:func:`ERKStepSetOrder()`     | 4                |
-   +----------------------------------+---------------------------------+------------------+
-   | Set explicit RK table            | :c:func:`ERKStepSetTable()`     | internal         |
-   +----------------------------------+---------------------------------+------------------+
-   | Specify explicit RK table number | :c:func:`ERKStepSetTableNum()`  | internal         |
-   +----------------------------------+---------------------------------+------------------+
+   +--------------------------------------+---------------------------------+------------------+
+   | Optional input                       | Function name                   | Default          |
+   +--------------------------------------+---------------------------------+------------------+
+   | Set integrator method order          | :c:func:`ERKStepSetOrder()`     | 4                |
+   +--------------------------------------+---------------------------------+------------------+
+   | Set explicit RK table                | :c:func:`ERKStepSetTable()`     | internal         |
+   +--------------------------------------+---------------------------------+------------------+
+   | Set explicit RK table via its number | :c:func:`ERKStepSetTableNum()`  | internal         |
+   +--------------------------------------+---------------------------------+------------------+
+   | Set explicit RK table via its name   | :c:func:`ERKStepSetTableName()` | internal         |
+   +--------------------------------------+---------------------------------+------------------+
 
 
 
@@ -1068,6 +1070,25 @@ Optional inputs for IVP method selection
       to ensure that the table exists, and is not implicit.
 
 
+
+.. c:function:: int ERKStepSetTableName(void* arkode_mem, const char *etable)
+
+   Indicates to use a specific built-in Butcher table for the ERK method.
+
+   **Arguments:**
+      * *arkode_mem* -- pointer to the ERKStep memory block.
+      * *etable* -- name of the Butcher table.
+
+   **Return value:**
+      * *ARK_SUCCESS* if successful
+      * *ARK_MEM_NULL* if the ERKStep memory is ``NULL``
+      * *ARK_ILL_INPUT* if an argument has an illegal value
+
+   **Notes:**
+      *etable* should match an existing explicit method from
+      :numref:`Butcher.explicit`.  Error-checking is performed
+      to ensure that the table exists, and is not implicit.
+      This function is case sensitive.
 
 
 
@@ -1600,7 +1621,8 @@ Main solver optional output functions
    +------------------------------------------------------+-------------------------------------------+
    | Number of constraint test failures                   | :c:func:`ERKStepGetNumConstrFails()`      |
    +------------------------------------------------------+-------------------------------------------+
-
+   | Retrieve a pointer for user data                     |  :c:func:`ERKStepGetUserData`             |
+   +------------------------------------------------------+-------------------------------------------+
 
 
 
@@ -1960,6 +1982,22 @@ Main solver optional output functions
 
 
 
+.. c:function:: int ERKStepGetUserData(void* arkode_mem, void** user_data)
+
+   Returns the user data pointer previously set with
+   :c:func:`ERKStepSetUserData`.
+
+   **Arguments:**
+      * *arkode_mem* -- pointer to the ERKStep memory block.
+      * *user_data* -- memory reference to a user data pointer
+
+   **Return value:**
+      * *ARK_SUCCESS* if successful
+      * *ARK_MEM_NULL* if the ARKStep memory was ``NULL``
+
+   .. versionadded:: 5.3.0
+
+
 .. _ARKODE.Usage.ERKStep.ERKStepRootOutputs:
 
 Rootfinding optional output functions
@@ -2113,7 +2151,8 @@ performs the same input checking and initializations that are done in
 assumes that the existing internal memory is sufficient for the new
 problem.  A call to this re-initialization routine deletes the
 solution history that was stored internally during the previous
-integration.  Following a successful call to
+integration, and deletes any previously-set *tstop* value specified via a
+call to :c:func:`ERKStepSetStopTime()`.  Following a successful call to
 :c:func:`ERKStepReInit()`, call :c:func:`ERKStepEvolve()` again for the
 solution of the new problem.
 
@@ -2182,7 +2221,9 @@ the current settings for all ERKStep module options and performs no memory
 allocations but, unlike :c:func:`ERKStepReInit()`, this routine performs only a
 *subset* of the input checking and initializations that are done in
 :c:func:`ERKStepCreate`. In particular this routine retains all internal
-counter values and the step size/error history. Following a successful call to
+counter values and the step size/error history. Like :c:func:`ERKStepReInit()`, a call to
+:c:func:`ERKStepReset()` will delete any previously-set *tstop* value specified
+via a call to :c:func:`ERKStepSetStopTime()`.  Following a successful call to
 :c:func:`ERKStepReset()`, call :c:func:`ERKStepEvolve()` again to continue
 solving the problem. By default the next call to :c:func:`ERKStepEvolve()` will
 use the step size computed by ERKStep prior to calling :c:func:`ERKStepReset()`.

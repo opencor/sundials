@@ -176,6 +176,8 @@ SUNDIALS_EXPORT int ARKStepSetTables(void *arkode_mem, int q, int p,
                                      ARKodeButcherTable Be);
 SUNDIALS_EXPORT int ARKStepSetTableNum(void *arkode_mem,
                                        ARKODE_DIRKTableID itable, ARKODE_ERKTableID etable);
+SUNDIALS_EXPORT int ARKStepSetTableName(void *arkode_mem,
+                                        const char *itable, const char *etable);
 SUNDIALS_EXPORT int ARKStepSetCFLFraction(void *arkode_mem,
                                           realtype cfl_frac);
 SUNDIALS_EXPORT int ARKStepSetSafetyFactor(void *arkode_mem,
@@ -358,6 +360,8 @@ SUNDIALS_EXPORT int ARKStepGetRootInfo(void *arkode_mem,
                                        int *rootsfound);
 SUNDIALS_EXPORT int ARKStepGetNumConstrFails(void *arkode_mem,
                                              long int *nconstrfails);
+SUNDIALS_EXPORT int ARKStepGetUserData(void *arkode_mem,
+                                       void **user_data);
 SUNDIALS_EXPORT int ARKStepPrintAllStats(void *arkode_mem, FILE *outfile,
                                          SUNOutputFormat fmt);
 SUNDIALS_EXPORT char *ARKStepGetReturnFlagName(long int flag);

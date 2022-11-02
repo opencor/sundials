@@ -11,7 +11,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * SUNDIALS Copyright End
  *---------------------------------------------------------------
- * This is the implementation file for ARKode's temporal
+ * This is the implementation file for ARKODE's temporal
  * interpolation utility.
  *--------------------------------------------------------------*/
 
@@ -339,7 +339,7 @@ int arkInterpSetDegree_Hermite(void* arkode_mem, ARKInterp interp,
   /* on positive degree, check for allowable value and overwrite stored degree */
   if (degree >= 0) {
     if (degree > ARK_INTERP_MAX_DEGREE) {
-      arkProcessError(ark_mem, ARK_INTERP_FAIL, "ARKode",
+      arkProcessError(ark_mem, ARK_INTERP_FAIL, "ARKODE",
                       "arkInterpSetDegree_Hermite",
                       "Illegal degree specified.");
       return(ARK_ILL_INPUT);
@@ -504,9 +504,15 @@ int arkInterpEvaluate_Hermite(void* arkode_mem, ARKInterp interp,
   q = SUNMAX(order, 0);                 /* respect lower bound  */
   q = SUNMIN(q, HINT_DEGREE(interp));   /* respect max possible */
 
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
+  SUNLogger_QueueMsg(ARK_LOGGER, SUN_LOGLEVEL_INFO,
+                     "ARKODE::arkInterpEvaluate_Hermite", "interp-eval",
+                     "tau = %"RSYM", d = %i, q = %i", tau, d, q);
+#endif
+
   /* error on illegal d */
   if (d < 0) {
-    arkProcessError(ark_mem, ARK_ILL_INPUT, "ARKode",
+    arkProcessError(ark_mem, ARK_ILL_INPUT, "ARKODE",
                     "arkInterpEvaluate_Hermite",
                     "Requested illegal derivative.");
     return (ARK_ILL_INPUT);
@@ -720,7 +726,7 @@ int arkInterpEvaluate_Hermite(void* arkode_mem, ARKInterp interp,
     break;
 
   default:
-    arkProcessError(ark_mem, ARK_ILL_INPUT, "ARKode",
+    arkProcessError(ark_mem, ARK_ILL_INPUT, "ARKODE",
                     "arkInterpEvaluate_Hermite",
                     "Illegal polynomial order");
     return (ARK_ILL_INPUT);
@@ -968,7 +974,7 @@ int arkInterpSetDegree_Lagrange(void* arkode_mem, ARKInterp I,
   /* on positive degree, check for allowable value and overwrite stored degree */
   if (degree >= 0) {
     if (degree > ARK_INTERP_MAX_DEGREE) {
-      arkProcessError(ark_mem, ARK_INTERP_FAIL, "ARKode",
+      arkProcessError(ark_mem, ARK_INTERP_FAIL, "ARKODE",
                       "arkInterpSetDegree_Lagrange",
                       "Illegal degree specified.");
       return(ARK_ILL_INPUT);
@@ -993,7 +999,7 @@ int arkInterpSetDegree_Lagrange(void* arkode_mem, ARKInterp I,
   This routine performs the following steps:
   1. allocates any missing/needed (t,y) history arrays
   2. zeros out stored (t,y) history
-  3. copies current (t,y) from main ARKode memory into history
+  3. copies current (t,y) from main ARKODE memory into history
   4. updates the 'active' history counter to 1
   ---------------------------------------------------------------*/
 int arkInterpInit_Lagrange(void* arkode_mem, ARKInterp I,
@@ -1176,9 +1182,15 @@ int arkInterpEvaluate_Lagrange(void* arkode_mem, ARKInterp I,
   q = SUNMAX(degree, 0);    /* respect lower bound */
   q = SUNMIN(q, nhist-1);   /* respect max possible */
 
+#if SUNDIALS_LOGGING_LEVEL >= SUNDIALS_LOGGING_INFO
+  SUNLogger_QueueMsg(ARK_LOGGER, SUN_LOGLEVEL_INFO,
+                     "ARKODE::arkInterpEvaluate_Lagrange", "interp-eval",
+                     "tau = %"RSYM", d = %i, q = %i", tau, deriv, q);
+#endif
+
   /* error on illegal deriv */
   if ((deriv < 0) || (deriv > 3)) {
-    arkProcessError(ark_mem, ARK_ILL_INPUT, "ARKode",
+    arkProcessError(ark_mem, ARK_ILL_INPUT, "ARKODE",
                     "arkInterpEvaluate_Lagrange",
                     "Requested illegal derivative.");
     return (ARK_ILL_INPUT);

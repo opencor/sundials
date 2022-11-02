@@ -12,7 +12,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * SUNDIALS Copyright End
  * -----------------------------------------------------------------------------
- * Implementation header file for ARKode's MRI time stepper module.
+ * Implementation header file for ARKODE's MRI time stepper module.
  * ---------------------------------------------------------------------------*/
 
 #ifndef _ARKODE_MRISTEP_IMPL_H
@@ -74,7 +74,8 @@ typedef struct ARKodeMRIStepMemRec {
   int q;                         /* method order                             */
   int p;                         /* embedding order                          */
   int stages;                    /* total number of stages                   */
-  int nstages_stored;            /* total number of stage RHS vectors stored */
+  int nstages_active;            /* number of active stage RHS vectors       */
+  int nstages_allocated;         /* number of stage RHS vectors allocated    */
   int *stage_map;                /* index map for storing stage RHS vectors  */
   int *stagetypes;               /* type flags for stages                    */
   realtype *Ae_row;              /* equivalent explicit RK coeffs            */
@@ -163,11 +164,12 @@ struct _MRIStepInnerStepper
   SUNContext  sunctx;
 
   /* base class data */
-  N_Vector*  forcing;    /* array of forcing vectors   */
-  int        nforcing;   /* number of forcing vectors  */
-  int        last_flag;  /* last stepper return flag   */
-  realtype   tshift;     /* time normalization shift   */
-  realtype   tscale;     /* time normalization scaling */
+  N_Vector*  forcing;             /* array of forcing vectors            */
+  int        nforcing;            /* number of forcing vectors active    */
+  int        nforcing_allocated;  /* number of forcing vectors allocated */
+  int        last_flag;           /* last stepper return flag            */
+  realtype   tshift;              /* time normalization shift            */
+  realtype   tscale;              /* time normalization scaling          */
 
   /* fused op workspace */
   realtype* vals;
@@ -176,8 +178,8 @@ struct _MRIStepInnerStepper
   /* Space requirements */
   sunindextype lrw1;        /* no. of realtype words in 1 N_Vector          */
   sunindextype liw1;        /* no. of integer words in 1 N_Vector           */
-  long int lrw;             /* no. of realtype words in ARKode work vectors */
-  long int liw;             /* no. of integer words in ARKode work vectors  */
+  long int lrw;             /* no. of realtype words in ARKODE work vectors */
+  long int liw;             /* no. of integer words in ARKODE work vectors  */
 };
 
 
@@ -185,7 +187,7 @@ struct _MRIStepInnerStepper
   MRI time step module private function prototypes
   ===============================================================*/
 
-/* Interface routines supplied to ARKode */
+/* Interface routines supplied to ARKODE */
 int mriStep_AttachLinsol(void* arkode_mem, ARKLinsolInitFn linit,
                          ARKLinsolSetupFn lsetup,
                          ARKLinsolSolveFn lsolve,
@@ -251,8 +253,8 @@ void mriStepInnerStepper_PrintMem(MRIStepInnerStepper stepper,
                                   FILE* outfile);
 
 /* Compute forcing for inner stepper */
-int mriStep_ComputeInnerForcing(ARKodeMRIStepMem step_mem, int stage,
-                                realtype cdiff);
+int mriStep_ComputeInnerForcing(ARKodeMem ark_mem, ARKodeMRIStepMem step_mem,
+                                int stage, realtype cdiff);
 
 /* Return effective RK coefficients (nofast stage) */
 int mriStep_RKCoeffs(MRIStepCoupling MRIC, int is, int *stage_map,

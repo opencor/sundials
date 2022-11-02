@@ -1390,16 +1390,17 @@ Optional inputs for IVP method selection
 
 .. cssclass:: table-bordered
 
-=================================  =================================  ==============
-Optional input                     Function name                      Default
-=================================  =================================  ==============
-Set integrator method order        :c:func:`ARKStepSetOrder()`        4
-Specify implicit/explicit problem  :c:func:`ARKStepSetImEx()`         ``SUNTRUE``
-Specify explicit problem           :c:func:`ARKStepSetExplicit()`     ``SUNFALSE``
-Specify implicit problem           :c:func:`ARKStepSetImplicit()`     ``SUNFALSE``
-Set additive RK tables             :c:func:`ARKStepSetTables()`       internal
-Specify additive RK table numbers  :c:func:`ARKStepSetTableNum()`     internal
-=================================  =================================  ==============
+========================================  =================================  ==============
+Optional input                            Function name                      Default
+========================================  =================================  ==============
+Set integrator method order               :c:func:`ARKStepSetOrder()`        4
+Specify implicit/explicit problem         :c:func:`ARKStepSetImEx()`         ``SUNTRUE``
+Specify explicit problem                  :c:func:`ARKStepSetExplicit()`     ``SUNFALSE``
+Specify implicit problem                  :c:func:`ARKStepSetImplicit()`     ``SUNFALSE``
+Set additive RK tables                    :c:func:`ARKStepSetTables()`       internal
+Set additive RK tables via their numbers  :c:func:`ARKStepSetTableNum()`     internal
+Set additive RK tables via their names    :c:func:`ARKStepSetTableName()`    internal
+========================================  =================================  ==============
 
 
 
@@ -1495,8 +1496,7 @@ Specify additive RK table numbers  :c:func:`ARKStepSetTableNum()`     internal
 
 .. c:function:: int ARKStepSetTables(void* arkode_mem, int q, int p, ARKodeButcherTable Bi, ARKodeButcherTable Be)
 
-   Specifies a customized Butcher table (or pair) for the ERK, DIRK,
-   or ARK method.
+   Specifies a customized Butcher table (or pair) for the ERK, DIRK, or ARK method.
 
    **Arguments:**
       * *arkode_mem* -- pointer to the ARKStep memory block.
@@ -1534,8 +1534,13 @@ Specify additive RK table numbers  :c:func:`ARKStepSetTableNum()`     internal
       checking is performed to ensure that either *p* or *q* correctly describe the
       coefficients that were input.
 
-      Error checking is performed on *Bi* and *Be* (if non-NULL) to ensure
-      that they specify DIRK and ERK methods, respectively.
+      Error checking is subsequently performed at ARKStep initialization to ensure
+      that *Bi* and *Be* (if non-NULL) specify DIRK and ERK methods, respectively.
+      Specifically, the *A* member of *Bi* must be lower triangular with at least
+      one nonzero value on the diagonal, and the *A* member of *Be* must be strictly
+      lower triangular.  When both *Bi* and *Be* are non-NULL, they must agree on
+      the number of internal stages, i.e., the *stages* members of both structures
+      must match.
 
       If the inputs *Bi* or *Be* do not contain an embedding (when the
       corresponding explicit or implicit table is non-NULL), the user *must* call
@@ -1581,6 +1586,45 @@ Specify additive RK table numbers  :c:func:`ARKStepSetTableNum()`     internal
       In all cases, error-checking is performed to ensure that the tables
       exist.
 
+
+
+
+.. c:function:: int ARKStepSetTableName(void* arkode_mem, const char *itable, const char *etable)
+
+   Indicates to use specific built-in Butcher tables for the ERK, DIRK
+   or ARK method.
+
+   **Arguments:**
+      * *arkode_mem* -- pointer to the ARKStep memory block.
+      * *itable* -- name of the DIRK Butcher table.
+      * *etable* -- name of the ERK Butcher table.
+
+   **Return value:**
+      * *ARK_SUCCESS* if successful
+      * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
+      * *ARK_ILL_INPUT* if an argument has an illegal value
+
+   **Notes:**
+      The allowable values for both the *itable* and *etable* arguments
+      corresponding to built-in tables may be found in :numref:`Butcher`.
+      This function is case sensitive.
+
+      To choose an explicit table, set *itable* to ``"ARKODE_DIRK_NONE"``.
+      This automatically calls :c:func:`ARKStepSetExplicit()`.  However,
+      if the problem is posed in explicit form, i.e. :math:`\dot{y} =
+      f(t,y)`, then we recommend that the ERKStep time-stepper module be
+      used instead of ARKStep.
+
+      To select an implicit table, set *etable* to ``"ARKODE_ERK_NONE"``.
+      This automatically calls :c:func:`ARKStepSetImplicit()`.
+
+      If both *itable* and *etable* are not none, then these should match
+      an existing implicit/explicit pair, listed in
+      :numref:`Butcher.additive`.  This automatically calls
+      :c:func:`ARKStepSetImEx()`.
+
+      In all cases, error-checking is performed to ensure that the tables
+      exist.
 
 
 
@@ -3158,6 +3202,7 @@ Current ERK and DIRK Butcher tables                    :c:func:`ARKStepGetCurren
 Estimated local truncation error vector                :c:func:`ARKStepGetEstLocalErrors()`
 Single accessor to many statistics at once             :c:func:`ARKStepGetTimestepperStats()`
 Number of constraint test failures                     :c:func:`ARKStepGetNumConstrFails()`
+Retrieve a pointer for user data                       :c:func:`ARKStepGetUserData`
 =====================================================  ============================================
 
 
@@ -3594,6 +3639,22 @@ Number of constraint test failures                     :c:func:`ARKStepGetNumCon
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory was ``NULL``
 
+
+
+.. c:function:: int ARKStepGetUserData(void* arkode_mem, void** user_data)
+
+   Returns the user data pointer previously set with
+   :c:func:`ARKStepSetUserData`.
+
+   **Arguments:**
+      * *arkode_mem* -- pointer to the ARKStep memory block.
+      * *user_data* -- memory reference to a user data pointer
+
+   **Return value:**
+      * *ARK_SUCCESS* if successful
+      * *ARK_MEM_NULL* if the ARKStep memory was ``NULL``
+
+   .. versionadded:: 5.3.0
 
 
 .. _ARKODE.Usage.ARKStep.ARKStepImplicitSolverOutputs:
@@ -4361,7 +4422,8 @@ performs the same input checking and initializations that are done in
 assumes that the existing internal memory is sufficient for the new
 problem.  A call to this re-initialization routine deletes the
 solution history that was stored internally during the previous
-integration.  Following a successful call to
+integration, and deletes any previously-set *tstop* value specified via a
+call to :c:func:`ARKStepSetStopTime()`.  Following a successful call to
 :c:func:`ARKStepReInit()`, call :c:func:`ARKStepEvolve()` again for
 the solution of the new problem.
 
@@ -4445,7 +4507,9 @@ allocations but, unlike :c:func:`ARKStepReInit()`, this routine performs only a
 :c:func:`ARKStepCreate`. In particular this routine retains all internal
 counter values and the step size/error history and does not reinitialize the
 linear and/or nonlinear solver but it does indicate that a linear solver setup
-is necessary in the next step. Following a successful call to
+is necessary in the next step. Like :c:func:`ARKStepReInit()`, a call to
+:c:func:`ARKStepReset()` will delete any previously-set *tstop* value specified
+via a call to :c:func:`ARKStepSetStopTime()`.  Following a successful call to
 :c:func:`ARKStepReset()`, call :c:func:`ARKStepEvolve()` again to continue
 solving the problem. By default the next call to :c:func:`ARKStepEvolve()` will
 use the step size computed by ARKStep prior to calling :c:func:`ARKStepReset()`.

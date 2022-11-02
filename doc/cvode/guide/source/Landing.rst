@@ -13,7 +13,7 @@
 .. only:: html
 
    This is the documentation for CVODE, a component of the `SUNDIALS
-   <https://computing.llnl.gov/casc/sundials/main.html>`_ suite of
+   <https://computing.llnl.gov/projects/sundials>`_ suite of
    nonlinear and differential/algebraic equation solvers.
 
    This work was performed under the auspices of the U.S. Department of Energy by Lawrence
@@ -47,6 +47,6 @@
          @Misc{cvodeDocumentation,
             author = {Alan C. Hindmarsh and Radu Serban and Cody J. Balos and David J. Gardner and Daniel R. Reynolds and Carol S. Woodward},
             title  = {User Documentation for CVODE},
-            year   = {|YEAR|}
+            year   = {|YEAR|},
             notes  = {|CVODE_VERSION|}
          }
