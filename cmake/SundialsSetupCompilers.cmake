@@ -18,7 +18,11 @@
 # Determine the index type for the compiler
 # ===============================================================
 
-include(SundialsIndexSize)
+if(DEFINED EMSCRIPTEN)
+  set(SUNDIALS_CINDEX_TYPE int32_t)
+else()
+  include(SundialsIndexSize)
+endif()
 
 # ===============================================================
 # Platform specifc settings
