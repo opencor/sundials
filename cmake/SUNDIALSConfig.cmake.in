@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -55,12 +55,21 @@ endforeach()
 
 ### ------- Create TPL imported targets
 
+if("@ENABLE_MPI@" AND NOT TARGET MPI::MPI_C)
+  set(MPI_C_COMPILER "@MPI_C_COMPILER@")
+  find_dependency(MPI)
+endif()
+
 if("@ENABLE_OPENMP@" AND NOT TARGET OpenMP::OpenMP_C)
   find_dependency(OpenMP)
 endif()
 
 if("@ENABLE_CALIPER@" AND NOT TARGET caliper)
   find_dependency(CALIPER PATHS "@CALIPER_DIR@")
+endif()
+
+if("@ENABLE_ADIAK@" AND NOT TARGET adiak::adiak)
+  find_dependency(adiak PATHS "@adiak_DIR@")
 endif()
 
 if("@ENABLE_CUDA@" AND NOT (TARGET CUDA::cudart AND TARGET CUDA::cublas
@@ -82,9 +91,13 @@ if("@ENABLE_HYPRE@" AND NOT TARGET SUNDIALS::HYPRE)
 endif()
 
 if("@ENABLE_KLU@" AND NOT TARGET SUNDIALS::KLU)
-  add_library(SUNDIALS::KLU INTERFACE IMPORTED)
-  target_link_libraries(SUNDIALS::KLU INTERFACE "@KLU_LIBRARIES@")
-  set_target_properties(SUNDIALS::KLU PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "@KLU_INCLUDE_DIR@")
+  if("@KLU_SUITESPARSE_TARGET@")
+    find_dependency(KLU)
+  else()
+    add_library(SUNDIALS::KLU INTERFACE IMPORTED)
+    target_link_libraries(SUNDIALS::KLU INTERFACE "@KLU_LIBRARIES@")
+    set_target_properties(SUNDIALS::KLU PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "@KLU_INCLUDE_DIR@")
+  endif()
 endif()
 
 if("@ENABLE_KOKKOS@" AND NOT TARGET Kokkos::kokkos)

@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -13,11 +13,6 @@
 # ---------------------------------------------------------------
 # Setup the CUDA languge and CUDA libraries.
 # ---------------------------------------------------------------
-
-# For CUDA support, require CMake 3.18 so we can use FindCUDAToolkit
-# FindCUDAToolkit was introduced in 3.17, but 3.18 fixes a lot
-# of issues with it and CUDA as a native language.
-cmake_minimum_required(VERSION 3.18.0)
 
 # ===============================================================
 # Configure options needed prior to enabling the CUDA language
@@ -33,24 +28,17 @@ endif()
 # Configure the CUDA flags
 # ===============================================================
 
+# Do not allow decaying to previous standards -- generates error if the standard
+# is not supported
+sundials_option(CMAKE_CUDA_STANDARD_REQUIRED BOOL
+  "Require C++ standard version" ON)
+
 set(DOCSTR "The CUDA standard to use if CUDA is enabled (14, 17, 20)")
 sundials_option(CMAKE_CUDA_STANDARD STRING "${DOCSTR}" "${CMAKE_CXX_STANDARD}"
                 OPTIONS "14;17;20")
 message(STATUS "CUDA standard set to ${CMAKE_CUDA_STANDARD}")
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda --expt-relaxed-constexpr")
-
-if(${CMAKE_VERSION} VERSION_LESS "3.18.0")
-  if(CMAKE_CUDA_ARCHITECTURES)
-    foreach(arch ${CMAKE_CUDA_ARCHITECTURES})
-      # Remove real/virtual specifiers
-      string(REGEX MATCH "[0-9]+" arch_name "${arch}")
-      string(APPEND _nvcc_arch_flags " -gencode=arch=compute_${arch_name},code=sm_${arch_name}")
-    endforeach()
-
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} ${_nvcc_arch_flags}")
-  endif()
-endif()
 
 if( (CMAKE_CXX_COMPILER_ID MATCHES GNU)
     OR (CMAKE_CXX_COMPILER_ID MATCHES Clang)
@@ -94,7 +82,7 @@ message(STATUS "CUDA Separable Compilation: ${CMAKE_CUDA_SEPARABLE_COMPILATION}"
 # Configure compiler for installed examples
 # ===============================================================
 
-if((SUNDIALS_BUILD_WITH_PROFILING OR SUNDIALS_LOGGING_ENABLE_MPI) AND ENABLE_MPI)
+if(ENABLE_MPI)
   set(_EXAMPLES_CUDA_HOST_COMPILER "${MPI_CXX_COMPILER}" CACHE INTERNAL "${lang} compiler for installed examples")
 else()
   set(_EXAMPLES_CUDA_HOST_COMPILER "${CMAKE_CUDA_HOST_COMPILER}" CACHE INTERNAL "${lang} compiler for installed examples")

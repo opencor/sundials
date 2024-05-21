@@ -3,7 +3,7 @@
  *                Daniel R. Reynolds @ SMU
  * -----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2022, Lawrence Livermore National Security
+ * Copyright (c) 2002-2024, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -32,11 +32,11 @@
 #include <example_utilities.hpp>
 
 // Macros for problem constants
-#define PI    RCONST(3.141592653589793238462643383279502884197169)
-#define ZERO  RCONST(0.0)
-#define ONE   RCONST(1.0)
-#define TWO   RCONST(2.0)
-#define EIGHT RCONST(8.0)
+#define PI    SUN_RCONST(3.141592653589793238462643383279502884197169)
+#define ZERO  SUN_RCONST(0.0)
+#define ONE   SUN_RCONST(1.0)
+#define TWO   SUN_RCONST(2.0)
+#define EIGHT SUN_RCONST(8.0)
 
 // -----------------------------------------------------------------------------
 // User data structure
@@ -75,7 +75,7 @@ struct UserData
   bool pcg           = true; // use PCG (true) or GMRES (false)
   bool prec          = true; // preconditioner on/off
   int liniters       = 20;   // number of linear iterations
-  int msbp           = 0;    // max number of steps between preconditioner setups
+  int msbp           = 0; // max number of steps between preconditioner setups
   sunrealtype epslin = ZERO; // linear solver tolerance factor
 
   // Inverse of Jacobian diagonal for preconditioner
@@ -95,7 +95,8 @@ struct UserData
 UserData::~UserData()
 {
   // Free preconditioner data
-  if (d) {
+  if (d)
+  {
     N_VDestroy(d);
     d = nullptr;
   }
@@ -109,7 +110,7 @@ UserData::~UserData()
 int Solution(sunrealtype t, N_Vector u, UserData& udata)
 {
   auto uarray = N_VGetArrayPointer(u);
-  if (check_ptr(uarray, "N_VGetArrayPointer")) return -1;
+  if (check_ptr(uarray, "N_VGetArrayPointer")) { return -1; }
 
   // Initialize u to one (handles boundary conditions)
   N_VConst(ONE, u);
@@ -117,8 +118,10 @@ int Solution(sunrealtype t, N_Vector u, UserData& udata)
   // Compute the true solution
   auto cos_sqr_t = cos(PI * t) * cos(PI * t);
 
-  for (sunindextype j = 1; j < udata.ny - 1; j++) {
-    for (sunindextype i = 1; i < udata.nx - 1; i++) {
+  for (sunindextype j = 1; j < udata.ny - 1; j++)
+  {
+    for (sunindextype i = 1; i < udata.nx - 1; i++)
+    {
       auto x = i * udata.dx;
       auto y = j * udata.dy;
 
@@ -138,7 +141,7 @@ int SolutionError(sunrealtype t, N_Vector u, N_Vector e, UserData& udata)
 {
   // Compute true solution
   auto flag = Solution(t, e, udata);
-  if (flag != 0) return -1;
+  if (flag != 0) { return -1; }
 
   // Compute absolute error
   N_VLinearSum(ONE, u, -ONE, e, e);
@@ -175,7 +178,8 @@ void InputHelp()
 // Read command line inputs
 int ReadInputs(std::vector<std::string>& args, UserData& udata)
 {
-  if (find(args.begin(), args.end(), "--help") != args.end()) {
+  if (find(args.begin(), args.end(), "--help") != args.end())
+  {
     InputHelp();
     return 1;
   }
@@ -223,12 +227,8 @@ void PrintUserData(UserData& udata)
             << "  dx        = " << udata.dx << "\n"
             << "  dy        = " << udata.dy << "\n"
             << " ----------------------------\n";
-  if (udata.pcg) {
-    std::cout << "  linear solver  = PCG\n";
-  }
-  else {
-    std::cout << "  linear solver  = GMRES\n";
-  }
+  if (udata.pcg) { std::cout << "  linear solver  = PCG\n"; }
+  else { std::cout << "  linear solver  = GMRES\n"; }
   std::cout << "  rtol      = " << udata.rtol << "\n"
             << "  atol      = " << udata.atol << "\n"
             << " ----------------------------\n"
@@ -246,14 +246,16 @@ void PrintUserData(UserData& udata)
 int OpenOutput(UserData& udata)
 {
   // Header for status output
-  std::cout << std::scientific << std::setprecision(std::numeric_limits<sunrealtype>::digits10)
+  std::cout << std::scientific
+            << std::setprecision(std::numeric_limits<sunrealtype>::digits10)
             << "          t                     ||u||_rms      "
             << "          max error\n"
             << " ----------------------------------------------"
             << "-------------------------\n";
 
   // Output problem information and open output streams
-  if (udata.output) {
+  if (udata.output)
+  {
     // Each processor outputs subdomain information
     std::ofstream dout;
     dout.open("heat2d_info.txt");
@@ -266,10 +268,12 @@ int OpenOutput(UserData& udata)
 
     // Open output streams for solution and error
     udata.uout.open("heat2d_solution.txt");
-    udata.uout << std::scientific << std::setprecision(std::numeric_limits<sunrealtype>::digits10);
+    udata.uout << std::scientific
+               << std::setprecision(std::numeric_limits<sunrealtype>::digits10);
 
     udata.eout.open("heat2d_error.txt");
-    udata.eout << std::scientific << std::setprecision(std::numeric_limits<sunrealtype>::digits10);
+    udata.eout << std::scientific
+               << std::setprecision(std::numeric_limits<sunrealtype>::digits10);
   }
 
   return 0;
@@ -280,7 +284,7 @@ int WriteOutput(sunrealtype t, N_Vector u, N_Vector e, UserData& udata)
 {
   // Compute the error
   auto flag = SolutionError(t, u, e, udata);
-  if (check_flag(flag, "SolutionError")) return 1;
+  if (check_flag(flag, "SolutionError")) { return 1; }
 
   // Compute max error
   sunrealtype max = N_VMaxNorm(e);
@@ -289,25 +293,29 @@ int WriteOutput(sunrealtype t, N_Vector u, N_Vector e, UserData& udata)
   sunrealtype urms = sqrt(N_VDotProd(u, u) / udata.nx / udata.ny);
 
   // Output current status
-  std::cout << std::setw(22) << t << std::setw(25) << urms << std::setw(25) << max << std::endl;
+  std::cout << std::setw(22) << t << std::setw(25) << urms << std::setw(25)
+            << max << std::endl;
 
   // Write solution and error to disk
-  if (udata.output) {
+  if (udata.output)
+  {
     sunrealtype* uarray = N_VGetArrayPointer(u);
-    if (check_ptr(uarray, "N_VGetArrayPointer")) return -1;
+    if (check_ptr(uarray, "N_VGetArrayPointer")) { return -1; }
 
     udata.uout << t << " ";
-    for (sunindextype i = 0; i < udata.nodes; i++) {
+    for (sunindextype i = 0; i < udata.nodes; i++)
+    {
       udata.uout << uarray[i] << " ";
     }
     udata.uout << std::endl;
 
     // Output error to disk
     sunrealtype* earray = N_VGetArrayPointer(e);
-    if (check_ptr(earray, "N_VGetArrayPointer")) return -1;
+    if (check_ptr(earray, "N_VGetArrayPointer")) { return -1; }
 
     udata.eout << t << " ";
-    for (sunindextype i = 0; i < udata.nodes; i++) {
+    for (sunindextype i = 0; i < udata.nodes; i++)
+    {
       udata.eout << earray[i] << " ";
     }
     udata.eout << std::endl;
@@ -323,7 +331,8 @@ int CloseOutput(UserData& udata)
   std::cout << " ----------------------------------------------"
             << "-------------------------\n\n";
 
-  if (udata.output) {
+  if (udata.output)
+  {
     // Close output streams
     udata.uout.close();
     udata.eout.close();

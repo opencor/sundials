@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -43,9 +43,9 @@ where ``MRIStepCouplingMem`` is the structure
      int stages;
      int q;
      int p;
-     realtype ***G;
-     realtype ***W;
-     realtype *c;
+     sunrealtype ***G;
+     sunrealtype ***W;
+     sunrealtype *c;
    };
 
 and the members of the strucutre are:
@@ -165,7 +165,7 @@ are defined ``arkode/arkode_mristep.h``.
       allocated.
 
 
-.. c:function:: MRIStepCoupling MRIStepCoupling_Create(int nmat, int stages, int q, int p, realtype *W, realtype *G, realtype *c)
+.. c:function:: MRIStepCoupling MRIStepCoupling_Create(int nmat, int stages, int q, int p, sunrealtype *W, sunrealtype *G, sunrealtype *c)
 
    Allocates a coupling table and fills it with the given values.
 
@@ -244,7 +244,7 @@ are defined ``arkode/arkode_mristep.h``.
 
    **Arguments:**
       * ``C`` -- the coupling table.
-      * ``lenrw`` -- the number of ``realtype`` values in the coupling table
+      * ``lenrw`` -- the number of ``sunrealtype`` values in the coupling table
         workspace.
       * ``leniw`` -- the number of integer values in the coupling table workspace.
 

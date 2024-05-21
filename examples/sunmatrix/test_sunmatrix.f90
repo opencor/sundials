@@ -6,7 +6,7 @@
 ! R. Reynolds @ SMU.
 ! -----------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -22,9 +22,9 @@
 module test_sunmatrix
   use, intrinsic :: iso_c_binding
   use test_utilities
-  use fsundials_nvector_mod
-  use fsundials_matrix_mod
-  use fsundials_types_mod
+
+
+
 
   implicit none
 
@@ -103,7 +103,7 @@ contains
   integer(C_INT) function Test_FSUNMatGetID(A, sunid, myid) result(failure)
     use, intrinsic :: iso_c_binding
     use test_utilities
-    use fsundials_matrix_mod
+
 
     implicit none
 
@@ -131,13 +131,13 @@ contains
   integer(C_INT) function Test_FSUNMatClone(A, myid) result(failure)
     use, intrinsic :: iso_c_binding
     use test_utilities
-    use fsundials_matrix_mod
+
 
     implicit none
 
     integer(C_INT)  :: myid
     type(SUNMatrix) :: A
-    real(C_DOUBLE)  :: tol = 10*UNIT_ROUNDOFF
+    real(C_DOUBLE)  :: tol = 10*SUN_UNIT_ROUNDOFF
     type(SUNMatrix), pointer ::  B
 
     failure = 0
@@ -175,12 +175,12 @@ contains
   integer(C_INT) function Test_FSUNMatZero(A, myid) result(failure)
     use, intrinsic :: iso_c_binding
     use test_utilities
-    use fsundials_matrix_mod
+
 
     implicit none
 
     integer(C_INT)  :: myid
-    real(C_DOUBLE)  :: tol = 10*UNIT_ROUNDOFF
+    real(C_DOUBLE)  :: tol = 10*SUN_UNIT_ROUNDOFF
     type(SUNMatrix) :: A
     type(SUNMatrix), pointer :: B
 
@@ -213,12 +213,12 @@ contains
   integer(C_INT) function Test_FSUNMatCopy(A, myid) result(failure)
     use, intrinsic :: iso_c_binding
     use test_utilities
-    use fsundials_matrix_mod
+
 
     implicit none
 
     integer(C_INT)  :: myid
-    real(C_DOUBLE)  :: tol = 10*UNIT_ROUNDOFF
+    real(C_DOUBLE)  :: tol = 10*SUN_UNIT_ROUNDOFF
     type(SUNMatrix) :: A
     type(SUNMatrix), pointer :: B
 
@@ -252,12 +252,12 @@ contains
   integer(C_INT) function Test_FSUNMatScaleAdd(A, I, myid) result(failure)
     use, intrinsic :: iso_c_binding
     use test_utilities
-    use fsundials_matrix_mod
+
 
     implicit none
 
     integer(C_INT)  :: myid
-    real(C_DOUBLE)  :: tol = 10*UNIT_ROUNDOFF
+    real(C_DOUBLE)  :: tol = 10*SUN_UNIT_ROUNDOFF
     type(SUNMatrix) :: A, I
     type(SUNMatrix), pointer :: B
 
@@ -301,12 +301,12 @@ contains
   integer(C_INT) function Test_FSUNMatScaleAddI(A, I, myid) result(failure)
     use, intrinsic :: iso_c_binding
     use test_utilities
-    use fsundials_matrix_mod
+
 
     implicit none
 
     integer(C_INT)  :: myid
-    real(C_DOUBLE)  :: tol = 10*UNIT_ROUNDOFF
+    real(C_DOUBLE)  :: tol = 10*SUN_UNIT_ROUNDOFF
     type(SUNMatrix) :: A, I
     type(SUNMatrix), pointer :: B
 
@@ -346,7 +346,7 @@ contains
   integer(C_INT) function Test_FSUNMatMatvecSetup(A, myid) result(failure)
     use, intrinsic :: iso_c_binding
     use test_utilities
-    use fsundials_matrix_mod
+
 
     implicit none
 
@@ -376,8 +376,8 @@ contains
   integer(C_INT) function Test_FSUNMatMatvec(A, x, y, myid) result(failure)
     use, intrinsic :: iso_c_binding
     use test_utilities
-    use fsundials_nvector_mod
-    use fsundials_matrix_mod
+
+
 
     implicit none
 
@@ -386,7 +386,7 @@ contains
     type(N_Vector)               :: x, y
     type(N_Vector),  pointer     :: z, w
     integer(C_INT)               :: myid
-    real(C_DOUBLE)               :: tol = 100*UNIT_ROUNDOFF
+    real(C_DOUBLE)               :: tol = 100*SUN_UNIT_ROUNDOFF
     type(SUNMatrix_Ops), pointer :: ops
 
     failure = 0
@@ -467,7 +467,7 @@ contains
   integer(C_INT) function Test_FSUNMatSpace(A, myid) result(failure)
     use, intrinsic :: iso_c_binding
     use test_utilities
-    use fsundials_matrix_mod
+
 
     implicit none
 

@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -47,44 +47,72 @@ CVODES uses various constants for both input and output. These are defined as
 needed in this chapter, but for convenience are also listed separately in
 :numref:`CVODES.Constants`.
 
-.. _CVODES.Usage.SIM.file_access:
+.. _CVODES.Usage.SIM.header_sim:
 
 Access to library and header files
 ----------------------------------
 
 At this point, it is assumed that the installation of CVODES, following the
 procedure described in :numref:`Installation`, has been completed successfully.
+In the proceeding text, the directories ``libdir`` and ``incdir`` are the
+installation library and include directories, respectively. For a default
+installation, these are ``instdir/lib`` and ``instdir/include``, respectively,
+where ``instdir`` is the directory where SUNDIALS was installed.
 
-Regardless of where the user’s application program resides, its
+Regardless of where the user's application program resides, its
 associated compilation and load commands must make reference to the
 appropriate locations for the library and header files required by
-CVODES. The relevant library files are
+CVODES. CVODES symbols are found in ``libdir/libsundials_cvodes.lib``.
+Thus, in addition to linking to ``libdir/libsundials_core.lib``, CVODES
+users need to link to the CVODES library. Symbols for additional SUNDIALS
+modules, vectors and algebraic solvers, are found in
 
 .. code-block::
 
-  <libdir>/libsundials_cvodes.<so|a>
-  <libdir>/libsundials_nvec*.<so|a>
-  <libdir>/libsundials_sunmat*.<so|a>
-  <libdir>/libsundials_sunlinsol*.<so|a>
-  <libdir>/libsundials_sunnonlinsol*.<so|a>
+  <libdir>/libsundials_nvec*.lib
+  <libdir>/libsundials_sunmat*.lib
+  <libdir>/libsundials_sunlinsol*.lib
+  <libdir>/libsundials_sunnonlinsol*.lib
+  <libdir>/libsundials_sunmem*.lib
 
-where the file extension ``.so`` is typically for shared libraries and
-``.a`` for static libraries. The relevant header files are located in the
-subdirectories
+The file extension ``.lib`` is typically ``.so`` for shared libraries
+and ``.a`` for static libraries.
 
-.. code-block::
+The relevant header files for CVODES are located in the subdirectories
+``incdir/include/cvodes``. To use CVODES the application needs to include
+the header file for CVODES in addition to the SUNDIALS core header file:
 
-  <incdir>/cvodes
-  <incdir>/sundials
-  <incdir>/nvector
-  <incdir>/sunmatrix
-  <incdir>/sunlinsol
-  <incdir>/sunnonlinsol
+.. code:: c
 
-The directories ``libdir`` and ``incdir`` are the install library and
-include directories, respectively. For a default installation, these are
-``<instdir>/lib`` and ``<instdir>/include``, respectively, where ``instdir`` is
-the directory where SUNDIALS was installed (:numref:`Installation`).
+  #include <sundials/sundials_core.h> // Provides core SUNDIALS types
+  #include <cvodes/cvodes.h>          // CVODES provides linear multistep methods with sensitivity analysis
+
+The calling program must also include an :c:type`N_Vector` implementation header file, of the form
+``nvector/nvector_*.h``. See :numref:`NVectors` for the appropriate name.
+
+If using a non-default nonlinear solver module, or when interacting with a
+:c:type:`SUNNonlinearSolver` module directly, the calling program must
+also include a :c:type:`SUNNonlinearSolver` implementation header file,
+of the form ``sunnonlinsol/sunnonlinsol_*.h`` where ``*`` is the name of
+the nonlinear solver module (see :numref:`SUNNonlinSol` for more
+information).
+
+If using a nonlinear solver that requires the solution of a linear system of the form
+:eq:`CVODES_Newton` (e.g., the default Newton iteration), then a linear solver module header file
+will be required. In this case it will be necessary to include the header file for a
+:c:type:`SUNLinearSolver` solver, which is of the form ``sunlinsol/sunlinsol_***.h``
+(see :numref:`SUNLinSol` for more information).
+
+If the linear solver is matrix-based, the linear solver header will also include a
+header file of the from ``sunmatrix/sunmatrix_*.h`` where ``*`` is the name of the
+matrix implementation compatible with the linear solver (see :numref:`SUNMatrix` for
+more information).
+
+Other headers may be needed, according to the choice of preconditioner, etc. For example, in the
+example (see :cite:p:`cvodes_ex`), preconditioning is done with a block-diagonal matrix. For this,
+even though the ``SUNLINSOL_SPGMR`` linear solver is used, the header
+``sundials_dense.h`` is included for access to the underlying generic dense matrix
+arithmetic routines.
 
 .. warning::
 
@@ -94,32 +122,6 @@ the directory where SUNDIALS was installed (:numref:`Installation`).
    contain both ODE problems and ODEs with sensitivity analysis, should use
    CVODES.
 
-.. _CVODES.Usage.SIM.data_types:
-
-.. include:: ../../../../shared/Types.rst
-
-.. _CVODES.Usage.SIM.header_sim:
-
-Header files
-------------
-
-The calling program must include several header files so that various
-macros and data types can be used. The header file that is always
-required is:
-
-* ``cvodes/cvodes.h`` the main header file for CVODES, which defines the several types and various constants, and includes function prototypes. This includes the header file for CVLS, ``cvodes/cvodes_ls.h``.
-
-Note that ``cvodes.h`` includes ``sundials_types.h``, which defines the types, ``realtype``, ``sunindextype``, and ``booleantype`` and the constants ``SUNFALSE`` and ``SUNTRUE``.
-
-The calling program must also include an ``N_Vector`` implementation header file, of the form ``nvector/nvector_*.h``. See :numref:`NVectors` for the appropriate name. This file in turn includes the header file ``sundials_nvector.h`` which defines the abstract data type.
-
-If using a non-default nonlinear solver module, or when interacting with a ``SUNNonlinearSolver`` module directly, the calling program must also include a ``SUNNonlinearSolver`` implementation header file, of the form ``sunnonlinsol/sunnonlinsol_*.h`` where is the name of the nonlinear solver module (see :numref:`SUNNonlinSol` for more information).
-This file in turn includes the header file which defines the abstract data type.
-
-If using a nonlinear solver that requires the solution of a linear system of the form :eq:`CVODES_Newton` (e.g., the default Newton iteration), then a linear solver module header file will be required.
-
-Other headers may be needed, according to the choice of preconditioner, etc. For example, in the example (see :cite:p:`cvodes_ex`), preconditioning is done with a block-diagonal matrix.
-For this, even though the ``SUNLINSOL_SPGMR`` linear solver is used, the header is included for access to the underlying generic dense matrix arithmetic routines.
 
 .. _CVODES.Usage.SIM.skeleton_sim:
 
@@ -328,7 +330,7 @@ calls.
       :c:func:`CVodeSetNonlinearSolver`.
 
 
-.. c:function:: int CVodeInit(void* cvode_mem, CVRhsFn f, realtype t0, N_Vector y0)
+.. c:function:: int CVodeInit(void* cvode_mem, CVRhsFn f, sunrealtype t0, N_Vector y0)
 
    The function ``CVodeInit`` provides required problem and solution
    specifications, allocates internal memory, and initializes CVODES.
@@ -372,7 +374,7 @@ integration tolerances (or directly specify the weights used in
 evaluating WRMS vector norms). Note that this call must be made after
 the call to :c:func:`CVodeInit`.
 
-.. c:function:: int CVodeSStolerances(void* cvode_mem, realtype reltol, realtype abstol)
+.. c:function:: int CVodeSStolerances(void* cvode_mem, sunrealtype reltol, sunrealtype abstol)
 
    The function ``CVodeSStolerances`` specifies scalar relative and absolute  tolerances.
 
@@ -387,7 +389,7 @@ the call to :c:func:`CVodeInit`.
      * ``CV_NO_MALLOC`` -- The allocation function returned ``NULL``.
      * ``CV_ILL_INPUT`` -- One of the input tolerances was negative.
 
-.. c:function:: int CVodeSVtolerances(void* cvode_mem, realtype reltol, N_Vector abstol)
+.. c:function:: int CVodeSVtolerances(void* cvode_mem, sunrealtype reltol, N_Vector abstol)
 
    The function ``CVodeSVtolerances`` specifies scalar relative tolerance and  vector absolute tolerances.
 
@@ -721,7 +723,7 @@ of two modes as to where CVODES is to return a solution. But these
 modes are modified if the user has set a stop time (with :c:func:`CVodeSetStopTime`) or requested
 rootfinding.
 
-.. c:function:: int CVode(void* cvode_mem, realtype tout, N_Vector yout, realtype tret, int itask)
+.. c:function:: int CVode(void* cvode_mem, sunrealtype tout, N_Vector yout, sunrealtype* tret, int itask)
 
    The function ``CVode`` integrates the ODE over an interval in t.
 
@@ -813,11 +815,9 @@ error message to the error handler function. All error return values are
 negative, so the test ``flag < 0`` will catch all errors.
 
 The optional input calls can, unless otherwise noted, be executed in any order.
-However, if the user's program calls either :c:func:`CVodeSetErrFile` or
-:c:func:`CVodeSetErrHandlerFn`, then that call should appear first, in order to
-take effect for any later error message. Finally, a call to an ``CVodeSet***``
-function can, unless otherwise noted, be made at any time from the user's
-calling program and, if successful, takes effect immediately.
+A call to an ``CVodeSet***`` function can, unless otherwise noted, be made at
+any time from the user's calling program and, if successful, takes effect
+immediately.
 
 
 .. _CVODES.Usage.SIM.optional_input.optin_main:
@@ -829,79 +829,44 @@ Main solver optional input functions
 
 .. table:: Optional inputs for CVODES
 
-   +-------------------------------+---------------------------------------------+----------------+
-   |      **Optional input**       |              **Function name**              |  **Default**   |
-   +===============================+=============================================+================+
-   | Pointer to an error file      | :c:func:`CVodeSetErrFile`                   | ``stderr``     |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Error handler function        | :c:func:`CVodeSetErrHandlerFn`              | internal fn.   |
-   +-------------------------------+---------------------------------------------+----------------+
-   | User data                     | :c:func:`CVodeSetUserData`                  | ``NULL``       |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Maximum order for BDF method  | :c:func:`CVodeSetMaxOrd`                    | 5              |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Maximum order for Adams       | :c:func:`CVodeSetMaxOrd`                    | 12             |
-   | method                        |                                             |                |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Maximum no. of internal steps | :c:func:`CVodeSetMaxNumSteps`               | 500            |
-   | before :math:`t_{out}`        |                                             |                |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Maximum no. of warnings for   | :c:func:`CVodeSetMaxHnilWarns`              | 10             |
-   | :math:`t_n+h=t_n`             |                                             |                |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Flag to activate stability    | :c:func:`CVodeSetStabLimDet`                | ``SUNFALSE``   |
-   | limit detection               |                                             |                |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Initial step size             | :c:func:`CVodeSetInitStep`                  | estimated      |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Minimum absolute step size    | :c:func:`CVodeSetMinStep`                   | 0.0            |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Maximum absolute step size    | :c:func:`CVodeSetMaxStep`                   | :math:`\infty` |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Value of :math:`t_{stop}`     | :c:func:`CVodeSetStopTime`                  | undefined      |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Maximum no. of error test     | :c:func:`CVodeSetMaxErrTestFails`           | 7              |
-   | failures                      |                                             |                |
-   +-------------------------------+---------------------------------------------+----------------+
-   | Inequality constraints on     | :c:func:`CVodeSetConstraints`               |                |
-   | solution                      |                                             |                |
-   +-------------------------------+---------------------------------------------+----------------+
+   +---------------------------------+---------------------------------------------+----------------+
+   |        **Optional input**       |              **Function name**              |  **Default**   |
+   +=================================+=============================================+================+
+   | User data                       | :c:func:`CVodeSetUserData`                  | ``NULL``       |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Maximum order for BDF method    | :c:func:`CVodeSetMaxOrd`                    | 5              |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Maximum order for Adams         | :c:func:`CVodeSetMaxOrd`                    | 12             |
+   | method                          |                                             |                |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Maximum no. of internal steps   | :c:func:`CVodeSetMaxNumSteps`               | 500            |
+   | before :math:`t_{out}`          |                                             |                |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Maximum no. of warnings for     | :c:func:`CVodeSetMaxHnilWarns`              | 10             |
+   | :math:`t_n+h=t_n`               |                                             |                |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Flag to activate stability      | :c:func:`CVodeSetStabLimDet`                | ``SUNFALSE``   |
+   | limit detection                 |                                             |                |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Initial step size               | :c:func:`CVodeSetInitStep`                  | estimated      |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Minimum absolute step size      | :c:func:`CVodeSetMinStep`                   | 0.0            |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Maximum absolute step size      | :c:func:`CVodeSetMaxStep`                   | :math:`\infty` |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Value of :math:`t_{stop}`       | :c:func:`CVodeSetStopTime`                  | undefined      |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Interpolate at :math:`t_{stop}` | :c:func:`CVodeSetInterpolateStopTime`       | ``SUNFALSE``   |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Disable the stop time           | :c:func:`CVodeClearStopTime`                | N/A            |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Maximum no. of error test       | :c:func:`CVodeSetMaxErrTestFails`           | 7              |
+   | failures                        |                                             |                |
+   +---------------------------------+---------------------------------------------+----------------+
+   | Inequality constraints on       | :c:func:`CVodeSetConstraints`               |                |
+   | solution                        |                                             |                |
+   +---------------------------------+---------------------------------------------+----------------+
 
-
-.. c:function:: int CVodeSetErrFile(void* cvode_mem, FILE * errfp)
-
-   The function ``CVodeSetErrFile`` specifies a pointer to the file  where all CVODES messages should be directed when the default  CVODES error handler function is used.
-
-   **Arguments:**
-     * ``cvode_mem`` -- pointer to the CVODES memory block.
-     * ``errfp`` -- pointer to output file.
-
-   **Return value:**
-     * ``CV_SUCCESS`` -- The optional value has been successfully set.
-     * ``CV_MEM_NULL`` -- The CVODES memory block was not initialized through a previous call to :c:func:`CVodeCreate`.
-
-   **Notes:**
-      The default value for ``errfp`` is ``stderr``.  Passing a value of ``NULL`` disables all future error message output  (except for the case in which the CVODES memory pointer is ``NULL``).  This use of ``CVodeSetErrFile`` is strongly discouraged.
-
-      .. warning::
-
-         If ``CVodeSetErrFile`` is to be called, it should be called before any  other optional input functions, in order to take effect for any later error message.
-
-.. c:function:: int CVodeSetErrHandlerFn(void* cvode_mem, CVErrHandlerFn ehfun, void * eh_data)
-
-   The function ``CVodeSetErrHandlerFn`` specifies the optional user-defined function  to be used in handling error messages.
-
-   **Arguments:**
-     * ``cvode_mem`` -- pointer to the CVODES memory block.
-     * ``ehfun`` -- is the C error handler function of type :c:type:`CVErrHandlerFn`.
-     * ``eh_data`` -- pointer to user data passed to ``ehfun`` every time it is called.
-
-   **Return value:**
-     * ``CV_SUCCESS`` -- The function ``ehfun`` and data pointer ``eh_data`` have been successfully set.
-     * ``CV_MEM_NULL`` -- The CVODES memory block was not initialized through a previous call to :c:func:`CVodeCreate`.
-
-   **Notes:**
-      Error messages indicating that the CVODES solver memory is ``NULL`` will  always be directed to ``stderr``.
 
 .. c:function:: int CVodeSetUserData(void* cvode_mem, void * user_data)
 
@@ -1010,7 +975,7 @@ Main solver optional input functions
    **Notes:**
       The default value is 10.  A negative value for ``mxhnil`` indicates that no warning messages should  be issued.
 
-.. c:function:: int CVodeSetStabLimDet(void* cvode_mem, booleantype stldet)
+.. c:function:: int CVodeSetStabLimDet(void* cvode_mem, sunbooleantype stldet)
 
    The function ``CVodeSetStabLimDet`` indicates if  the BDF stability limit detection algorithm should be used. See :numref:`CVODES.Mathematics.stablimit` for further details.
 
@@ -1026,7 +991,7 @@ Main solver optional input functions
    **Notes:**
       The default value is ``SUNFALSE``. If ``stldet = SUNTRUE`` when BDF is used  and the method order is greater than or equal to 3, then an internal function, ``CVsldet``,  is called to detect a possible stability limit. If such a limit is detected, then the order is  reduced.
 
-.. c:function:: int CVodeSetInitStep(void* cvode_mem, realtype hin)
+.. c:function:: int CVodeSetInitStep(void* cvode_mem, sunrealtype hin)
 
    The function ``CVodeSetInitStep`` specifies the initial step size.
 
@@ -1041,7 +1006,7 @@ Main solver optional input functions
    **Notes:**
       By default, CVODES estimates the initial step size to be the solution :math:`h` of the equation :math:`0.5 h^2 \ddot{y} = 1`,  where :math:`\ddot{y}` is an estimated second derivative of the solution at :math:`t_0`.
 
-.. c:function:: int CVodeSetMinStep(void* cvode_mem, realtype hmin)
+.. c:function:: int CVodeSetMinStep(void* cvode_mem, sunrealtype hmin)
 
    The function ``CVodeSetMinStep`` specifies a lower bound on the magnitude  of the step size.
 
@@ -1057,7 +1022,7 @@ Main solver optional input functions
    **Notes:**
       The default value is 0.0.
 
-.. c:function:: int CVodeSetMaxStep(void* cvode_mem, realtype hmax)
+.. c:function:: int CVodeSetMaxStep(void* cvode_mem, sunrealtype hmax)
 
    The function ``CVodeSetMaxStep`` specifies an upper bound on the magnitude  of the step size.
 
@@ -1073,7 +1038,7 @@ Main solver optional input functions
    **Notes:**
       Pass ``hmax`` = 0.0 to obtain the default value :math:`\infty`.
 
-.. c:function:: int CVodeSetStopTime(void* cvode_mem, realtype tstop)
+.. c:function:: int CVodeSetStopTime(void* cvode_mem, sunrealtype tstop)
 
    The function ``CVodeSetStopTime`` specifies the value of the  independent variable :math:`t` past which the solution is not to proceed.
 
@@ -1090,6 +1055,42 @@ Main solver optional input functions
       The default, if this routine is not called, is that no stop time is imposed.
 
       Once the integrator returns at a stop time, any future testing for ``tstop``  is disabled (and can be reenabled only though a new call to ``CVodeSetStopTime``).
+
+      A stop time not reached before a call to :c:func:`CVodeReInit` will
+      remain active but can be disabled by calling :c:func:`CVodeClearStopTime`.
+
+.. c:function:: int CVodeSetInterpolateStopTime(void* cvode_mem, sunbooleantype interp)
+
+   The function ``CVodeSetInterpolateStopTime`` specifies that the output solution should be
+   interpolated when the current :math:`t` equals the specified ``tstop`` (instead of
+   merely copying the internal solution :math:`y_n`).
+
+   **Arguments:**
+     * ``cvode_mem`` -- pointer to the CVODES memory block.
+     * ``interp`` -- flag indicating to use interpolation (1) or copy (0).
+
+   **Return value:**
+     * ``CV_SUCCESS`` -- The optional value has been successfully set.
+     * ``CV_MEM_NULL`` -- The CVODES memory block was not initialized through a previous call to :c:func:`CVodeCreate`.
+
+   .. versionadded:: 6.6.0
+
+.. c:function:: int CVodeClearStopTime(void* cvode_mem)
+
+   Disables the stop time set with :c:func:`CVodeSetStopTime`.
+
+   **Arguments:**
+      * ``cvode_mem`` -- pointer to the CVODES memory block.
+
+   **Return value:**
+      * ``CV_SUCCESS`` if successful
+      * ``CV_MEM_NULL`` if the CVODES memory is ``NULL``
+
+   **Notes:**
+      The stop time can be reenabled though a new call to
+      :c:func:`CVodeSetStopTime`.
+
+   .. versionadded:: 6.5.1
 
 .. c:function:: int CVodeSetMaxErrTestFails(void* cvode_mem, int maxnef)
 
@@ -1219,10 +1220,12 @@ Jacobian information, depends on several factors including:
    :math:`M`, and
 -  the number of steps since Jacobian information was last evaluated.
 
-The frequency with which to update Jacobian information can be controlled with
-the ``msbj`` argument to :c:func:`CVodeSetJacEvalFrequency`. We note that this
-is only checked *within* calls to the linear solver setup routine, so values
-:math:`<` ``msbp`` do not make sense. For linear-solvers with user-supplied
+Jacobian information is considered out-of-date when :math:`msbj` or more steps
+have been completed since the last update, in which case it will be recomputed during the next
+linear solver setup call. The value of :math:`msbj` is controlled with the
+``msbj`` argument to :c:func:`CVodeSetJacEvalFrequency()`.
+
+For linear-solvers with user-supplied
 preconditioning the above factors are used to determine whether to recommend
 updating the Jacobian information in the preconditioner (i.e., whether to set
 ``jok`` to ``SUNFALSE`` in calling the user-supplied preconditioner setup
@@ -1235,7 +1238,7 @@ difference approximation or a call to the user-supplied Jacobian function
 is reused and the system matrix :math:`M(t,y) \approx I - \gamma J(t,y)` is recomputed
 using the current :math:`\gamma` value.
 
-.. c:function:: int CVodeSetDeltaGammaMaxLSetup(void* cvode_mem, realtype dgmax_lsetup)
+.. c:function:: int CVodeSetDeltaGammaMaxLSetup(void* cvode_mem, sunrealtype dgmax_lsetup)
 
    The function ``CVodeSetDeltaGammaMaxLSetup`` specifies the maximum allowed
    :math:`\gamma` change that does not require a linear solver setup call. If
@@ -1255,7 +1258,7 @@ using the current :math:`\gamma` value.
 
    .. versionadded:: 6.2.0
 
-.. c:function:: int CVodeSetDeltaGammaMaxBadJac(void* cvode_mem, realtype dgmax_jbad)
+.. c:function:: int CVodeSetDeltaGammaMaxBadJac(void* cvode_mem, sunrealtype dgmax_jbad)
 
    The function ``CVodeSetDeltaGammaMaxBadJac`` specifies the maximum allowed
    :math:`\gamma` change after a NLS failure that requires updating the Jacobian
@@ -1294,7 +1297,9 @@ using the current :math:`\gamma` value.
 
 .. c:function:: int CVodeSetJacEvalFrequency(void* cvode_mem, long int msbj)
 
-   The function ``CVodeSetJacEvalFrequency`` specifies the frequency for  recomputing the Jacobian or recommending a preconditioner update.
+   The function ``CVodeSetJacEvalFrequency`` Specifies the number of steps after
+   which the Jacobian information is considered out-of-date, :math:`msbj` from
+   :numref:`CVODES.Mathematics.nls`.
 
    **Arguments:**
      * ``cvode_mem`` -- pointer to the CVODES memory block.
@@ -1307,7 +1312,22 @@ using the current :math:`\gamma` value.
      * ``CVLS_ILL_INPUT`` -- The frequency ``msbj`` is negative.
 
    **Notes:**
-      The Jacobian update frequency is only checked within calls to the  linear solver setup routine, as such values of ``msbj`` < ``msbp`` will  result in recomputing the Jacobian every ``msbp`` steps. See :c:func:`CVodeSetLSetupFrequency` for setting the linear solver setup frequency  ``msbp``.  If ``msbj = 0``, the default value of 51 will be used. Otherwise an error is returned. This function must be called after the CVLS linear solver interface has been initialized through a call to :c:func:`CVodeSetLinearSolver`.
+      If ``nstlj`` is the step number at which the Jacobian information was
+      lasted updated and ``nst`` is the current step number,
+      ``nst - nstlj >= msbj`` indicates that the Jacobian information will be updated
+      during the next linear solver setup call.
+
+      As the Jacobian update frequency is only checked *within* calls to the
+      linear solver setup routine, Jacobian information may be more than
+      ``msbj`` steps old when updated depending on when a linear solver setup
+      call occurs. See :numref:`CVODES.Mathematics.nls` for more information on
+      when linear solver setups are performed.
+
+      If ``msbj = 0``, the default value of 51 will be used. Otherwise an error
+      is returned.
+
+      This function must be called after  the CVLS linear solver interface has
+      been initialized through a call to :c:func:`CVodeSetLinearSolver`.
 
 When using matrix-based linear solver modules, the CVLS solver interface
 needs a function to compute an approximation to the Jacobian matrix :math:`J(t,y)` or
@@ -1389,7 +1409,7 @@ system to account for the lagged value of :math:`\gamma`. See
 necessary, e.g., when providing a custom linear solver that updates the matrix
 using the current :math:`\gamma` as part of the solve.
 
-.. c:function:: int CVodeSetLinearSolutionScaling(void* cvode_mem, booleantype onoff)
+.. c:function:: int CVodeSetLinearSolutionScaling(void* cvode_mem, sunbooleantype onoff)
 
    The function :c:func:`CVodeSetLinearSolutionScaling` enables or disables scaling  the linear system solution to account for a change in :math:`\gamma` in the linear system. For more details see :numref:`SUNLinSol.CVODES.lagged`.
 
@@ -1538,7 +1558,7 @@ the :c:func:`CVodeSetEpsLin` function.
       The previous routine ``CVSpilsSetPreconditioner`` is now a wrapper  for this routine, and may still be used for backward-compatibility.  However, this will be deprecated in future releases, so we recommend  that users transition to the new routine name soon.
 
 
-.. c:function:: int CVodeSetEpsLin(void* cvode_mem, realtype eplifac)
+.. c:function:: int CVodeSetEpsLin(void* cvode_mem, sunrealtype eplifac)
 
    The function ``CVodeSetEpsLin`` specifies the factor by  which the Krylov linear solver's convergence test constant is  reduced from the nonlinear solver test constant.
 
@@ -1562,7 +1582,7 @@ the :c:func:`CVodeSetEpsLin` function.
       The previous routine ``CVSpilsSetEpsLin`` is now a wrapper for this  routine, and may still be used for backward-compatibility.  However,  this will be deprecated in future releases, so we recommend that  users transition to the new routine name soon.
 
 
-.. c:function:: int CVodeSetLSNormFactor(void* cvode_mem, realtype nrmfac)
+.. c:function:: int CVodeSetLSNormFactor(void* cvode_mem, sunrealtype nrmfac)
 
    The function ``CVodeSetLSNormFactor`` specifies the factor to use when  converting from the integrator tolerance (WRMS norm) to the linear solver  tolerance (L2 norm) for Newton linear system solves e.g.,  ``tol_L2 = fac * tol_WRMS``.
 
@@ -1586,8 +1606,8 @@ the :c:func:`CVodeSetEpsLin` function.
 
 .. _CVODES.Usage.SIM.optional_input.optin_nls:
 
-Linear solver interface optional input functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Nonlinear solver interface optional input functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _CVODES.Usage.SIM.optional_input.optin_nls_table:
 
@@ -1643,7 +1663,7 @@ nonlinear solver.
    **Notes:**
       The default value is 10.
 
-.. c:function:: int CVodeSetNonlinConvCoef(void* cvode_mem, realtype nlscoef)
+.. c:function:: int CVodeSetNonlinConvCoef(void* cvode_mem, sunrealtype nlscoef)
 
    The function ``CVodeSetNonlinConvCoef`` specifies the safety factor used in the nonlinear convergence test (see :numref:`CVODES.Mathematics.ivp_sol`).
 
@@ -1741,7 +1761,7 @@ step size adaptivity.
    make changes gradually and with testing to determine their effectiveness.
 
 
-.. c:function:: int CVodeSetEtaFixedStepBounds(void* cvode_mem, realtype eta_min_fx, realtype eta_max_fx)
+.. c:function:: int CVodeSetEtaFixedStepBounds(void* cvode_mem, sunrealtype eta_min_fx, sunrealtype eta_max_fx)
 
    The function ``CVodeSetEtaFixedStepBounds`` specifies the interval lower
    (:math:`\eta_{\mathrm{min\_fx}}`) and upper (:math:`\eta_{\mathrm{max\_fx}}`)
@@ -1767,7 +1787,7 @@ step size adaptivity.
 
    .. versionadded:: 6.2.0
 
-.. c:function:: int CVodeSetEtaMaxFirstStep(void* cvode_mem, realtype eta_max_fs)
+.. c:function:: int CVodeSetEtaMaxFirstStep(void* cvode_mem, sunrealtype eta_max_fs)
 
    The function ``CVodeSetEtaMaxFirstStep`` specifies the maximum step size
    factor after the first time step, :math:`\eta_{\mathrm{max\_fs}}`.
@@ -1786,7 +1806,7 @@ step size adaptivity.
 
    .. versionadded:: 6.2.0
 
-.. c:function:: int CVodeSetEtaMaxEarlyStep(void* cvode_mem, realtype eta_max_es)
+.. c:function:: int CVodeSetEtaMaxEarlyStep(void* cvode_mem, sunrealtype eta_max_es)
 
    The function ``CVodeSetEtaMaxEarlyStepEtaMax`` specifies the maximum step size
    factor for steps early in the integration,
@@ -1843,7 +1863,7 @@ step size adaptivity.
 
    .. versionadded:: 6.2.0
 
-.. c:function:: int CVodeSetEtaMax(void* cvode_mem, realtype eta_max_gs)
+.. c:function:: int CVodeSetEtaMax(void* cvode_mem, sunrealtype eta_max_gs)
 
    The function ``CVodeSetEtaMax`` specifies the maximum step size factor,
    :math:`\eta_{\mathrm{max\_gs}}`.
@@ -1870,7 +1890,7 @@ step size adaptivity.
 
    .. versionadded:: 6.2.0
 
-.. c:function:: int CVodeSetEtaMin(void* cvode_mem, realtype eta_min)
+.. c:function:: int CVodeSetEtaMin(void* cvode_mem, sunrealtype eta_min)
 
    The function ``CVodeSetEtaMin`` specifies the minimum step size factor,
    :math:`\eta_{\mathrm{min}}`.
@@ -1889,7 +1909,7 @@ step size adaptivity.
 
    .. versionadded:: 6.2.0
 
-.. c:function:: int CVodeSetEtaMinErrFail(void *cvode_mem, realtype eta_min_ef)
+.. c:function:: int CVodeSetEtaMinErrFail(void *cvode_mem, sunrealtype eta_min_ef)
 
    The function ``CVodeSetEtaMinErrFail`` specifies the minimum step size
    factor after an error test failure, :math:`\eta_{\mathrm{min\_ef}}`.
@@ -1909,7 +1929,7 @@ step size adaptivity.
 
    .. versionadded:: 6.2.0
 
-.. c:function:: int CVodeSetEtaMaxErrFail(void* cvode_mem, realtype eta_max_ef)
+.. c:function:: int CVodeSetEtaMaxErrFail(void* cvode_mem, sunrealtype eta_max_ef)
 
    The function ``CVodeSetEtaMaxErrFail`` specifies the maximum step size
    factor after multiple error test failures, :math:`\eta_{\mathrm{max\_ef}}`.
@@ -1962,7 +1982,7 @@ step size adaptivity.
 
    .. versionadded:: 6.2.0
 
-.. c:function:: int CVodeSetEtaConvFail(void* cvode_mem, realtype eta_cf)
+.. c:function:: int CVodeSetEtaConvFail(void* cvode_mem, sunrealtype eta_cf)
 
    The function ``CVodeSetEtaConvFail`` specifies the step size factor after a
    nonlinear solver failure :math:`\eta_{\mathrm{cf}}`.
@@ -2064,7 +2084,7 @@ Projection optional input functions
 The following functions can be called to set optional inputs to control
 the projection when solving an IVP with constraints.
 
-.. c:function:: int CVodeSetProjErrEst(void* cvode_mem, booleantype onoff)
+.. c:function:: int CVodeSetProjErrEst(void* cvode_mem, sunbooleantype onoff)
 
    The function ``CVodeSetProjErrEst`` enables or disables projection of  the error estimate by the projection function.
 
@@ -2109,7 +2129,7 @@ the projection when solving an IVP with constraints.
 
    .. versionadded:: 6.2.0
 
-.. c:function:: int CVodeSetEpsProj(void* cvode_mem, realtype eps)
+.. c:function:: int CVodeSetEpsProj(void* cvode_mem, sunrealtype eps)
 
    The function ``CVodeSetEpsProj`` specifies the tolerance for the nonlinear  constrained least squares problem solved by the projection function.
 
@@ -2124,7 +2144,7 @@ the projection when solving an IVP with constraints.
 
    .. versionadded:: 6.2.0
 
-.. c:function:: int CVodeSetProjFailEta(void* cvode_mem, realtype eta)
+.. c:function:: int CVodeSetProjFailEta(void* cvode_mem, sunrealtype eta)
 
    The function ``CVodeSetProjFailEta`` specifies the time step reduction factor  to apply on a projection function failure.
 
@@ -2153,7 +2173,7 @@ value of :math:`t` in the last internal step taken by CVODES.
 
 The call to the function has the following form:
 
-.. c:function:: int CVodeGetDky(void* cvode_mem, realtype t, int k, N_Vector dky)
+.. c:function:: int CVodeGetDky(void* cvode_mem, sunrealtype t, int k, N_Vector dky)
 
    The function ``CVodeGetDky`` computes the ``k``-th derivative of the function  ``y`` at time ``t``, i.e. :math:`\dfrac{\mathrm d^{k}y}{\mathrm dt^{k}}(t)`, where :math:`t_n - h_u \leq  t \leq t_n`, :math:`t_n` denotes the current internal time reached, and :math:`h_u` is the  last internal step size successfully used by the solver.  The  user may request ``k`` = :math:`0, 1, \ldots, q_u`, where :math:`q_u` is the current order  (optional output ``qlast``).
 
@@ -2205,103 +2225,109 @@ the preconditioner.
 .. table:: Optional outputs from CVODES, CVLS, and CVDIAG
    :align: center
 
-   +------------------------------------------------+------------------------------------------+
-   |              **Optional output**               |            **Function name**             |
-   +================================================+==========================================+
-   | **CVODES main solver**                         |                                          |
-   +------------------------------------------------+------------------------------------------+
-   | Size of CVODES real and integer workspaces     | :c:func:`CVodeGetWorkSpace`              |
-   +------------------------------------------------+------------------------------------------+
-   | Cumulative number of internal steps            | :c:func:`CVodeGetNumSteps`               |
-   +------------------------------------------------+------------------------------------------+
-   | No. of calls to r.h.s. function                | :c:func:`CVodeGetNumRhsEvals`            |
-   +------------------------------------------------+------------------------------------------+
-   | No. of calls to linear solver setup function   | :c:func:`CVodeGetNumLinSolvSetups`       |
-   +------------------------------------------------+------------------------------------------+
-   | No. of local error test failures that have     | :c:func:`CVodeGetNumErrTestFails`        |
-   | occurred                                       |                                          |
-   +------------------------------------------------+------------------------------------------+
-   | No. of failed steps due to a nonlinear solver  | :c:func:`CVodeGetNumStepSolveFails`      |
-   | failure                                        |                                          |
-   +------------------------------------------------+------------------------------------------+
-   | Order used during the last step                | :c:func:`CVodeGetLastOrder`              |
-   +------------------------------------------------+------------------------------------------+
-   | Order to be attempted on the next step         | :c:func:`CVodeGetCurrentOrder`           |
-   +------------------------------------------------+------------------------------------------+
-   | No. of order reductions due to stability limit | :c:func:`CVodeGetNumStabLimOrderReds`    |
-   | detection                                      |                                          |
-   +------------------------------------------------+------------------------------------------+
-   | Actual initial step size used                  | :c:func:`CVodeGetActualInitStep`         |
-   +------------------------------------------------+------------------------------------------+
-   | Step size used for the last step               | :c:func:`CVodeGetLastStep`               |
-   +------------------------------------------------+------------------------------------------+
-   | Step size to be attempted on the next step     | :c:func:`CVodeGetCurrentStep`            |
-   +------------------------------------------------+------------------------------------------+
-   | Current internal time reached by the solver    | :c:func:`CVodeGetCurrentTime`            |
-   +------------------------------------------------+------------------------------------------+
-   | Suggested factor for tolerance scaling         | :c:func:`CVodeGetTolScaleFactor`         |
-   +------------------------------------------------+------------------------------------------+
-   | Error weight vector for state variables        | :c:func:`CVodeGetErrWeights`             |
-   +------------------------------------------------+------------------------------------------+
-   | Estimated local error vector                   | :c:func:`CVodeGetEstLocalErrors`         |
-   +------------------------------------------------+------------------------------------------+
-   | No. of nonlinear solver iterations             | :c:func:`CVodeGetNumNonlinSolvIters`     |
-   +------------------------------------------------+------------------------------------------+
-   | No. of nonlinear convergence failures          | :c:func:`CVodeGetNumNonlinSolvConvFails` |
-   +------------------------------------------------+------------------------------------------+
-   | All CVODES integrator statistics               | :c:func:`CVodeGetIntegratorStats`        |
-   +------------------------------------------------+------------------------------------------+
-   | CVODES nonlinear solver statistics             | :c:func:`CVodeGetNonlinSolvStats`        |
-   +------------------------------------------------+------------------------------------------+
-   | User data pointer                              | :c:func:`CVodeGetUserData`               |
-   +------------------------------------------------+------------------------------------------+
-   | Array showing roots found                      | :c:func:`CVodeGetRootInfo`               |
-   +------------------------------------------------+------------------------------------------+
-   | No. of calls to user root function             | :c:func:`CVodeGetNumGEvals`              |
-   +------------------------------------------------+------------------------------------------+
-   | Print all statistics                           | :c:func:`CVodePrintAllStats`             |
-   +------------------------------------------------+------------------------------------------+
-   | Name of constant associated with a return flag | :c:func:`CVodeGetReturnFlagName`         |
-   +------------------------------------------------+------------------------------------------+
-   | **CVLS linear solver interface**               |                                          |
-   +------------------------------------------------+------------------------------------------+
-   | Size of real and integer workspaces            | :c:func:`CVodeGetLinWorkSpace`           |
-   +------------------------------------------------+------------------------------------------+
-   | No. of Jacobian evaluations                    | :c:func:`CVodeGetNumJacEvals`            |
-   +------------------------------------------------+------------------------------------------+
-   | No. of r.h.s. calls for finite diff.           | :c:func:`CVodeGetNumLinRhsEvals`         |
-   | Jacobian[-vector] evals.                       |                                          |
-   +------------------------------------------------+------------------------------------------+
-   | No. of linear iterations                       | :c:func:`CVodeGetNumLinIters`            |
-   +------------------------------------------------+------------------------------------------+
-   | No. of linear convergence failures             | :c:func:`CVodeGetNumLinConvFails`        |
-   +------------------------------------------------+------------------------------------------+
-   | No. of preconditioner evaluations              | :c:func:`CVodeGetNumPrecEvals`           |
-   +------------------------------------------------+------------------------------------------+
-   | No. of preconditioner solves                   | :c:func:`CVodeGetNumPrecSolves`          |
-   +------------------------------------------------+------------------------------------------+
-   | No. of Jacobian-vector setup evaluations       | :c:func:`CVodeGetNumJTSetupEvals`        |
-   +------------------------------------------------+------------------------------------------+
-   | No. of Jacobian-vector product evaluations     | :c:func:`CVodeGetNumJtimesEvals`         |
-   +------------------------------------------------+------------------------------------------+
-   | Get all linear solver statistics in one        | :c:func:`CVodeGetLinSolvStats`           |
-   | function call                                  |                                          |
-   +------------------------------------------------+------------------------------------------+
-   | Last return from a linear solver function      | :c:func:`CVodeGetLastLinFlag`            |
-   +------------------------------------------------+------------------------------------------+
-   | Name of constant associated with a return flag | :c:func:`CVodeGetLinReturnFlagName`      |
-   +------------------------------------------------+------------------------------------------+
-   | **CVDIAG linear solver interface**             |                                          |
-   +------------------------------------------------+------------------------------------------+
-   | Size of CVDIAG real and integer workspaces     | :c:func:`CVDiagGetWorkSpace`             |
-   +------------------------------------------------+------------------------------------------+
-   | No. of r.h.s. calls for finite diff. Jacobian  | :c:func:`CVDiagGetNumRhsEvals`           |
-   | evals.                                         |                                          |
-   +------------------------------------------------+------------------------------------------+
-   | Last return from a CVDIAG function             | :c:func:`CVDiagGetLastFlag`              |
-   +------------------------------------------------+------------------------------------------+
-   | Name of constant associated with a return flag | :c:func:`CVDiagGetReturnFlagName`        |
-   +------------------------------------------------+------------------------------------------+
+   +-------------------------------------------------+------------------------------------------+
+   |              **Optional output**                |            **Function name**             |
+   +=================================================+==========================================+
+   | **CVODES main solver**                          |                                          |
+   +-------------------------------------------------+------------------------------------------+
+   | Size of CVODES real and integer workspaces      | :c:func:`CVodeGetWorkSpace`              |
+   +-------------------------------------------------+------------------------------------------+
+   | Cumulative number of internal steps             | :c:func:`CVodeGetNumSteps`               |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of calls to r.h.s. function                 | :c:func:`CVodeGetNumRhsEvals`            |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of calls to linear solver setup function    | :c:func:`CVodeGetNumLinSolvSetups`       |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of local error test failures that have      | :c:func:`CVodeGetNumErrTestFails`        |
+   | occurred                                        |                                          |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of failed steps due to a nonlinear solver   | :c:func:`CVodeGetNumStepSolveFails`      |
+   | failure                                         |                                          |
+   +-------------------------------------------------+------------------------------------------+
+   | Order used during the last step                 | :c:func:`CVodeGetLastOrder`              |
+   +-------------------------------------------------+------------------------------------------+
+   | Order to be attempted on the next step          | :c:func:`CVodeGetCurrentOrder`           |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of order reductions due to stability limit  | :c:func:`CVodeGetNumStabLimOrderReds`    |
+   | detection                                       |                                          |
+   +-------------------------------------------------+------------------------------------------+
+   | Actual initial step size used                   | :c:func:`CVodeGetActualInitStep`         |
+   +-------------------------------------------------+------------------------------------------+
+   | Step size used for the last step                | :c:func:`CVodeGetLastStep`               |
+   +-------------------------------------------------+------------------------------------------+
+   | Step size to be attempted on the next step      | :c:func:`CVodeGetCurrentStep`            |
+   +-------------------------------------------------+------------------------------------------+
+   | Current internal time reached by the solver     | :c:func:`CVodeGetCurrentTime`            |
+   +-------------------------------------------------+------------------------------------------+
+   | Suggested factor for tolerance scaling          | :c:func:`CVodeGetTolScaleFactor`         |
+   +-------------------------------------------------+------------------------------------------+
+   | Error weight vector for state variables         | :c:func:`CVodeGetErrWeights`             |
+   +-------------------------------------------------+------------------------------------------+
+   | Estimated local error vector                    | :c:func:`CVodeGetEstLocalErrors`         |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of nonlinear solver iterations              | :c:func:`CVodeGetNumNonlinSolvIters`     |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of nonlinear convergence failures           | :c:func:`CVodeGetNumNonlinSolvConvFails` |
+   +-------------------------------------------------+------------------------------------------+
+   | All CVODES integrator statistics                | :c:func:`CVodeGetIntegratorStats`        |
+   +-------------------------------------------------+------------------------------------------+
+   | CVODES nonlinear solver statistics              | :c:func:`CVodeGetNonlinSolvStats`        |
+   +-------------------------------------------------+------------------------------------------+
+   | User data pointer                               | :c:func:`CVodeGetUserData`               |
+   +-------------------------------------------------+------------------------------------------+
+   | Array showing roots found                       | :c:func:`CVodeGetRootInfo`               |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of calls to user root function              | :c:func:`CVodeGetNumGEvals`              |
+   +-------------------------------------------------+------------------------------------------+
+   | Print all statistics                            | :c:func:`CVodePrintAllStats`             |
+   +-------------------------------------------------+------------------------------------------+
+   | Name of constant associated with a return flag  | :c:func:`CVodeGetReturnFlagName`         |
+   +-------------------------------------------------+------------------------------------------+
+   | **CVLS linear solver interface**                |                                          |
+   +-------------------------------------------------+------------------------------------------+
+   | Stored Jacobian of the ODE RHS function         | :c:func:`CVodeGetJac`                    |
+   +-------------------------------------------------+------------------------------------------+
+   | Time at which the Jacobian was evaluated        | :c:func:`CVodeGetJacTime`                |
+   +-------------------------------------------------+------------------------------------------+
+   | Step number at which the Jacobian was evaluated | :c:func:`CVodeGetJacNumSteps`            |
+   +-------------------------------------------------+------------------------------------------+
+   | Size of real and integer workspaces             | :c:func:`CVodeGetLinWorkSpace`           |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of Jacobian evaluations                     | :c:func:`CVodeGetNumJacEvals`            |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of r.h.s. calls for finite diff.            | :c:func:`CVodeGetNumLinRhsEvals`         |
+   | Jacobian[-vector] evals.                        |                                          |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of linear iterations                        | :c:func:`CVodeGetNumLinIters`            |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of linear convergence failures              | :c:func:`CVodeGetNumLinConvFails`        |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of preconditioner evaluations               | :c:func:`CVodeGetNumPrecEvals`           |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of preconditioner solves                    | :c:func:`CVodeGetNumPrecSolves`          |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of Jacobian-vector setup evaluations        | :c:func:`CVodeGetNumJTSetupEvals`        |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of Jacobian-vector product evaluations      | :c:func:`CVodeGetNumJtimesEvals`         |
+   +-------------------------------------------------+------------------------------------------+
+   | Get all linear solver statistics in one         | :c:func:`CVodeGetLinSolvStats`           |
+   | function call                                   |                                          |
+   +-------------------------------------------------+------------------------------------------+
+   | Last return from a linear solver function       | :c:func:`CVodeGetLastLinFlag`            |
+   +-------------------------------------------------+------------------------------------------+
+   | Name of constant associated with a return flag  | :c:func:`CVodeGetLinReturnFlagName`      |
+   +-------------------------------------------------+------------------------------------------+
+   | **CVDIAG linear solver interface**              |                                          |
+   +-------------------------------------------------+------------------------------------------+
+   | Size of CVDIAG real and integer workspaces      | :c:func:`CVDiagGetWorkSpace`             |
+   +-------------------------------------------------+------------------------------------------+
+   | No. of r.h.s. calls for finite diff. Jacobian   | :c:func:`CVDiagGetNumRhsEvals`           |
+   | evals.                                          |                                          |
+   +-------------------------------------------------+------------------------------------------+
+   | Last return from a CVDIAG function              | :c:func:`CVDiagGetLastFlag`              |
+   +-------------------------------------------------+------------------------------------------+
+   | Name of constant associated with a return flag  | :c:func:`CVDiagGetReturnFlagName`        |
+   +-------------------------------------------------+------------------------------------------+
 
 .. _CVODES.Usage.SIM.optional_output.optout_main:
 
@@ -2325,7 +2351,7 @@ described next.
 
    **Arguments:**
      * ``cvode_mem`` -- pointer to the CVODES memory block.
-     * ``lenrw`` -- the number of ``realtype`` values in the CVODES workspace.
+     * ``lenrw`` -- the number of ``sunrealtype`` values in the CVODES workspace.
      * ``leniw`` -- the number of integer values in the CVODES workspace.
 
    **Return value:**
@@ -2333,7 +2359,7 @@ described next.
      * ``CV_MEM_NULL`` -- The CVODES memory block was not initialized through a previous call to :c:func:`CVodeCreate`.
 
    **Notes:**
-      In terms of the problem size :math:`N`, the maximum method order :math:`\texttt{maxord}`, and the number :math:`\texttt{nrtfn}` of root functions (see :numref:`CVODES.Usage.SIM.cvrootinit`) the actual size of the real workspace, in ``realtype`` words, is  given by the following:
+      In terms of the problem size :math:`N`, the maximum method order :math:`\texttt{maxord}`, and the number :math:`\texttt{nrtfn}` of root functions (see :numref:`CVODES.Usage.SIM.cvrootinit`) the actual size of the real workspace, in ``sunrealtype`` words, is  given by the following:
 
       * base value: :math:`\texttt{lenrw} = 96 + ( \texttt{maxord} + 5) N_r + 3\texttt{nrtfn}`;
 
@@ -2465,7 +2491,7 @@ described next.
 
 
 
-.. c:function:: int CVodeGetLastStep(void* cvode_mem, realtype *hlast)
+.. c:function:: int CVodeGetLastStep(void* cvode_mem, sunrealtype *hlast)
 
    The function ``CVodeGetLastStep`` returns the  integration step size taken on the last internal step.
 
@@ -2479,7 +2505,7 @@ described next.
 
 
 
-.. c:function:: int CVodeGetCurrentStep(void* cvode_mem, realtype *hcur)
+.. c:function:: int CVodeGetCurrentStep(void* cvode_mem, sunrealtype *hcur)
 
    The function ``CVodeGetCurrentStep`` returns the  integration step size to be attempted on the next internal step.
 
@@ -2493,7 +2519,7 @@ described next.
 
 
 
-.. c:function:: int CVodeGetActualInitStep(void* cvode_mem, realtype *hinused)
+.. c:function:: int CVodeGetActualInitStep(void* cvode_mem, sunrealtype *hinused)
 
    The function ``CVodeGetActualInitStep`` returns the  value of the integration step size used on the first step.
 
@@ -2510,7 +2536,7 @@ described next.
 
 
 
-.. c:function:: int CVodeGetCurrentTime(void* cvode_mem, realtype *tcur)
+.. c:function:: int CVodeGetCurrentTime(void* cvode_mem, sunrealtype *tcur)
 
    The function ``CVodeGetCurrentTime`` returns the  current internal time reached by the solver.
 
@@ -2541,7 +2567,7 @@ described next.
 
 
 
-.. c:function:: int CVodeGetTolScaleFactor(void* cvode_mem, realtype *tolsfac)
+.. c:function:: int CVodeGetTolScaleFactor(void* cvode_mem, sunrealtype *tolsfac)
 
    The function ``CVodeGetTolScaleFactor`` returns a  suggested factor by which the user's tolerances  should be scaled when too much accuracy has been  requested for some internal step.
 
@@ -2595,7 +2621,7 @@ described next.
 
 
 
-.. c:function:: int CVodeGetIntegratorStats(void* cvode_mem, long int *nsteps, long int *nfevals, long int *nlinsetups, long int *netfails, int *qlast, int *qcur, realtype *hinused, realtype *hlast, realtype *hcur, realtype *tcur)
+.. c:function:: int CVodeGetIntegratorStats(void* cvode_mem, long int *nsteps, long int *nfevals, long int *nlinsetups, long int *netfails, int *qlast, int *qcur, sunrealtype *hinused, sunrealtype *hlast, sunrealtype *hcur, sunrealtype *tcur)
 
    The function ``CVodeGetIntegratorStats`` returns the CVODES integrator statistics as a group.
 
@@ -2818,6 +2844,46 @@ linear solver function. Note that, where the name of an output would
 otherwise conflict with the name of an optional output from the main
 solver, a suffix (for Linear Solver) has been added (e.g. ``lenrwLS``).
 
+.. c:function:: int CVodeGetJac(void* cvode_mem, SUNMatrix* J)
+
+   Returns the internally stored copy of the Jacobian matrix of the ODE
+   right-hand side function.
+
+   :param cvode_mem: the CVODES memory structure
+   :param J: the Jacobian matrix
+
+   :retval CVLS_SUCCESS: the output value has been successfully set
+   :retval CVLS_MEM_NULL: ``cvode_mem`` was ``NULL``
+   :retval CVLS_LMEM_NULL: the linear solver interface has not been initialized
+
+   .. warning::
+
+      This function is provided for debugging purposes and the values in the
+      returned matrix should not be altered.
+
+.. c:function:: int CVodeGetJacTime(void* cvode_mem, sunrealtype* t_J)
+
+   Returns the time at which the internally stored copy of the Jacobian matrix
+   of the ODE right-hand side function was evaluated.
+
+   :param cvode_mem: the CVODES memory structure
+   :param t_J: the time at which the Jacobian was evaluated
+
+   :retval CVLS_SUCCESS: the output value has been successfully set
+   :retval CVLS_MEM_NULL: ``cvode_mem`` was ``NULL``
+   :retval CVLS_LMEM_NULL: the linear solver interface has not been initialized
+
+.. c:function:: int CVodeGetJacNumSteps(void* cvode_mem, long int* nst_J)
+
+   Returns the value of the internal step counter at which the internally stored copy of the
+   Jacobian matrix of the ODE right-hand side function was evaluated.
+
+   :param cvode_mem: the CVODES memory structure
+   :param nst_J: the value of the internal step counter at which the Jacobian was evaluated
+
+   :retval CVLS_SUCCESS: the output value has been successfully set
+   :retval CVLS_MEM_NULL: ``cvode_mem`` was ``NULL``
+   :retval CVLS_LMEM_NULL: the linear solver interface has not been initialized
 
 .. c:function:: int CVodeGetLinWorkSpace(void* cvode_mem, long int *lenrwLS, long int *leniwLS)
 
@@ -2825,7 +2891,7 @@ solver, a suffix (for Linear Solver) has been added (e.g. ``lenrwLS``).
 
    **Arguments:**
      * ``cvode_mem`` -- pointer to the CVODES memory block.
-     * ``lenrwLS`` -- the number of ``realtype`` values in the CVLS workspace.
+     * ``lenrwLS`` -- the number of ``sunrealtype`` values in the CVLS workspace.
      * ``leniwLS`` -- the number of integer values in the CVLS workspace.
 
    **Return value:**
@@ -3005,9 +3071,9 @@ solver, a suffix (for Linear Solver) has been added (e.g. ``lenrwLS``).
    **Notes:**
       If the CVLS setup function failed (i.e., :c:func:`CVode` returned  ``CV_LSETUP_FAIL``) when using the ``SUNLINSOL_DENSE`` or  ``SUNLINSOL_BAND`` modules, then the value of ``lsflag`` is equal to  the column index (numbered from one) at which a zero diagonal  element was encountered during the LU factorization of the (dense or  banded) Jacobian matrix.
 
-      If the CVLS setup function failed when using another ``SUNLinearSolver``  module, then ``lsflag`` will be ``SUNLS_PSET_FAIL_UNREC``,  ``SUNLS_ASET_FAIL_UNREC``, or  ``SUNLS_PACKAGE_FAIL_UNREC``.
+      If the CVLS setup function failed when using another ``SUNLinearSolver``  module, then ``lsflag`` will be ``SUNLS_PSET_FAIL_UNREC``,  ``SUNLS_ASET_FAIL_UNREC``, or  ``SUN_ERR_EXT_FAIL``.
 
-      If the CVLS solve function failed (i.e., :c:func:`CVode` returned  ``CV_LSOLVE_FAIL``), then ``lsflag`` contains the error return  flag from the ``SUNLinearSolver`` object, which will be one of: ``SUNLS_MEM_NULL``, indicating that the ``SUNLinearSolver`` memory is ``NULL``;   ``SUNLS_ATIMES_FAIL_UNREC``, indicating an unrecoverable failure in the  Jv function; ``SUNLS_PSOLVE_FAIL_UNREC``, indicating that the preconditioner solve  function ``psolve`` failed unrecoverably;  ``SUNLS_GS_FAIL``, indicating a failure in the Gram-Schmidt  procedure (SPGMR and SPFGMR only);  ``SUNLS_QRSOL_FAIL``, indicating that the matrix R was found to be  singular during the QR solve phase (SPGMR and SPFGMR only); or  ``SUNLS_PACKAGE_FAIL_UNREC``, indicating an unrecoverable  failure in an external iterative linear solver package.
+      If the CVLS solve function failed (i.e., :c:func:`CVode` returned  ``CV_LSOLVE_FAIL``), then ``lsflag`` contains the error return  flag from the ``SUNLinearSolver`` object, which will be one of: ``SUN_ERR_ARG_CORRUPTRRUPT``, indicating that the ``SUNLinearSolver`` memory is ``NULL``;   ``SUNLS_ATIMES_FAIL_UNREC``, indicating an unrecoverable failure in the  Jv function; ``SUNLS_PSOLVE_FAIL_UNREC``, indicating that the preconditioner solve  function ``psolve`` failed unrecoverably;  ``SUNLS_GS_FAIL``, indicating a failure in the Gram-Schmidt  procedure (SPGMR and SPFGMR only);  ``SUNLS_QRSOL_FAIL``, indicating that the matrix R was found to be  singular during the QR solve phase (SPGMR and SPFGMR only); or  ``SUN_ERR_EXT_FAIL``, indicating an unrecoverable  failure in an external iterative linear solver package.
 
       The previous routines ``CVDlsGetLastFlag`` and  ``CVSpilsGetLastFlag`` are now wrappers for this routine, and may  still be used for backward-compatibility.  However, these will be  deprecated in future releases, so we recommend that users transition  to the new routine name soon.
 
@@ -3045,7 +3111,7 @@ solver, a suffix (for Linear Solver) has been added here (e.g. ``lenrwLS``).
 
    **Arguments:**
      * ``cvode_mem`` -- pointer to the CVODES memory block.
-     * ``lenrwLS`` -- the number of ``realtype`` values in the CVDIAG workspace.
+     * ``lenrwLS`` -- the number of ``sunrealtype`` values in the CVDIAG workspace.
      * ``leniwLS`` -- the number of integer values in the CVDIAG workspace.
 
    **Return value:**
@@ -3054,7 +3120,7 @@ solver, a suffix (for Linear Solver) has been added here (e.g. ``lenrwLS``).
      * ``CVDIAG_LMEM_NULL`` -- The CVDIAG linear solver has not been initialized.
 
    **Notes:**
-      In terms of the problem size :math:`N`, the actual size of the real workspace  is roughly :math:`3 N` ``realtype`` words.
+      In terms of the problem size :math:`N`, the actual size of the real workspace  is roughly :math:`3 N` ``sunrealtype`` words.
 
 
 .. c:function:: int CVDiagGetNumRhsEvals(void* cvode_mem, long int *nfevalsLS)
@@ -3145,7 +3211,7 @@ comments apply if there is to be a jump in the dependent variable
 vector.
 
 
-.. c:function:: int CVodeReInit(void* cvode_mem, realtype t0, N_Vector y0)
+.. c:function:: int CVodeReInit(void* cvode_mem, sunrealtype t0, N_Vector y0)
 
    The function ``CVodeReInit`` provides required problem specifications  and reinitializes CVODES.
 
@@ -3161,6 +3227,9 @@ vector.
      * ``CV_ILL_INPUT`` -- An input argument was an illegal value.
 
    **Notes:**
+      All previously set options are retained but may be updated by calling
+      the appropriate "Set" functions.
+
       If an error occurred, ``CVodeReInit`` also sends an error message to the  error handler function.
 
 
@@ -3184,7 +3253,7 @@ ODE right-hand side
 
 The user must provide a function of type defined as follows:
 
-.. c:type:: int (*CVRhsFn)(realtype t, N_Vector y, N_Vector ydot, void *user_data);
+.. c:type:: int (*CVRhsFn)(sunrealtype t, N_Vector y, N_Vector ydot, void *user_data);
 
    This function computes the ODE right-hand side for a given value of the independent variable :math:`t` and state vector :math:`y`.
 
@@ -3232,35 +3301,6 @@ The user must provide a function of type defined as follows:
       The other is when a recoverable error is reported by ``CVRhsFn``
       after an error test failure, while the linear multistep method order is
       equal to 1 (in which case CVODES returns ``CV_UNREC_RHSFUNC_ERR``).
-
-
-.. _CVODES.Usage.SIM.user_supplied.ehFn:
-
-Error message handler function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-As an alternative to the default behavior of directing error and warning
-messages to the file pointed to by ``errfp`` (see :c:func:`CVodeSetErrFile`), the user may provide a
-function of type ``CVErrHandlerFn`` to process any such messages. The function type
-:c:type:`CVErrHandlerFn` is defined as follows:
-
-.. c:type:: void (*CVErrHandlerFn)(int error_code, const char *module, const char *function, char *msg, void *eh_data);
-
-   This function processes error and warning message from CVODES and it sub-modules.
-
-   **Arguments:**
-      * ``error_code`` is the error code.
-      * ``module`` is the name of the CVODES module reporting the error.
-      * ``function`` is the name of the function in which the error occurred.
-      * ``msg`` is the error message.
-      * ``eh_data`` is a pointer to user data, the same as the ``eh_data`` parameter passed to :c:func:`CVodeSetErrHandlerFn`.
-
-   **Return value:**
-      * void
-
-   **Notes:**
-      ``error_code`` is negative for errors and positive (``CV_WARNING``) for warnings.
-      If a function that returns a pointer to memory encounters an error, it sets ``error_code`` to 0.
 
 
 .. _CVODES.Usage.SIM.user_supplied.monitorfn:
@@ -3333,7 +3373,7 @@ If a rootfinding problem is to be solved during the integration of the
 ODE system, the user must supply a C function of type ``CVRootFn``, defined as
 follows:
 
-.. c:type:: int (*CVRootFn)(realtype t, N_Vector y, realtype *gout, void *user_data);
+.. c:type:: int (*CVRootFn)(sunrealtype t, N_Vector y, sunrealtype *gout, void *user_data);
 
    This function implements a vector-valued function :math:`g(t,y)` such that the roots of the ``nrtfn`` components :math:`g_i(t,y)` are sought.
 
@@ -3359,7 +3399,7 @@ When solving an IVP with a constraint equation and providing a
 user-defined projection operation the projection function must have type
 ``CVProjFn``, defined as follows:
 
-.. c:type:: int (*CVProjFn)(realtype t, N_Vector ycur, N_Vector corr, realtype epsProj, N_Vector err, void *user_data);
+.. c:type:: int (*CVProjFn)(sunrealtype t, N_Vector ycur, N_Vector corr, sunrealtype epsProj, N_Vector err, void *user_data);
 
    This function computes the projection of the solution and, if enabled, the error on to the constraint manifold.
 
@@ -3385,7 +3425,7 @@ user-defined projection operation the projection function must have type
 
       If needed by the user's projection routine, the error weight vector can be
       accessed by calling :c:func:`CVodeGetErrWeights`, and the unit roundoff is
-      available as ``UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
+      available as ``SUN_UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
 
    .. versionadded:: 6.2.0
 
@@ -3401,7 +3441,7 @@ a function of type ``CVLsJacFn`` for evaluating the Jacobian of the ODE right-ha
 side function (or an approximation of it). ``CVLsJacFn`` is defined as follows:
 
 
-.. c:type:: int (*CVLsJacFn)(realtype t, N_Vector y, N_Vector fy, SUNMatrix Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+.. c:type:: int (*CVLsJacFn)(sunrealtype t, N_Vector y, N_Vector fy, SUNMatrix Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 
    This function computes the Jacobian matrix :math:`J = \dfrac{\partial f}{\partial y}` (or an approximation to it).
 
@@ -3441,7 +3481,7 @@ side function (or an approximation of it). ``CVLsJacFn`` is defined as follows:
       the current step size, the error weights, etc. To obtain these, the user
       will need to add a pointer to ``cv_mem`` in ``user_data`` and then use the
       ``CVodeGet*`` functions described in :numref:`CVODES.Usage.SIM.optional_output`.
-      The unit roundoff can be accessed as ``UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
+      The unit roundoff can be accessed as ``SUN_UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
 
       **Dense**:
       A user-supplied dense Jacobian function must load the :math:`N` by :math:`N`
@@ -3485,7 +3525,7 @@ side function (or an approximation of it). ``CVLsJacFn`` is defined as follows:
       :math:`\le m-n \le` ``mlower``. Alternatively,
       ``SM_COLUMN_B(J, j)`` returns a pointer to the diagonal element
       of the :math:`j`-th column of ``Jac``, and if we assign this address
-      to ``realtype *col_j``, then the :math:`i`-th element of the
+      to ``sunrealtype *col_j``, then the :math:`i`-th element of the
       :math:`j`-th column is given by
       ``SM_COLUMN_ELEMENT_B(col_j, i, j)``, counting from 0.  Thus,
       for :math:`(m,n)` within the band, :math:`J(m,n)` can be loaded by setting
@@ -3531,7 +3571,7 @@ side function, the user may optionally supply a function of type ``CVLsLinSysFn`
 for evaluating the linear system, :math:`M = I - \gamma J` (or an
 approximation of it).  ``CVLsLinSysFn`` is defined as follows:
 
-.. c:type:: int (*CVLsLinSysFn)(realtype t, N_Vector y, N_Vector fy, SUNMatrix M, booleantype jok, booleantype *jcur, realtype gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+.. c:type:: int (*CVLsLinSysFn)(sunrealtype t, N_Vector y, N_Vector fy, SUNMatrix M, sunbooleantype jok, sunbooleantype *jcur, sunrealtype gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 
    This function computes the linear system matrix :math:`M = I - \gamma J` (or an approximation to it).
 
@@ -3561,7 +3601,7 @@ provide a function of type :c:type:`CVLsJacTimesVecFn` in the following form,
 to compute matrix-vector products :math:`Jv`. If such a function is not supplied,
 the default is a difference quotient approximation to these products.
 
-.. c:type:: int (*CVLsJacTimesVecFn)(N_Vector v, N_Vector Jv, realtype t, N_Vector y, N_Vector fy, void *user_data, N_Vector tmp);
+.. c:type:: int (*CVLsJacTimesVecFn)(N_Vector v, N_Vector Jv, sunrealtype t, N_Vector y, N_Vector fy, void *user_data, N_Vector tmp);
 
    This function computes the product :math:`Jv = \dfrac{\partial f(t,y)}{\partial y} v` (or an approximation to it).
 
@@ -3587,7 +3627,7 @@ the default is a difference quotient approximation to these products.
       To obtain these, the user will need to add a pointer to ``cvode_mem``
       to ``user_data`` and then use the ``CVodeGet*`` functions described in
       :numref:`CVODES.Usage.SIM.optional_output.optout_main`. The unit roundoff can be accessed as
-      ``UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
+      ``SUN_UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
 
       The previous function type ``CVSpilsJacTimesVecFn`` is identical to
       :c:func:`CVLsJacTimesVecFn`, and may still be used for backward-compatibility.
@@ -3604,7 +3644,7 @@ If the user’s Jacobian-times-vector routine requires that any
 Jacobian-related data be preprocessed or evaluated, then this needs to
 be done in a user-supplied function of type :c:type:`CVLsJacTimesSetupFn`, defined as follows:
 
-.. c:type:: int (*CVLsJacTimesSetupFn)(realtype t, N_Vector y, N_Vector fy, void *user_data);
+.. c:type:: int (*CVLsJacTimesSetupFn)(sunrealtype t, N_Vector y, N_Vector fy, void *user_data);
 
    This function preprocesses and/or evaluates Jacobian-related data needed by the Jacobian-times-vector routine.
 
@@ -3632,7 +3672,7 @@ be done in a user-supplied function of type :c:type:`CVLsJacTimesSetupFn`, defin
       To obtain these, the user will need to add a pointer to ``cvode_mem``
       to ``user_data`` and then use the ``CVodeGet*`` functions described in
       :numref:`CVODES.Usage.SIM.optional_output.optout_main`. The unit roundoff can be accessed as
-      ``UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
+      ``SUN_UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
 
       The previous function type ``CVSpilsJacTimesSetupFn`` is identical
       to :c:type:`CVLsJacTimesSetupFn`, and may still be used for
@@ -3655,7 +3695,7 @@ crudely) the matrix :math:`M = I - \gamma J`, where
 sides, the product of the two preconditioner matrices should approximate
 :math:`M`. This function must be of type :c:type:`CVLsPrecSolveFn`, defined as follows:
 
-.. c:type:: int (*CVLsPrecSolveFn)(realtype t, N_Vector y, N_Vector fy, N_Vector r, N_Vector z, realtype gamma, realtype delta, int lr, void *user_data);
+.. c:type:: int (*CVLsPrecSolveFn)(sunrealtype t, N_Vector y, N_Vector fy, N_Vector r, N_Vector z, sunrealtype gamma, sunrealtype delta, int lr, void *user_data);
 
    This function solves the preconditioned system :math:`Pz = r`.
 
@@ -3692,7 +3732,7 @@ If the user’s preconditioner requires that any Jacobian-related data be
 preprocessed or evaluated, then this needs to be done in a user-supplied
 function of type , defined as follows:
 
-.. c:type:: int (*CVLsPrecSetupFn)(realtype t, N_Vector y, N_Vector fy, booleantype jok, booleantype *jcurPtr, realtype gamma, void *user_data);
+.. c:type:: int (*CVLsPrecSetupFn)(sunrealtype t, N_Vector y, N_Vector fy, sunbooleantype jok, sunbooleantype *jcurPtr, sunrealtype gamma, void *user_data);
 
    This function preprocesses and/or evaluates Jacobian-related data needed by the preconditioner.
 
@@ -3735,7 +3775,7 @@ function of type , defined as follows:
       To obtain these, the user will need to add a pointer to ``cvode_mem``
       to ``user_data`` and then use the ``CVodeGet*`` functions described in
       :numref:`CVODES.Usage.SIM.optional_output`. The unit roundoff can be accessed as
-      ``UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
+      ``SUN_UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
 
       The previous function type ``CVSpilsPrecSetupFn`` is identical to
       :c:type:`CVLsPrecSetupFn`, and may still be used for backward-compatibility.
@@ -3934,7 +3974,7 @@ solution and quadratures at time ``t``. However, :c:func:`CVode` will still retu
 only the solution :math:`y` in ``yout``. Solution quadratures can be obtained
 using the following function:
 
-.. c:function:: int CVodeGetQuad(void * cvode_mem, realtype tret, N_Vector yQ)
+.. c:function:: int CVodeGetQuad(void * cvode_mem, sunrealtype* tret, N_Vector yQ)
 
    The function ``CVodeGetQuad`` returns the quadrature solution vector after a  successful return from ``CVode``.
 
@@ -3958,7 +3998,7 @@ interpolating polynomials for the quadrature variables at time ``t``. This
 function is called by :c:func:`CVodeGetQuad` with ``k = 0`` and with the current time
 at which :c:func:`CVode` has returned, but may also be called directly by the user.
 
-.. c:function:: int CVodeGetQuadDky(void * cvode_mem, realtype t, int k, N_Vector dkyQ)
+.. c:function:: int CVodeGetQuadDky(void * cvode_mem, sunrealtype t, int k, N_Vector dkyQ)
 
    The function ``CVodeGetQuadDky`` returns derivatives of the quadrature solution  vector after a successful return from :c:func:`CVode`.
 
@@ -3989,7 +4029,7 @@ CVODES provides the following optional input functions to control the integratio
 of quadrature equations.
 
 
-.. c:function:: int CVodeSetQuadErrCon(void * cvode_mem, booleantype errconQ)
+.. c:function:: int CVodeSetQuadErrCon(void * cvode_mem, sunbooleantype errconQ)
 
    The function ``CVodeSetQuadErrCon`` specifies whether or not the  quadrature variables are to be used in the step size control mechanism within CVODES.  If they are, the user must call :c:func:`CVodeQuadSStolerances`  or :c:func:`CVodeQuadSVtolerances` to specify the  integration tolerances for the quadrature variables.
 
@@ -4014,14 +4054,30 @@ If the quadrature variables are part of the step size control mechanism,
 one of the following functions must be called to specify the
 integration tolerances for quadrature variables.
 
-.. c:function:: int CVodeQuadSVtolerances(void * cvode_mem, realtype reltolQ, realtype abstolQ)
+.. c:function:: int CVodeQuadSStolerances(void *cvode_mem, sunrealtype reltolQ, sunrealtype abstolQ)
 
-   The function ``CVodeQuadSStolerances`` specifies scalar relative and absolute  tolerances.
+   The function ``CVodeQuadSStolerances`` specifies scalar relative and absolute tolerances.
 
    **Arguments:**
      * ``cvode_mem`` -- pointer to the CVODES memory block.
-     * ``reltolQ`` --  tolerances is the scalar relative error tolerance.
+     * ``reltolQ`` --  is the scalar relative error tolerance.
      * ``abstolQ`` -- is the scalar absolute error tolerance.
+
+   **Return value:**
+     * ``CV_SUCCESS`` -- The optional value has been successfully set.
+     * ``CV_NO_QUAD`` -- Quadrature integration was not initialized.
+     * ``CV_MEM_NULL`` -- The ``cvode_mem`` pointer is ``NULL``.
+     * ``CV_ILL_INPUT`` -- One of the input tolerances was negative.
+
+
+.. c:function:: int CVodeQuadSVtolerances(void * cvode_mem, sunrealtype reltolQ, N_Vector abstolQ)
+
+   The function ``CVodeQuadSVtolerances`` specifies scalar relative and vector absolute tolerances.
+
+   **Arguments:**
+     * ``cvode_mem`` -- pointer to the CVODES memory block.
+     * ``reltolQ`` --  is the scalar relative error tolerance.
+     * ``abstolQ`` -- the vector of absolute error tolerances.
 
    **Return value:**
      * ``CV_SUCCESS`` -- The optional value has been successfully set.
@@ -4108,7 +4164,7 @@ that defines the right-hand side of the quadrature equations (in other words,
 the integrand function of the integral that must be evaluated). This function
 must be of type :c:type:`CVQuadRhsFn` defined as follows:
 
-.. c:type:: int (*CVQuadRhsFn)(realtype t, N_Vector y, N_Vector yQdot, void *user_data)
+.. c:type:: int (*CVQuadRhsFn)(sunrealtype t, N_Vector y, N_Vector yQdot, void *user_data)
 
    This function computes the quadrature equation right-hand side for a given value
    of the independent variable :math:`t` and state vector :math:`y`.
@@ -4275,7 +4331,7 @@ the CVBANDPRE module:
 
    **Arguments:**
      * ``cvode_mem`` -- pointer to the CVODES memory block.
-     * ``lenrwBP`` -- the number of ``realtype`` values in the CVBANDPRE workspace.
+     * ``lenrwBP`` -- the number of ``sunrealtype`` values in the CVBANDPRE workspace.
      * ``leniwBP`` -- the number of integer values in the CVBANDPRE workspace.
 
    **Return value:**
@@ -4407,7 +4463,7 @@ The user is responsible for providing space (presumably within ``user_data``)
 for components of :math:`y` that are communicated between processes by ``cfn``, and
 that are then used by ``gloc``, which should not do any communication.
 
-.. c:type:: int (*CVLocalFn)(sunindextype Nlocal, realtype t, N_Vector y, N_Vector glocal, void *user_data);
+.. c:type:: int (*CVLocalFn)(sunindextype Nlocal, sunrealtype t, N_Vector y, N_Vector glocal, void *user_data);
 
    This ``gloc`` function computes :math:`g(t,y)`. It loads the vector ``glocal`` as a function of ``t`` and ``y``.
 
@@ -4432,7 +4488,7 @@ that are then used by ``gloc``, which should not do any communication.
       The case where :math:`g` is mathematically identical to :math:`f` is allowed.
 
 
-.. c:type:: int (*CVCommFn)(sunindextype Nlocal, realtype t, N_Vector y, void *user_data);
+.. c:type:: int (*CVCommFn)(sunindextype Nlocal, sunrealtype t, N_Vector y, void *user_data);
 
    This ``cfn`` function performs all interprocess communication necessary for the execution of the ``gloc`` function above, using the input vector ``y``.
 
@@ -4536,7 +4592,7 @@ The user-callable functions that initialize or re-initialize
 the CVBBDPRE preconditioner module are described next.
 
 
-.. c:function:: int CVBBDPrecInit(void* cvode_mem, sunindextype local_N, sunindextype mudq, sunindextype mldq, sunindextype mukeep, sunindextype mlkeep, realtype dqrely, CVLocalFn gloc, CVCommFn cfn)
+.. c:function:: int CVBBDPrecInit(void* cvode_mem, sunindextype local_N, sunindextype mudq, sunindextype mldq, sunindextype mukeep, sunindextype mlkeep, sunrealtype dqrely, CVLocalFn gloc, CVCommFn cfn)
 
    The function ``CVBBDPrecInit`` initializes and allocates (internal) memory for the CVBBDPRE preconditioner.
 
@@ -4589,7 +4645,7 @@ one or more of the corresponding CVLS "set" functions, must
 also be made (in the proper order).
 
 
-.. c:function:: int CVBBDPrecReInit(void* cvode_mem, sunindextype mudq, sunindextype mldq, realtype dqrely)
+.. c:function:: int CVBBDPrecReInit(void* cvode_mem, sunindextype mudq, sunindextype mldq, sunrealtype dqrely)
 
    The function ``CVBBDPrecReInit`` re-initializes the CVBBDPRE preconditioner.
 
@@ -4619,7 +4675,7 @@ the CVBBDPRE module:
 
    **Arguments:**
       * ``cvode_mem`` -- pointer to the CVODES memory block.
-      * ``lenrwBBDP`` -- local number of ``realtype`` values in the CVBBDPRE workspace.
+      * ``lenrwBBDP`` -- local number of ``sunrealtype`` values in the CVBBDPRE workspace.
       * ``leniwBBDP`` -- local number of integer values in the CVBBDPRE workspace.
 
    **Return value:**

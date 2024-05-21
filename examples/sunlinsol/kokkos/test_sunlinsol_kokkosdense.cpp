@@ -2,7 +2,7 @@
  * Programmer(s): David J. Gardner @ LLNL
  * -----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2022, Lawrence Livermore National Security
+ * Copyright (c) 2002-2024, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include <nvector/nvector_kokkos.hpp>
+#include <sundials/sundials_core.hpp>
 #include <sunlinsol/sunlinsol_kokkosdense.hpp>
 #include <sunmatrix/sunmatrix_kokkosdense.hpp>
 
@@ -165,9 +166,9 @@ int main(int argc, char* argv[])
 KOKKOS_FUNCTION
 int CompareTol(sunrealtype a, sunrealtype b, sunrealtype tol)
 {
-  if (a == b) return 0;
-  if (std::isnan(a) || std::isnan(b)) return 1;
-  if (std::isinf(a) || std::isinf(b)) return 1;
+  if (a == b) { return 0; }
+  if (std::isnan(a) || std::isnan(b)) { return 1; }
+  if (std::isinf(a) || std::isinf(b)) { return 1; }
   sunrealtype diff = std::abs(a - b);
   sunrealtype norm = std::min(std::abs(a + b),
                               std::numeric_limits<sunrealtype>::max());
@@ -175,7 +176,7 @@ int CompareTol(sunrealtype a, sunrealtype b, sunrealtype tol)
          std::max(10 * std::numeric_limits<sunrealtype>::epsilon(), tol * norm);
 }
 
-int check_vector(N_Vector expected, N_Vector computed, realtype tol)
+int check_vector(N_Vector expected, N_Vector computed, sunrealtype tol)
 {
   int failure = 0;
 
@@ -194,8 +195,8 @@ int check_vector(N_Vector expected, N_Vector computed, realtype tol)
     },
     failure);
 
-  if (failure > ZERO) return 1;
-  else return 0;
+  if (failure > ZERO) { return 1; }
+  else { return 0; }
 }
 
 void sync_device() { Kokkos::fence(); }

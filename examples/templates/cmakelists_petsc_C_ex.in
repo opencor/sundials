@@ -2,7 +2,7 @@
 # Programmer(s): Radu Serban, Cody Balos @ LLNL
 # -----------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -23,7 +23,7 @@ cmake_minimum_required(VERSION @CMAKE_VERSION@)
 
 # Set cache variables for compilers and flags
 set(CMAKE_C_COMPILER
-  @MPI_C_COMPILER@
+  "@MPI_C_COMPILER@"
   CACHE FILEPATH "MPI C compiler")
 
 set(CMAKE_C_FLAGS

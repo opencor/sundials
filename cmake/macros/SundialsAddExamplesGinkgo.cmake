@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -63,6 +63,8 @@ macro(sundials_add_examples_ginkgo EXAMPLES_VAR)
       elseif(backend MATCHES "HIP")
         set_source_files_properties(${example} PROPERTIES LANGUAGE CXX)
         set(vector nvechip)
+      elseif(backend MATCHES "DPCPP")
+        set(vector nvecsycl)
       elseif(backend MATCHES "OMP")
         set(vector nvecopenmp)
       elseif(backend MATCHES "REF")

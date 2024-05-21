@@ -3,7 +3,7 @@
 #                Radu Serban, Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -21,7 +21,6 @@ install(CODE "MESSAGE(\"\nInstall IDAS\n\")")
 set(idas_SOURCES
   idas.c
   idaa.c
-  idas_direct.c
   idas_io.c
   idas_ic.c
   idaa_io.c
@@ -30,25 +29,17 @@ set(idas_SOURCES
   idas_nls.c
   idas_nls_sim.c
   idas_nls_stg.c
-  idas_spils.c
   )
 
 # Add variable idas_HEADERS with the exported IDAS header files
 set(idas_HEADERS
   idas.h
   idas_bbdpre.h
-  idas_direct.h
   idas_ls.h
-  idas_spils.h
   )
 
 # Add prefix with complete path to the IDAS header files
 add_prefix(${SUNDIALS_SOURCE_DIR}/include/idas/ idas_HEADERS)
-
-if(ENABLE_CALIPER AND SUNDIALS_BUILD_WITH_PROFILING)
-  set(_include_caliper_if_needed PUBLIC ${caliper_INCLUDE_DIR})
-  set(_link_caliper_if_needed PUBLIC caliper)
-endif()
 
 # Create the library
 sundials_add_library(sundials_idas
@@ -58,10 +49,9 @@ sundials_add_library(sundials_idas
     ${idas_HEADERS}
   INCLUDE_SUBDIR
     idas
-  INCLUDE_DIRECTORIES
-    ${_include_caliper_if_needed}
+  LINK_LIBRARIES
+    PUBLIC sundials_core
   OBJECT_LIBRARIES
-    sundials_generic_obj
     sundials_sunmemsys_obj
     sundials_nvecserial_obj
     sundials_sunmatrixband_obj
@@ -76,9 +66,6 @@ sundials_add_library(sundials_idas
     sundials_sunlinsolpcg_obj
     sundials_sunnonlinsolnewton_obj
     sundials_sunnonlinsolfixedpoint_obj
-  LINK_LIBRARIES
-    # Link to caliper if conditions are met.
-    ${_link_caliper_if_needed}
   OUTPUT_NAME
     sundials_idas
   VERSION

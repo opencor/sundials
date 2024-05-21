@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -28,7 +28,7 @@ to have a similar user experience to the `CVODE
 solver, including user modes to allow adaptive integration to specified
 output times, return after each internal step and root-finding
 capabilities, and for calculations in serial, using shared-memory
-parallelism (via OpenMP, Pthreads, CUDA, Raja) or distributed-memory
+parallelism (e.g., via OpenMP, CUDA, Raja, Kokkos) or distributed-memory
 parallelism (via MPI).  The default integration and solver options
 should apply to most users, though control over nearly all internal
 parameters and time adaptivity algorithms is enabled through optional
@@ -59,12 +59,14 @@ with support by the `US Department of Energy <http://www.doe.gov>`_,
    sundials/index.rst
    Usage/index.rst
    ARKodeButcherTable
+   ARKodeSPRKTable
    nvectors/index.rst
    sunmatrix/index.rst
    sunlinsol/index.rst
    sunnonlinsol/index.rst
+   sunadaptcontroller/index.rst
    sunmemory/index.rst
-   Install_link.rst
+   sundials/Install_link.rst
    Constants
    Butcher
    History_link.rst

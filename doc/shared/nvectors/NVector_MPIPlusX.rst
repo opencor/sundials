@@ -2,7 +2,7 @@
    Programmer(s): Cody J. Balos @ LLNL
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -89,13 +89,23 @@ user-callable routines:
    *local_vector* is ``NULL``).
 
 
-.. c:function:: N_Vector N_VGetLocal_MPIPlusX(N_Vector v)
+.. c:function:: N_Vector N_VGetLocalVector_MPIPlusX(N_Vector v)
 
-   This function returns the local vector underneath the MPIPlusX
-   NVECTOR.
+   This function returns the local vector underneath the MPIPlusX NVECTOR.
 
 
-.. c:function:: realtype *N_VGetArrayPointer_MPIPlusX(N_Vector v)
+.. c:function:: sunindextype N_VGetLocalLength_MPIPlusX(N_Vector v)
+
+   This function returns the local length of the vector underneath the MPIPlusX NVECTOR.
+
+   Usage:
+
+   .. code-block:: c
+
+      local_length = N_VGetLocalLength_MPIPlusX(v);
+
+
+.. c:function:: sunrealtype *N_VGetArrayPointer_MPIPlusX(N_Vector v)
 
    This function returns the data array pointer for the local vector.
 
@@ -103,7 +113,7 @@ user-callable routines:
    operation, then ``NULL`` is returned.
 
 
-.. c:function:: void N_VSetArrayPointer_MPIPlusX(realtype *v_data, N_Vector v)
+.. c:function:: void N_VSetArrayPointer_MPIPlusX(sunrealtype *v_data, N_Vector v)
 
    This function sets the data array pointer for the local vector if
    the local vector implements the :c:func:`N_VSetArrayPointer` operation.

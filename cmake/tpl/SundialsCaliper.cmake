@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # -----------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -42,7 +42,6 @@ endif()
 
 find_package(CALIPER
              PATHS "${CALIPER_DIR}"
-             NO_DEFAULT_PATH
              REQUIRED)
 
 message(STATUS "CALIPER_LIB_DIR:     ${caliper_LIB_DIR}")
@@ -80,7 +79,7 @@ if(CALIPER_FOUND AND (NOT CALIPER_WORKS))
   # Create a C source file
   file(WRITE ${CALIPER_TEST_DIR}/ltest.c
   "\#include <caliper/cali.h>\n"
-  "int main()\n"
+  "int main(void)\n"
   "{\n"
   "  CALI_MARK_FUNCTION_BEGIN;\n"
   "  CALI_MARK_FUNCTION_END;\n"

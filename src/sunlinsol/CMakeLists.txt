@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -32,6 +32,7 @@ if(BUILD_SUNLINSOL_GINKGO)
   install(CODE "MESSAGE(\"\nInstall SUNLINSOL_GINKGO\n\")")
   message(STATUS "Added BUILD_SUNLINSOL_GINKGO module")
   add_library(sundials_sunlinsolginkgo INTERFACE)
+  target_link_libraries(sundials_sunlinsolginkgo INTERFACE sundials_core)
   target_include_directories(sundials_sunlinsolginkgo INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
@@ -51,7 +52,7 @@ if(BUILD_SUNLINSOL_KOKKOSDENSE)
   message(STATUS "Added BUILD_SUNLINSOL_KOKKOSDENSE module")
   add_library(sundials_sunlinsolkokkosdense INTERFACE)
   target_link_libraries(sundials_sunlinsolkokkosdense INTERFACE
-    Kokkos::kokkos Kokkos::kokkoskernels)
+    sundials_core Kokkos::kokkos Kokkos::kokkoskernels)
   target_include_directories(sundials_sunlinsolkokkosdense INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>

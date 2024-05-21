@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -24,7 +24,8 @@ ordinary differential equations (ODEs).  ARKODE itself is structured
 to support a wide range of one-step (but multi-stage) methods,
 allowing for rapid development of parallel implementations of
 state-of-the-art time integration methods.  At present, ARKODE is
-packaged with two time-stepping modules, *ARKStep* and *ERKStep*.
+packaged with four time-stepping modules, *ARKStep*, *ERKStep*, *SPRKStep*,
+and *MRIStep*.
 
 
 *ARKStep* supports ODE systems posed in split, linearly-implicit form,
@@ -63,8 +64,8 @@ for splittings tuned for use with optimal implicit solver algorithms.
 This framework allows for significant freedom over the constitutive
 methods used for each component, and ARKODE is packaged with a wide
 array of built-in methods for use.  These built-in Butcher tables
-include adaptive explicit methods of orders 2-8, adaptive implicit
-methods of orders 2-5, and adaptive ImEx methods of orders 3-5.
+include adaptive explicit methods of orders 2-9, adaptive implicit
+methods of orders 2-5, and adaptive ImEx methods of orders 2-5.
 
 
 *ERKStep* focuses specifically on problems posed in explicit form,
@@ -76,8 +77,19 @@ methods of orders 2-5, and adaptive ImEx methods of orders 3-5.
 allowing for increased computational efficiency and memory savings.
 The algorithms used in ERKStep are adaptive- and fixed-step explicit
 Runge--Kutta methods.   As with ARKStep, the ERKStep module is packaged
-with adaptive explicit methods of orders 2-8.
+with adaptive explicit methods of orders 2-9.
 
+*SPRKStep* focuses on Hamiltonian systems posed in the form,
+
+.. math::
+   H(t, p, q) = T(t, p) + V(t, q)
+
+.. math::
+   \dot{p} = f_1(t,q) = \frac{\partial V(t,q)}{\partial q}, \quad
+   \dot{q} = f_2(t,p) = \frac{\partial T(t,p)}{\partial p},
+   :label: ARKODE_ODE_hamiltonian
+
+allowing for conservation of quadratic invariants.
 
 *MRIStep* focuses specifically on problems posed in additive form,
 
@@ -118,6 +130,377 @@ provided with SUNDIALS, or again may utilize a user-supplied module.
 Changes from previous versions
 ==============================
 
+Changes in v6.0.0
+----------------------
+
+**Major Features**
+
+SUNDIALS now has more robust and uniform error handling. Non-release builds will
+be built with additional error checking by default. See :numref:`SUNDIALS.Errors`
+for details.
+
+**Breaking Changes**
+
+*Minimum C Standard*
+
+SUNDIALS now requires using a compiler that supports a subset of the C99
+standard. Note with the Microsoft C/C++ compiler the subset of C99 features
+utilized by SUNDIALS are available starting with
+`Visual Studio 2015 <https://learn.microsoft.com/en-us/cpp/overview/visual-cpp-language-conformance?view=msvc-170#c-standard-library-features-1>`_.
+
+*Deprecated Types and Functions Removed*
+
+The previously deprecated types ``realtype`` and ``booleantype`` were removed
+from ``sundials_types.h`` and replaced with ``sunrealtype`` and
+``sunbooleantype``. The deprecated names for these types can be used by
+including the header file ``sundials_types_deprecated.h`` but will be fully
+removed in the next major release. Functions, types, and header files that were
+previously deprecated have also been removed.
+
+*Error Handling Changes*
+
+With the addition of the new error handling capability, the following functions
+have been removed
+
+* ``ARKStepSetErrHandlerFn``
+* ``ARKStepSetErrFile``
+* ``ERKStepSetErrHandlerFn``
+* ``ERKStepSetErrFile``
+* ``MRIStepSetErrHandlerFn``
+* ``MRIStepSetErrFile``
+* ``SPRKStepSetErrHandlerFn``
+* ``SPRKStepSetErrFile``
+
+Users of these functions can use the functions :c:func:`SUNContext_PushErrHandler`,
+and :c:func:`SUNLogger_SetErrorFilename` instead. For further details see
+Sections :numref:`SUNDIALS.Errors` and :numref:`SUNDIALS.Logging`.
+
+In addition the following names/symbols were replaced by ``SUN_ERR_*`` codes:
+
++-------------------------------+-----------------------------------+
+| Removed                       | Replaced with ``SUNErrCode``      |
++===============================+===================================+
+| SUNLS_SUCCESS                 | SUN_SUCCESS                       |
++-------------------------------+-----------------------------------+
+| SUNLS_UNRECOV_FAILURE         | no replacement (value was unused) |
++-------------------------------+-----------------------------------+
+| SUNLS_MEM_NULL                | SUN_ERR_ARG_CORRUPT               |
++-------------------------------+-----------------------------------+
+| SUNLS_ILL_INPUT               | SUN_ERR_ARG_*                     |
++-------------------------------+-----------------------------------+
+| SUNLS_MEM_FAIL                | SUN_ERR_MEM_FAIL                  |
++-------------------------------+-----------------------------------+
+| SUNLS_PACKAGE_FAIL_UNREC      | SUN_ERR_EXT_FAIL                  |
++-------------------------------+-----------------------------------+
+| SUNLS_VECTOROP_ERR            | SUN_ERR_OP_FAIL                   |
++-------------------------------+-----------------------------------+
+| SUN_NLS_SUCCESS               | SUN_SUCCESS                       |
++-------------------------------+-----------------------------------+
+| SUN_NLS_MEM_NULL              | SUN_ERR_ARG_CORRUPT               |
++-------------------------------+-----------------------------------+
+| SUN_NLS_MEM_FAIL              | SUN_ERR_MEM_FAIL                  |
++-------------------------------+-----------------------------------+
+| SUN_NLS_ILL_INPUT             | SUN_ERR_ARG_*                     |
++-------------------------------+-----------------------------------+
+| SUN_NLS_VECTOROP_ERR          | SUN_ERR_OP_FAIL                   |
++-------------------------------+-----------------------------------+
+| SUN_NLS_EXT_FAIL              | SUN_ERR_EXT_FAIL                  |
++-------------------------------+-----------------------------------+
+| SUNMAT_SUCCESS                | SUN_SUCCESS                       |
++-------------------------------+-----------------------------------+
+| SUNMAT_ILL_INPUT              | SUN_ERR_ARG_*                     |
++-------------------------------+-----------------------------------+
+| SUNMAT_MEM_FAIL               | SUN_ERR_MEM_FAIL                  |
++-------------------------------+-----------------------------------+
+| SUNMAT_OPERATION_FAIL         | SUN_ERR_OP_FAIL                   |
++-------------------------------+-----------------------------------+
+| SUNMAT_MATVEC_SETUP_REQUIRED  | SUN_ERR_OP_FAIL                   |
++-------------------------------+-----------------------------------+
+
+The following functions have had their signature updated to ensure they can
+leverage the new SUNDIALS error handling capabilities.
+
+* From ``sundials_futils.h``
+
+  * :c:func:`SUNDIALSFileOpen`
+  * :c:func:`SUNDIALSFileClose`
+
+* From ``sundials_memory.h``
+
+  * :c:func:`SUNMemorNewEmpty`
+  * :c:func:`SUNMemoryHelper_Alias`
+  * :c:func:`SUNMemoryHelper_Wrap`
+
+* From ``sundials_nvector.h``
+
+  * :c:func:`N_VNewVectorArray`
+
+*SUNComm Type Added*
+
+We have replaced the use of a type-erased (i.e., ``void*``) pointer to a
+communicator in place of ``MPI_Comm`` throughout the SUNDIALS API with a
+:c:type:`SUNComm`, which is just a typedef to an ``int`` in builds without MPI
+and a typedef to a ``MPI_Comm`` in builds with MPI. As a result:
+
+- All users will need to update their codes because the call to
+  :c:func:`SUNContext_Create` now takes a :c:type:`SUNComm` instead
+  of type-erased pointer to a communicator. For non-MPI codes,
+  pass :c:type:`SUN_COMM_NULL` to the ``comm`` argument instead of
+  ``NULL``. For MPI codes, pass the ``MPI_Comm`` directly.
+
+- The same change must be made for calls to
+  :c:func:`SUNLogger_Create` or :c:func:`SUNProfiler_Create`.
+
+- Some users will need to update their calls to ``N_VGetCommunicator``, and
+  update any custom ``N_Vector`` implementations that provide
+  ``N_VGetCommunicator``, since it now returns a ``SUNComm``.
+
+The change away from type-erased pointers for :c:type:`SUNComm` fixes problems
+like the one described in
+`GitHub Issue #275 <https://github.com/LLNL/sundials/issues/275>`_.
+
+The SUNLogger is now always MPI-aware if MPI is enabled in SUNDIALS and the
+``SUNDIALS_LOGGING_ENABLE_MPI`` CMake option and macro definition were removed
+accordingly.
+
+*SUNDIALS Core Library*
+
+Users now need to link to ``sundials_core`` in addition to the libraries already
+linked to. This will be picked up automatically in projects that use the
+SUNDIALS CMake target. The library ``sundials_generic`` has been superseded by
+``sundials_core`` and is no longer available. This fixes some duplicate symbol
+errors on Windows when linking to multiple SUNDIALS libraries.
+
+*Fortran Interface Modules Streamlined*
+
+We have streamlined the Fortran modules that need to be included by users by combining
+the SUNDIALS core into one Fortran module, ``fsundials_core_mod``. Modules for
+implementations of the core APIs still exist (e.g., for the Dense linear solver there
+is ``fsunlinsol_dense_mod``) as do the modules for the SUNDIALS packages (e.g., ``fcvode_mod``).
+The following modules are the ones that have been consolidated into ``fsundials_core_mod``:
+
+.. code-block::
+
+  fsundials_adaptcontroller_mod
+  fsundials_context_mod
+  fsundials_futils_mod
+  fsundials_linearsolver_mod
+  fsundials_logger_mod
+  fsundials_matrix_mod
+  fsundials_nonlinearsolver_mod
+  fsundials_nvector_mod
+  fsundials_profiler_mod
+  fsundials_types_mod
+
+
+**Deprecation notice**
+
+The functions in ``sundials_math.h`` will be deprecated in the next release.
+
+.. code-block:: c
+
+  sunrealtype SUNRpowerI(sunrealtype base, int exponent);
+  sunrealtype SUNRpowerR(sunrealtype base, sunrealtype exponent);
+  sunbooleantype SUNRCompare(sunrealtype a, sunrealtype b);
+  sunbooleantype SUNRCompareTol(sunrealtype a, sunrealtype b, sunrealtype tol);
+  sunrealtype SUNStrToReal(const char* str);
+
+Additionally, the following header files (and everything in them) will be deprecated -- users who
+rely on these are recommended to transition to the corresponding :c:type:`SUNMatrix` and
+:c:type:`SUNLinearSolver` modules:
+
+.. code-block:: c
+
+  sundials_direct.h
+  sundials_dense.h
+  sundials_band.h
+
+**Minor changes**
+
+Fixed `GitHub Issue #329 <https://github.com/LLNL/sundials/issues/329>`_ so
+that C++20 aggregate initialization can be used.
+
+Fixed integer overflow in the internal SUNDIALS hashmap. This resolves
+`GitHub Issues #409 <https://github.com/LLNL/sundials/issues/409>`_ and
+`#249 <https://github.com/LLNL/sundials/issues/249>`_.
+
+The ``CMAKE_BUILD_TYPE`` defaults to ``RelWithDebInfo`` mode now i.e., SUNDIALS
+will be built with optimizations and debugging symbols enabled by default.
+Previously the build type was unset by default so no optimization or debugging
+flags were set.
+
+The advanced CMake options to override the inferred LAPACK name-mangling scheme
+have been updated from ``SUNDIALS_F77_FUNC_CASE`` and
+``SUNDIALS_F77_FUNC_UNDERSCORES`` to :cmakeop:`SUNDIALS_LAPACK_CASE` and
+:cmakeop:`SUNDIALS_LAPACK_UNDERSCORES`, respectively.
+
+Converted most previous Fortran 77 and 90 examples to use SUNDIALS' Fortran 2003
+interface.
+
+Changes in v5.7.0
+-----------------
+
+Added the :c:type:`SUNAdaptController` base class, ported ARKODE's internal
+implementations of time step controllers into implementations of this class,
+and updated ARKODE to use these objects instead of its own implementations.  Added
+:c:func:`ARKStepSetAdaptController` and :c:func:`ERKStepSetAdaptController`
+routines so that users can modify controller parameters, or even provide custom
+implementations.
+
+Added the routines :c:func:`ARKStepSetAdaptivityAdjustment` and
+:c:func:`ERKStepSetAdaptivityAdjustment`, that allow users to adjust the
+value for the method order supplied to the temporal adaptivity controllers.
+The ARKODE default for this adjustment has been :math:`-1` since its initial
+release, but for some applications a value of :math:`0` is more appropriate.
+Users who notice that their simulations encounter a large number of
+temporal error test failures may want to experiment with adjusting this value.
+
+Added the third order ERK method ``ARKODE_SHU_OSHER_3_2_3``, the fourth order
+ERK method ``ARKODE_SOFRONIOU_SPALETTA_5_3_4``, the sixth order ERK method
+``ARKODE_VERNER_9_5_6``, the seventh order ERK method ``ARKODE_VERNER_10_6_7``,
+the eighth order ERK method ``ARKODE_VERNER_13_7_8``, and the ninth order ERK
+method ``ARKODE_VERNER_16_8_9``.
+
+ARKStep, ERKStep, MRIStep, and SPRKStep were updated to remove a potentially
+unnecessary right-hand side evaluation at the end of an integration. ARKStep was
+additionally updated to remove extra right-hand side evaluations when using an
+explicit method or an implicit method with an explicit first stage.
+
+Improved computational complexity of ``SUNMatScaleAddI_Sparse`` from ``O(M*N)``
+to ``O(NNZ)``.
+
+Added Fortran support for the LAPACK  dense ``SUNLinearSolver`` implementation.
+
+Fixed a regression introduced by the stop time bug fix in v6.6.1 where ARKODE
+steppers would return at the stop time rather than the requested output time if
+the stop time was reached in the same step in which the output time was passed.
+
+Fixed a bug in ERKStep where methods with :math:`c_s = 1` but
+:math:`a_{s,j} \neq b_j` were incorrectly treated as having the first same as
+last (FSAL) property.
+
+Fixed a bug in ARKODE where :c:func:`ARKStepSetInterpolateStopTime` would return
+an interpolated solution at the stop time in some cases when interpolation was
+disabled.
+
+Fixed a bug in :c:func:`ARKStepSetTableNum` wherein it did not recognize
+`ARKODE_ARK2_ERK_3_1_2` and `ARKODE_ARK2_DIRK_3_1_2` as a valid additive
+Runge--Kutta Butcher table pair.
+
+Fixed a bug in :c:func:`MRIStepCoupling_Write` where explicit coupling tables
+were not written to the output file pointer.
+
+The :c:type:`MRIStepInnerStepper` class in MRIStep was updated to make supplying
+an :c:func:`MRIStepInnerFullRhsFn` optional.
+
+Fixed scaling bug in ``SUNMatScaleAddI_Sparse`` for non-square matrices.
+
+Changed the ``SUNProfiler`` so that it does not rely on ``MPI_WTime`` in any case.
+This fixes `GitHub Issue #312 <https://github.com/LLNL/sundials/issues/312>`_.
+
+Fixed missing soversions in some ``SUNLinearSolver`` and ``SUNNonlinearSolver``
+CMake targets.
+
+Changes in v5.6.2
+-----------------
+
+Fixed the build system support for MAGMA when using a NVIDIA HPC SDK installation of CUDA
+and fixed the targets used for rocBLAS and rocSPARSE.
+
+Changes in v5.6.1
+-----------------
+
+Updated the Tpetra NVector interface to support Trilinos 14.
+
+Fixed a memory leak when destroying a CUDA, HIP, SYCL, or system SUNMemoryHelper
+object.
+
+Fixed a bug where the stop time may not be cleared when using normal mode if the
+requested output time is the same as the stop time. Additionally, this fix
+removes an unnecessary interpolation of the solution at the stop time that could
+occur in this case.
+
+Changes in v5.6.0
+-----------------
+
+A new time-stepping module, :ref:`SPRKStep <ARKODE.Mathematics.SPRKStep>`, was
+added to ARKODE. This time-stepper provides explicit symplectic partitioned
+Runge-Kutta methods up to order 10 for separable Hamiltonian systems.
+
+Added support for relaxation Runge-Kutta methods in ERKStep and ARKStep, see
+:numref:`ARKODE.Mathematics.Relaxation`, :numref:`ARKODE.Usage.ERKStep.Relaxation`,
+and :numref:`ARKODE.Usage.ARKStep.Relaxation` for more information.
+
+Added the second order IMEX method from :cite:p:`giraldo2013implicit` as the
+default second order IMEX method in ARKStep. The explicit table is given by
+``ARKODE_ARK2_ERK_3_1_2`` (see :numref:`Butcher.ARK2_ERK`) and the implicit
+table by ``ARKODE_ARK2_DIRK_3_1_2`` (see :numref:`Butcher.ARK2_DIRK`).
+
+Updated the default ARKODE behavior when returning the solution when
+the internal time has reached a user-specified stop time.  Previously, the output
+solution was interpolated to the value of ``tstop``; the default is now to copy the
+internal solution vector.  Users who wish to revert to interpolation may call a new
+routine :c:func:`ARKStepSetInterpolateStopTime`,
+:c:func:`ERKStepSetInterpolateStopTime`, or :c:func:`MRIStepSetInterpolateStopTime`.
+
+A potential bug was fixed when using inequality constraint handling and
+calling :c:func:`ARKStepGetEstLocalErrors` or :c:func:`ERKStepGetEstLocalErrors`
+after a failed step in which an inequality constraint violation occurred. In
+this case, the values returned by :c:func:`ARKStepGetEstLocalErrors` or
+:c:func:`ERKStepGetEstLocalErrors` may have been invalid.
+
+Updated the F2003 utility routines :c:func:`SUNDIALSFileOpen` and :c:func:`SUNDIALSFileClose`
+to support user specification of ``stdout`` and ``stderr`` strings for the output
+file names.
+
+Changes in v5.5.1
+-----------------
+
+Added the functions :c:func:`ARKStepClearStopTime`,
+:c:func:`ERKStepClearStopTime`, and :c:func:`MRIStepClearStopTime` to disable a
+previously set stop time.
+
+Fixed build errors when using SuperLU_DIST with ROCM enabled to target AMD GPUs.
+
+Fixed compilation errors in some SYCL examples when using the ``icx`` compiler.
+
+The default interpolant in ARKODE when using a first order method has been
+updated to a linear interpolant to ensure values obtained by the integrator are
+returned at the ends of the time interval. To restore the previous behavior of
+using a constant interpolant call :c:func:`ARKStepSetInterpolantDegree`,
+:c:func:`ERKStepSetInterpolantDegree`, or :c:func:`MRIStepSetInterpolantDegree`
+and set the interpolant degree to zero before evolving the problem.
+
+Changes in v5.5.0
+-----------------
+
+Added the functions :c:func:`ARKStepGetJac`, :c:func:`ARKStepGetJacTime`,
+:c:func:`ARKStepGetJacNumSteps`, :c:func:`MRIStepGetJac`,
+:c:func:`MRIStepGetJacTime`, and :c:func:`MRIStepGetJacNumSteps` to assist in
+debugging simulations utilizing a matrix-based linear solver.
+
+Added support for the SYCL backend with RAJA 2022.x.y.
+
+Fixed an underflow bug during root finding.
+
+A new capability to keep track of memory allocations made through the ``SUNMemoryHelper``
+classes has been added. Memory allocation stats can be accessed through the
+:c:func:`SUNMemoryHelper_GetAllocStats` function. See the documentation for
+the ``SUNMemoryHelper`` classes for more details.
+
+Added support for CUDA v12.
+
+Fixed an issue with finding oneMKL when using the ``icpx`` compiler with the
+``-fsycl`` flag as the C++ compiler instead of ``dpcpp``.
+
+Fixed the shape of the arrays returned by ``FN_VGetArrayPointer`` functions as well
+as the ``FSUNDenseMatrix_Data``, ``FSUNBandMatrix_Data``, ``FSUNSparseMatrix_Data``,
+``FSUNSparseMatrix_IndexValues``, and ``FSUNSparseMatrix_IndexPointers`` functions.
+Compiling and running code that uses the SUNDIALS Fortran interfaces with
+bounds checking will now work.
+
+Fixed an implicit conversion error in the Butcher table for ESDIRK5(4)7L[2]SA2.
+
 Changes in v5.4.1
 -----------------
 
@@ -127,7 +510,7 @@ Fixed a compilation error with the Intel oneAPI 2022.2 Fortran compiler in the
 Fortran 2003 interface test for the serial ``N_Vector``.
 
 Fixed a bug in the SUNLINSOL_LAPACKBAND and SUNLINSOL_LAPACKDENSE modules
-which would cause the tests to fail on some platforms. 
+which would cause the tests to fail on some platforms.
 
 Changes in v5.4.0
 -----------------
@@ -852,7 +1235,6 @@ utilize a zero initial guess.
 
 A bug was fixed in the ARKODE stepper modules where the stop time may be passed
 after resetting the integrator.
-
 
 Changes in v4.7.0
 -----------------

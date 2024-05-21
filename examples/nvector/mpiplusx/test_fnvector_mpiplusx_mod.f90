@@ -2,7 +2,7 @@
 ! Programmer(s): Cody J. Balos @ LLNL
 ! -----------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -17,7 +17,7 @@
 
 module test_nvector_mpiplusx
   use, intrinsic :: iso_c_binding
-  use fsundials_nvector_mod
+
   use fnvector_mpiplusx_mod
   use fnvector_serial_mod
   use test_utilities
@@ -26,7 +26,6 @@ module test_nvector_mpiplusx
 
   integer(c_long), parameter :: N    = 100            ! overall manyvector length
   integer(c_int), target     :: comm = MPI_COMM_WORLD ! default MPI communicator
-  integer(c_int), pointer    :: commptr
   integer(c_int)             :: nprocs                ! number of MPI processes
 
 contains
@@ -100,7 +99,7 @@ end module
 integer(C_INT) function check_ans(ans, X, local_length) result(failure)
   use, intrinsic :: iso_c_binding
   use fnvector_mpiplusx_mod
-  use fsundials_nvector_mod
+
   use test_utilities
   implicit none
 
@@ -132,7 +131,7 @@ end function check_ans
 
 logical function has_data(X) result(failure)
   use, intrinsic :: iso_c_binding
-  use fsundials_nvector_mod
+
   use test_utilities
   implicit none
 
@@ -165,12 +164,10 @@ program main
     stop 1
   endif
 
-  commptr => comm
-
   !============== Introduction =============
   if (myid == 0) print *, 'MPIPlusX N_Vector Fortran 2003 interface test'
 
-  call Test_Init(c_loc(commptr))
+  call Test_Init(comm)
 
   call MPI_Comm_size(comm, nprocs, fails)
   if (fails /= 0) then

@@ -1,5 +1,346 @@
 # SUNDIALS Changelog
 
+## Changes to SUNDIALS in release v7.0.0
+
+### Major Feature
+
+SUNDIALS now has more robust and uniform error handling. Non-release builds will
+be built with additional error checking by default. See the
+[Error Checking](https://sundials.readthedocs.io/en/latest/sundials/Errors_link.html)
+section in the user guide for details.
+
+### Breaking Changes
+
+#### Minimum C Standard
+
+SUNDIALS now requires using a compiler that supports a subset of the C99
+standard. Note with the Microsoft C/C++ compiler the subset of C99 features
+utilized by SUNDIALS are available starting with [Visual Studio 2015](https://learn.microsoft.com/en-us/cpp/overview/visual-cpp-language-conformance?view=msvc-170#c-standard-library-features-1).
+
+#### Deprecated Types and Functions Removed
+
+The previously deprecated types `realtype` and `booleantype` were removed from
+`sundials_types.h` and replaced with `sunrealtype` and `sunbooleantype`. The
+deprecated names for these types can be used by including the header file
+`sundials_types_deprecated.h` but will be fully removed in the next major
+release. Functions, types and header files that were previously deprecated have
+also been removed.
+
+#### Error Handling Changes
+
+With the addition of the new error handling capability, the `*SetErrHandlerFn`
+and `*SetErrFile` functions in CVODE(S), IDA(S), ARKODE, and KINSOL have been
+removed. Users of these functions can use the functions
+`SUNContext_PushErrHandler`, and `SUNLogger_SetErrorFilename` instead. For
+further details see the
+[Error Checking](https://sundials.readthedocs.io/en/latest/sundials/Errors_link.html)
+and
+[Logging](https://sundials.readthedocs.io/en/latest/sundials/Logging_link.html)
+sections in the documentation.
+
+In addition the following names/symbols were replaced by ``SUN_ERR_*`` codes:
+
+| Removed                        | Replaced with ``SUNErrCode``      |
+|:-------------------------------|:----------------------------------|
+| `SUNLS_SUCCESS`                | `SUN_SUCCESS`                     |
+| `SUNLS_UNRECOV_FAILURE`        | no replacement (value was unused) |
+| `SUNLS_MEM_NULL`               | `SUN_ERR_ARG_CORRUPT`             |
+| `SUNLS_ILL_INPUT`              | `SUN_ERR_ARG_*`                   |
+| `SUNLS_MEM_FAIL`               | `SUN_ERR_MEM_FAIL`                |
+| `SUNLS_PACKAGE_FAIL_UNREC`     | `SUN_ERR_EXT_FAIL`                |
+| `SUNLS_VECTOROP_ERR`           | `SUN_ERR_OP_FAIL`                 |
+| `SUN_NLS_SUCCESS`              | `SUN_SUCCESS`                     |
+| `SUN_NLS_MEM_NULL`             | `SUN_ERR_ARG_CORRUPT`             |
+| `SUN_NLS_MEM_FAIL`             | `SUN_ERR_MEM_FAIL`                |
+| `SUN_NLS_ILL_INPUT`            | `SUN_ERR_ARG_*`                   |
+| `SUN_NLS_VECTOROP_ERR`         | `SUN_ERR_OP_FAIL`                 |
+| `SUN_NLS_EXT_FAIL`             | `SUN_ERR_EXT_FAIL`                |
+| `SUNMAT_SUCCESS`               | `SUN_SUCCESS`                     |
+| `SUNMAT_ILL_INPUT`             | `SUN_ERR_ARG_*`                   |
+| `SUNMAT_MEM_FAIL`              | `SUN_ERR_MEM_FAIL`                |
+| `SUNMAT_OPERATION_FAIL`        | `SUN_ERR_OP_FAIL`                 |
+| `SUNMAT_MATVEC_SETUP_REQUIRED` | `SUN_ERR_OP_FAIL`                 |
+
+The following functions have had their signature updated to ensure they can
+leverage the new SUNDIALS error handling capabilities.
+
+```c
+// From sundials_futils.h
+SUNDIALSFileOpen
+SUNDIALSFileClose
+
+// From sundials_memory.h
+SUNMemorNewEmpty
+SUNMemoryHelper_Alias
+SUNMemoryHelper_Wrap
+
+// From sundials_nvector.h
+N_VNewVectorArray
+```
+
+#### SUNComm Type Added
+
+We have replaced the use of a type-erased (i.e., `void*`) pointer to a
+communicator in place of `MPI_Comm` throughout the SUNDIALS API with a
+`SUNComm`, which is just a typedef to an `int` in builds without MPI
+and a typedef to a `MPI_Comm` in builds with MPI. As a result:
+
+- All users will need to update their codes because the call to
+  `SUNContext_Create` now takes a `SUNComm` instead
+  of type-erased pointer to a communicator. For non-MPI codes,
+  pass `SUN_COMM_NULL` to the `comm` argument instead of
+  `NULL`. For MPI codes, pass the `MPI_Comm` directly.
+
+- The same change must be made for calls to
+  `SUNLogger_Create` or `SUNProfiler_Create`.
+
+- Some users will need to update their calls to `N_VGetCommunicator`, and
+  update any custom `N_Vector` implementations that provide
+  `N_VGetCommunicator`, since it now returns a `SUNComm`.
+
+The change away from type-erased pointers for `SUNComm` fixes problems like the
+one described in [GitHub Issue #275](https://github.com/LLNL/sundials/issues/275).
+
+The SUNLogger is now always MPI-aware if MPI is enabled in SUNDIALS and the
+`SUNDIALS_LOGGING_ENABLE_MPI` CMake option and macro definition were removed
+accordingly.
+
+#### SUNDIALS Core Library
+
+Users now need to link to `sundials_core` in addition to the libraries already
+linked to. This will be picked up automatically in projects that use the
+SUNDIALS CMake target. The library `sundials_generic` has been superseded by
+`sundials_core` and is no longer available. This fixes some duplicate symbol
+errors on Windows when linking to multiple SUNDIALS libraries.
+
+#### Fortran Interface Modules Streamlined
+
+We have streamlined the Fortran modules that need to be included by users by combining
+the SUNDIALS core into one Fortran module, `fsundials_core_mod`. Modules for
+implementations of the core APIs still exist (e.g., for the Dense linear solver there
+is `fsunlinsol_dense_mod`) as do the modules for the SUNDIALS packages (e.g., `fcvode_mod`).
+The following modules are the ones that have been consolidated into `fsundials_core_mod`:
+
+```
+fsundials_adaptcontroller_mod
+fsundials_context_mod
+fsundials_futils_mod
+fsundials_linearsolver_mod
+fsundials_logger_mod
+fsundials_matrix_mod
+fsundials_nonlinearsolver_mod
+fsundials_nvector_mod
+fsundials_profiler_mod
+fsundials_types_mod
+```
+
+
+### Deprecation notice
+
+The functions in `sundials_math.h` will be deprecated in the next release.
+
+```c
+  sunrealtype SUNRpowerI(sunrealtype base, int exponent);
+  sunrealtype SUNRpowerR(sunrealtype base, sunrealtype exponent);
+  sunbooleantype SUNRCompare(sunrealtype a, sunrealtype b);
+  sunbooleantype SUNRCompareTol(sunrealtype a, sunrealtype b, sunrealtype tol);
+  sunrealtype SUNStrToReal(const char* str);
+```
+
+Additionally, the following header files (and everything in them) will be
+deprecated -- users who rely on these are recommended to transition to the
+corresponding `SUNMatrix` and `SUNLinearSolver` modules:
+
+```c
+sundials_direct.h
+sundials_dense.h
+sundials_band.h
+```
+
+### Minor Changes
+
+Fixed [#329](https://github.com/LLNL/sundials/issues/329) so that C++20 aggregate initialization can be used.
+
+Fixed integer overflow in the internal SUNDIALS hashmap. This resolves
+[#409](https://github.com/LLNL/sundials/issues/409) and
+[#249](https://github.com/LLNL/sundials/issues/249).
+
+The `CMAKE_BUILD_TYPE` defaults to `RelWithDebInfo` mode now i.e., SUNDIALS
+will be built with optimizations and debugging symbols enabled by default.
+Previously the build type was unset by default so no optimization or debugging
+flags were set.
+
+The advanced CMake options to override the inferred LAPACK name-mangling scheme
+have been updated from `SUNDIALS_F77_FUNC_CASE` and
+`SUNDIALS_F77_FUNC_UNDERSCORES` to `SUNDIALS_LAPACK_CASE` and
+`SUNDIALS_LAPACK_UNDERSCORES`, respectively.
+
+Converted most previous Fortran 77 and 90 examples to use SUNDIALS' Fortran 2003
+interface.
+
+## Changes to SUNDIALS in release 6.7.0
+
+Added the `SUNAdaptController` base class, ported ARKODE's internal
+implementations of time step controllers into implementations of this class,
+and updated ARKODE to use these objects instead of its own implementations.
+Added `ARKStepSetAdaptController` and `ERKStepSetAdaptController` routines
+so that users can modify controller parameters, or even provide custom
+implementations.
+
+Added the routines `ARKStepSetAdaptivityAdjustment` and
+`ERKStepSetAdaptivityAdjustment`, that allow users to adjust the
+value for the method order supplied to the temporal adaptivity controllers.
+The ARKODE default for this adjustment has been -1 since its initial
+release, but for some applications a value of 0 is more appropriate.
+Users who notice that their simulations encounter a large number of
+temporal error test failures may want to experiment with adjusting this value.
+
+Added the third order ERK method `ARKODE_SHU_OSHER_3_2_3`, the fourth order
+ERK method `ARKODE_SOFRONIOU_SPALETTA_5_3_4`, the sixth order ERK method
+`ARKODE_VERNER_9_5_6`, the seventh order ERK method `ARKODE_VERNER_10_6_7`,
+the eighth order ERK method `ARKODE_VERNER_13_7_8`, and the ninth order ERK
+method `ARKODE_VERNER_16_8_9`.
+
+ARKStep, ERKStep, MRIStep, and SPRKStep were updated to remove a potentially
+unnecessary right-hand side evaluation at the end of an integration. ARKStep was
+additionally updated to remove extra right-hand side evaluations when using an
+explicit method or an implicit method with an explicit first stage.
+
+Improved computational complexity of `SUNMatScaleAddI_Sparse` from `O(M*N)` to
+`O(NNZ)`.
+
+Added Fortran support for the LAPACK dense `SUNLinearSolver` implementation.
+
+Fixed a regression introduced by the stop time bug fix in v6.6.1 where ARKODE,
+CVODE, CVODES, IDA, and IDAS would return at the stop time rather than the
+requested output time if the stop time was reached in the same step in which the
+output time was passed.
+
+Fixed a bug in ERKStep where methods with `c[s-1] = 1` but `a[s-1,j] != b[j]`
+were incorrectly treated as having the first same as last (FSAL) property.
+
+Fixed a bug in ARKODE where `ARKStepSetInterpolateStopTime` would return an
+interpolated solution at the stop time in some cases when interpolation was
+disabled.
+
+Fixed a bug in `ARKStepSetTableNum` wherein it did not recognize
+`ARKODE_ARK2_ERK_3_1_2` and `ARKODE_ARK2_DIRK_3_1_2` as a valid additive
+Runge--Kutta Butcher table pair.
+
+Fixed a bug in `MRIStepCoupling_Write` where explicit coupling tables were not
+written to the output file pointer.
+
+The `MRIStepInnerStepper` class in MRIStep was updated to make supplying an
+`MRIStepInnerFullRhsFn` optional.
+
+Fixed scaling bug in `SUNMatScaleAddI_Sparse` for non-square matrices.
+
+Changed the `SUNProfiler` so that it does not rely on `MPI_WTime` in any case.
+This fixes [GitHub Issue #312](https://github.com/LLNL/sundials/issues/312).
+
+Fixed missing soversions in some `SUNLinearSolver` and `SUNNonlinearSolver`
+CMake targets.
+
+Renamed some internal types in CVODES and IDAS to allow both packages to be
+built together in the same binary.
+
+## Changes to SUNDIALS in release 6.6.2
+
+Fixed the build system support for MAGMA when using a NVIDIA HPC SDK installation of CUDA
+and fixed the targets used for rocBLAS and rocSPARSE.
+
+## Changes to SUNDIALS in release 6.6.1
+
+Updated the Tpetra NVector interface to support Trilinos 14.
+
+Fixed a memory leak when destroying a CUDA, HIP, SYCL, or system SUNMemoryHelper
+object.
+
+Fixed a bug in ARKODE, CVODE, CVODES, IDA, and IDAS where the stop time may not
+be cleared when using normal mode if the requested output time is the same as
+the stop time. Additionally, with ARKODE, CVODE, and CVODES this fix removes an
+unnecessary interpolation of the solution at the stop time that could occur in
+this case.
+
+## Changes to SUNDIALS in release 6.6.0
+
+A new time-stepping module, `SPRKStep`, was added to ARKODE. This time-stepper
+provides explicit symplectic partitioned Runge-Kutta methods up to order 10
+for separable Hamiltonian systems.
+
+Added support for relaxation Runge-Kutta methods to ERKStep and ARKStep in
+ARKODE.
+
+Added the second order IMEX method from Giraldo, Kelly, and Constantinescu 2013
+as the default second order IMEX method in ARKStep. The explicit table is given
+by `ARKODE_ARK2_ERK_3_1_2` and the implicit table by `ARKODE_ARK2_DIRK_3_1_2`.
+
+Updated CVODE, CVODES and ARKODE default behavior when returning the solution when
+the internal time has reached a user-specified stop time.  Previously, the output
+solution was interpolated to the value of `tstop`; the default is now to copy the
+internal solution vector.  Users who wish to revert to interpolation may call a new
+routine `CVodeSetInterpolateStopTime`, `ARKStepSetInterpolateStopTime`,
+`ERKStepSetInterpolateStopTime`, or `MRIStepSetInterpolateStopTime`.
+
+A potential bug was fixed when using inequality constraint handling and
+calling `ARKStepGetEstLocalErrors` or `ERKStepGetEstLocalErrors` after a failed
+step in which an inequality constraint violation occurred. In this case, the
+values returned by `ARKStepGetEstLocalErrors` or `ERKStepGetEstLocalErrors` may
+have been invalid.
+
+Updated the F2003 utility routines `SUNDIALSFileOpen` and `SUNDIALSFileClose`
+to support user specification of `stdout` and `stderr` strings for the output
+file names.
+
+## Changes to SUNDIALS in release 6.5.1
+
+Added the functions `ARKStepClearStopTime`, `ERKStepClearStopTime`,
+`MRIStepClearStopTime`, `CVodeClearStopTime`, and `IDAClearStopTime` to
+disable a previously set stop time.
+
+Fixed build errors when using SuperLU_DIST with ROCM enabled to target AMD GPUs.
+
+Fixed compilation errors in some SYCL examples when using the `icx` compiler.
+
+The default interpolant in ARKODE when using a first order method has been
+updated to a linear interpolant to ensure values obtained by the integrator are
+returned at the ends of the time interval. To restore the previous behavior of
+using a constant interpolant call `ARKStepSetInterpolantDegree`,
+`ERKStepSetInterpolantDegree`, or `MRIStepSetInterpolantDegree` and set the
+interpolant degree to zero before evolving the problem.
+
+## Changes to SUNDIALS in release 6.5.0
+
+Added the functions `ARKStepGetJac`, `ARKStepGetJacTime`,
+`ARKStepGetJacNumSteps`, `MRIStepGetJac`, `MRIStepGetJacTime`,
+`MRIStepGetJacNumSteps`, `CVodeGetJac`, `CVodeGetJacTime`,
+`CVodeGetJacNumSteps`, `IDAGetJac`, `IDAGetJacCj`, `IDAGetJacTime`,
+`IDAGetJacNumSteps`, `KINGetJac`, `KINGetJacNumIters` to assist in
+debugging simulations utilizing a matrix-based linear solver.
+
+Added support for the SYCL backend with RAJA 2022.x.y.
+
+Fixed an underflow bug during root finding in ARKODE, CVODE, CVODES, IDA and
+IDAS.
+
+Fixed an issue with finding oneMKL when using the `icpx` compiler with the
+`-fsycl` flag as the C++ compiler instead of `dpcpp`.
+
+Fixed the shape of the arrays returned by `FN_VGetArrayPointer` functions as well
+as the `FSUNDenseMatrix_Data`, `FSUNBandMatrix_Data`, `FSUNSparseMatrix_Data`,
+`FSUNSparseMatrix_IndexValues`, and `FSUNSparseMatrix_IndexPointers` functions.
+Compiling and running code that uses the SUNDIALS Fortran interfaces with
+bounds checking will now work.
+
+Fixed an implicit conversion error in the Butcher table for ESDIRK5(4)7L[2]SA2.
+
+A new capability to keep track of memory allocations made through the `SUNMemoryHelper`
+classes has been added. Memory allocation stats can be accessed through the
+`SUNMemoryHelper_GetAllocStats` function. See the documentation for
+the `SUNMemoryHelper` classes for more details.
+
+Added support for CUDA 12.
+
 ## Changes to SUNDIALS in release 6.4.1
 
 Fixed a bug with the Kokkos interfaces that would arise when using clang.
@@ -8,7 +349,7 @@ Fixed a compilation error with the Intel oneAPI 2022.2 Fortran compiler in the
 Fortran 2003 interface test for the serial `N_Vector`.
 
 Fixed a bug in the SUNLINSOL_LAPACKBAND and SUNLINSOL_LAPACKDENSE modules
-which would cause the tests to fail on some platforms. 
+which would cause the tests to fail on some platforms.
 
 ## Changes to SUNDIALS in release 6.4.0
 
@@ -235,7 +576,7 @@ different reduction implementations.
 `SUNDIALS::<lib>` targets with no static/shared suffix have been added for use
 within the build directory (this mirrors the targets exported on installation).
 
-``CMAKE_C_STANDARD`` is now set to 99 by default.
+`CMAKE_C_STANDARD` is now set to 99 by default.
 
 Fixed exported `SUNDIALSConfig.cmake` when profiling is enabled without Caliper.
 
@@ -1774,3 +2115,196 @@ Corrected KINSOL fcmix name translation for `FKIN_SPFGMR`.
 Renamed `KINLocalFn` and `KINCommFn` to `KINBBDLocalFn` and `KINBBDCommFn`
 respectively in the BBD preconditioner module for consistency with other
 SUNDIALS solvers.
+
+## Changes to SUNDIALS in release v2.7.0
+
+- Two new NVECTOR modules added: for _hypre_ ParVector and PETSC.
+- In vector API, added new required function, N\_VGetVectorID.
+- Upgrades to sparse solver interfaces; now support CSR matrix type with KLU solver.
+- In all packages, example codes were changed from using NV\_DATA macro to using N\_VGetArrayPointer\_\* when using the native vectors shipped with SUNDIALS
+- In all packages, fixed memory leak in banded preconditioner interface.
+- Fixed some examples w.r.t. switch to new macro/function names SUNRexp etc.
+- Various minor fixes to installation-related files.
+- Corrected name N\_VCloneEmptyVectorArray to N\_VCloneVectorArrayEmpty in all documentation files.
+- Updated all packages to return integers from linear solver and preconditioner 'free' functions.
+- Removed Matlab interface from distribution as it has not been updated since 2009. We expect to update this interface soon.
+- In FKINSOL, FCVODE, and FIDA, added missing Fortran interface routines so that users can supply the sparse Jacobian routine.
+- Minor corrections and additions to all User Guides, including removal of references to specific NVECTOR names in usage skeletons.
+- Additional example programs added throughout.
+- In CVODE
+  - in FCVODE, fixed argument order bugs in FCVKLU and FCVSUPERLUMT linear solver interfaces.
+- In CVODES
+  - changed each \*\*FreeB() to type int; added return(0) to each.
+  - in interpolation routines for backward problems, added logic to bypass sensitivity interpolation if input sensitivity argument is NULL.
+- In ARKODE
+  - updated linear and mass matrix solvers so that 'free' routines return integer instead of void; updated documentation accordingly.
+  - fixed initialization of linear solver performance counters.
+  - method and embedding for Billington and TRBDF2 explicit Runge-Kutta methods were swapped.
+  - fix for user specification of absolute tolerance array along with vector Resize() functionality.
+  - fix for user-supplied Butcher tables without embeddings (if fixed time steps or manual adaptivity are employed).
+  - multiple documentation updates.
+  - added missing ARKSpilsGetNumMtimesEvals() function.
+  - implicit predictor algorithms were updated: methods 2 and 3 were improved, a new predictor approach was added, and the default choice was modified.
+  - revised handling of integer codes for specifying built-in Butcher tables: a global numbering system is still used, but methods now have #defined names to simplify the user interface.
+  - maximum number of Butcher table stages was increased from 8 to 15 to accommodate very high-order methods, and an 8th-order adaptive ERK method was added.
+  - added support for the explicit and implicit methods in an additive Runge-Kutta method to utilize different stage times, solution and embedding coefficients, to support new SSP-ARK methods.
+  - extended FARKODE interface to include a routine to set scalar/array-valued residual tolerances, to support Fortran applications with non-identity mass-matrices.
+- In IDA
+  - corrected example idaFoodWeb\_bnd.c in PrintOutput (wrong component printed).
+  - added optional input function IDASetMaxBacksIC to limit number of linesearch backtrack operations in IDACalcIC. User guides amended accordingly.
+- In IDAS
+  - added optional input function IDASetMaxBacksIC to limit number of linesearch backtrack operations in IDACalcIC. User guides amended accordingly.
+  - changed each \*\*FreeB() to type int; added return(0) to each.
+  - in interpolation routines for backward problems, added logic to bypass sensitivity interpolation if input sensitivity argument is NULL.
+- In KINSOL
+  - minor bug fix in Picard iteration.
+  - minor bug fix in line search to prevent infinite loop when beta condition fails and lambda is below minimum size.
+
+## Changes to SUNDIALS in release v2.6.2
+
+- In IDAS, added missing backward problem support functions: IDALapackDenseB, IDALapackDenseFreeB, IDALapackBandB, IDALapackBandFreeB
+- In KINSOL and ARKode, updated Anderson acceleration implementation with QR updating.
+- Updated BiCGStab solver to remove redundant dot product call.
+- Minor corrections and additions to all User Guides.
+- In CVODES and IDAS header files, corrected documentation of backward integration functions, especially the 'which' argument.
+- In CVODES, added DVKLUB prototype and corrected CVSuperLUMTB prototype.
+- In IDAS, made SuperLUMT call for backward problem consistent with CVODES.
+- In CVODES and IDAS, added ReInit and SetOrdering wrappers for backward problems. Fixed potential memory leak in KLU ReInit functions in all solvers.
+- In CVODE, IDA, and ARKode, fixed Fortran interfaces to enable calls to \*GetErrWeights, \*GetEstLocalErrors, and \*GetDky within a time step. In ARKode, fixed a bug in one Butcher table.
+- In ARKode, fixed error in arkDoErrorTest in recovery after failure.
+- In IDAS, fixed for-loop bugs in IDAAckpntAllocVectors Various minor fixes to installation-related files.
+
+## Changes to SUNDIALS in release v2.6.1
+
+- Fixed loop limit bug in SlsAddMat function.
+- In all six solver interfaces to KLU and SuperLUMT, added #include lines, and removed redundant KLU structure allocations.
+- Numerous minor documentation improvements
+- Minor bug fixes in ARKode
+
+## Changes to SUNDIALS in release v2.6.0
+
+- Addition of ARKode package of explicit, implicit, and additive Runge-Kutta methods for ODES. This package API is close to CVODE so switching between the two should be straightforward. Thanks go to Daniel Reynolds for the addition of this package.
+- Addition of support for two sparse direct solver packages when using the serial vector structure, KLU and SuperLU\_MT. exploits highly sparse systems. SuperLU\_MT supports multithreading in the factorization.
+- Addition of openMP and PThreads vector kernels.
+- Addition of fixed point and Picard iterative solvers within KINSOL. These are both optionally accelerated with Anderson acceleration.
+- Addition of FGMRES support for KINSOL.
+- Removal of autotools configuration support. We now exclusively use CMake.
+- Numerous bug fixes throughout.
+
+## Changes to SUNDIALS in release v2.5.0
+
+- Changes to user interface
+  - Problem size and related integers (bandwidth parameters etc.) all have type long int, except in BLAS and LAPACK routines. Function NewIntArray is replaced by a pair NewIntArray/NewLintArray, for int and long int arrays, respectively.
+
+## Changes to SUNDIALS in release v2.4.0
+
+- New features
+  - new linear solver module, based on Blas and Lapack for both dense and banded matrices.
+- Changes to user interface
+  - reorganization of all linear solver modules into two families (besides the existing family of scaled preconditioned iterative linear solvers, the direct solvers, including the new Lapack-based ones, were also organized into a direct family).
+- Changes related to the build system
+  - provide CMake-based build option, in addition to that based on autotools.
+
+## Changes to SUNDIALS in release v2.3.0
+
+- Changes to the user interface
+  - modified the functions in the generic dense linear solver (sundials\_dense and sundials\_smalldense) to work for rectangular m by n matrices (m ≤ n).
+  - renamed the factorization and solution functions in the generic dense linear solver to DenseGETRF/denGETRF and DenseGETRS/denGETRS, respectively.
+  - renamed the factorization and solution functions in the generic band linear solver to BandGBTRF and BandGBTRS, respectively.
+- Changes related to the build system
+  - rearranged the entire SUNDIALS source tree
+  - all exported header files are now installed in separate subdirectories of the installation include directory
+  - header files are included now by specifying the relative path (e.g., #include \<sundials/sundials\_types.h\>)
+
+## Changes to SUNDIALS in release v2.2.0
+
+- New features
+  - added SPBCG (scaled preconditioned Bi-CGStab) linear solver module
+  - added SPTFQMR (scaled preconditioned TFQMR) linear solver module
+- Changes related to the build system
+  - updated configure script and Makefiles for Fortran examples to avoid C++ compiler errors (now use CC and MPICC to link only if necessary)
+  - SUNDIALS shared header files are installed under a sundials subdirectory of the installation include directory
+  - the shared object files are now linked into each SUNDIALS library rather than into a separate libsundials\_shared library
+- Changes to the user interface
+  - added prefix sundials\_ to all shared header files
+
+## Changes to SUNDIALS in release v2.1.1
+
+- Changes to the generic NVECTOR module
+  - N\_VCloneEmpty was added to the global vector operations table
+
+## Changes to SUNDIALS in release v2.0.2
+
+- Changes related to the build system
+  - fixed autoconf-related bug to allow configuration with the PGI Fortran compiler
+  - modified to use customized detection of the Fortran name mangling scheme (autoconf's AC\_F77\_WRAPPERS routine is problematic on some platforms)
+
+## Changes to SUNDIALS in release v2.0.1
+
+- Changes related to the build system
+  - changed order of compiler directives in header files to avoid compilation errors when using a C++ compiler.
+  - changed method of generating sundials\_config.h to avoid potential warnings of redefinition of preprocessor symbols.
+
+## Changes to SUNDIALS in release v2.0.0
+
+- Changes to the generic NVECTOR module
+  - removed machEnv, redefined table of vector operations (now contained in the N\_Vector structure itself).
+  - all SUNDIALS functions create new N\_Vector variables through cloning, using an N\_Vector passed by the user as a template.
+  - a particular NVECTOR implementation is supposed to provide user-callable constructor and destructor functions.
+  - removed from structure of vector operations the following functions: N\_VNew, N\_VNew\_S, N\_VFree, N\_VFree\_S, N\_VMake, N\_VDispose, N\_VGetData, N\_VSetData, N\_VConstrProdPos, and N\_VOneMask.
+  - added in structure of vector operations the following functions: N\_VClone, N\_VDestroy, N\_VSpace, N\_VGetArrayPointer, N\_VSetArrayPointer, and N\_VWrmsNormMask.
+  - Note that nvec\_ser and nvec\_par are now separate modules outside the shared SUNDIALS module.
+- Changes to the generic linear solvers
+  - in SPGMR, added a dummy N\_Vector argument to be used as a template for cloning.
+  - in SPGMR, removed N (problem dimension) from argument list of SpgmrMalloc.
+  - iterative.{c,h} replace iterativ.{c,h}
+  - modified constant names in iterative.h (preconditioner types are prefixed with 'PREC\_').
+  - changed numerical values for MODIFIED\_GS (from 0 to 1) and CLASSICAL\_GS (from 1 to 2).
+- Changes to sundialsmath submodule
+  - replaced internal routine for estimation of unit roundoff with definition of unit roundoff from float.h
+  - modified functions to call appropriate math routines given the precision level specified by the user.
+- Changes to sundialstypes submodule
+  - removed type 'integertype'.
+  - added definitions for 'BIG\_REAL', 'SMALL\_REAL', and 'UNIT\_ROUNDOFF' using values from float.h based on the precision.
+  - changed definition of macro RCONST to depend on precision.
+
+# sundialsTB
+
+sundialsTB is no longer distributed as of sundials v. 2.7.0 as it has not been updated in many years.
+
+## What's new in v2.5.0?
+
+- Bug fixes
+  - fixed lines setting etachoice in kimOpts.c
+  - in cvm.c and idm.c, fixed size of rootsfound array; added lines to free rootsfound and ckpnt arrays when done using each
+- What's new in v2.4.0?
+- New Features
+  - the Matlab interface to IDAS was extended to provide sensitivity analysis capabilities.
+- Changes to user interface
+  - the API for adjoint sensitivity analysis (cvodes and idas) was modified to support simultaneous integration of multiple backward problems.
+
+## What's new in v2.3.0?
+
+- New features
+  - added Matlab interface to IDA (named idas)
+  - on platforms which support configure scripts, installation of sundialsTB can now be enabled while configuring SUNDIALS and installed through make and make install (provided a working MEX compiler is found).
+- Bug fixes
+  - the installation script install\_STB.m was modified to increase robustness on various platforms (related to path and file names).
+- Changes to user interface
+  - (cvodes) for improved legibility, some of the keys for forward sensitivity optional inputs were renamed.
+  - (cvodes) removed xaxis type option for the internal monitoring function CVodeMonitor.
+
+## What's new in v2.2.0?
+
+- New features
+  - modified installation procedure to use a Matlab script
+  - added sample Matlab startup file
+  - (cvodes) expanded CVodeMonitor
+  - (kinsol) added interface to KINSOL's performance monitoring function ('Verbose' option to KINSetOptions)
+- Bug fixes
+  - (cvodes) fixed bug in interface to quadrature integration which was causing a segmentation violation when monitoring was turned on.
+- Changes to user interface
+  - updated to reflect changes to the SUNDIALS libraries in v.2.2.0
+  - (cvodes) changed the interface for sensitivity analysis (both forward and adjoint) to follow more closely the CVODES calling sequence
+  - (cvodes) optional inputs for forward sensitivity analysis are now provided through a separate function, CVodeSensSetOptions
+  - removed NVM mex interface

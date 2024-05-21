@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -53,7 +53,7 @@ foreach(example_tuple ${examples_list})
       # libraries to link against
       target_link_libraries(${example_target}
         PRIVATE
-        sundials_generic
+        sundials_core
         sundials_nveckokkos
         sundials_sunmatrixkokkosdense
         ${EXE_EXTRA_LINK_LIBS}

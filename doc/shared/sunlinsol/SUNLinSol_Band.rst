@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -60,15 +60,6 @@ The SUNLinSol_Band module provides the following user-callable constructor routi
       Additionally, this routine will verify that the input matrix ``A``
       is allocated with appropriate upper bandwidth storage for the :math:`LU`
       factorization.
-
-
-For backwards compatibility, we also provide the following wrapper function:
-
-.. c:function:: SUNLinearSolver SUNBandLinearSolver(N_Vector y, SUNMatrix A)
-
-   Wrapper function for :c:func:`SUNLinSol_Band`, with identical input and
-   output arguments.
-
 
 
 .. _SUNLinSol_Band.Description:

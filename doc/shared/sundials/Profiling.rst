@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -48,6 +48,11 @@ If Caliper is enabled, then users should refer to the `Caliper documentation <ht
 for information on getting profiler output. In most cases, this involves
 setting the ``CALI_CONFIG`` environment variable.
 
+
+.. note:: 
+
+   The SUNDIALS profiler requires POSIX timers or the Windows ``profileapi.h`` timers.
+
 .. warning::
 
    While the SUNDIALS profiling scheme is relatively lightweight, enabling
@@ -86,7 +91,7 @@ a function, and leverages RAII to implicitly end the region.
 The ``profobj`` argument to the macro should be a ``SUNProfiler`` object, i.e.
 an instance of the struct
 
-.. c:type:: struct _SUNProfiler *SUNProfiler
+.. c:type:: struct SUNProfiler_ *SUNProfiler
 
 When SUNDIALS is built with profiling, a default profiling object is stored in the
 ``SUNContext`` object and can be accessed with a call to
@@ -101,12 +106,12 @@ In addition to the macros, the following methods of the ``SUNProfiler`` class
 are available.
 
 
-.. c:function:: int SUNProfiler_Create(void* comm, const char* title, SUNProfiler* p)
+.. c:function:: int SUNProfiler_Create(SUNComm comm, const char* title, SUNProfiler* p)
 
    Creates a new ``SUNProfiler`` object.
 
    **Arguments:**
-      * ``comm`` -- a pointer to the MPI communicator if MPI is enabled, otherwise can be ``NULL``
+      * ``comm`` -- the MPI communicator to use, if MPI is enabled, otherwise can be ``SUN_COMM_NULL``.
       * ``title`` -- a title or description of the profiler
       * ``p`` -- [in,out] On input this is a pointer to a ``SUNProfiler``, on output it will point to a new ``SUNProfiler`` instance
 
@@ -144,6 +149,31 @@ are available.
    **Arguments:**
       * ``p`` -- a ``SUNProfiler`` object
       * ``name`` -- a name for the profiling region
+
+   **Returns:**
+      * Returns zero if successful, or non-zero if an error occurred
+
+
+.. c:function:: int SUNProfiler_GetElapsedTime(SUNProfiler p, const char* name, double* time)
+
+   Get the elapsed time for the timer "name" in seconds.
+
+   **Arguments:**
+      * ``p`` -- a ``SUNProfiler`` object
+      * ``name`` -- the name for the profiling region of interest
+      * ``time`` -- upon return, the elapsed time for the timer
+
+   **Returns:**
+      * Returns zero if successful, or non-zero if an error occurred
+
+
+.. c:function:: int SUNProfiler_GetTimerResolution(SUNProfiler p, double* resolution)
+
+   Get the timer resolution in seconds.
+
+   **Arguments:**
+      * ``p`` -- a ``SUNProfiler`` object
+      * ``resolution`` -- upon return, the resolution for the timer
 
    **Returns:**
       * Returns zero if successful, or non-zero if an error occurred
@@ -188,7 +218,7 @@ It is applicable to any of the SUNDIALS solver packages.
    SUNProfiler profobj;
 
    /* Create the SUNDIALS context */
-   retval = SUNContext_Create(NULL, &ctx);
+   retval = SUNContext_Create(SUN_COMM_NULL, &ctx);
 
    /* Get a reference to the profiler */
    retval = SUNContext_GetProfiler(ctx, &profobj);

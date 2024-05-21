@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -24,17 +24,10 @@ sundials_option(USE_XSDK_DEFAULTS BOOL "Enable default xSDK settings" OFF)
 
 if(USE_XSDK_DEFAULTS)
   message(STATUS "Enabling xSDK defaults:")
-
-  # set the CMake build type, SUNDIALS does not set a build type by default
-  if(NOT CMAKE_BUILD_TYPE)
-    message(STATUS "  Setting build type to Debug")
-    set(DOCSTR "Choose the type of build: None Debug Release RelWithDebInfo MinSizeRel")
-    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "${DOCSTR}" FORCE)
-  endif()
 endif()
 
 # ---------------------------------------------------------------
-# Option to specify precision (realtype)
+# Option to specify precision (sunrealtype)
 # ---------------------------------------------------------------
 
 set(DOCSTR "single, double, or extended")
@@ -71,30 +64,44 @@ sundials_option(SUNDIALS_BUILD_WITH_MONITORING BOOL "${DOCSTR}" OFF)
 set(DOCSTR "Build with simulation profiling capabilities enabled")
 sundials_option(SUNDIALS_BUILD_WITH_PROFILING BOOL "${DOCSTR}" OFF)
 
+if(SUNDIALS_BUILD_WITH_PROFILING)
+  message(WARNING "SUNDIALS built with profiling turned on, performance may be affected.")
+endif()
+
+# ---------------------------------------------------------------
+# Option to enable/disable error checking
+# ---------------------------------------------------------------
+
+if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
+  set(_default_err_checks OFF)
+else()
+  set(_default_err_checks ON)
+endif()
+
+set(DOCSTR "Build with error checking enabled/disabled. Enabling error checks may affect performance.")
+sundials_option(SUNDIALS_ENABLE_ERROR_CHECKS BOOL "${DOCSTR}" ${_default_err_checks})
+if(SUNDIALS_ENABLE_ERROR_CHECKS)
+  message(STATUS "SUNDIALS error checking enabled")
+  message(WARNING "SUNDIALS is being built with extensive error checks, performance may be affected.")
+endif()
+
 # ---------------------------------------------------------------
 # Option to enable logging
 # ---------------------------------------------------------------
 
 set(DOCSTR "Build with logging capabilities enabled (0 = no logging, 1 = errors, 2 = +warnings, 3 = +info, 4 = +debug, 5 = +extras")
-sundials_option(SUNDIALS_LOGGING_LEVEL STRING "${DOCSTR}" 0
+sundials_option(SUNDIALS_LOGGING_LEVEL STRING "${DOCSTR}" 2
                 OPTIONS "0;1;2;3;4;5")
 
-if(SUNDIALS_LOGGING_LEVEL GREATER_EQUAL 1)
+if(SUNDIALS_LOGGING_LEVEL GREATER_EQUAL 3)
   message(STATUS "SUNDIALS logging level set to ${SUNDIALS_LOGGING_LEVEL}")
-  message(WARNING "SUNDIALS built with logging turned on, performance may be affected.")
+  message(WARNING "SUNDIALS built with additional logging turned on, performance may be affected.")
 endif()
 
-set(DOCSTR "Build SUNDIALS logging with MPI support")
-sundials_option(SUNDIALS_LOGGING_ENABLE_MPI BOOL "${DOCSTR}" "OFF"
-                DEPENDS_ON ENABLE_MPI)
-
 # ---------------------------------------------------------------
-# Option to use the generic math libraries
+# Option to set the math library
 # ---------------------------------------------------------------
 
-# We still provide USE_GENERIC_MATH for backwards compatibility
-# We also provide it for non-unix systems, but with different defaults,
-# in order to present a uniform CMake interface.
 if(UNIX)
   sundials_option(SUNDIALS_MATH_LIBRARY PATH "Which math library (e.g., libm) to link to" "-lm" ADVANCED)
 else()
@@ -194,6 +201,8 @@ endif()
 
 sundials_option(BUILD_BENCHMARKS BOOL "Build the SUNDIALS benchmark suite" OFF)
 
+sundials_option(BENCHMARKS_INSTALL_PATH PATH "Output directory for installing benchmark executables" "${CMAKE_INSTALL_PREFIX}/benchmarks")
+
 # ---------------------------------------------------------------
 # Options for CMake config installation
 # ---------------------------------------------------------------
@@ -278,3 +287,44 @@ sundials_option(SUNDIALS_TEST_OUTPUT_DIR PATH
 
 sundials_option(SUNDIALS_TEST_ANSWER_DIR PATH
   "Location of testing answer files" "" ADVANCED)
+
+sundials_option(SUNDIALS_TEST_PROFILE BOOL
+  "Use Caliper to profile SUNDIALS tests" OFF ADVANCED)
+
+sundials_option(SUNDIALS_TEST_NODIFF BOOL
+  "Disable output comparison in the regression test suite" OFF ADVANCED)
+
+sundials_option(SUNDIALS_TEST_CONTAINER_EXE PATH
+  "Path to docker or podman" "" ADVANCED)
+
+sundials_option(SUNDIALS_TEST_CONTAINER_RUN_EXTRA_ARGS STRING
+  "Extra arguments to pass to docker/podman run command" "--tls-verify=false" ADVANCED)
+
+sundials_option(SUNDIALS_TEST_CONTAINER_MNT STRING
+  "Path to project root inside the container" "/sundials" ADVANCED)
+
+# Include development examples in regression tests
+sundials_option(SUNDIALS_TEST_DEVTESTS BOOL
+  "Include development tests in make test" OFF ADVANCED)
+
+# Include unit tests in regression tests
+sundials_option(SUNDIALS_TEST_UNITTESTS BOOL
+  "Include unit tests in make test" OFF ADVANCED)
+
+# Include googletest unit tests in regression tests
+sundials_option(SUNDIALS_TEST_ENABLE_GTEST BOOL
+  "Disable GTest unit tests" ON ADVANCED)
+
+sundials_option(SUNDIALS_DEV_IWYU BOOL
+  "Enable include-what-you-use" OFF ADVANCED)
+
+sundials_option(SUNDIALS_DEV_CLANG_TIDY BOOL
+  "Enable clang-tidy" OFF ADVANCED)
+
+sundials_option(SUNDIALS_SCHEDULER_COMMAND STRING "Job scheduler command to use to launch SUNDIALS MPI tests" "" ADVANCED)
+
+sundials_option(SUNDIALS_CALIPER_OUTPUT_DIR PATH "Location to write caliper output files" "" ADVANCED)
+
+sundials_option(SUNDIALS_BENCHMARK_NUM_CPUS STRING "Number of CPU cores to run benchmarks with" "40" ADVANCED)
+
+sundials_option(SUNDIALS_BENCHMARK_NUM_GPUS STRING "Number of GPUs to run benchmarks with" "4" ADVANCED)

@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -73,7 +73,7 @@ The module SUNLinSol_SuperLUMT provides the following user-callable routines:
       and is passed directly to SuperLU_MT routines.
 
 
-.. c:function:: int SUNLinSol_SuperLUMTSetOrdering(SUNLinearSolver S, int ordering_choice)
+.. c:function:: SUNErrCode SUNLinSol_SuperLUMTSetOrdering(SUNLinearSolver S, int ordering_choice)
 
    This function sets the ordering used by SuperLU_MT for reducing fill in
    the linear solve.
@@ -93,26 +93,7 @@ The module SUNLinSol_SuperLUMT provides the following user-callable routines:
       The default is 3 for COLAMD.
 
    **Return value:**
-      * ``SUNLS_SUCCESS`` -- option successfully set
-      * ``SUNLS_MEM_NULL`` -- ``S`` is ``NULL``
-      * ``SUNLS_ILL_INPUT`` -- invalid ``ordering_choice``
-
-
-For backwards compatibility, we also provide the following wrapper functions,
-each with identical input and output arguments to the routines that
-they wrap:
-
-.. c:function:: SUNLinearSolver SUNSuperLUMT(N_Vector y, SUNMatrix A, int num_threads)
-
-   Wrapper for :c:func:`SUNLinSol_SuperLUMT`.
-
-and
-
-.. c:function:: int SUNSuperLUMTSetOrdering(SUNLinearSolver S, int ordering_choice)
-
-   Wrapper for :c:func:`SUNLinSol_SuperLUMTSetOrdering()`.
-
-
+      * A :c:type:`SUNErrCode`
 
 
 .. _SUNLinSol.SuperLUMT.Description:
@@ -133,7 +114,7 @@ The SUNLinSol_SuperLUMT module defines the *content* field of a
      sunindextype *perm_r, *perm_c;
      sunindextype N;
      int          num_threads;
-     realtype     diag_pivot_thresh;
+     sunrealtype  diag_pivot_thresh;
      int          ordering;
      superlumt_options_t *options;
    };
@@ -177,8 +158,8 @@ appropriately to link with SuperLU_MT (see
 :numref:`Installation.CMake.ExternalLibraries` for details).
 Additionally, this wrapper only supports single- and
 double-precision calculations, and therefore cannot be compiled if
-SUNDIALS is configured to have :c:type:`realtype` set to ``extended``
-(see :numref:`Usage.CC.DataTypes` for details).  Moreover,
+SUNDIALS is configured to have :c:type:`sunrealtype` set to ``extended``
+(see :numref:`SUNDIALS.DataTypes` for details).  Moreover,
 since the SuperLU_MT library may be installed to support either 32-bit
 or 64-bit integers, it is assumed that the SuperLU_MT library is
 installed using the same integer precision as the SUNDIALS

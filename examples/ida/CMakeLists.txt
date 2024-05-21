@@ -3,7 +3,7 @@
 #                Cody Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -45,6 +45,12 @@ endif()
 # Fortran examples
 if(BUILD_FORTRAN_MODULE_INTERFACE AND EXAMPLES_ENABLE_F2003)
   add_subdirectory(F2003_serial)
+  if(ENABLE_MPI)
+    add_subdirectory(F2003_parallel)
+  endif()
+  if(ENABLE_OPENMP AND OPENMP_FOUND)
+    add_subdirectory(F2003_openmp)
+  endif()
 endif()
 
 # cuda examples

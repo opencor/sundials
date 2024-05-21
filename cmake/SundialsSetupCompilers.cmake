@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -111,125 +111,95 @@ endif()
 # C settings
 # ===============================================================
 
-set(DOCSTR "The C standard to use (90, 99, 11, 17)")
+set(DOCSTR "The C standard to use (99, 11, 17)")
 sundials_option(CMAKE_C_STANDARD STRING "${DOCSTR}" "99"
-                OPTIONS "90;99;11;17")
+                OPTIONS "99;11;17")
 message(STATUS "C standard set to ${CMAKE_C_STANDARD}")
 
 set(DOCSTR "Enable C compiler specific extensions")
 sundials_option(CMAKE_C_EXTENSIONS BOOL "${DOCSTR}" ON)
 message(STATUS "C extensions set to ${CMAKE_C_EXTENSIONS}")
 
-# Profiling generally requires ISO C99 or newer for __func__ though some
-# compilers define __func__ even with ISO C90.
-if(SUNDIALS_BUILD_WITH_PROFILING AND (CMAKE_C_STANDARD STREQUAL "90"))
-  message(WARNING "SUNDIALS_BUILD_WITH_PROFILING=ON requires __func__, compilation may fail with CMAKE_C_STANDARD=90")
-endif()
-
 # ---------------------------------------------------------------
-# Check for snprintf and va_copy
-#
-# 199901L is the minimum ISO C standard for snprintf but some
-# C89 compilers provide extensions that define it.
+# Check for __builtin_expect
 # ---------------------------------------------------------------
 
 check_c_source_compiles("
   #include <stdio.h>
-  #include <stdarg.h>
-  int main() {
-    int size = snprintf(NULL, 0, \"%s\", \"snprintf works\");
-    va_list args;
-    va_list tmp;
-    va_copy(tmp, args);
-    printf(\"%d\", size);
+  int main(void) {
+    double a = 0.0;
+    if (__builtin_expect(a < 0, 0)) {
+      a = 0.0;
+    }
+    a = a + 1.0;
+    printf(\"a=%g\", a);
     return 0;
   }
-" SUNDIALS_C_COMPILER_HAS_SNPRINTF_AND_VA_COPY)
-if(NOT SUNDIALS_C_COMPILER_HAS_SNPRINTF_AND_VA_COPY)
-  sundials_option(SUNDIALS_MAX_SPRINTF_SIZE STRING
-    "Max size of buffer for sprintf" "5120" ADVANCED)
+" SUNDIALS_C_COMPILER_HAS_BUILTIN_EXPECT)
+
+# ---------------------------------------------------------------
+# Check for assume related extensions
+# ---------------------------------------------------------------
+
+# gcc >= 13 should have __attribute__((assume))
+check_c_source_compiles("
+  #include <stdio.h>
+  int main(void) {
+    double a = 0.0;
+    #if defined(__has_attribute)
+    # if !__has_attribute(assume)
+    #   error no assume
+    # endif
+    #else
+    #error no __has_attribute
+    #endif
+    __attribute__((assume(a >= 0.0)));
+    a = a + 1.0;
+    printf(\"a=%g\", a);
+    return 0;
+  }
+" SUNDIALS_C_COMPILER_HAS_ATTRIBUTE_ASSUME)
+
+# LLVM based compilers should have __builtin_assume
+if(NOT SUNDIALS_C_COMPILER_HAS_ATTRIBUTE_ASSUME)
+  check_c_source_compiles("
+    #include <stdio.h>
+    int main(void) {
+      double a = 0.0;
+      __builtin_assume(a >= 0.0);
+      a = a + 1.0;
+      printf(\"a=%g\", a);
+      return 0;
+    }
+  " SUNDIALS_C_COMPILER_HAS_BUILTIN_ASSUME)
+endif()
+
+# MSVC provides __assume
+if(NOT (SUNDIALS_C_COMPILER_HAS_ATTRIBUTE_ASSUME OR SUNDIALS_C_COMPILER_HAS_BUILTIN_ASSUME))
+  check_c_source_compiles("
+    #include <stdio.h>
+    int main(void) {
+      double a = 0.0;
+      __assume(a >= 0.0));
+      a = a + 1.0;
+      printf(\"a=%g\", a);
+      return 0;
+    }
+  " SUNDIALS_C_COMPILER_HAS_ASSUME)
 endif()
 
 # ---------------------------------------------------------------
-# Check for float and long double math functions
-# ---------------------------------------------------------------
-
-set(CMAKE_REQUIRED_LIBRARIES ${SUNDIALS_MATH_LIBRARY})
-check_c_source_compiles("
-  #include <math.h>
-  int main() {
-    float a, a_result;
-    long double b, b_result;
-
-    a = 1.0F;
-    b = 1.0L;
-
-    a_result = sqrtf(a);
-    a_result = fabsf(a);
-    a_result = expf(a);
-    a_result = ceilf(a);
-    a_result = powf(a, 1.0F);
-
-    b_result = sqrtl(b);
-    b_result = fabsl(b);
-    b_result = expl(b);
-    b_result = ceill(b);
-    b_result = powl(b, 1.0L);
-
-    return 0;
-  }
-" SUNDIALS_C_COMPILER_HAS_MATH_PRECISIONS)
-
-# ---------------------------------------------------------------
-# Check for isinf and isnan
-# ---------------------------------------------------------------
-
-check_c_source_compiles("
-  #include <math.h>
-  int main() {
-    double a = 0.0;
-    int result = isinf(a);
-    result = isnan(a);
-    return result;
-  }
-" SUNDIALS_C_COMPILER_HAS_ISINF_ISNAN)
-
-# ---------------------------------------------------------------
-# Check for inline
-# ---------------------------------------------------------------
-
-check_c_source_compiles("
-  static inline double add1(double a) {
-    return a + 1.0;
-  }
-  int main() {
-    double a = 0.0;
-    return add1(a) < a;
-  }
-" SUNDIALS_C_COMPILER_HAS_INLINE)
-
-# ---------------------------------------------------------------
 # Check for POSIX timers
-#
-# 199309L is the minimum POSIX version needed for struct timespec
-# and clock_monotonic()
 # ---------------------------------------------------------------
 include(SundialsPOSIXTimers)
 
 if(SUNDIALS_POSIX_TIMERS AND POSIX_TIMERS_NEED_POSIX_C_SOURCE)
   set(DOCSTR "Value of _POSIX_C_SOURCE")
-  sundials_option(SUNDIALS_POSIX_C_SOURCE STRING "${DOCSTR}" "199309L"
+  sundials_option(SUNDIALS_POSIX_C_SOURCE STRING "${DOCSTR}" "200112L"
                   ADVANCED)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_POSIX_C_SOURCE=${SUNDIALS_POSIX_C_SOURCE}")
 endif()
 
-# Check if profiling is being built with no timers.
-if(SUNDIALS_BUILD_WITH_PROFILING AND
-   (NOT ENABLE_CALIPER) AND
-   (NOT ENABLE_MPI) AND
-   (NOT SUNDIALS_POSIX_TIMERS))
-  message(SEND_ERROR "The SUNDIALS native profiler requires POSIX timers or MPI_Wtime, but neither were found.")
-endif()
 
 # ---------------------------------------------------------------
 # Check for deprecated attribute with message
@@ -241,8 +211,8 @@ else()
 endif()
 check_c_source_compiles("
   #define msg \"test\"
-  ${COMPILER_DEPRECATED_MSG_ATTRIBUTE} int somefunc() { return 0; }
-  int main() { return somefunc();}" COMPILER_HAS_DEPRECATED_MSG
+  ${COMPILER_DEPRECATED_MSG_ATTRIBUTE} int somefunc(void) { return 0; }
+  int main(void) { return somefunc();}" COMPILER_HAS_DEPRECATED_MSG
 )
 
 # ===============================================================
@@ -270,70 +240,75 @@ endif()
 # ------------------------------------------------------------------------------
 
 # The case to use in the name-mangling scheme
-sundials_option(SUNDIALS_F77_FUNC_CASE STRING
-                "case of Fortran function names (lower/upper)"
+sundials_option(SUNDIALS_LAPACK_CASE STRING
+                "case of LAPACK function names (lower/upper)"
                 ""
                 ADVANCED)
 
 # The number of underscores of appended in the name-mangling scheme
-sundials_option(SUNDIALS_F77_FUNC_UNDERSCORES STRING
-                "number of underscores appended to Fortran function names (none/one/two)"
+sundials_option(SUNDIALS_LAPACK_UNDERSCORES STRING
+                "number of underscores appended to LAPACK function names (none/one/two)"
                 ""
                 ADVANCED)
 
 # If used, both case and underscores must be set
-if((NOT SUNDIALS_F77_FUNC_CASE) AND SUNDIALS_F77_FUNC_UNDERSCORES)
-  print_error("If SUNDIALS_F77_FUNC_UNDERSCORES is set, "
-                      "SUNDIALS_F77_FUNC_CASE must also be set.")
+if((NOT SUNDIALS_LAPACK_CASE) AND SUNDIALS_LAPACK_UNDERSCORES)
+  print_error("If SUNDIALS_LAPACK_UNDERSCORES is set, "
+                      "SUNDIALS_LAPACK_CASE must also be set.")
 endif()
-if(SUNDIALS_F77_FUNC_CASE AND (NOT SUNDIALS_F77_FUNC_UNDERSCORES))
-  print_error("If SUNDIALS_F77_FUNC_CASE is set, "
-                      "SUNDIALS_F77_FUNC_UNDERSCORES must also be set.")
+if(SUNDIALS_LAPACK_CASE AND (NOT SUNDIALS_LAPACK_UNDERSCORES))
+  print_error("If SUNDIALS_LAPACK_CASE is set, "
+                      "SUNDIALS_LAPACK_UNDERSCORES must also be set.")
 endif()
 
 # Did the user provide a name-mangling scheme?
-if(SUNDIALS_F77_FUNC_CASE AND SUNDIALS_F77_FUNC_UNDERSCORES)
+if(SUNDIALS_LAPACK_CASE AND SUNDIALS_LAPACK_UNDERSCORES)
 
-  string(TOUPPER ${SUNDIALS_F77_FUNC_CASE} SUNDIALS_F77_FUNC_CASE)
-  string(TOUPPER ${SUNDIALS_F77_FUNC_UNDERSCORES} SUNDIALS_F77_FUNC_UNDERSCORES)
+  string(TOUPPER ${SUNDIALS_LAPACK_CASE} SUNDIALS_LAPACK_CASE)
+  string(TOUPPER ${SUNDIALS_LAPACK_UNDERSCORES} SUNDIALS_LAPACK_UNDERSCORES)
 
   # Based on the given case and number of underscores, set the C preprocessor
   # macro definitions. Since SUNDIALS never uses symbols names containing
   # underscores we set the name-mangling schemes to be the same. In general,
   # names of symbols with and without underscore may be mangled differently
   # (e.g. g77 mangles mysub to mysub_ and my_sub to my_sub__)
-  if(SUNDIALS_F77_FUNC_CASE MATCHES "LOWER")
-    if(SUNDIALS_F77_FUNC_UNDERSCORES MATCHES "NONE")
-      set(F77_MANGLE_MACRO1 "#define SUNDIALS_F77_FUNC(name,NAME) name")
-      set(F77_MANGLE_MACRO2 "#define SUNDIALS_F77_FUNC_(name,NAME) name")
-    elseif(SUNDIALS_F77_FUNC_UNDERSCORES MATCHES "ONE")
-      set(F77_MANGLE_MACRO1 "#define SUNDIALS_F77_FUNC(name,NAME) name ## _")
-      set(F77_MANGLE_MACRO2 "#define SUNDIALS_F77_FUNC_(name,NAME) name ## _")
-    elseif(SUNDIALS_F77_FUNC_UNDERSCORES MATCHES "TWO")
-      set(F77_MANGLE_MACRO1 "#define SUNDIALS_F77_FUNC(name,NAME) name ## __")
-      set(F77_MANGLE_MACRO2 "#define SUNDIALS_F77_FUNC_(name,NAME) name ## __")
+  if(SUNDIALS_LAPACK_CASE MATCHES "LOWER")
+    if(SUNDIALS_LAPACK_UNDERSCORES MATCHES "NONE")
+      set(LAPACK_MANGLE_MACRO1 "#define SUNDIALS_LAPACK_FUNC(name,NAME) name")
+      set(LAPACK_MANGLE_MACRO2 "#define SUNDIALS_LAPACK_FUNC_(name,NAME) name")
+    elseif(SUNDIALS_LAPACK_UNDERSCORES MATCHES "ONE")
+      set(LAPACK_MANGLE_MACRO1 "#define SUNDIALS_LAPACK_FUNC(name,NAME) name ## _")
+      set(LAPACK_MANGLE_MACRO2 "#define SUNDIALS_LAPACK_FUNC_(name,NAME) name ## _")
+    elseif(SUNDIALS_LAPACK_UNDERSCORES MATCHES "TWO")
+      set(LAPACK_MANGLE_MACRO1 "#define SUNDIALS_LAPACK_FUNC(name,NAME) name ## __")
+      set(LAPACK_MANGLE_MACRO2 "#define SUNDIALS_LAPACK_FUNC_(name,NAME) name ## __")
     else()
-      print_error("Invalid SUNDIALS_F77_FUNC_UNDERSCORES option.")
+      print_error("Invalid SUNDIALS_LAPACK_UNDERSCORES option.")
     endif()
-  elseif(SUNDIALS_F77_FUNC_CASE MATCHES "UPPER")
-    if(SUNDIALS_F77_FUNC_UNDERSCORES MATCHES "NONE")
-      set(F77_MANGLE_MACRO1 "#define SUNDIALS_F77_FUNC(name,NAME) NAME")
-      set(F77_MANGLE_MACRO2 "#define SUNDIALS_F77_FUNC_(name,NAME) NAME")
-    elseif(SUNDIALS_F77_FUNC_UNDERSCORES MATCHES "ONE")
-      set(F77_MANGLE_MACRO1 "#define SUNDIALS_F77_FUNC(name,NAME) NAME ## _")
-      set(F77_MANGLE_MACRO2 "#define SUNDIALS_F77_FUNC_(name,NAME) NAME ## _")
-    elseif(SUNDIALS_F77_FUNC_UNDERSCORES MATCHES "TWO")
-      set(F77_MANGLE_MACRO1 "#define SUNDIALS_F77_FUNC(name,NAME) NAME ## __")
-      set(F77_MANGLE_MACRO2 "#define SUNDIALS_F77_FUNC_(name,NAME) NAME ## __")
+  elseif(SUNDIALS_LAPACK_CASE MATCHES "UPPER")
+    if(SUNDIALS_LAPACK_UNDERSCORES MATCHES "NONE")
+      set(LAPACK_MANGLE_MACRO1 "#define SUNDIALS_LAPACK_FUNC(name,NAME) NAME")
+      set(LAPACK_MANGLE_MACRO2 "#define SUNDIALS_LAPACK_FUNC_(name,NAME) NAME")
+    elseif(SUNDIALS_LAPACK_UNDERSCORES MATCHES "ONE")
+      set(LAPACK_MANGLE_MACRO1 "#define SUNDIALS_LAPACK_FUNC(name,NAME) NAME ## _")
+      set(LAPACK_MANGLE_MACRO2 "#define SUNDIALS_LAPACK_FUNC_(name,NAME) NAME ## _")
+    elseif(SUNDIALS_LAPACK_UNDERSCORES MATCHES "TWO")
+      set(LAPACK_MANGLE_MACRO1 "#define SUNDIALS_LAPACK_FUNC(name,NAME) NAME ## __")
+      set(LAPACK_MANGLE_MACRO2 "#define SUNDIALS_LAPACK_FUNC_(name,NAME) NAME ## __")
     else()
-      print_error("Invalid SUNDIALS_F77_FUNC_UNDERSCORES option.")
+      print_error("Invalid SUNDIALS_LAPACK_UNDERSCORES option.")
     endif()
   else()
-    print_error("Invalid SUNDIALS_F77_FUNC_CASE option.")
+    print_error("Invalid SUNDIALS_LAPACK_CASE option.")
   endif()
 
   # name-mangling scheme has been manually set
   set(NEED_FORTRAN_NAME_MANGLING FALSE)
+
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/src/sundials/sundials_lapack_defs.h.in
+    ${PROJECT_BINARY_DIR}/src/sundials/sundials_lapack_defs.h
+  )
 
 endif()
 
@@ -347,7 +322,7 @@ endif()
 # C++ settings
 # ===============================================================
 
-if(BUILD_BENCHMARKS OR EXAMPLES_ENABLE_CXX OR
+if(BUILD_BENCHMARKS OR SUNDIALS_TEST_UNITTESTS OR EXAMPLES_ENABLE_CXX OR
     ENABLE_CUDA OR
     ENABLE_HIP OR
     ENABLE_SYCL OR
@@ -356,7 +331,8 @@ if(BUILD_BENCHMARKS OR EXAMPLES_ENABLE_CXX OR
     ENABLE_SUPERLUDIST OR
     ENABLE_MAGMA OR
     ENABLE_GINKGO OR
-    ENABLE_KOKKOS)
+    ENABLE_KOKKOS OR
+    ENABLE_ADIAK)
   include(SundialsSetupCXX)
 endif()
 
@@ -420,7 +396,7 @@ endforeach()
 # ===============================================================
 
 foreach(lang ${_SUNDIALS_ENABLED_LANGS})
-  if((SUNDIALS_BUILD_WITH_PROFILING OR SUNDIALS_LOGGING_ENABLE_MPI) AND ENABLE_MPI)
+  if(ENABLE_MPI)
     if(DEFINED MPI_${lang}_COMPILER)
       set(_EXAMPLES_${lang}_COMPILER "${MPI_${lang}_COMPILER}" CACHE INTERNAL "${lang} compiler for installed examples")
     endif()
@@ -428,3 +404,48 @@ foreach(lang ${_SUNDIALS_ENABLED_LANGS})
     set(_EXAMPLES_${lang}_COMPILER "${CMAKE_${lang}_COMPILER}" CACHE INTERNAL "${lang} compiler for installed examples")
   endif()
 endforeach()
+
+
+# ===============================================================
+# Configure clang-tidy for linting
+# ===============================================================
+
+set(SUNDIALS_DEV_CLANG_TIDY_DIR ${CMAKE_BINARY_DIR}/clang-tidy/)
+
+if(SUNDIALS_DEV_CLANG_TIDY)
+  find_program(CLANG_TIDY_PATH NAMES clang-tidy)
+  if(NOT CLANG_TIDY_PATH)
+      message(FATAL_ERROR "Could not find the program clang-tidy")
+  endif()
+  message(STATUS "Found clang-tidy: ${CLANG_TIDY_PATH}")
+
+  make_directory(${SUNDIALS_DEV_CLANG_TIDY_DIR})
+  if(SUNDIALS_DEV_CLANG_TIDY_FIX_ERRORS)
+    set(CMAKE_C_CLANG_TIDY ${CLANG_TIDY_PATH} -format-style='file' --fix)
+    set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_PATH} -format-style='file' --fix)
+  else()
+    set(CMAKE_C_CLANG_TIDY ${CLANG_TIDY_PATH}
+      -format-style='file'
+      --export-fixes=${SUNDIALS_DEV_CLANG_TIDY_DIR}/clang-tidy-fixes.yaml
+    )
+    set(CMAKE_CXX_CLANG_TIDY
+      ${CLANG_TIDY_PATH}
+      -format-style='file'
+      --export-fixes=${SUNDIALS_DEV_CLANG_TIDY_DIR}/clang-tidy-cxx-fixes.yaml
+    )
+  endif()
+endif()
+
+if(SUNDIALS_DEV_IWYU)
+  find_program(IWYU_PATH NAMES include-what-you-use iwyu)
+  if(NOT IWYU_PATH)
+    message(FATAL_ERROR "Could not find the program include-what-you-use")
+  endif()
+  message(STATUS "Found IWYU: ${IWYU_PATH}")
+  set(CMAKE_C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH}
+    -Xiwyu --mapping_file=${CMAKE_SOURCE_DIR}/scripts/iwyu.imp
+    -Xiwyu --error_always)
+  set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE ${IWYU_PATH}
+    -Xiwyu --mapping_file=${CMAKE_SOURCE_DIR}/scripts/iwyu.imp
+    -Xiwyu --error_always)
+endif()

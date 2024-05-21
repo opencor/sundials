@@ -38,34 +38,38 @@
  * -----------------------------------------------------------------
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <cmath>
-#include <string.h>
-#include <vector>
-
 #include <Tpetra_Core.hpp>
 #include <Tpetra_Vector.hpp>
 #include <Tpetra_Version.hpp>
+#include <Trilinos_version.h>
+#include <cmath>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <vector>
+
+#if TRILINOS_MAJOR_VERSION > 13
+#include <Tpetra_Access.hpp>
+#endif
 
 #include <ida/ida.h>
-#include <nvector/trilinos/SundialsTpetraVectorInterface.hpp>
 #include <nvector/nvector_trilinos.h>
-#include <sunlinsol/sunlinsol_spgmr.h>
-#include <sundials/sundials_types.h>
+#include <nvector/trilinos/SundialsTpetraVectorInterface.hpp>
 #include <sundials/sundials_mpi_types.h>
+#include <sundials/sundials_types.h>
+#include <sunlinsol/sunlinsol_spgmr.h>
 
-#define ZERO  RCONST(0.0)
-#define ONE   RCONST(1.0)
-#define TWO   RCONST(2.0)
+#define ZERO SUN_RCONST(0.0)
+#define ONE  SUN_RCONST(1.0)
+#define TWO  SUN_RCONST(2.0)
 
-#define NOUT         11    /* Number of output times */
+#define NOUT 11 /* Number of output times */
 
-#define NPEX         2     /* No. PEs in x direction of PE array */
-#define NPEY         2     /* No. PEs in y direction of PE array */
-                           /* Total no. PEs = NPEX*NPEY */
-#define MXSUB        5     /* No. x points per subgrid */
-#define MYSUB        5     /* No. y points per subgrid */
+#define NPEX 2  /* No. PEs in x direction of PE array */
+#define NPEY 2  /* No. PEs in y direction of PE array */
+                /* Total no. PEs = NPEX*NPEY */
+#define MXSUB 5 /* No. x points per subgrid */
+#define MYSUB 5 /* No. y points per subgrid */
 
 /* Global spatial mesh is MX x MY = (NPEX x MXSUB) x (NPEY x MYSUB) */
 
@@ -80,18 +84,18 @@ typedef vector_type::node_type::execution_space execution_space;
 typedef vector_type::map_type map_type;
 
 /* User data structure */
-struct UserData {
+struct UserData
+{
   /* user data destructor */
   ~UserData()
   {
-    if (pp != NULL)
-      N_VDestroy(pp);
+    if (pp != NULL) { N_VDestroy(pp); }
   }
 
-  Teuchos::RCP<const Teuchos::Comm<int> > comm;
+  Teuchos::RCP<const Teuchos::Comm<int>> comm;
   int thispe, npex, npey, ixsub, jysub;
   sunindextype mx, my, mxsub, mysub;
-  realtype dx, dy, coeffx, coeffy, coeffxy;
+  sunrealtype dx, dy, coeffx, coeffy, coeffxy;
   Kokkos::View<scalar_type*, memory_space> uext; /* device array */
 
   Kokkos::View<scalar_type*, memory_space> send_buff_top;
@@ -112,52 +116,52 @@ struct UserData {
   typename Kokkos::View<scalar_type*, memory_space>::HostMirror h_recv_buff_left;
   typename Kokkos::View<scalar_type*, memory_space>::HostMirror h_recv_buff_right;
 
-  N_Vector pp;    /* vector of diagonal preconditioner elements */
+  N_Vector pp; /* vector of diagonal preconditioner elements */
 };
-
 
 /* User-supplied residual and supporting functions */
 
-int resHeat(realtype tt, N_Vector uu, N_Vector up,
-            N_Vector rr, void *user_data);
+int resHeat(sunrealtype tt, N_Vector uu, N_Vector up, N_Vector rr,
+            void* user_data);
 
-static int rescomm(N_Vector uu, N_Vector up, void *user_data);
+static int rescomm(N_Vector uu, N_Vector up, void* user_data);
 
-static int reslocal(realtype tt, N_Vector uu, N_Vector up,
-                    N_Vector res,  void *user_data);
+static int reslocal(sunrealtype tt, N_Vector uu, N_Vector up, N_Vector res,
+                    void* user_data);
 
-static int BSend(N_Vector uu, void *user_data);
+static int BSend(N_Vector uu, void* user_data);
 
-static int BRecvPost(MPI_Request request[], void *user_data);
+static int BRecvPost(MPI_Request request[], void* user_data);
 
-static int BRecvWait(MPI_Request request[], void *user_data);
-
+static int BRecvWait(MPI_Request request[], void* user_data);
 
 /* User-supplied preconditioner functions */
 
-int PsolveHeat(realtype tt, N_Vector uu, N_Vector up, N_Vector rr,
-               N_Vector rvec, N_Vector zvec, realtype c_j,
-               realtype delta, void *user_data);
+int PsolveHeat(sunrealtype tt, N_Vector uu, N_Vector up, N_Vector rr,
+               N_Vector rvec, N_Vector zvec, sunrealtype c_j, sunrealtype delta,
+               void* user_data);
 
-int PsetupHeat(realtype tt, N_Vector yy, N_Vector yp, N_Vector rr,
-               realtype c_j, void *user_data);
+int PsetupHeat(sunrealtype tt, N_Vector yy, N_Vector yp, N_Vector rr,
+               sunrealtype c_j, void* user_data);
 
 /* Private function to allocate memory, initialize problem and print output */
 
-static int InitUserData(int thispe, const Teuchos::RCP<const Teuchos::Comm<int> > comm, UserData *data);
+static int InitUserData(int thispe,
+                        const Teuchos::RCP<const Teuchos::Comm<int>> comm,
+                        UserData* data);
 
-static int AllocUserData(int thispe, N_Vector uu, UserData *data);
+static int AllocUserData(int thispe, N_Vector uu, UserData* data);
 
 static int SetInitialProfile(N_Vector uu, N_Vector up, N_Vector id,
-                             N_Vector res, UserData *data);
+                             N_Vector res, UserData* data);
 
-static void PrintHeader(realtype rtol, realtype atol, UserData *data);
+static void PrintHeader(sunrealtype rtol, sunrealtype atol, UserData* data);
 
-static void PrintOutput(int id, void *ida_mem, realtype t, N_Vector uu);
+static void PrintOutput(int id, void* ida_mem, sunrealtype t, N_Vector uu);
 
-static void PrintFinalStats(void *ida_mem);
+static void PrintFinalStats(void* ida_mem);
 
-static int check_retval(void *flagvalue, const char *funcname, int opt, int id);
+static int check_retval(void* flagvalue, const char* funcname, int opt, int id);
 
 /*
  *--------------------------------------------------------------------
@@ -165,7 +169,7 @@ static int check_retval(void *flagvalue, const char *funcname, int opt, int id);
  *--------------------------------------------------------------------
  */
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   /* Start an MPI session */
   Tpetra::ScopeGuard tpetraScope(&argc, &argv);
@@ -173,22 +177,21 @@ int main(int argc, char *argv[])
     int retval;
 
     /* Create Tpetra communicator */
-    auto comm = Tpetra::getDefaultComm();
+    auto comm        = Tpetra::getDefaultComm();
     const int thispe = comm->getRank();
     const int npes   = comm->getSize();
 
     /* Create the SUNDIALS context object for this simulation. */
-    auto mpiComm = Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int> >(comm);
+    auto mpiComm = Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int>>(comm);
     MPI_Comm rawComm = *(mpiComm->getRawMpiComm());
 
     SUNContext ctx;
-    retval = SUNContext_Create((void*) &rawComm, &ctx);
-    if (check_retval(&retval, "SUNContext_Create", 1, thispe)) return -1;
+    retval = SUNContext_Create(rawComm, &ctx);
+    if (check_retval(&retval, "SUNContext_Create", 1, thispe)) { return -1; }
 
     /* Allocate and initialize the data structure */
-    UserData *data = new UserData();
-    if(check_retval((void *)data, "malloc", 2, thispe))
-      return -1;
+    UserData* data = new UserData();
+    if (check_retval((void*)data, "malloc", 2, thispe)) { return -1; }
 
     /* Initialize user data */
     InitUserData(thispe, comm, data);
@@ -200,49 +203,45 @@ int main(int argc, char *argv[])
     const sunindextype index_base = 0;
 
     /* Construct am MPI Map */
-    Teuchos::RCP<const map_type> testMap =
-      Teuchos::rcp(new map_type (global_length, index_base, comm,
-                                 Tpetra::GloballyDistributed));
+    Teuchos::RCP<const map_type> testMap = Teuchos::rcp(
+      new map_type(global_length, index_base, comm, Tpetra::GloballyDistributed));
 
     /* Check if the number of MPI processes matches the number of subgrids */
-    if (npes != (data->npex * data->npey)) {
+    if (npes != (data->npex * data->npey))
+    {
       if (thispe == 0)
+      {
         fprintf(stderr,
                 "\nMPI_ERROR(0): npes = %d is not equal to NPEX*NPEY = %d\n",
                 npes, data->npex * data->npey);
+      }
       delete data;
       return 1;
     }
 
     /* Construct a Tpetra vector and return refernce counting pointer to it. */
-    Teuchos::RCP<vector_type> rcpuu =
-      Teuchos::rcp(new vector_type(testMap));
+    Teuchos::RCP<vector_type> rcpuu = Teuchos::rcp(new vector_type(testMap));
 
     /* Allocate and initialize N-vectors. */
 
     N_Vector uu = N_VMake_Trilinos(rcpuu, ctx);
-    if(check_retval((void *)uu, "N_VMake_Trilinos", 0, thispe))
-      return -1;
+    if (check_retval((void*)uu, "N_VMake_Trilinos", 0, thispe)) { return -1; }
 
     N_Vector up = N_VClone(uu);
-    if(check_retval((void *)up, "N_VClone", 0, thispe))
-      return -1;
+    if (check_retval((void*)up, "N_VClone", 0, thispe)) { return -1; }
 
     N_Vector res = N_VClone(uu);
-    if(check_retval((void *)res, "N_VClone", 0, thispe))
-      return -1;
+    if (check_retval((void*)res, "N_VClone", 0, thispe)) { return -1; }
 
     N_Vector constraints = N_VClone(uu);
-    if(check_retval((void *)constraints, "N_VClone", 0, thispe))
-      return -1;
+    if (check_retval((void*)constraints, "N_VClone", 0, thispe)) { return -1; }
 
     N_Vector id = N_VClone(uu);
-    if(check_retval((void *)id, "N_VClone", 0, thispe))
-      return -1;
+    if (check_retval((void*)id, "N_VClone", 0, thispe)) { return -1; }
 
     /* Allocate user data extended vector and MPI buffers */
     retval = AllocUserData(thispe, uu, data);
-    if(check_retval(&retval, "AllocUserData", 1, thispe)) return -1;
+    if (check_retval(&retval, "AllocUserData", 1, thispe)) { return -1; }
 
     /* Initialize the uu, up, id, and res profiles. */
     SetInitialProfile(uu, up, id, res, data);
@@ -250,80 +249,69 @@ int main(int argc, char *argv[])
     /* Set constraints to all 1's for nonnegative solution values. */
     N_VConst(ONE, constraints);
 
-    realtype t0 = ZERO;
-    realtype t1 = RCONST(0.01);
+    sunrealtype t0 = ZERO;
+    sunrealtype t1 = SUN_RCONST(0.01);
 
     /* Scalar relative and absolute tolerance. */
-    realtype rtol = ZERO;
-    realtype atol = RCONST(1.0e-3);
+    sunrealtype rtol = ZERO;
+    sunrealtype atol = SUN_RCONST(1.0e-3);
 
     /* Call IDACreate and IDAMalloc to initialize solution. */
 
-    void *ida_mem = IDACreate(ctx);
-    if(check_retval((void *)ida_mem, "IDACreate", 0, thispe))
-      return -1;
+    void* ida_mem = IDACreate(ctx);
+    if (check_retval((void*)ida_mem, "IDACreate", 0, thispe)) { return -1; }
 
     retval = IDASetUserData(ida_mem, data);
-    if(check_retval(&retval, "IDASetUserData", 1, thispe))
-      return -1;
+    if (check_retval(&retval, "IDASetUserData", 1, thispe)) { return -1; }
 
     retval = IDASetSuppressAlg(ida_mem, SUNTRUE);
-    if(check_retval(&retval, "IDASetSuppressAlg", 1, thispe))
-      return -1;
+    if (check_retval(&retval, "IDASetSuppressAlg", 1, thispe)) { return -1; }
 
     retval = IDASetId(ida_mem, id);
-    if(check_retval(&retval, "IDASetId", 1, thispe))
-      return -1;
+    if (check_retval(&retval, "IDASetId", 1, thispe)) { return -1; }
 
     retval = IDASetConstraints(ida_mem, constraints);
-    if(check_retval(&retval, "IDASetConstraints", 1, thispe))
-      return -1;
+    if (check_retval(&retval, "IDASetConstraints", 1, thispe)) { return -1; }
     N_VDestroy(constraints);
 
     retval = IDAInit(ida_mem, resHeat, t0, uu, up);
-    if(check_retval(&retval, "IDAInit", 1, thispe))
-      return -1;
+    if (check_retval(&retval, "IDAInit", 1, thispe)) { return -1; }
 
     retval = IDASStolerances(ida_mem, rtol, atol);
-    if(check_retval(&retval, "IDASStolerances", 1, thispe))
-      return -1;
+    if (check_retval(&retval, "IDASStolerances", 1, thispe)) { return -1; }
 
     /* Call SUNLinSol_SPGMR and IDASetLinearSolver to specify the linear solver. */
 
-    SUNLinearSolver LS = SUNLinSol_SPGMR(uu, SUN_PREC_LEFT, 0, ctx);  /* use default maxl */
-    if(check_retval((void *)LS, "SUNLinSol_SPGMR", 0, thispe))
-      return -1;
+    SUNLinearSolver LS = SUNLinSol_SPGMR(uu, SUN_PREC_LEFT, 0,
+                                         ctx); /* use default maxl */
+    if (check_retval((void*)LS, "SUNLinSol_SPGMR", 0, thispe)) { return -1; }
 
     retval = IDASetLinearSolver(ida_mem, LS, NULL);
-    if(check_retval(&retval, "IDASetLinearSolver", 1, thispe))
-      return -1;
+    if (check_retval(&retval, "IDASetLinearSolver", 1, thispe)) { return -1; }
 
     retval = IDASetPreconditioner(ida_mem, PsetupHeat, PsolveHeat);
-    if(check_retval(&retval, "IDASetPreconditioner", 1, thispe))
-      return -1;
+    if (check_retval(&retval, "IDASetPreconditioner", 1, thispe)) { return -1; }
 
     /* Print output heading (on processor 0 only) and intial solution  */
 
-    if (thispe == 0) PrintHeader(rtol, atol, data);
+    if (thispe == 0) { PrintHeader(rtol, atol, data); }
     PrintOutput(thispe, ida_mem, t0, uu);
 
     /* Loop over tout, call IDASolve, print output. */
     int iout;
-    realtype tret, tout;
+    sunrealtype tret, tout;
 
-    for (tout = t1, iout = 1; iout <= NOUT; iout++, tout *= TWO) {
-
+    for (tout = t1, iout = 1; iout <= NOUT; iout++, tout *= TWO)
+    {
       retval = IDASolve(ida_mem, tout, &tret, uu, up, IDA_NORMAL);
-      if(check_retval(&retval, "IDASolve", 1, thispe))
-        return -1;
+      if (check_retval(&retval, "IDASolve", 1, thispe)) { return -1; }
 
       PrintOutput(thispe, ida_mem, tret, uu);
-
     }
 
     /* Print remaining counters. */
 
-    if (thispe == 0) PrintFinalStats(ida_mem);
+    if (thispe == 0) { PrintFinalStats(ida_mem); }
 
     /* Free memory */
 
@@ -343,7 +331,7 @@ int main(int argc, char *argv[])
     SUNContext_Free(&ctx);
   }
 
-  return(0);
+  return (0);
 }
 
 /*
@@ -367,8 +355,7 @@ int main(int argc, char *argv[])
  * BSend, BRecvPost, and BREcvWait handle interprocessor communication
  * of uu required to calculate the residual.
  */
-int resHeat(realtype tt, N_Vector uu, N_Vector up, N_Vector rr,
-            void *user_data)
+int resHeat(sunrealtype tt, N_Vector uu, N_Vector up, N_Vector rr, void* user_data)
 {
   int retval = 0;
 
@@ -378,9 +365,8 @@ int resHeat(realtype tt, N_Vector uu, N_Vector up, N_Vector rr,
   /* Call reslocal to calculate res. */
   retval = reslocal(tt, uu, up, rr, user_data);
 
-  return(retval);
+  return (retval);
 }
-
 
 /*
  * PsetupHeat: setup for diagonal preconditioner for heatsk.
@@ -399,15 +385,15 @@ int resHeat(realtype tt, N_Vector uu, N_Vector up, N_Vector rr,
  * pp etc.) are used from the PsetupHeat argument list.
  *
  */
-int PsetupHeat(realtype tt, N_Vector yy, N_Vector yp, N_Vector rr,
-               realtype c_j, void *user_data)
+int PsetupHeat(sunrealtype tt, N_Vector yy, N_Vector yp, N_Vector rr,
+               sunrealtype c_j, void* user_data)
 {
   /* Unwrap the user data */
-  UserData* data = reinterpret_cast<UserData*>(user_data);
-  const int ixsub = data->ixsub;
-  const int jysub = data->jysub;
-  const int npex  = data->npex;
-  const int npey  = data->npey;
+  UserData* data           = reinterpret_cast<UserData*>(user_data);
+  const int ixsub          = data->ixsub;
+  const int jysub          = data->jysub;
+  const int npex           = data->npex;
+  const int npey           = data->npey;
   const sunindextype mxsub = data->mxsub;
   const sunindextype mysub = data->mysub;
 
@@ -418,31 +404,35 @@ int PsetupHeat(realtype tt, N_Vector yy, N_Vector yp, N_Vector rr,
 
   /* Get access to local data */
   Teuchos::RCP<vector_type> pptp = N_VGetVector_Trilinos(data->pp);
+
+#if TRILINOS_MAJOR_VERSION < 14
   auto pp_2d = pptp->getLocalView<memory_space>();
-  auto pp_1d = Kokkos::subview (pp_2d, Kokkos::ALL(), 0);
+  auto pp_1d = Kokkos::subview(pp_2d, Kokkos::ALL(), 0);
+#else
+  auto pp_2d = pptp->getLocalView<memory_space>(Tpetra::Access::ReadWrite);
+  auto pp_1d = Kokkos::subview(pp_2d, Kokkos::ALL(), 0);
+#endif
 
   /* Calculate the value for the inverse element of the diagonal preconditioner */
-  const realtype pelinv = ONE/(c_j + data->coeffxy);
+  const sunrealtype pelinv = ONE / (c_j + data->coeffxy);
 
-  ibc = (ixsub == 0) || (ixsub == npex-1);
+  ibc = (ixsub == 0) || (ixsub == npex - 1);
   i0  = (ixsub == 0);
-  jbc = (jysub == 0) || (jysub == npey-1);
+  jbc = (jysub == 0) || (jysub == npey - 1);
   j0  = (jysub == 0);
 
   /* Set inverse of the preconditioner; ppv must be on the device */
-  Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, (mxsub - ibc)*(mysub - jbc)),
-    KOKKOS_LAMBDA (const local_ordinal_type &tid)
-    {
+  Kokkos::parallel_for(
+    Kokkos::RangePolicy<execution_space>(0, (mxsub - ibc) * (mysub - jbc)),
+    KOKKOS_LAMBDA(const local_ordinal_type& tid) {
       sunindextype j = tid / (mxsub - ibc) + j0;
       sunindextype i = tid % (mxsub - ibc) + i0;
 
-      pp_1d(i + j*mxsub) = pelinv;
-    }
-  );
+      pp_1d(i + j * mxsub) = pelinv;
+    });
 
-  return(0);
+  return (0);
 }
-
 
 /*
  * PsolveHeat: solve preconditioner linear system.
@@ -450,15 +440,15 @@ int PsetupHeat(realtype tt, N_Vector yy, N_Vector yp, N_Vector rr,
  * containing the inverse diagonal Jacobian elements (previously
  * computed in PsetupHeat), returning the result in zvec.
  */
-int PsolveHeat(realtype tt, N_Vector uu, N_Vector up,
-               N_Vector rr, N_Vector rvec, N_Vector zvec,
-               realtype c_j, realtype delta, void *user_data)
+int PsolveHeat(sunrealtype tt, N_Vector uu, N_Vector up, N_Vector rr,
+               N_Vector rvec, N_Vector zvec, sunrealtype c_j, sunrealtype delta,
+               void* user_data)
 {
   UserData* data = reinterpret_cast<UserData*>(user_data);
 
   N_VProd(data->pp, rvec, zvec);
 
-  return(0);
+  return (0);
 }
 
 /*
@@ -466,7 +456,6 @@ int PsolveHeat(realtype tt, N_Vector uu, N_Vector up,
  * SUPPORTING FUNCTIONS
  *--------------------------------------------------------------------
  */
-
 
 /*
  * rescomm routine.  This routine performs all inter-processor
@@ -486,7 +475,7 @@ static int rescomm(N_Vector uu, N_Vector up, void* user_data)
   /* Finish receiving boundary data from neighboring PEs. */
   BRecvWait(request, user_data);
 
-  return(0);
+  return (0);
 }
 
 /*
@@ -494,22 +483,22 @@ static int rescomm(N_Vector uu, N_Vector up, void* user_data)
  * that all inter-processor communication of data needed to calculate F
  * has already been done, and that this data is in the work array uext.
  */
-static int reslocal(realtype tt, N_Vector uu, N_Vector up, N_Vector rr,
-                    void *user_data)
+static int reslocal(sunrealtype tt, N_Vector uu, N_Vector up, N_Vector rr,
+                    void* user_data)
 {
   UserData* data = reinterpret_cast<UserData*>(user_data);
 
   /* Get subgrid indices, array sizes, and grid coefficients. */
-  const int ixsub = data->ixsub;
-  const int jysub = data->jysub;
-  const int npex  = data->npex;
-  const int npey  = data->npey;
+  const int ixsub           = data->ixsub;
+  const int jysub           = data->jysub;
+  const int npex            = data->npex;
+  const int npey            = data->npey;
   const sunindextype mxsub  = data->mxsub;
   const sunindextype mxsub2 = data->mxsub + 2;
   const sunindextype mysub  = data->mysub;
-  const realtype coeffx  = data->coeffx;
-  const realtype coeffy  = data->coeffy;
-  const realtype coeffxy = data->coeffxy;
+  const sunrealtype coeffx  = data->coeffx;
+  const sunrealtype coeffy  = data->coeffy;
+  const sunrealtype coeffxy = data->coeffxy;
 
   sunindextype ibc, i0, jbc, j0;
 
@@ -522,64 +511,72 @@ static int reslocal(realtype tt, N_Vector uu, N_Vector up, N_Vector rr,
   Teuchos::RCP<vector_type> upv = N_VGetVector_Trilinos(up);
   Teuchos::RCP<vector_type> rrv = N_VGetVector_Trilinos(rr);
 
+#if TRILINOS_MAJOR_VERSION < 14
   const auto uu_2d = uuv->getLocalView<memory_space>();
-  const auto uu_1d = Kokkos::subview (uu_2d, Kokkos::ALL(), 0);
+  const auto uu_1d = Kokkos::subview(uu_2d, Kokkos::ALL(), 0);
   const auto up_2d = upv->getLocalView<memory_space>();
-  const auto up_1d = Kokkos::subview (up_2d, Kokkos::ALL(), 0);
-  auto rr_2d = rrv->getLocalView<memory_space>();
-  auto rr_1d = Kokkos::subview (rr_2d, Kokkos::ALL(), 0);
-  Kokkos::View<realtype*, memory_space> uext_1d = data->uext;
+  const auto up_1d = Kokkos::subview(up_2d, Kokkos::ALL(), 0);
+  auto rr_2d       = rrv->getLocalView<memory_space>();
+  auto rr_1d       = Kokkos::subview(rr_2d, Kokkos::ALL(), 0);
+#else
+  const auto uu_2d = uuv->getLocalView<memory_space>(Tpetra::Access::ReadOnly);
+  const auto uu_1d = Kokkos::subview(uu_2d, Kokkos::ALL(), 0);
+  const auto up_2d = upv->getLocalView<memory_space>(Tpetra::Access::ReadOnly);
+  const auto up_1d = Kokkos::subview(up_2d, Kokkos::ALL(), 0);
+  auto rr_2d       = rrv->getLocalView<memory_space>(Tpetra::Access::ReadWrite);
+  auto rr_1d       = Kokkos::subview(rr_2d, Kokkos::ALL(), 0);
+#endif
+
+  Kokkos::View<sunrealtype*, memory_space> uext_1d = data->uext;
 
   /* Copy local segment of u vector into the working extended array uext.
      This completes uext prior to the computation of the rr vector.
      uext and uuv must be on the device.     */
-  Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, mxsub*mysub),
-    KOKKOS_LAMBDA (const local_ordinal_type &tid)
-    {
-      sunindextype j = tid/mxsub;
-      sunindextype i = tid%mxsub;
+  Kokkos::parallel_for(
+    Kokkos::RangePolicy<execution_space>(0, mxsub * mysub),
+    KOKKOS_LAMBDA(const local_ordinal_type& tid) {
+      sunindextype j = tid / mxsub;
+      sunindextype i = tid % mxsub;
 
-      uext_1d((i+1) + (j+1)*mxsub2) = uu_1d(i + j*mxsub);
-    }
-  );
+      uext_1d((i + 1) + (j + 1) * mxsub2) = uu_1d(i + j * mxsub);
+    });
 
   /* Set loop limits for the interior of the local subgrid. */
 
   /* Prepare to loop over subgrid. */
-  ibc = (ixsub == 0) || (ixsub == npex-1);
+  ibc = (ixsub == 0) || (ixsub == npex - 1);
   i0  = (ixsub == 0);
-  jbc = (jysub == 0) || (jysub == npey-1);
+  jbc = (jysub == 0) || (jysub == npey - 1);
   j0  = (jysub == 0);
 
   /* Compute local residual; uext, upv, and resv must be on the device */
-  Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, (mxsub - ibc)*(mysub - jbc)),
-    KOKKOS_LAMBDA (const local_ordinal_type &tid)
-    {
-      sunindextype j = tid/(mxsub - ibc) + j0;
-      sunindextype i = tid%(mxsub - ibc) + i0;
-      sunindextype locu  = i + j*mxsub;
-      sunindextype locue = (i+1) + (j+1)*mxsub2;
+  Kokkos::parallel_for(
+    Kokkos::RangePolicy<execution_space>(0, (mxsub - ibc) * (mysub - jbc)),
+    KOKKOS_LAMBDA(const local_ordinal_type& tid) {
+      sunindextype j     = tid / (mxsub - ibc) + j0;
+      sunindextype i     = tid % (mxsub - ibc) + i0;
+      sunindextype locu  = i + j * mxsub;
+      sunindextype locue = (i + 1) + (j + 1) * mxsub2;
 
-      realtype termx   = coeffx * (uext_1d(locue-1)      + uext_1d(locue+1));
-      realtype termy   = coeffy * (uext_1d(locue-mxsub2) + uext_1d(locue+mxsub2));
-      realtype termctr = coeffxy * uext_1d(locue);
-      rr_1d(locu) = up_1d(locu) - (termx + termy - termctr);
-    }
-  );
+      sunrealtype termx = coeffx * (uext_1d(locue - 1) + uext_1d(locue + 1));
+      sunrealtype termy = coeffy *
+                          (uext_1d(locue - mxsub2) + uext_1d(locue + mxsub2));
+      sunrealtype termctr = coeffxy * uext_1d(locue);
+      rr_1d(locu)         = up_1d(locu) - (termx + termy - termctr);
+    });
 
-  return(0);
+  return (0);
 }
-
 
 /*
  * Routine to send boundary data to neighboring PEs.
  */
-static int BSend(N_Vector uu, void *user_data)
+static int BSend(N_Vector uu, void* user_data)
 {
   UserData* data = reinterpret_cast<UserData*>(user_data);
 
   /* Get comm, thispe, subgrid indices, data sizes */
-  auto comm = Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int> >(data->comm);
+  auto comm = Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int>>(data->comm);
   auto rawComm = comm->getRawMpiComm();
 
   const int thispe = data->thispe;
@@ -593,243 +590,258 @@ static int BSend(N_Vector uu, void *user_data)
   const int mysub = data->mysub;
 
   /* Get pointers to buffers and extended solution vector data array uext. */
-  Kokkos::View<realtype*, memory_space> bufleft   = data->send_buff_left;
-  Kokkos::View<realtype*, memory_space> bufright  = data->send_buff_right;
-  Kokkos::View<realtype*, memory_space> buftop    = data->send_buff_top;
-  Kokkos::View<realtype*, memory_space> bufbottom = data->send_buff_bottom;
-  typename Kokkos::View<realtype*>::HostMirror h_bufleft   =  data->h_send_buff_left;
-  typename Kokkos::View<realtype*>::HostMirror h_bufright  =  data->h_send_buff_right;
-  typename Kokkos::View<realtype*>::HostMirror h_buftop    =  data->h_send_buff_top;
-  typename Kokkos::View<realtype*>::HostMirror h_bufbottom =  data->h_send_buff_bottom;
+  Kokkos::View<sunrealtype*, memory_space> bufleft   = data->send_buff_left;
+  Kokkos::View<sunrealtype*, memory_space> bufright  = data->send_buff_right;
+  Kokkos::View<sunrealtype*, memory_space> buftop    = data->send_buff_top;
+  Kokkos::View<sunrealtype*, memory_space> bufbottom = data->send_buff_bottom;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_bufleft =
+    data->h_send_buff_left;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_bufright =
+    data->h_send_buff_right;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_buftop = data->h_send_buff_top;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_bufbottom =
+    data->h_send_buff_bottom;
 
   /* Get solution vector data. */
   Teuchos::RCP<vector_type> uuv = N_VGetVector_Trilinos(uu);
+
+#if TRILINOS_MAJOR_VERSION < 14
   const auto uu_2d = uuv->getLocalView<memory_space>();
-  const auto uu_1d = Kokkos::subview (uu_2d, Kokkos::ALL(), 0);
+  const auto uu_1d = Kokkos::subview(uu_2d, Kokkos::ALL(), 0);
+#else
+  const auto uu_2d = uuv->getLocalView<memory_space>(Tpetra::Access::ReadOnly);
+  const auto uu_1d = Kokkos::subview(uu_2d, Kokkos::ALL(), 0);
+#endif
 
   /* If jysub > 0, send data from bottom x-line of u.  (via bufbottom) */
 
-  if (jysub != 0) {
+  if (jysub != 0)
+  {
     /* Device kernel here to copy from uarray to the buffer on the device */
-    Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, mxsub),
-      KOKKOS_LAMBDA (const local_ordinal_type &lx)
-      {
-        bufbottom(lx) = uu_1d(lx);
-      }
-    );
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<execution_space>(0, mxsub),
+      KOKKOS_LAMBDA(const local_ordinal_type& lx) { bufbottom(lx) = uu_1d(lx); });
     /* Copy device buffer to the corresponding host buffer */
     Kokkos::deep_copy(h_bufbottom, bufbottom);
     /* MPI send buffer */
-    MPI_Send(h_bufbottom.data(), mxsub, MPI_SUNREALTYPE, thispe-npex, 0, *rawComm);
+    MPI_Send(h_bufbottom.data(), mxsub, MPI_SUNREALTYPE, thispe - npex, 0,
+             *rawComm);
   }
 
   /* If jysub < NPEY-1, send data from top x-line of u. (via buftop) */
 
-  if (jysub != npey-1) {
+  if (jysub != npey - 1)
+  {
     /* Device kernel here to copy from uarray to the buffer on the device */
-    Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, mxsub),
-      KOKKOS_LAMBDA (const local_ordinal_type &lx)
-      {
-        buftop(lx) = uu_1d((mysub-1)*mxsub + lx);
-      }
-    );
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<execution_space>(0, mxsub),
+      KOKKOS_LAMBDA(const local_ordinal_type& lx) {
+        buftop(lx) = uu_1d((mysub - 1) * mxsub + lx);
+      });
     /* Copy buffer to the host */
     Kokkos::deep_copy(h_buftop, buftop);
     /* MPI send buffer */
-    MPI_Send(h_buftop.data(), mxsub, MPI_SUNREALTYPE, thispe+npex, 0, *rawComm);
+    MPI_Send(h_buftop.data(), mxsub, MPI_SUNREALTYPE, thispe + npex, 0, *rawComm);
   }
 
   /* If ixsub > 0, send data from left y-line of u (via bufleft). */
 
-  if (ixsub != 0) {
+  if (ixsub != 0)
+  {
     /* Device kernel here to copy from uarray to the buffer on the device */
-    Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, mysub),
-      KOKKOS_LAMBDA (const local_ordinal_type &ly)
-      {
-        bufleft(ly) = uu_1d(ly*mxsub);
-      }
-    );
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<execution_space>(0, mysub),
+      KOKKOS_LAMBDA(const local_ordinal_type& ly) {
+        bufleft(ly) = uu_1d(ly * mxsub);
+      });
     /* Copy buffer to the host */
     Kokkos::deep_copy(h_bufleft, bufleft);
     /* MPI send buffer */
-    MPI_Send(h_bufleft.data(), mysub, MPI_SUNREALTYPE, thispe-1, 0, *rawComm);
+    MPI_Send(h_bufleft.data(), mysub, MPI_SUNREALTYPE, thispe - 1, 0, *rawComm);
   }
 
   /* If ixsub < NPEX-1, send data from right y-line of u (via bufright). */
 
-  if (ixsub != npex-1) {
+  if (ixsub != npex - 1)
+  {
     /* Device kernel here to copy from uarray to the buffer on the device */
-    Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, mysub),
-      KOKKOS_LAMBDA (const local_ordinal_type &ly)
-      {
-        bufright(ly) = uu_1d(ly*mxsub + (mxsub-1));
-      }
-    );
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<execution_space>(0, mysub),
+      KOKKOS_LAMBDA(const local_ordinal_type& ly) {
+        bufright(ly) = uu_1d(ly * mxsub + (mxsub - 1));
+      });
     /* Copy buffer to the host */
     Kokkos::deep_copy(h_bufright, bufright);
     /* MPI send buffer */
-    MPI_Send(h_bufright.data(), mysub, MPI_SUNREALTYPE, thispe+1, 0, *rawComm);
+    MPI_Send(h_bufright.data(), mysub, MPI_SUNREALTYPE, thispe + 1, 0, *rawComm);
   }
 
-  return(0);
-
+  return (0);
 }
-
 
 /*
  * Routine to start receiving boundary data from neighboring PEs.
  * Notes:
- *   1) buffer should be able to hold 2*(MYSUB+MYSUB) realtype entries, should
+ *   1) buffer should be able to hold 2*(MYSUB+MYSUB) sunrealtype entries, should
  *      be passed to both the BRecvPost and BRecvWait functions, and should not
  *      be manipulated between the two calls.
  *   2) request should have 4 entries, and should be passed in
  *      both calls also.
  */
-static int BRecvPost(MPI_Request request[], void *user_data)
+static int BRecvPost(MPI_Request request[], void* user_data)
 {
   UserData* data = reinterpret_cast<UserData*>(user_data);
 
   /* Get comm, thispe, subgrid indices, data sizes */
-  auto comm = Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int> >(data->comm);
+  auto comm = Teuchos::rcp_dynamic_cast<const Teuchos::MpiComm<int>>(data->comm);
   auto rawComm = comm->getRawMpiComm();
 
-  const int thispe = data->thispe;
-  const int ixsub  = data->ixsub;
-  const int jysub  = data->jysub;
-  const int npex   = data->npex;
-  const int npey   = data->npey;
+  const int thispe         = data->thispe;
+  const int ixsub          = data->ixsub;
+  const int jysub          = data->jysub;
+  const int npex           = data->npex;
+  const int npey           = data->npey;
   const sunindextype mxsub = data->mxsub;
   const sunindextype mysub = data->mysub;
 
   /* Get left, right, top and bottom host buffers. */
-  typename Kokkos::View<realtype*>::HostMirror h_bufleft   = data->h_recv_buff_left;
-  typename Kokkos::View<realtype*>::HostMirror h_bufright  = data->h_recv_buff_right;
-  typename Kokkos::View<realtype*>::HostMirror h_buftop    = data->h_recv_buff_top;
-  typename Kokkos::View<realtype*>::HostMirror h_bufbottom = data->h_recv_buff_bottom;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_bufleft =
+    data->h_recv_buff_left;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_bufright =
+    data->h_recv_buff_right;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_buftop = data->h_recv_buff_top;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_bufbottom =
+    data->h_recv_buff_bottom;
 
   /* If jysub > 0, receive data for bottom x-line of uext. */
-  if (jysub != 0) {
-    MPI_Irecv(h_bufbottom.data(), mxsub, MPI_SUNREALTYPE,
-              thispe-npex, 0, *rawComm, &request[0]);
+  if (jysub != 0)
+  {
+    MPI_Irecv(h_bufbottom.data(), mxsub, MPI_SUNREALTYPE, thispe - npex, 0,
+              *rawComm, &request[0]);
   }
 
   /* If jysub < NPEY-1, receive data for top x-line of uext. */
-  if (jysub != npey-1) {
-    MPI_Irecv(h_buftop.data(), mxsub, MPI_SUNREALTYPE,
-              thispe+npex, 0, *rawComm, &request[1]);
+  if (jysub != npey - 1)
+  {
+    MPI_Irecv(h_buftop.data(), mxsub, MPI_SUNREALTYPE, thispe + npex, 0,
+              *rawComm, &request[1]);
   }
 
   /* If ixsub > 0, receive data for left y-line of uext (via bufleft). */
-  if (ixsub != 0) {
-    MPI_Irecv(h_bufleft.data(), mysub, MPI_SUNREALTYPE,
-              thispe-1, 0, *rawComm, &request[2]);
+  if (ixsub != 0)
+  {
+    MPI_Irecv(h_bufleft.data(), mysub, MPI_SUNREALTYPE, thispe - 1, 0, *rawComm,
+              &request[2]);
   }
 
   /* If ixsub < NPEX-1, receive data for right y-line of uext (via bufright). */
-  if (ixsub != npex-1) {
-    MPI_Irecv(h_bufright.data(), mysub, MPI_SUNREALTYPE,
-              thispe+1, 0, *rawComm, &request[3]);
+  if (ixsub != npex - 1)
+  {
+    MPI_Irecv(h_bufright.data(), mysub, MPI_SUNREALTYPE, thispe + 1, 0,
+              *rawComm, &request[3]);
   }
 
-  return(0);
-
+  return (0);
 }
 
 /*
  * Routine to finish receiving boundary data from neighboring PEs.
  * Notes:
- *   1) buffer should be able to hold 2*MYSUB realtype entries, should be
+ *   1) buffer should be able to hold 2*MYSUB sunrealtype entries, should be
  *      passed to both the BRecvPost and BRecvWait functions, and should not
  *      be manipulated between the two calls.
  *   2) request should have four entries, and should be passed in both
  *      calls also.
  */
-static int BRecvWait(MPI_Request request[], void *user_data)
+static int BRecvWait(MPI_Request request[], void* user_data)
 {
   MPI_Status status;
   UserData* data = reinterpret_cast<UserData*>(user_data);
 
   /* Get thispe, subgrid indices, data sizes */
-  const int ixsub  = data->ixsub;
-  const int jysub  = data->jysub;
-  const int npex   = data->npex;
-  const int npey   = data->npey;
+  const int ixsub          = data->ixsub;
+  const int jysub          = data->jysub;
+  const int npex           = data->npex;
+  const int npey           = data->npey;
   const sunindextype mxsub = data->mxsub;
   const sunindextype mysub = data->mysub;
 
   /* Get pointers to buffers and extended solution vector data array uext. */
-  typename Kokkos::View<realtype*>::HostMirror h_bufleft   = data->h_recv_buff_left;
-  typename Kokkos::View<realtype*>::HostMirror h_bufright  = data->h_recv_buff_right;
-  typename Kokkos::View<realtype*>::HostMirror h_buftop    = data->h_recv_buff_top;
-  typename Kokkos::View<realtype*>::HostMirror h_bufbottom = data->h_recv_buff_bottom;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_bufleft =
+    data->h_recv_buff_left;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_bufright =
+    data->h_recv_buff_right;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_buftop = data->h_recv_buff_top;
+  typename Kokkos::View<sunrealtype*>::HostMirror h_bufbottom =
+    data->h_recv_buff_bottom;
 
-  Kokkos::View<realtype*, memory_space> bufleft   = data->recv_buff_left;
-  Kokkos::View<realtype*, memory_space> bufright  = data->recv_buff_right;
-  Kokkos::View<realtype*, memory_space> buftop    = data->recv_buff_top;
-  Kokkos::View<realtype*, memory_space> bufbottom = data->recv_buff_bottom;
+  Kokkos::View<sunrealtype*, memory_space> bufleft   = data->recv_buff_left;
+  Kokkos::View<sunrealtype*, memory_space> bufright  = data->recv_buff_right;
+  Kokkos::View<sunrealtype*, memory_space> buftop    = data->recv_buff_top;
+  Kokkos::View<sunrealtype*, memory_space> bufbottom = data->recv_buff_bottom;
 
-  Kokkos::View<realtype*, memory_space> uext_1d = data->uext;
+  Kokkos::View<sunrealtype*, memory_space> uext_1d = data->uext;
 
   const sunindextype mxsub2 = mxsub + 2;
   const sunindextype mysub1 = mysub + 1;
 
   /* If jysub > 0, receive data for bottom x-line of uext. */
-  if (jysub != 0) {
+  if (jysub != 0)
+  {
     MPI_Wait(&request[0], &status);
     /* Copy the buffer from the host to the device */
     Kokkos::deep_copy(bufbottom, h_bufbottom);
     /* Copy the bottom dev_recv_buff to uext. */
-    Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, mxsub),
-      KOKKOS_LAMBDA (const local_ordinal_type &lx)
-      {
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<execution_space>(0, mxsub),
+      KOKKOS_LAMBDA(const local_ordinal_type& lx) {
         uext_1d(1 + lx) = bufbottom(lx);
-      }
-    );
+      });
   }
 
   /* If jysub < NPEY-1, receive data for top x-line of uext. */
-  if (jysub != npey-1) {
+  if (jysub != npey - 1)
+  {
     MPI_Wait(&request[1], &status);
     /* Copy the buffer from the host to the device */
     Kokkos::deep_copy(buftop, h_buftop);
     /* Copy the top dev_recv_buff to uext. */
-    Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, mxsub),
-      KOKKOS_LAMBDA (const local_ordinal_type &lx)
-      {
-        uext_1d((1 + mysub1*mxsub2) + lx) = buftop(lx);
-      }
-    );
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<execution_space>(0, mxsub),
+      KOKKOS_LAMBDA(const local_ordinal_type& lx) {
+        uext_1d((1 + mysub1 * mxsub2) + lx) = buftop(lx);
+      });
   }
 
   /* If ixsub > 0, receive data for left y-line of uext (via bufleft). */
-  if (ixsub != 0) {
+  if (ixsub != 0)
+  {
     MPI_Wait(&request[2], &status);
     /* Copy the buffer from the host to the device */
     Kokkos::deep_copy(bufleft, h_bufleft);
     /* Copy the left dev_recv_buff to uext. */
-    Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, mysub),
-      KOKKOS_LAMBDA (const local_ordinal_type &ly)
-      {
-        uext_1d((ly + 1)*mxsub2) = bufleft(ly);
-      }
-    );
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<execution_space>(0, mysub),
+      KOKKOS_LAMBDA(const local_ordinal_type& ly) {
+        uext_1d((ly + 1) * mxsub2) = bufleft(ly);
+      });
   }
 
   /* If ixsub < NPEX-1, receive data for right y-line of uext (via bufright). */
-  if (ixsub != npex-1) {
+  if (ixsub != npex - 1)
+  {
     MPI_Wait(&request[3], &status);
     /* Copy the buffer from the host to the device */
     Kokkos::deep_copy(bufright, h_bufright);
     /* Copy the right dev_recv_buff to uext. */
-    Kokkos::parallel_for (Kokkos::RangePolicy<execution_space>(0, mysub),
-      KOKKOS_LAMBDA (const local_ordinal_type &ly)
-      {
-        uext_1d((ly + 2)*mxsub2 - 1) = bufright(ly);
-      }
-    );
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<execution_space>(0, mysub),
+      KOKKOS_LAMBDA(const local_ordinal_type& ly) {
+        uext_1d((ly + 2) * mxsub2 - 1) = bufright(ly);
+      });
   }
 
-  return(0);
+  return (0);
 }
 
 /*
@@ -841,7 +853,9 @@ static int BRecvWait(MPI_Request request[], void *user_data)
 /*
  * InitUserData initializes the user's data block data.
  */
-static int InitUserData(int thispe, const Teuchos::RCP<const Teuchos::Comm<int> > comm, UserData *data)
+static int InitUserData(int thispe,
+                        const Teuchos::RCP<const Teuchos::Comm<int>> comm,
+                        UserData* data)
 {
   data->comm    = comm;
   data->thispe  = thispe;
@@ -849,72 +863,68 @@ static int InitUserData(int thispe, const Teuchos::RCP<const Teuchos::Comm<int> 
   data->npey    = NPEY;  /* Number of subgrids in y-direction */
   data->mxsub   = MXSUB; /* Number of subgrid mesh points in x-direction */
   data->mysub   = MYSUB; /* Number of subgrid mesh points in y-direction */
-  data->jysub   = thispe/data->npex;
+  data->jysub   = thispe / data->npex;
   data->ixsub   = thispe - (data->jysub * data->npex);
-  data->mx      = data->npex * data->mxsub;  /* Mesh size in x-direction */
-  data->my      = data->npey * data->mysub;  /* Mesh size in y-direction */
-  data->dx      = ONE/(data->mx-ONE); /* Assumes a [0,1] interval in x. */
-  data->dy      = ONE/(data->my-ONE); /* Assumes a [0,1] interval in y. */
-  data->coeffx  = ONE/(data->dx * data->dx);
-  data->coeffy  = ONE/(data->dy * data->dy);
-  data->coeffxy = TWO/(data->dx * data->dx) + TWO/(data->dy * data->dy);
+  data->mx      = data->npex * data->mxsub; /* Mesh size in x-direction */
+  data->my      = data->npey * data->mysub; /* Mesh size in y-direction */
+  data->dx      = ONE / (data->mx - ONE);   /* Assumes a [0,1] interval in x. */
+  data->dy      = ONE / (data->my - ONE);   /* Assumes a [0,1] interval in y. */
+  data->coeffx  = ONE / (data->dx * data->dx);
+  data->coeffy  = ONE / (data->dy * data->dy);
+  data->coeffxy = TWO / (data->dx * data->dx) + TWO / (data->dy * data->dy);
 
-  return(0);
+  return (0);
 }
-
 
 /*
  * AllocUserData allocates memory for the extended vector uext
  * and MPI communication buffers.
  */
-static int AllocUserData(int thispe, N_Vector uu, UserData *data)
+static int AllocUserData(int thispe, N_Vector uu, UserData* data)
 {
   sunindextype mxsub = data->mxsub;
   sunindextype mysub = data->mysub;
 
   /* Allocate local extended vector (includes ghost nodes) */
-  Kokkos::resize(data->uext, (mxsub + 2)*(mysub +2));
+  Kokkos::resize(data->uext, (mxsub + 2) * (mysub + 2));
 
   /* Allocate local send buffers */
-  Kokkos::resize(data->send_buff_left,   mysub);
-  Kokkos::resize(data->send_buff_right,  mysub);
-  Kokkos::resize(data->send_buff_top,    mxsub);
+  Kokkos::resize(data->send_buff_left, mysub);
+  Kokkos::resize(data->send_buff_right, mysub);
+  Kokkos::resize(data->send_buff_top, mxsub);
   Kokkos::resize(data->send_buff_bottom, mxsub);
 
-  data->h_send_buff_left = create_mirror_view(data->send_buff_left);
-  data->h_send_buff_right = create_mirror_view(data->send_buff_right);
-  data->h_send_buff_top = create_mirror_view(data->send_buff_top);
+  data->h_send_buff_left   = create_mirror_view(data->send_buff_left);
+  data->h_send_buff_right  = create_mirror_view(data->send_buff_right);
+  data->h_send_buff_top    = create_mirror_view(data->send_buff_top);
   data->h_send_buff_bottom = create_mirror_view(data->send_buff_bottom);
 
   /* Allocate local receive buffers */
-  Kokkos::resize(data->recv_buff_left,   mysub);
-  Kokkos::resize(data->recv_buff_right,  mysub);
-  Kokkos::resize(data->recv_buff_top,    mxsub);
+  Kokkos::resize(data->recv_buff_left, mysub);
+  Kokkos::resize(data->recv_buff_right, mysub);
+  Kokkos::resize(data->recv_buff_top, mxsub);
   Kokkos::resize(data->recv_buff_bottom, mxsub);
 
-  data->h_recv_buff_left = create_mirror_view(data->recv_buff_left);
-  data->h_recv_buff_right = create_mirror_view(data->recv_buff_right);
-  data->h_recv_buff_top = create_mirror_view(data->recv_buff_top);
+  data->h_recv_buff_left   = create_mirror_view(data->recv_buff_left);
+  data->h_recv_buff_right  = create_mirror_view(data->recv_buff_right);
+  data->h_recv_buff_top    = create_mirror_view(data->recv_buff_top);
   data->h_recv_buff_bottom = create_mirror_view(data->recv_buff_bottom);
 
   /* An N-vector to hold preconditioner. */
   data->pp = N_VClone(uu);
-  if(data->pp == NULL) {
-    return -1;
-  }
+  if (data->pp == NULL) { return -1; }
 
   return 0;
 }
 
-
 /*
  * SetInitialProfile sets the initial values for the problem.
  */
-static int SetInitialProfile(N_Vector uu, N_Vector up,  N_Vector id,
-                             N_Vector res, UserData *data)
+static int SetInitialProfile(N_Vector uu, N_Vector up, N_Vector id,
+                             N_Vector res, UserData* data)
 {
   sunindextype i, iloc, j, jloc, loc;
-  realtype xfact, yfact;
+  sunrealtype xfact, yfact;
 
   /* Initialize uu. */
 
@@ -923,6 +933,7 @@ static int SetInitialProfile(N_Vector uu, N_Vector up,  N_Vector id,
   Teuchos::RCP<vector_type> ti = N_VGetVector_Trilinos(id);
 
   /* Get access to local uu and id data, sync the host with the device */
+#if TRILINOS_MAJOR_VERSION < 14
   tu->sync<Kokkos::HostSpace>();
   auto u_2d = tu->getLocalView<Kokkos::HostSpace>();
   auto u_1d = Kokkos::subview(u_2d, Kokkos::ALL(), 0);
@@ -932,47 +943,60 @@ static int SetInitialProfile(N_Vector uu, N_Vector up,  N_Vector id,
   auto id_2d = ti->getLocalView<Kokkos::HostSpace>();
   auto id_1d = Kokkos::subview(id_2d, Kokkos::ALL(), 0);
   ti->modify<Kokkos::HostSpace>();
+#else
+  auto u_2d = tu->getLocalView<Kokkos::HostSpace>(Tpetra::Access::ReadWrite);
+  auto u_1d = Kokkos::subview(u_2d, Kokkos::ALL(), 0);
+
+  auto id_2d = ti->getLocalView<Kokkos::HostSpace>(Tpetra::Access::ReadWrite);
+  auto id_1d = Kokkos::subview(id_2d, Kokkos::ALL(), 0);
+#endif
 
   /* Set mesh spacings and subgrid indices for this PE. */
-  const realtype dx = data->dx;
-  const realtype dy = data->dy;
-  const int ixsub = data->ixsub;
-  const int jysub = data->jysub;
+  const sunrealtype dx = data->dx;
+  const sunrealtype dy = data->dy;
+  const int ixsub      = data->ixsub;
+  const int jysub      = data->jysub;
 
   /* Set beginning and ending locations in the global array corresponding
      to the portion of that array assigned to this processor. */
   const sunindextype mxsub   = data->mxsub;
   const sunindextype mysub   = data->mysub;
-  const sunindextype ixbegin = mxsub*ixsub;
-  const sunindextype ixend   = mxsub*(ixsub+1) - 1;
-  const sunindextype jybegin = mysub*jysub;
-  const sunindextype jyend   = mysub*(jysub+1) - 1;
+  const sunindextype ixbegin = mxsub * ixsub;
+  const sunindextype ixend   = mxsub * (ixsub + 1) - 1;
+  const sunindextype jybegin = mysub * jysub;
+  const sunindextype jyend   = mysub * (jysub + 1) - 1;
 
   /* Loop over the local array, computing the initial profile value.
      The global indices are (i,j) and the local indices are (iloc,jloc).
      Also set the id vector to zero for boundary points, one otherwise. */
 
-  for (j = jybegin, jloc = 0; j <= jyend; j++, jloc++) {
-    yfact = dy*j;
-    for (i = ixbegin, iloc = 0; i <= ixend; i++, iloc++) {
-      xfact = dx*i;
-      loc = iloc + jloc*mxsub;
-      u_1d(loc) = RCONST(16.0) * xfact * (ONE - xfact) * yfact * (ONE - yfact);
+  for (j = jybegin, jloc = 0; j <= jyend; j++, jloc++)
+  {
+    yfact = dy * j;
+    for (i = ixbegin, iloc = 0; i <= ixend; i++, iloc++)
+    {
+      xfact     = dx * i;
+      loc       = iloc + jloc * mxsub;
+      u_1d(loc) = SUN_RCONST(16.0) * xfact * (ONE - xfact) * yfact *
+                  (ONE - yfact);
 
       if (i == 0 || i == data->mx - 1 || j == 0 || j == data->my - 1)
+      {
         id_1d(loc) = ZERO;
-      else
-        id_1d(loc) = ONE;
+      }
+      else { id_1d(loc) = ONE; }
     }
   }
 
+#if TRILINOS_MAJOR_VERSION < 14
   /* Sync the device with the host */
   tu->sync<memory_space>();
   ti->sync<memory_space>();
+#endif
 
   /* Initialize up. */
 
-  N_VConst(ZERO, up);    /* Initially set up = 0. */
+  N_VConst(ZERO, up); /* Initially set up = 0. */
 
   /* resHeat sets res to negative of ODE RHS values at interior points. */
   resHeat(ZERO, uu, up, res, data);
@@ -980,23 +1004,23 @@ static int SetInitialProfile(N_Vector uu, N_Vector up,  N_Vector id,
   /* Copy -res into up to get correct initial up values on the device only! */
   N_VScale(-ONE, res, up);
 
-  return(0);
+  return (0);
 }
-
 
 /*
  * Print first lines of output and table heading
  */
-static void PrintHeader(realtype rtol, realtype atol, UserData *data)
+static void PrintHeader(sunrealtype rtol, sunrealtype atol, UserData* data)
 {
-  printf("\nidaHeat2D_kry_p: Heat equation, parallel example problem for IDA\n");
+  printf(
+    "\nidaHeat2D_kry_p: Heat equation, parallel example problem for IDA\n");
   printf("            Discretized heat equation on 2D unit square.\n");
   printf("            Zero boundary conditions,");
   printf(" polynomial initial conditions.\n");
-  printf("            Mesh dimensions: %d x %d", (int) data->mx, (int) data->my);
-  printf("        Total system size: %ld\n\n", (long) data->mx * data->my);
-  printf("Subgrid dimensions: %d x %d", (int) data->mxsub, (int) data->mysub);
-  printf("        Processor array: %d x %d\n", (int) data->npex, (int) data->npey);
+  printf("            Mesh dimensions: %d x %d", (int)data->mx, (int)data->my);
+  printf("        Total system size: %ld\n\n", (long)data->mx * data->my);
+  printf("Subgrid dimensions: %d x %d", (int)data->mxsub, (int)data->mysub);
+  printf("        Processor array: %d x %d\n", (int)data->npex, (int)data->npey);
 #if defined(SUNDIALS_EXTENDED_PRECISION)
   printf("Tolerance parameters:  rtol = %Lg   atol = %Lg\n", rtol, atol);
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
@@ -1012,24 +1036,25 @@ static void PrintHeader(realtype rtol, realtype atol, UserData *data)
 
   /* Print output table heading and initial line of table. */
   printf("\n   Output Summary (umax = max-norm of solution) \n\n");
-  printf("  time     umax       k  nst  nni  nli   nre   nreLS    h      npe nps\n");
-  printf("----------------------------------------------------------------------\n");
+  printf(
+    "  time     umax       k  nst  nni  nli   nre   nreLS    h      npe nps\n");
+  printf(
+    "----------------------------------------------------------------------\n");
 }
-
 
 /*
  * PrintOutput: print max norm of solution and current solver statistics
  */
-static void PrintOutput(int id, void *ida_mem, realtype t, N_Vector uu)
+static void PrintOutput(int id, void* ida_mem, sunrealtype t, N_Vector uu)
 {
-  realtype hused, umax;
+  sunrealtype hused, umax;
   long int nst, nni, nje, nre, nreLS, nli, npe, nps;
   int kused, retval;
 
   umax = N_VMaxNorm(uu);
 
-  if (id == 0) {
-
+  if (id == 0)
+  {
     retval = IDAGetLastOrder(ida_mem, &kused);
     check_retval(&retval, "IDAGetLastOrder", 1, id);
     retval = IDAGetNumSteps(ida_mem, &nst);
@@ -1052,24 +1077,25 @@ static void PrintOutput(int id, void *ida_mem, realtype t, N_Vector uu)
     check_retval(&retval, "IDAGetNumPrecSolves", 1, id);
 
 #if defined(SUNDIALS_EXTENDED_PRECISION)
-    printf(" %5.2Lf %13.5Le  %d  %3ld  %3ld  %3ld  %4ld  %4ld  %9.2Le  %3ld %3ld\n",
+    printf(" %5.2Lf %13.5Le  %d  %3ld  %3ld  %3ld  %4ld  %4ld  %9.2Le  %3ld "
+           "%3ld\n",
            t, umax, kused, nst, nni, nje, nre, nreLS, hused, npe, nps);
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
-    printf(" %5.2f %13.5e  %d  %3ld  %3ld  %3ld  %4ld  %4ld  %9.2e  %3ld %3ld\n",
+    printf(" %5.2f %13.5e  %d  %3ld  %3ld  %3ld  %4ld  %4ld  %9.2e  %3ld "
+           "%3ld\n",
            t, umax, kused, nst, nni, nje, nre, nreLS, hused, npe, nps);
 #else
-    printf(" %5.2f %13.5e  %d  %3ld  %3ld  %3ld  %4ld  %4ld  %9.2e  %3ld %3ld\n",
+    printf(" %5.2f %13.5e  %d  %3ld  %3ld  %3ld  %4ld  %4ld  %9.2e  %3ld "
+           "%3ld\n",
            t, umax, kused, nst, nni, nje, nre, nreLS, hused, npe, nps);
 #endif
-
   }
 }
-
 
 /*
  * Print some final integrator statistics
  */
-static void PrintFinalStats(void *ida_mem)
+static void PrintFinalStats(void* ida_mem)
 {
   long int netf, ncfn, ncfl;
 
@@ -1091,32 +1117,36 @@ static void PrintFinalStats(void *ida_mem)
  *   opt == 2 means function allocates memory so check if returned
  *            NULL pointer
  */
-static int check_retval(void *flagvalue, const char *funcname, int opt, int id)
+static int check_retval(void* flagvalue, const char* funcname, int opt, int id)
 {
-  int *errflag;
+  int* errflag;
 
-  if (opt == 0 && flagvalue == NULL) {
+  if (opt == 0 && flagvalue == NULL)
+  {
     /* Check if SUNDIALS function returned NULL pointer - no memory allocated */
     fprintf(stderr,
-            "\nSUNDIALS_ERROR(%d): %s() failed - returned NULL pointer\n\n",
-            id, funcname);
-    return(1);
-  } else if (opt == 1) {
+            "\nSUNDIALS_ERROR(%d): %s() failed - returned NULL pointer\n\n", id,
+            funcname);
+    return (1);
+  }
+  else if (opt == 1)
+  {
     /* Check if flag < 0 */
-    errflag = (int *) flagvalue;
-    if (*errflag < 0) {
-      fprintf(stderr,
-              "\nSUNDIALS_ERROR(%d): %s() failed with flag = %d\n\n",
+    errflag = (int*)flagvalue;
+    if (*errflag < 0)
+    {
+      fprintf(stderr, "\nSUNDIALS_ERROR(%d): %s() failed with flag = %d\n\n",
               id, funcname, *errflag);
-      return(1);
+      return (1);
     }
-  } else if (opt == 2 && flagvalue == NULL) {
+  }
+  else if (opt == 2 && flagvalue == NULL)
+  {
     /* Check if function returned NULL pointer - no memory allocated */
-    fprintf(stderr,
-            "\nMEMORY_ERROR(%d): %s() failed - returned NULL pointer\n\n",
+    fprintf(stderr, "\nMEMORY_ERROR(%d): %s() failed - returned NULL pointer\n\n",
             id, funcname);
-    return(1);
+    return (1);
   }
 
-  return(0);
+  return (0);
 }

@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -99,7 +99,7 @@ the beginning of the array of subvectors, and a boolean flag
      sunindextype  num_subvectors;  /* number of vectors attached      */
      sunindextype  global_length;   /* overall mpimanyvector length    */
      N_Vector*     subvec_array;    /* pointer to N_Vector array       */
-     booleantype   own_data;        /* flag indicating data ownership  */
+     sunbooleantype   own_data;        /* flag indicating data ownership  */
    };
 
 The header file to include when using this module is
@@ -198,7 +198,18 @@ the following additional user-callable routines:
    This function returns the *vec_num* subvector from the NVECTOR array.
 
 
-.. c:function:: realtype *N_VGetSubvectorArrayPointer_MPIManyVector(N_Vector v, sunindextype vec_num)
+.. c:function:: sunindextype N_VGetSubvectorLocalLength_MPIManyVector(N_Vector v, sunindextype vec_num)
+
+   This function returns the local length of the *vec_num* subvector from the NVECTOR array.
+
+   Usage:
+
+   .. code-block:: c
+
+      local_length = N_VGetSubvectorLocalLength_MPIManyVector(v, 0);
+
+
+.. c:function:: sunrealtype *N_VGetSubvectorArrayPointer_MPIManyVector(N_Vector v, sunindextype vec_num)
 
    This function returns the data array pointer for the *vec_num*
    subvector from the NVECTOR array.
@@ -208,14 +219,12 @@ the following additional user-callable routines:
    returned.
 
 
-.. c:function:: int N_VSetSubvectorArrayPointer_MPIManyVector(realtype *v_data, N_Vector v, sunindextype vec_num)
+.. c:function:: SUNErrCode N_VSetSubvectorArrayPointer_MPIManyVector(sunrealtype *v_data, N_Vector v, sunindextype vec_num)
 
    This function sets the data array pointer for the *vec_num*
    subvector from the NVECTOR array.
 
-   If the input *vec_num* is invalid, or if the subvector does not
-   support the ``N_VSetArrayPointer`` operation, then ``-1`` is
-   returned; otherwise it returns ``0``.
+   The function returns a :c:type:`SUNErrCode`.
 
 
 .. c:function:: sunindextype N_VGetNumSubvectors_MPIManyVector(N_Vector v)
@@ -243,62 +252,51 @@ subvectors, so those should be set up as desired *before* attaching
 them to the MPIManyVector in :c:func:`N_VNew_MPIManyVector` or
 :c:func:`N_VMake_MPIManyVector`.
 
-.. c:function:: int N_VEnableFusedOps_MPIManyVector(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableFusedOps_MPIManyVector(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) all fused and
-   vector array operations in the MPIManyVector vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   vector array operations in the MPIManyVector vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearCombination_MPIManyVector(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearCombination_MPIManyVector(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear
-   combination fused operation in the MPIManyVector vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   combination fused operation in the MPIManyVector vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleAddMulti_MPIManyVector(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleAddMulti_MPIManyVector(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale and
    add a vector to multiple vectors fused operation in the MPIManyVector vector. The
-   return value is ``0`` for success and ``-1`` if the input vector or its
-   ``ops`` structure are ``NULL``.
+   return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableDotProdMulti_MPIManyVector(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableDotProdMulti_MPIManyVector(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the multiple
-   dot products fused operation in the MPIManyVector vector. The return value is ``0``
-   for success and ``-1`` if the input vector or its ``ops`` structure are
-   ``NULL``.
+   dot products fused operation in the MPIManyVector vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearSumVectorArray_MPIManyVector(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearSumVectorArray_MPIManyVector(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear sum
-   operation for vector arrays in the MPIManyVector vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the MPIManyVector vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleVectorArray_MPIManyVector(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleVectorArray_MPIManyVector(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale
-   operation for vector arrays in the MPIManyVector vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the MPIManyVector vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableConstVectorArray_MPIManyVector(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableConstVectorArray_MPIManyVector(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the const
-   operation for vector arrays in the MPIManyVector vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the MPIManyVector vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableWrmsNormVectorArray_MPIManyVector(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableWrmsNormVectorArray_MPIManyVector(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the WRMS norm
-   operation for vector arrays in the MPIManyVector vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the MPIManyVector vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableWrmsNormMaskVectorArray_MPIManyVector(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableWrmsNormMaskVectorArray_MPIManyVector(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the masked WRMS
-   norm operation for vector arrays in the MPIManyVector vector. The return value is
-   ``0`` for success and ``-1`` if the input vector or its ``ops`` structure are
-   ``NULL``.
+   norm operation for vector arrays in the MPIManyVector vector. The return value is a :c:type:`SUNErrCode`.
 
 
 **Notes**

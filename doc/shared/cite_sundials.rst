@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -20,6 +20,9 @@ reporting work done with SUNDIALS:
      author    = {Gardner, David J and Reynolds, Daniel R and Woodward, Carol S and Balos, Cody J},
      journal   = {ACM Transactions on Mathematical Software (TOMS)},
      publisher = {ACM},
+     volume    = {48},
+     number    = {3},
+     pages     = {1--24},
      year      = {2022},
      doi       = {10.1145/3539801}
    }

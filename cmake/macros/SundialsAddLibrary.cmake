@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -152,6 +152,8 @@ macro(sundials_add_library target)
     # create the target for the object library
     add_library(${obj_target} OBJECT ${sources})
 
+    set_target_properties(${obj_target} PROPERTIES FOLDER "obj")
+
     # add all object libraries to object library
     if(sundials_add_library_OBJECT_LIBRARIES)
       target_link_libraries(${obj_target}
@@ -174,12 +176,22 @@ macro(sundials_add_library target)
       target_link_libraries(${obj_target} ${_all_libs})
     endif()
 
+    if(SUNDIALS_BUILD_WITH_PROFILING)
+      if(ENABLE_CALIPER)
+        target_link_libraries(${obj_target} PUBLIC caliper)
+      endif()
+      if(ENABLE_ADIAK)
+        target_link_libraries(${obj_target} PUBLIC adiak::adiak ${CMAKE_DL_LIBS})
+      endif()
+    endif()
+
     # add includes to object library
     target_include_directories(${obj_target}
       PUBLIC
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
       $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-      $<BUILD_INTERFACE:${SUNDIALS_SOURCE_DIR}/src/sundials>
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/sundials>
+      $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/src/sundials>
     )
     if(sundials_add_library_INCLUDE_DIRECTORIES)
       string(REPLACE "{{libtype}}" "${_libtype}" _includes "${sundials_add_library_INCLUDE_DIRECTORIES}")
@@ -190,7 +202,7 @@ macro(sundials_add_library target)
     if(${_libtype} MATCHES "STATIC")
       target_compile_definitions(${obj_target} PRIVATE SUNDIALS_STATIC_DEFINE)
     else()
-      target_compile_definitions(${obj_target} PRIVATE sundials_generic_EXPORTS)
+      target_compile_definitions(${obj_target} PRIVATE sundials_core_EXPORTS)
     endif()
 
     # add all other compile definitions to object library
@@ -229,6 +241,8 @@ macro(sundials_add_library target)
 
       add_library(${_actual_target_name} ${_libtype} $<TARGET_OBJECTS:${obj_target}>)
 
+      set_target_properties(${_actual_target_name} PROPERTIES FOLDER "src")
+
       # add any object library dependencies
       if(sundials_add_library_OBJECT_LIBRARIES)
         if(${_libtype} MATCHES "STATIC")
@@ -239,7 +253,7 @@ macro(sundials_add_library target)
         foreach(_tmp ${_all_objs})
           # We use target_sources since target_link_libraries does not work
           # as expected with CMake 3.12 (see CMake issues 18090 and 18692).
-          # TODO(DJG): Update whenever we require CMake 3.14 or 3.21
+          # TODO(DJG): Update whenever we require CMake 3.14 or newer
           target_sources(${_actual_target_name} PRIVATE $<TARGET_OBJECTS:${_tmp}>)
         endforeach()
       endif()
@@ -255,13 +269,12 @@ macro(sundials_add_library target)
         target_link_libraries(${_actual_target_name} ${sundials_add_library_LINK_LIBRARIES})
       endif()
 
-      if(SUNDIALS_BUILD_WITH_PROFILING OR SUNDIALS_LOGGING_ENABLE_MPI)
-        if(ENABLE_MPI AND MPI_C_FOUND)
-          # Workaround issues with sundials_generic object library dependency on
-          # MPI not getting propagated when building examples.
-          # Workaround bug in CMake < 3.17.3 when using MPI::MPI_C and CUDA
-          target_include_directories(${_actual_target_name} PUBLIC ${MPI_C_INCLUDE_DIRS})
-          target_link_libraries(${_actual_target_name} PUBLIC ${MPI_C_LIBRARIES})
+      if(SUNDIALS_BUILD_WITH_PROFILING)
+        if(ENABLE_CALIPER)
+          target_link_libraries(${_actual_target_name} PUBLIC caliper)
+        endif()
+        if(ENABLE_ADIAK)
+          target_link_libraries(${_actual_target_name} PUBLIC adiak::adiak ${CMAKE_DL_LIBS})
         endif()
       endif()
 
@@ -271,7 +284,8 @@ macro(sundials_add_library target)
       target_include_directories(${_actual_target_name} PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-        $<BUILD_INTERFACE:${SUNDIALS_SOURCE_DIR}/src/sundials>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/sundials>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/src/sundials>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
       # add all other includes
@@ -284,7 +298,7 @@ macro(sundials_add_library target)
       if(${_libtype} MATCHES "STATIC")
         target_compile_definitions(${_actual_target_name} PRIVATE SUNDIALS_STATIC_DEFINE)
       else()
-        target_compile_definitions(${obj_target} PRIVATE sundials_generic_EXPORTS)
+        target_compile_definitions(${obj_target} PRIVATE sundials_core_EXPORTS)
       endif()
 
       # add all other compile definitions
@@ -427,12 +441,6 @@ macro(sundials_add_f2003_library target)
   string(REPLACE "sundials_f" "sundials_" _clib_name "${target}")
   string(REPLACE "_mod" "" _clib_name "${_clib_name}")
 
-  # If SundialsSetupFortran.cmake did not set CMAKE_Fortran_PREPROCESS to ON,
-  # then add a compiler flag to preprocess Fortran code.
-  if(CMAKE_VERSION VERSION_LESS "3.18")
-    set(_preprocess PRIVATE -cpp)
-  endif()
-
   sundials_add_library(${target}
     SOURCES ${sundials_add_f2003_library_SOURCES}
     OBJECT_LIBRARIES ${sundials_add_f2003_library_OBJECT_LIBRARIES}
@@ -443,7 +451,7 @@ macro(sundials_add_f2003_library target)
       ${sundials_add_f2003_library_INCLUDE_DIRECTORIES}
       ${_includes}
     COMPILE_DEFINITIONS ${sundials_add_f2003_library_COMPILE_DEFINITIONS}
-    COMPILE_OPTIONS ${sundials_add_f2003_library_COMPILE_OPTIONS} ${_preprocess}
+    COMPILE_OPTIONS ${sundials_add_f2003_library_COMPILE_OPTIONS}
     PROPERTIES ${sundials_add_f2003_library_PROPERTIES} ${_properties}
     OUTPUT_NAME ${sundials_add_f2003_library_OUTPUT_NAME}
     VERSION ${sundials_add_f2003_library_VERSION}

@@ -3,7 +3,7 @@
 #                Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -23,6 +23,11 @@ set(CXX_FOUND TRUE)
 # here so it is set in the same configuration pass as the C++
 # compiler and related options.
 # ---------------------------------------------------------------
+
+# Do not allow decaying to previous standards -- generates error if the standard
+# is not supported
+sundials_option(CMAKE_CXX_STANDARD_REQUIRED BOOL
+  "Require C++ standard version" ON)
 
 if(ENABLE_SYCL)
   set(DOCSTR "The C++ standard to use if C++ is enabled (17, 20)")

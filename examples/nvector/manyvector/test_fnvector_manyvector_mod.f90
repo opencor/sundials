@@ -2,7 +2,7 @@
 ! Programmer(s): Cody J. Balos @ LLNL
 ! -----------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -17,7 +17,7 @@
 
 module test_nvector_manyvector
   use, intrinsic :: iso_c_binding
-  use fsundials_nvector_mod
+
   use fnvector_manyvector_mod
   use fnvector_serial_mod
   use test_utilities
@@ -36,7 +36,6 @@ contains
 
     integer(c_long)         :: lenrw(1), leniw(1)     ! real and int work space size
     integer(c_long)         :: ival                   ! integer work value
-    type(c_ptr)             :: cptr                   ! c_ptr work value
     real(c_double)          :: rval                   ! real work value
     real(c_double)          :: x1data(N1), x2data(N2) ! vector data array
     real(c_double), pointer :: xptr(:)                ! pointer to vector data array
@@ -46,7 +45,7 @@ contains
     type(c_ptr)             :: xvecs, zvecs           ! C pointer to array of ManyVectors
 
     !===== Setup ====
-    subvecs = FN_VNewVectorArray(nsubvecs)
+    subvecs = FN_VNewVectorArray(nsubvecs, sunctx)
     tmp  => FN_VMake_Serial(N1, x1data, sunctx)
     call FN_VSetVecAtIndexVectorArray(subvecs, 0, tmp)
     tmp  => FN_VMake_Serial(N2, x2data, sunctx)
@@ -68,7 +67,7 @@ contains
     ! test generic vector functions
     ival = FN_VGetVectorID_ManyVector(x)
     call FN_VSpace_ManyVector(x, lenrw, leniw)
-    cptr = FN_VGetCommunicator(x)
+    ival = FN_VGetCommunicator(x)
     ival = FN_VGetLength_ManyVector(x)
 
     ! test standard vector operations
@@ -108,6 +107,7 @@ contains
     ival = FN_VGetNumSubvectors_ManyVector(x)
     xptr => FN_VGetSubvectorArrayPointer_ManyVector(x, ival-1)
     ival = FN_VSetSubvectorArrayPointer_ManyVector(xptr, x, ival-1)
+    ival = FN_VGetNumSubvectors_ManyVector(x)
     tmp  => FN_VGetSubvector_ManyVector(x, ival-1)
 
     !==== Cleanup =====
@@ -134,7 +134,7 @@ contains
     !===== Setup ====
     fails = 0
 
-    subvecs = FN_VNewVectorArray(nsubvecs)
+    subvecs = FN_VNewVectorArray(nsubvecs, sunctx)
     tmp  => FN_VMake_Serial(N1, x1data, sunctx)
     call FN_VSetVecAtIndexVectorArray(subvecs, 0, tmp)
     tmp  => FN_VMake_Serial(N2, x2data, sunctx)
@@ -160,7 +160,7 @@ end module
 integer(C_INT) function check_ans(ans, X, local_length) result(failure)
   use, intrinsic :: iso_c_binding
   use fnvector_manyvector_mod
-  use fsundials_nvector_mod
+
   use test_utilities
   implicit none
 
@@ -200,7 +200,7 @@ end function check_ans
 
 logical function has_data(X) result(failure)
   use, intrinsic :: iso_c_binding
-  use fsundials_nvector_mod
+
   use test_utilities
   implicit none
 
@@ -222,7 +222,7 @@ program main
   !============== Introduction =============
   print *, 'ManyVector N_Vector Fortran 2003 interface test'
 
-  call Test_Init(c_null_ptr)
+  call Test_Init(SUN_COMM_NULL)
 
   fails = smoke_tests()
   if (fails /= 0) then

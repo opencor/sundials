@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2021, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -16,15 +16,15 @@
 # 'develop' for examples excluded from 'make test' in releases
 set(examples
   "test_sunlinsol_ginkgo.cpp\;bicg csr 100 0 100 0\;"
-  "test_sunlinsol_ginkgo.cpp\;bicg dense 100 0 100 0\;"
+#  "test_sunlinsol_ginkgo.cpp\;bicg dense 100 0 100 0\;"
   "test_sunlinsol_ginkgo.cpp\;bicgstab csr 100 0 100 0\;"
-  "test_sunlinsol_ginkgo.cpp\;bicgstab dense 100 0 100 0\;"
+#  "test_sunlinsol_ginkgo.cpp\;bicgstab dense 100 0 100 0\;"
   "test_sunlinsol_ginkgo.cpp\;cgs csr 100 0 100 0\;"
-  "test_sunlinsol_ginkgo.cpp\;cgs dense 100 0 100 0\;"
+#  "test_sunlinsol_ginkgo.cpp\;cgs dense 100 0 100 0\;"
   "test_sunlinsol_ginkgo.cpp\;gmres csr 100 0 100 0\;"
-  "test_sunlinsol_ginkgo.cpp\;gmres dense 100 0 100 0\;"
+#  "test_sunlinsol_ginkgo.cpp\;gmres dense 100 0 100 0\;"
   "test_sunlinsol_ginkgo.cpp\;idr csr 100 0 100 0\;"
-  "test_sunlinsol_ginkgo.cpp\;idr dense 100 0 100 0\;"
+#  "test_sunlinsol_ginkgo.cpp\;idr dense 100 0 100 0\;"
 )
 
 # Add source directory to include directories
@@ -32,7 +32,7 @@ include_directories(..)
 
 sundials_add_examples_ginkgo(examples
   TARGETS test_sunlinsol_obj
-  BACKENDS REF OMP CUDA HIP
+  BACKENDS REF OMP CUDA HIP DPCPP
   UNIT_TEST)
 
 # Install the targets
@@ -43,6 +43,9 @@ if(EXAMPLES_INSTALL)
   endif()
   if(SUNDIALS_GINKGO_BACKENDS MATCHES "HIP")
     list(APPEND vectors nvechip)
+  endif()
+  if(SUNDIALS_GINKGO_BACKENDS MATCHES "DPCPP")
+    list(APPEND vectors nvecsycl)
   endif()
   if(SUNDIALS_GINKGO_BACKENDS MATCHES "OMP")
     list(APPEND vectors nvecopenmp)

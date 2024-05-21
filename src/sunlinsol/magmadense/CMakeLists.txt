@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -19,7 +19,7 @@ if(SUNDIALS_MAGMA_BACKENDS MATCHES "CUDA")
   set(_libs_needed sundials_sunmatrixmagmadense sundials_nveccuda)
 elseif(SUNDIALS_MAGMA_BACKENDS MATCHES "HIP")
   set_source_files_properties(sunlinsol_magmadense.cpp PROPERTIES LANGUAGE CXX)
-  set(_libs_needed sundials_sunmatrixmagmadense sundials_nvechip)
+  set(_libs_needed sundials_sunmatrixmagmadense sundials_nvechip hip::device)
 endif()
 
 # Add the sunlinsol_magmadense library
@@ -30,8 +30,9 @@ sundials_add_library(sundials_sunlinsolmagmadense
     ${SUNDIALS_SOURCE_DIR}/include/sunlinsol/sunlinsol_magmadense.h
   INCLUDE_SUBDIR
     sunlinsol
+  LINK_LIBRARIES
+    PUBLIC sundials_core
   OBJECT_LIBRARIES
-    sundials_generic_obj
   LINK_LIBRARIES
     PUBLIC SUNDIALS::MAGMA ${_libs_needed}
   OUTPUT_NAME

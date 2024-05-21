@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -22,16 +22,6 @@ list(APPEND ARKODE_examples "ark_brusselator1D_FEM_sludist.cpp\;1\;1\;develop")
 # Auxiliary files to install
 set(ARKODE_extras
   )
-
-if(MPI_CXX_COMPILER)
-  # use MPI wrapper as the compiler
-  set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
-  # disable C++ extensions (for known wrappers)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMPICH_SKIP_MPICXX -DOMPI_SKIP_MPICXX -DLAM_BUILDING")
-else()
-  # add MPI_INCLUDE_PATH to include directories
-  include_directories(${MPI_INCLUDE_PATH})
-endif()
 
 # Add the build and install targets for each example
 foreach(example_tuple ${ARKODE_examples})
@@ -59,6 +49,7 @@ foreach(example_tuple ${ARKODE_examples})
 
   # libraries to link against
   target_link_libraries(${example_target} PRIVATE
+    MPI::MPI_CXX
     sundials_arkode
     sundials_sunlinsolsuperludist)
 

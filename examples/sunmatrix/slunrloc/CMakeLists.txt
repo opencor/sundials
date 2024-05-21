@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # -----------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -31,11 +31,6 @@ set(sunmatrix_slunrloc_dependencies
   test_sunmatrix
   )
 
-if(MPI_C_COMPILER)
-  set(CMAKE_C_COMPILER ${MPI_C_COMPILER})
-  set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
-endif()
-
 # Add the build and install targets for each example
 foreach(example_tuple ${sunmatrix_slunrloc_examples})
   # parse the example tuple
@@ -62,6 +57,7 @@ foreach(example_tuple ${sunmatrix_slunrloc_examples})
     # libraries to link against
     target_link_libraries(${example_target}
       PRIVATE
+        MPI::MPI_CXX
         sundials_sunmatrixslunrloc
         sundials_sunmatrixdense
         sundials_nvecparallel

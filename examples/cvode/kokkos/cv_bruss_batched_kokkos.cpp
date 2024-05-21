@@ -2,7 +2,7 @@
  * Programmer(s): David J. Gardner and Cody J. Balos @ LLNL
  * -----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2022, Lawrence Livermore National Security
+ * Copyright (c) 2002-2024, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -69,6 +69,7 @@
 #include <cvode/cvode.h>
 #include <memory>
 #include <nvector/nvector_kokkos.hpp>
+#include <sundials/sundials_core.hpp>
 #include <sunlinsol/sunlinsol_kokkosdense.hpp>
 #include <sunlinsol/sunlinsol_spgmr.h>
 #include <sunmatrix/sunmatrix_kokkosdense.hpp>
@@ -135,15 +136,15 @@ int main(int argc, char* argv[])
     int argi = 0;
 
     // Total number of batch systems
-    if (argc > 1) udata.nbatches = atoi(argv[++argi]);
+    if (argc > 1) { udata.nbatches = atoi(argv[++argi]); }
 
     // Linear solver type
     int solver_type = 0;
-    if (argc > 2) solver_type = atoi(argv[++argi]);
+    if (argc > 2) { solver_type = atoi(argv[++argi]); }
 
     // Problem setup
     int test_type = 2;
-    if (argc > 3) test_type = atoi(argv[++argi]);
+    if (argc > 3) { test_type = atoi(argv[++argi]); }
 
     // Shortcuts
     int nbatches  = udata.nbatches;
@@ -243,11 +244,11 @@ int main(int argc, char* argv[])
 
       // Attach the matrix and linear solver to CVODE
       retval = CVodeSetLinearSolver(cvode_mem, LS->Convert(), A->Convert());
-      if (check_flag(retval, "CVodeSetLinearSolver")) return 1;
+      if (check_flag(retval, "CVodeSetLinearSolver")) { return 1; }
 
       // Set the user-supplied Jacobian function
       retval = CVodeSetJacFn(cvode_mem, Jac);
-      if (check_flag(retval, "CVodeSetJacFn")) return 1;
+      if (check_flag(retval, "CVodeSetJacFn")) { return 1; }
     }
     else
     {
@@ -257,7 +258,7 @@ int main(int argc, char* argv[])
 
       // Attach the linear solver to CVODE
       retval = CVodeSetLinearSolver(cvode_mem, LS->Convert(), nullptr);
-      if (check_flag(retval, "CVodeSetLinearSolver")) return 1;
+      if (check_flag(retval, "CVodeSetLinearSolver")) { return 1; }
     }
 
     // Final time and time between outputs
@@ -288,7 +289,7 @@ int main(int argc, char* argv[])
     {
       // Advance in time
       retval = CVode(cvode_mem, tout, y, &t, CV_NORMAL);
-      if (check_flag(retval, "CVode")) break;
+      if (check_flag(retval, "CVode")) { break; }
 
       // Output solution from some batches
       sundials::kokkos::CopyFromDevice(y);

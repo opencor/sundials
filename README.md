@@ -1,5 +1,5 @@
 # SUNDIALS: SUite of Nonlinear and DIfferential/ALgebraic equation Solvers #
-### Version 6.4.1 (Oct 2022) ###
+### Version 7.0.0 (Feb 2024) ###
 
 **Center for Applied Scientific Computing, Lawrence Livermore National Laboratory**
 
@@ -15,30 +15,24 @@ equation (ODE) systems, differential-algebraic equation (DAE) systems, and
 nonlinear algebraic systems:
 
 * ARKODE - for integrating stiff, nonstiff, and multirate ODEs of the form
-
-  $$ M(t) \\, y' = f_1(t,y) + f_2(t,y), \quad y(t_0) = y_0 $$
+  $$M(t) \\, y' = f_1(t,y) + f_2(t,y), \quad y(t_0) = y_0$$
 
 * CVODE - for integrating stiff and nonstiff ODEs of the form
-
-  $$ y' = f(t,y), \quad y(t_0) = y_0 $$
+  $$y' = f(t,y), \quad y(t_0) = y_0$$
 
 * CVODES - for integrating and sensitivity analysis (forward and adjoint) of
   ODEs of the form
-
-  $$ y' = f(t,y,p), \quad y(t_0) = y_0(p) $$
+  $$y' = f(t,y,p), \quad y(t_0) = y_0(p)$$
 
 * IDA - for integrating DAEs of the form
-
-  $$ F(t,y,y') = 0, \quad y(t_0) = y_0, \quad y'(t_0) = y_0' $$
+  $$F(t,y,y') = 0, \quad y(t_0) = y_0, \quad y'(t_0) = y_0'$$
 
 * IDAS - for integrating and sensitivity analysis (forward and adjoint) of DAEs
   of the form
-
-  $$ F(t,y,y',p) = 0, \quad y(t_0) = y_0(p), \quad y'(t_0) = y_0'(p) $$
+  $$F(t,y,y',p) = 0, \quad y(t_0) = y_0(p), \quad y'(t_0) = y_0'(p)$$
 
 * KINSOL - for solving nonlinear algebraic systems of the form
-
-  $$ F(u) = 0 \quad \text{or} \quad G(u) = u $$
+  $$F(u) = 0 \quad \text{or} \quad G(u) = u$$
 
 ## Installation ##
 
@@ -88,9 +82,9 @@ We thank Radu Serban for significant and critical past contributions.
 Other contributors to SUNDIALS include: James Almgren-Bell, Lawrence E. Banks,
 Peter N. Brown, George Byrne, Rujeko Chinomona, Scott D. Cohen, Aaron Collier,
 Keith E. Grant, Steven L. Lee, Shelby L. Lockhart, John Loffeld, Daniel McGreer,
-Slaven Peles, Cosmin Petra, H. Hunter Schwartz, Jean M. Sexton,
-Dan Shumaker, Steve G. Smith, Allan G. Taylor, Hilari C. Tiedeman, Chris White,
-Ting Yan, and Ulrike M. Yang.
+Yu Pan, Slaven Peles, Cosmin Petra, Steven B. Roberts, H. Hunter Schwartz,
+Jean M. Sexton, Dan Shumaker, Steve G. Smith, Shahbaj Sohal, Allan G. Taylor,
+Hilari C. Tiedeman, Chris White, Ting Yan, and Ulrike M. Yang.
 
 ## License ##
 

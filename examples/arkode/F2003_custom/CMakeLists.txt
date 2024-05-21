@@ -2,7 +2,7 @@
 # Programmer(s): Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -112,9 +112,6 @@ endforeach(example_tuple ${FARKODE_tests})
 
 # create Makfile and CMakeLists.txt for examples
 if(EXAMPLES_INSTALL)
-
-  # Install the README file
-  install(FILES README DESTINATION ${EXAMPLES_INSTALL_PATH}/arkode/F2003_custom)
 
   # Install the extra files
   foreach(extrafile ${ARKODE_extras})

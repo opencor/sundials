@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -38,13 +38,8 @@ macro(sundials_add_nvector_benchmark NAME)
   target_link_libraries(${NAME} PRIVATE
     ${arg_SUNDIALS_TARGETS} ${arg_LINK_LIBRARIES} -lm)
 
-
-  if(ENABLE_CALIPER AND SUNDIALS_BUILD_WITH_PROFILING)
-    target_include_directories(${NAME} PRIVATE ${caliper_INCLUDE_DIR})
-    target_link_libraries(${NAME} PRIVATE caliper)
-  endif()
-
   install(TARGETS ${NAME}
-    DESTINATION "${CMAKE_INSTALL_BINDIR}/${arg_INSTALL_SUBDIR}")
+    DESTINATION "${BENCHMARKS_INSTALL_PATH}/${arg_INSTALL_SUBDIR}")
 
 endmacro(sundials_add_nvector_benchmark)
+

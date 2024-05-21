@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -42,78 +42,59 @@ preconditioner can only be used with ``NVECTOR_PARALLEL``. It is not recommended
 to use a threaded vector object with SuperLU_MT unless it is the
 ``NVECTOR_OPENMP`` module, and SuperLU_MT is also compiled with OpenMP.
 
-.. _KINSOL.Usage.CC.file_access:
+.. _KINSOL.Usage.CC.header_sim:
 
 Access to library and header files
 ----------------------------------
 
 At this point, it is assumed that the installation of KINSOL, following the
 procedure described in :numref:`Installation`, has been completed successfully.
+In the proceeding text, the directories ``libdir`` and ``incdir`` are the
+installation library and include directories, respectively. For a default
+installation, these are ``instdir/lib`` and ``instdir/include``, respectively,
+where ``instdir`` is the directory where SUNDIALS was installed.
 
-Regardless of where the user’s application program resides, its associated
-compilation and load commands must make reference to the appropriate locations
-for the library and header files required by KINSOL. The relevant library files are
-
-.. code-block::
-
-  <libdir>/libsundials_kinsol.<so|a>
-  <libdir>/libsundials_nvec*.<so|a>
-  <libdir>/libsundials_sunmat*.<so|a>
-  <libdir>/libsundials_sunlinsol*.<so|a>
-  <libdir>/libsundials_sunnonlinsol*.<so|a>
-
-where the file extension ``.so`` is typically for shared libraries and ``.a``
-for static libraries. The relevant header files are located in the
-subdirectories
+Regardless of where the user's application program resides, its
+associated compilation and load commands must make reference to the
+appropriate locations for the library and header files required by
+KINSOL. KINSOL symbols are found in ``libdir/libsundials_kinsol.lib``.
+Thus, in addition to linking to ``libdir/libsundials_core.lib``, KINSOL
+users need to link to the KINSOL library. Symbols for additional SUNDIALS
+modules, vectors and algebraic solvers, are found in
 
 .. code-block::
 
-  <incdir>/kinsol
-  <incdir>/sundials
-  <incdir>/nvector
-  <incdir>/sunmatrix
-  <incdir>/sunlinsol
-  <incdir>/sunnonlinsol
+  <libdir>/libsundials_nvec*.lib
+  <libdir>/libsundials_sunmat*.lib
+  <libdir>/libsundials_sunlinsol*.lib
+  <libdir>/libsundials_sunnonlinsol*.lib
+  <libdir>/libsundials_sunmem*.lib
 
-The directories ``libdir`` and ``incdir`` are the install library and include
-directories, respectively. For a default installation, these are
-``<instdir>/lib`` or ``<instdir>/lib64`` and ``<instdir>/include``,
-respectively, where ``instdir`` is the directory where SUNDIALS was installed
-(see :numref:`Installation`).
+The file extension ``.lib`` is typically ``.so`` for shared libraries
+and ``.a`` for static libraries.
 
+The relevant header files for KINSOL are located in the subdirectories
+``incdir/include/kinsol``. To use KINSOL the application needs to include
+the header file for KINSOL in addition to the SUNDIALS core header file:
 
-.. include:: ../../../../shared/Types.rst
+.. code:: c
 
+  #include <sundials/sundials_core.h> // Provides core SUNDIALS types
+  #include <kinsol/kinsol.h>          // KINSOL provides methods for solving nonlinear systems
 
-.. _KINSOL.Usage.CC.header_sim:
-
-Header files
-------------
-
-The calling program must include several header files so that various macros and
-data types can be used. The header file that is always required is:
-
-* ``kinsol/kinsol.h`` the main header file for kinsol, which defines the types and
-  various constants, and includes function prototypes. This includes the
-  header file for KINLS, ``kinsol/kinsol_ls.h``.
-
-Note that ``kinsol.h`` includes ``sundials_types.h``, which defines the types,
-``realtype``, ``sunindextype``, and ``booleantype`` and the constants
-``SUNFALSE`` and ``SUNTRUE``.
-
-The calling program must also include an ``N_Vector`` implementation
-header file, of the form ``nvector/nvector_*.h`` (see :numref:`NVectors`
-for more information). This file in turn includes the header file
-``sundials_nvector.h`` which defines the abstract vector data type.
+The calling program must also include an :c:type:`N_Vector` implementation header file, of the form
+``nvector/nvector_*.h``. See :numref:`NVectors` for the appropriate name.
 
 If using a Newton or Picard nonlinear solver that requires the solution of a
-linear system, then a linear solver module header file will be required. If the
-linear solver is matrix-based, the linear solver header will also include a
-header file of the from ``sunmatrix/sunmatrix_*.h`` where ``*`` is the name of
-the matrix implementation compatible with the linear solver. The matrix header
-file provides access to the relevant matrix functions/macros and in turn
-includes the header file ``sundials_matrix.h`` which defines the abstract matrix
-data type.
+linear system, the calling program must also include a ``SUNLinearSolver``
+implementation header file, of the from ``sunlinsol/sunlinsol_*.h`` where ``*``
+is the name of the linear solver (see Chapter :numref:`SUNLinSol` for more
+information).
+
+If the linear solver is matrix-based, the linear solver header will also include
+a header file of the from ``sunmatrix/sunmatrix_*.h`` where ``*`` is the name of
+the matrix implementation compatible with the linear solver. (see Chapter
+:numref:`SUNMatrix` for more information).
 
 Other headers may be needed, according to the choice of preconditioner, etc. For
 example, in the example ``kinFoodWeb_kry_p`` (see :cite:p:`kinsol_ex`),
@@ -477,17 +458,9 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
   +========================================================+==================================+==============================+
   | **KINSOL main solver**                                 |                                  |                              |
   +--------------------------------------------------------+----------------------------------+------------------------------+
-  | Error handler function                                 | :c:func:`KINSetErrHandlerFn`     | internal fn.                 |
-  +--------------------------------------------------------+----------------------------------+------------------------------+
-  | Pointer to an error file                               | :c:func:`KINSetErrFile`          | ``stderr``                   |
-  +--------------------------------------------------------+----------------------------------+------------------------------+
   | Info handler function                                  | :c:func:`KINSetInfoHandlerFn`    | internal fn.                 |
   +--------------------------------------------------------+----------------------------------+------------------------------+
-  | Pointer to an info file                                | :c:func:`KINSetInfoFile`         | ``stdout``                   |
-  +--------------------------------------------------------+----------------------------------+------------------------------+
   | Data for problem-defining function                     | :c:func:`KINSetUserData`         | ``NULL``                     |
-  +--------------------------------------------------------+----------------------------------+------------------------------+
-  | Verbosity level of output                              | :c:func:`KINSetPrintLevel`       | 0                            |
   +--------------------------------------------------------+----------------------------------+------------------------------+
   | Max. number of nonlinear iterations                    | :c:func:`KINSetNumMaxIters`      | 200                          |
   +--------------------------------------------------------+----------------------------------+------------------------------+
@@ -550,134 +523,6 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
   +--------------------------------------------------------+----------------------------------+------------------------------+
 
 
-.. c:function:: int KINSetErrFile(void * kin_mem, FILE * errfp)
-
-   The function :c:func:`KINSetErrFile` specifies the pointer to the file  where
-   all KINSOL messages should be directed when the default  KINSOL error handler
-   function is used.
-
-   **Arguments:**
-     * ``kin_mem`` -- pointer to the KINSOL memory block.
-     * ``errfp`` -- pointer to output file.
-
-   **Return value:**
-     * ``KIN_SUCCESS`` -- The optional value has been successfully set.
-     * ``KIN_MEM_NULL`` -- The ``kin_mem`` pointer is ``NULL``.
-
-   **Notes:**
-      The default value for ``errfp`` is ``stderr``.
-
-      Passing a value of
-      ``NULL`` disables all future error message output  (except for the case in
-      which the KINSOL memory pointer is ``NULL``).  This use of
-      :c:func:`KINSetErrFile` is strongly discouraged.
-
-   .. warning::
-      If :c:func:`KINSetErrFile` is to be called, it should be called before any
-      other optional input functions, in order to take effect for any later
-      error message.
-
-
-.. c:function:: int KINSetErrHandlerFn(void * kin_mem, KINErrHandlerFn ehfun, void * eh_data)
-
-   The function :c:func:`KINSetErrHandlerFn` specifies the optional user-defined
-   function  to be used in handling error messages.
-
-   **Arguments:**
-     * ``kin_mem`` -- pointer to the KINSOL memory block.
-     * ``ehfun`` -- is the user's CC error handler function (see :numref:`KINSOL.Usage.CC.user_fct_sim.ehFn`).
-     * ``eh_data`` -- pointer to user data passed to ``ehfun`` every time it is called.
-
-   **Return value:**
-     * ``KIN_SUCCESS`` -- The function ``ehfun`` and data pointer ``eh_data`` have been successfully set.
-     * ``KIN_MEM_NULL`` -- The ``kin_mem`` pointer is ``NULL``.
-
-   **Notes:**
-      The default internal error handler function directs error messages to the
-      file specified by the file pointer ``errfp`` (see :c:func:`KINSetErrFile`
-      above).
-
-      Error messages indicating that the KINSOL solver memory is
-      ``NULL`` will  always be directed to ``stderr``.
-
-
-.. c:function:: int KINSetInfoFile(void * kin_mem, FILE * infofp)
-
-   The function :c:func:`KINSetInfoFile` specifies the pointer to the file
-   where all informative (non-error) messages should be directed.
-
-   **Arguments:**
-     * ``kin_mem`` -- pointer to the KINSOL memory block.
-     * ``infofp`` -- pointer to output file.
-
-   **Return value:**
-     * ``KIN_SUCCESS`` -- The optional value has been successfully set.
-     * ``KIN_MEM_NULL`` -- The ``kin_mem`` pointer is ``NULL``.
-
-   **Notes:**
-      The default value for ``infofp`` is ``stdout``.
-
-   .. deprecated:: 6.2.0
-
-      Use :c:func:`SUNLogger_SetInfoFilename` instead.
-
-
-.. c:function:: int KINSetInfoHandlerFn(void * kin_mem, KINInfoHandlerFn ihfun, void * ih_data)
-
-   The function :c:func:`KINSetInfoHandlerFn` specifies the optional
-   user-defined function  to be used in handling informative (non-error)
-   messages.
-
-   **Arguments:**
-     * ``kin_mem`` -- pointer to the KINSOL memory block.
-     * ``ihfun`` -- is the user's CC information handler function (see :numref:`KINSOL.Usage.CC.user_fct_sim.ihFn`).
-     * ``ih_data`` -- pointer to user data passed to ``ihfun`` every time it is called.
-
-   **Return value:**
-     * ``KIN_SUCCESS`` -- The function ``ihfun`` and data pointer ``ih_data`` have been successfully set.
-     * ``KIN_MEM_NULL`` -- The ``kin_mem`` pointer is ``NULL``.
-
-   **Notes:**
-      The default internal information handler function directs informative
-      (non-error)  messages to the file specified by the file pointer ``infofp``
-      (see  :c:func:`KINSetInfoFile` above).
-
-
-.. c:function:: int KINSetPrintLevel(void * kin_mem, int printfl)
-
-   The function :c:func:`KINSetPrintLevel` specifies the level of verbosity  of the output.
-
-   **Arguments:**
-     * ``kin_mem`` -- pointer to the KINSOL memory block.
-     * ``printfl`` -- flag indicating the level of verbosity. Must be one of:
-
-       0 -- no information is displayed.
-
-       1 -- for each nonlinear iteration display the following information:
-
-       - the scaled Euclidean :math:`\ell_2` norm of the system function evaluated at the current iterate,
-       - the scaled norm of the Newton step (only if using ``KIN_NONE``), and
-       - the number of function evaluations performed so far.
-
-       2 -- display level 1 output and the following values for each iteration:
-
-       - :math:`\|F(u)\|_{D_F}` (only for ``KIN_NONE``).
-       - :math:`\|F(u)\|_{D_F,\infty}` (for ``KIN_NONE`` and ``KIN_LINESEARCH``).
-
-       3 -- display level 2 output plus
-
-       - additional values used by the global strategy (only if using ``KIN_LINESEARCH``), and
-       - statistical information for iterative linear solver modules.
-
-   **Return value:**
-     * ``KIN_SUCCESS`` -- The optional value has been successfully set.
-     * ``KIN_MEM_NULL`` -- The ``kin_mem`` pointer is ``NULL``.
-     * ``KIN_ILL_INPUT`` -- The argument ``printfl`` had an illegal value.
-
-   **Notes:**
-      The default value for ``printfl`` is :math:`0`.
-
-
 .. c:function:: int KINSetUserData(void * kin_mem, void * user_data)
 
    The function :c:func:`KINSetUserData` specifies the pointer to user-defined
@@ -720,7 +565,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       The default value for ``mxiter`` is ``MXITER_DEFAULT`` :math:`=200`.
 
 
-.. c:function:: int KINSetNoInitSetup(void * kin_mem, booleantype noInitSetup)
+.. c:function:: int KINSetNoInitSetup(void * kin_mem, sunbooleantype noInitSetup)
 
    The function :c:func:`KINSetNoInitSetup` specifies whether an initial call
    to the preconditioner or Jacobian setup function should be made or not.
@@ -743,7 +588,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       problem is to be used initially  for the next problem.
 
 
-.. c:function:: int KINSetNoResMon(void * kin_mem, booleantype noNNIResMon)
+.. c:function:: int KINSetNoResMon(void * kin_mem, sunbooleantype noNNIResMon)
 
    The function :c:func:`KINSetNoResMon` specifies whether or not the nonlinear
    residual monitoring scheme is used to control Jacobian updating
@@ -859,7 +704,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       where :math:`\eta_{\text{min}} = 10^{-4}` and :math:`\eta_{\text{max}} = 0.9`.
 
 
-.. c:function:: int KINSetEtaConstValue(void * kin_mem, realtype eta)
+.. c:function:: int KINSetEtaConstValue(void * kin_mem, sunrealtype eta)
 
    The function :c:func:`KINSetEtaConstValue` specifies the constant value  for
    :math:`\eta` in the case  ``etachoice = KIN_ETACONSTANT``.
@@ -878,7 +723,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       :math:`0.0 <` ``eta`` :math:`\le 1.0`.
 
 
-.. c:function:: int KINSetEtaParams(void * kin_mem, realtype egamma, realtype ealpha)
+.. c:function:: int KINSetEtaParams(void * kin_mem, sunrealtype egamma, sunrealtype ealpha)
 
    The function :c:func:`KINSetEtaParams` specifies the parameters
    :math:`\gamma` and  :math:`\alpha` in the formula for :math:`\eta`, in the
@@ -900,7 +745,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       :math:`\le 1.0` and  :math:`1.0<` ``ealpha`` :math:`\le 2.0`.
 
 
-.. c:function:: int KINSetResMonConstValue(void * kin_mem, realtype omegaconst)
+.. c:function:: int KINSetResMonConstValue(void * kin_mem, sunrealtype omegaconst)
 
    The function :c:func:`KINSetResMonConstValue` specifies the constant value
    for :math:`\omega` when using residual monitoring.
@@ -919,7 +764,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       :math:`0.0 <` ``omegaconst`` :math:`< 1.0`.
 
 
-.. c:function:: int KINSetResMonParams(void * kin_mem, realtype omegamin, realtype omegamax)
+.. c:function:: int KINSetResMonParams(void * kin_mem, sunrealtype omegamin, sunrealtype omegamax)
 
    The function :c:func:`KINSetResMonParams` specifies the parameters
    :math:`\omega_{min}` and  :math:`\omega_{max}` in the formula :eq:`KIN_resmon_omega` for
@@ -945,7 +790,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       solver modules.
 
 
-.. c:function:: int KINSetNoMinEps(void * kin_mem, booleantype noMinEps)
+.. c:function:: int KINSetNoMinEps(void * kin_mem, sunbooleantype noMinEps)
 
    The function :c:func:`KINSetNoMinEps` specifies a flag that controls whether
    or not  the value of :math:`\epsilon`, the scaled linear residual tolerance,
@@ -965,7 +810,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       :math:`\epsilon` (see :c:func:`KINSetFuncNormTol` below).
 
 
-.. c:function:: int KINSetMaxNewtonStep(void * kin_mem, realtype mxnewtstep)
+.. c:function:: int KINSetMaxNewtonStep(void * kin_mem, sunrealtype mxnewtstep)
 
    The function :c:func:`KINSetMaxNewtonStep` specifies the maximum allowable
    scaled  length of the Newton step.
@@ -985,7 +830,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       where :math:`u_0` is the initial guess.
 
 
-.. c:function:: int KINSetMaxBetaFails(void * kin_mem, realtype mxnbcf)
+.. c:function:: int KINSetMaxBetaFails(void * kin_mem, sunrealtype mxnbcf)
 
    The function :c:func:`KINSetMaxBetaFails` specifies the maximum number of
    :math:`\beta`-condition failures in the linesearch algorithm.
@@ -1004,7 +849,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       The default value of ``mxnbcf`` is ``MXNBCF_DEFAULT`` :math:`=10`.
 
 
-.. c:function:: int KINSetRelErrFunc(void * kin_mem, realtype relfunc)
+.. c:function:: int KINSetRelErrFunc(void * kin_mem, sunrealtype relfunc)
 
    The function :c:func:`KINSetRelErrFunc` specifies the relative error in
    computing :math:`F(u)`, which is used in the difference quotient
@@ -1026,7 +871,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       The default value for ``relfunc`` is :math:`U` = unit roundoff.
 
 
-.. c:function:: int KINSetFuncNormTol(void * kin_mem, realtype fnormtol)
+.. c:function:: int KINSetFuncNormTol(void * kin_mem, sunrealtype fnormtol)
 
    The function :c:func:`KINSetFuncNormTol` specifies the scalar used as a
    stopping  tolerance on the scaled maximum norm of the system function
@@ -1046,7 +891,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       The default value for ``fnormtol`` is (unit roundoff) :math:`^{1/3}`.
 
 
-.. c:function:: int KINSetScaledStepTol(void * kin_mem, realtype scsteptol)
+.. c:function:: int KINSetScaledStepTol(void * kin_mem, sunrealtype scsteptol)
 
    The function :c:func:`KINSetScaledStepTol` specifies the scalar used  as a
    stopping tolerance on the minimum scaled step length.
@@ -1116,7 +961,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       different functions.
 
 
-.. c:function:: int KINSetReturnNewest(void * kin_mem, booleantype ret_newest)
+.. c:function:: int KINSetReturnNewest(void * kin_mem, sunbooleantype ret_newest)
 
    The function :c:func:`KINSetReturnNewest` specifies if the fixed point
    iteration  should return the newest iteration or the iteration consistent
@@ -1134,7 +979,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       The default value of ``ret_newest`` is ``SUNFALSE``.
 
 
-.. c:function:: int KINSetDamping(void * kin_mem, realtype beta)
+.. c:function:: int KINSetDamping(void * kin_mem, sunrealtype beta)
 
    The function :c:func:`KINSetDamping` specifies the value of the damping
    parameter  in the fixed point or Picard iteration.
@@ -1186,7 +1031,7 @@ negative, so a test ``retval`` :math:`<0` will catch any error.
       value of ``mxiter``.
 
 
-.. c:function:: int KINSetDampingAA(void * kin_mem, realtype beta)
+.. c:function:: int KINSetDampingAA(void * kin_mem, sunrealtype beta)
 
    The function :c:func:`KINSetDampingAA` specifies the value of the Anderson
    acceleration damping paramter.
@@ -1452,32 +1297,34 @@ Linear Solver) has been added here (e.g., ``lenrwLS``).
 .. _KINSOL.Usage.CC.optional_output.Table:
 .. table:: Optional outputs from KINSOL and KINLS
 
-  ======================================================== ==================================
-  **Optional output**                                      **Function name**
-  ======================================================== ==================================
+  ==============================================================  ==================================
+  **Optional output**                                             **Function name**
+  ==============================================================  ==================================
   **KINSOL main solver**
-  Size of KINSOL real and integer workspaces               :c:func:`KINGetWorkSpace`
-  Number of function evaluations                           :c:func:`KINGetNumFuncEvals`
-  Number of nonlinear iterations                           :c:func:`KINGetNumNonlinSolvIters`
-  Number of :math:`\beta`-condition failures               :c:func:`KINGetNumBetaCondFails`
-  Number of backtrack operations                           :c:func:`KINGetNumBacktrackOps`
-  Scaled norm of :math:`F`                                 :c:func:`KINGetFuncNorm`
-  Scaled norm of the step                                  :c:func:`KINGetStepLength`
-  User data pointer                                        :c:func:`KINGetUserData`
-  Print all statistics                                     :c:func:`KINPrintAllStats`
-  Name of constant associated with a return flag           :c:func:`KINGetReturnFlagName`
+  Size of KINSOL real and integer workspaces                      :c:func:`KINGetWorkSpace`
+  Number of function evaluations                                  :c:func:`KINGetNumFuncEvals`
+  Number of nonlinear iterations                                  :c:func:`KINGetNumNonlinSolvIters`
+  Number of :math:`\beta`-condition failures                      :c:func:`KINGetNumBetaCondFails`
+  Number of backtrack operations                                  :c:func:`KINGetNumBacktrackOps`
+  Scaled norm of :math:`F`                                        :c:func:`KINGetFuncNorm`
+  Scaled norm of the step                                         :c:func:`KINGetStepLength`
+  User data pointer                                               :c:func:`KINGetUserData`
+  Print all statistics                                            :c:func:`KINPrintAllStats`
+  Name of constant associated with a return flag                  :c:func:`KINGetReturnFlagName`
   **KINLS linear solver interface**
-  Size of real and integer workspaces                      :c:func:`KINGetLinWorkSpace`
-  No. of Jacobian evaluations                              :c:func:`KINGetNumJacEvals`
-  No. of :math:`F` calls for D.Q. Jacobian[-vector] evals. :c:func:`KINGetNumLinFuncEvals`
-  No. of linear iterations                                 :c:func:`KINGetNumLinIters`
-  No. of linear convergence failures                       :c:func:`KINGetNumLinConvFails`
-  No. of preconditioner evaluations                        :c:func:`KINGetNumPrecEvals`
-  No. of preconditioner solves                             :c:func:`KINGetNumPrecSolves`
-  No. of Jacobian-vector product evaluations               :c:func:`KINGetNumJtimesEvals`
-  Last return from a KINLS function                        :c:func:`KINGetLastLinFlag`
-  Name of constant associated with a return flag           :c:func:`KINGetLinReturnFlagName`
-  ======================================================== ==================================
+  Stored Jacobian of the nonlinear system                         :c:func:`KINGetJac`
+  Nonlinear iteration number at which the Jacobian was evaluated  :c:func:`KINGetJacNumIters`
+  Size of real and integer workspaces                             :c:func:`KINGetLinWorkSpace`
+  No. of Jacobian evaluations                                     :c:func:`KINGetNumJacEvals`
+  No. of :math:`F` calls for D.Q. Jacobian[-vector] evals.        :c:func:`KINGetNumLinFuncEvals`
+  No. of linear iterations                                        :c:func:`KINGetNumLinIters`
+  No. of linear convergence failures                              :c:func:`KINGetNumLinConvFails`
+  No. of preconditioner evaluations                               :c:func:`KINGetNumPrecEvals`
+  No. of preconditioner solves                                    :c:func:`KINGetNumPrecSolves`
+  No. of Jacobian-vector product evaluations                      :c:func:`KINGetNumJtimesEvals`
+  Last return from a KINLS function                               :c:func:`KINGetLastLinFlag`
+  Name of constant associated with a return flag                  :c:func:`KINGetLinReturnFlagName`
+  ==============================================================  ==================================
 
 
 .. _KINSOL.Usage.CC.optional_output.optout_main:
@@ -1497,7 +1344,7 @@ functions are described next.
 
    **Arguments:**
      * ``kin_mem`` -- pointer to the KINSOL memory block.
-     * ``lenrw`` -- the number of ``realtype`` values in the KINSOL workspace.
+     * ``lenrw`` -- the number of ``sunrealtype`` values in the KINSOL workspace.
      * ``leniw`` -- the number of integer values in the KINSOL workspace.
 
    **Return value:**
@@ -1506,7 +1353,7 @@ functions are described next.
 
    **Notes:**
       KINSOL solver  In terms of the problem size :math:`N`, the actual size of
-      the real workspace  is :math:`17 + 5 N` ``realtype`` words. The real workspace
+      the real workspace  is :math:`17 + 5 N` ``sunrealtype`` words. The real workspace
       is increased by  an additional :math:`N` words if constraint checking is
       enabled (see :c:func:`KINSetConstraints`).
 
@@ -1571,7 +1418,7 @@ functions are described next.
      * ``KIN_MEM_NULL`` -- The ``kin_mem`` pointer is ``NULL``.
 
 
-.. c:function:: int KINGetFuncNorm(void * kin_mem, realtype fnorm)
+.. c:function:: int KINGetFuncNorm(void * kin_mem, sunrealtype fnorm)
 
    The function :c:func:`KINGetFuncNorm` returns the scaled Euclidean
    :math:`\ell_2` norm of the  nonlinear system function :math:`F(u)` evaluated
@@ -1586,7 +1433,7 @@ functions are described next.
      * ``KIN_MEM_NULL`` -- The ``kin_mem`` pointer is ``NULL``.
 
 
-.. c:function:: int KINGetStepLength(void * kin_mem, realtype steplength)
+.. c:function:: int KINGetStepLength(void * kin_mem, sunrealtype steplength)
 
    The function :c:func:`KINGetStepLength` returns the scaled Euclidean
    :math:`\ell_2` norm of  the step used during the previous iteration.
@@ -1662,6 +1509,41 @@ KINLS linear solver interface optional output functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following optional outputs are available from the KINLS modules:
+
+.. c:function:: int KINGetJac(void* kin_mem, SUNMatrix* J)
+
+   Returns the internally stored copy of the Jacobian matrix of the nonlinear
+   system function.
+
+   :param kin_mem: the KINSOL solver object
+   :param J: the Jacobian matrix
+
+   :retval KINLS_SUCCESS: the output value has been successfully set
+   :retval KINLS_MEM_NULL: ``kin_mem`` was ``NULL``
+   :retval KINLS_LMEM_NULL: the linear solver interface has not been initialized
+
+   .. warning::
+
+      With linear solvers that overwrite the input Jacobian matrix as part of
+      the linear solver setup (e.g., performing an in-place LU factorization)
+      the matrix returned by :c:func:`KINGetJac` may differ from the matrix
+      returned by the last Jacobian evaluation.
+
+   .. warning::
+
+      This function is provided for debugging purposes and the values in the
+      returned matrix should not be altered.
+
+.. c:function:: int KINGetJacNumIters(void* kin_mem, sunrealtype* nni_J)
+
+   Returns the nonlinear iteration number at which the Jacobian was evaluated.
+
+   :param kin_mem: the KINSOL memory structure
+   :param nni_J: the nonlinear iteration number
+
+   :retval KINLS_SUCCESS: the output value has been successfully set
+   :retval KINLS_MEM_NULL: ``kin_mem`` was ``NULL``
+   :retval KINLS_LMEM_NULL: the linear solver interface has not been initialized
 
 .. c:function:: int KINGetLinWorkSpace(void * kin_mem, long int * lenrwLS, long int * leniwLS)
 
@@ -1851,11 +1733,11 @@ The following optional outputs are available from the KINLS modules:
 
       If the KINLS setup function failed when using another ``SUNLinearSolver``
       object, then ``lsflag`` will be ``SUNLS_PSET_FAIL_UNREC``,
-      ``SUNLS_ASET_FAIL_UNREC``, or ``SUNLS_PACKAGE_FAIL_UNREC``.
+      ``SUNLS_ASET_FAIL_UNREC``, or ``SUN_ERR_EXT_FAIL``.
 
       If the KINLS solve function failed (:c:func:`KINSolve` returned ``KIN_LSOLVE_FAIL``),
       ``lsflag`` contains the error return flag from the ``SUNLinearSolver``
-      object, which will be one of: ``SUNLS_MEM_NULL``, indicating that the
+      object, which will be one of: ``SUN_ERR_ARG_CORRUPTRRUPT``, indicating that the
       ``SUNLinearSolver`` memory is ``NULL``; ``SUNLS_ATIMES_FAIL_UNREC``,
       indicating an unrecoverable failure in the :math:`J*v` function;
       ``SUNLS_PSOLVE_FAIL_UNREC``, indicating that the preconditioner solve
@@ -1863,7 +1745,7 @@ The following optional outputs are available from the KINLS modules:
       failure in the Gram-Schmidt procedure (generated only in SPGMR or SPFGMR);
       ``SUNLS_QRSOL_FAIL``, indicating that the matrix :math:`R` was found to be
       singular during the QR solve phase (SPGMR and SPFGMR only); or
-      ``SUNLS_PACKAGE_FAIL_UNREC``, indicating an unrecoverable failure in an
+      ``SUN_ERR_EXT_FAIL``, indicating an unrecoverable failure in an
       external iterative linear solver package.
 
    .. warning::
@@ -1932,63 +1814,6 @@ The user must provide a function of type :c:type:`KINSysFn` defined as follows:
       Allocation of memory for ``fval`` is handled within KINSOL.
 
 
-.. _KINSOL.Usage.CC.user_fct_sim.ehFn:
-
-Error message handler function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-As an alternative to the default behavior of directing error and warning
-messages to the file pointed to by ``errfp`` (see :c:func:`KINSetErrFile`), the
-user may provide a function of type :c:type:`KINErrHandlerFn` to process any
-such messages.  The function type :c:type:`KINErrHandlerFn` is defined as
-follows:
-
-.. c:type:: void (*KINErrHandlerFn)(int error_code, const char *module, const char *function, char *msg, void *user_data)
-
-   This function processes error and warning messages from KINSOL and its
-   sub-modules.
-
-   **Arguments:**
-      * ``error_code`` -- is the error code
-      * ``module`` -- is the name of the KINSOL module reporting the error
-      * ``function`` -- is the name of the function in which the error occurred
-      * ``eH_data`` -- is a pointer to user data, the same as the ``eh_data``
-        parameter passed to :c:func:`KINSetErrHandlerFn`
-
-   **Return value:**
-      This function has no return value.
-
-   **Notes:**
-      ``error_code`` is negative for errors and positive (``KIN_WARNING``) for
-      warnings. If a function that returns a pointer to memory encounters an error,
-      it sets ``error_code`` to 0.
-
-.. _KINSOL.Usage.CC.user_fct_sim.ihFn:
-
-Informational message handler function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-As an alternative to the default behavior of directing informational (meaning non-error) messages
-to the file pointed to by ``infofp`` (see :c:func:`KINSetInfoFile`), the user may
-provide a function of type :c:type:`KINInfoHandlerFn` to process any such messages.
-The function type :c:type:`KINInfoHandlerFn` is defined as follows:
-
-.. c:type:: void (*KINInfoHandlerFn)(const char *module, const char *function, char *msg, void *ih_data)
-
-   This function processes error and warning messages from KINSOL and its
-   sub-modules.
-
-   **Arguments:**
-      * ``error_code`` -- is the error code
-      * ``module`` -- is the name of the KINSOL module reporting the error
-      * ``function`` -- is the name of the function in which the error occurred
-      * ``ih_data`` -- is a pointer to user data, the same as the ``ih_data``
-        parameter passed to :c:func:`KINSetInfoHandlerFn`
-
-   **Return value:**
-      This function has no return value.
-
-
 .. _KINSOL.Usage.CC.user_fct_sim.jacFn:
 
 Jacobian construction (matrix-based linear solvers)
@@ -2035,7 +1860,7 @@ provide a function of type :c:type:`KINLsJacFn` defined as follows:
       These quantities may include the scale vectors and the unit roundoff. To
       obtain the scale vectors, the user will need to add to ``user_data``
       pointers to ``u_scale`` and/or ``f_scale`` as needed. The unit roundoff
-      can be accessed as ``UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
+      can be accessed as ``SUN_UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
 
       **dense:**
 
@@ -2079,7 +1904,7 @@ provide a function of type :c:type:`KINLsJacFn` defined as follows:
       :math:`J_{m,n}`. The elements within the band are those with ``-mupper``
       :math:`\le` ``m-n`` :math:`\le` ``mlower``. Alternatively,
       ``SM_COLUMN_B(J, j)`` returns a pointer to the diagonal element of the
-      ``j``-th column of ``J``, and if we assign this address to ``realtype
+      ``j``-th column of ``J``, and if we assign this address to ``sunrealtype
       *col_j``, then the ``i``-th element of the ``j``-th column is given by
       ``SM_COLUMN_ELEMENT_B(col_j, i, j)``, counting from :math:`0`. Thus, for
       :math:`(m,n)` within the band, :math:`J_{m,n}` can be loaded by setting
@@ -2127,7 +1952,7 @@ provide a function of type :c:type:`KINLsJacTimesVecFn` in the following form,
 to compute matrix-vector products :math:`Jv`. If such a function is not
 supplied, the default is a difference quotient approximation to these products.
 
-.. c:type:: int (*KINLsJacTimesVecFn)(N_Vector v, N_Vector Jv, N_Vector u, booleantype* new_u, void* user_data)
+.. c:type:: int (*KINLsJacTimesVecFn)(N_Vector v, N_Vector Jv, N_Vector u, sunbooleantype* new_u, void* user_data)
 
    This function computes the product :math:`J v` (or an approximation to it).
 
@@ -2158,7 +1983,7 @@ supplied, the default is a difference quotient approximation to these products.
       might include the scale vectors and the unit roundoff. To obtain the scale
       vectors, the user will need to add to ``user_data`` pointers to ``u_scale``
       and/or ``f_scale`` as needed. The unit roundoff can be accessed as
-      ``UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
+      ``SUN_UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
 
    .. warning::
 
@@ -2253,7 +2078,7 @@ function of type :c:type:`KINLsPrecSetupFn`, defined as follows:
       might include the scale vectors and the unit roundoff. To obtain the scale
       vectors, the user will need to add to ``user_data`` pointers to ``u_scale``
       and/or ``f_scale`` as needed. The unit roundoff can be accessed as
-      ``UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
+      ``SUN_UNIT_ROUNDOFF`` defined in ``sundials_types.h``.
 
       If the preconditioner solve routine requires no preparation, then a
       preconditioner setup function need not be given.
@@ -2420,7 +2245,7 @@ user main program presented in :numref:`KINSOL.Usage.CC.skeleton_sim` are not bo
 The user-callable functions that initialize or re-initialize the KINBBDPRE
 preconditioner module are described next.
 
-.. c:function:: int KINBBDPrecInit(void* kin_mem, sunindextype Nlocal, sunindextype mudq, sunindexype mldq, sunindextype mukeep, sunindextype mlkeep, realtype dq_rel_u, KINBBDLocalFn Gloc, KINBBDCommFn Gcomm)
+.. c:function:: int KINBBDPrecInit(void* kin_mem, sunindextype Nlocal, sunindextype mudq, sunindexype mldq, sunindextype mukeep, sunindextype mlkeep, sunrealtype dq_rel_u, KINBBDLocalFn Gloc, KINBBDCommFn Gcomm)
 
    The function :c:func:`KINBBDPrecInit` initializes and allocates  memory for
    the KINBBDPRE preconditioner.

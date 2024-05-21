@@ -2,7 +2,7 @@
 ! Programmer(s): Daniel R. Reynolds @ SMU
 ! ------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -35,6 +35,7 @@ module ode_mod
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
+  use fsundials_core_mod
 
   !======= Declarations =========
   implicit none
@@ -118,11 +119,10 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
+  use fsundials_core_mod
   use farkode_mod           ! Fortran interface to the ARKode module
   use farkode_arkstep_mod   ! Fortran interface to the ARKStep module
   use fnvector_complex_mod  ! Custom complex N_Vector
-  use fsundials_context_mod
   use ode_mod               ! ODE functions
 
   !======= Declarations =========
@@ -141,7 +141,7 @@ program main
   !======= Internals ============
 
   ! create the SUNDIALS context
-  ierr = FSUNContext_Create(c_null_ptr, sunctx)
+  ierr = FSUNContext_Create(SUN_COMM_NULL, sunctx)
 
   ! initial problem output
   print *, "  "

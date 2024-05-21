@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -28,7 +28,7 @@ indicating ownership of the wrapped PETSc vector.
    struct _N_VectorContent_Petsc {
       sunindextype local_length;
       sunindextype global_length;
-      booleantype own_data;
+      sunbooleantype own_data;
       Vec *pvec;
       MPI_Comm comm;
    };
@@ -101,76 +101,62 @@ operations enabled/disabled as cloned vectors inherit the same enable/disable
 options as the vector they are cloned from while vectors created with
 :c:func:`N_VMake_Petsc` will have the default settings for the NVECTOR_PETSC module.
 
-.. c:function:: int N_VEnableFusedOps_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableFusedOps_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) all fused and
-   vector array operations in the PETSc vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   vector array operations in the PETSc vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearCombination_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearCombination_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear
-   combination fused operation in the PETSc vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   combination fused operation in the PETSc vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleAddMulti_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleAddMulti_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale and
    add a vector to multiple vectors fused operation in the PETSc vector. The
-   return value is ``0`` for success and ``-1`` if the input vector or its
-   ``ops`` structure are ``NULL``.
+   return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableDotProdMulti_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableDotProdMulti_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the multiple
-   dot products fused operation in the PETSc vector. The return value is ``0``
-   for success and ``-1`` if the input vector or its ``ops`` structure are
-   ``NULL``.
+   dot products fused operation in the PETSc vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearSumVectorArray_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearSumVectorArray_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear sum
-   operation for vector arrays in the PETSc vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the PETSc vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleVectorArray_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleVectorArray_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale
-   operation for vector arrays in the PETSc vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the PETSc vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableConstVectorArray_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableConstVectorArray_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the const
-   operation for vector arrays in the PETSc vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the PETSc vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableWrmsNormVectorArray_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableWrmsNormVectorArray_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the WRMS norm
-   operation for vector arrays in the PETSc vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the PETSc vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableWrmsNormMaskVectorArray_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableWrmsNormMaskVectorArray_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the masked WRMS
-   norm operation for vector arrays in the PETSc vector. The return value is
-   ``0`` for success and ``-1`` if the input vector or its ``ops`` structure are
-   ``NULL``.
+   norm operation for vector arrays in the PETSc vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleAddMultiVectorArray_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleAddMultiVectorArray_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale and
    add a vector array to multiple vector arrays operation in the PETSc vector. The
-   return value is ``0`` for success and ``-1`` if the input vector or its
-   ``ops`` structure are ``NULL``.
+   return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearCombinationVectorArray_Petsc(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearCombinationVectorArray_Petsc(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear
-   combination operation for vector arrays in the PETSc vector. The return value
-   is ``0`` for success and ``-1`` if the input vector or its ``ops`` structure
-   are ``NULL``.
+   combination operation for vector arrays in the PETSc vector. The return value is a :c:type:`SUNErrCode`.
 
 
 **Notes**
@@ -179,13 +165,11 @@ options as the vector they are cloned from while vectors created with
   is recommeded to extract the PETSc vector via ``x_vec = N_VGetVector_Petsc(v);``
   and then access components using appropriate PETSc functions.
 
-* The functions :c:func:`N_VNewEmpty_Petsc`, :c:func:`N_VMake_Petsc`,
-  and :c:func:`N_VCloneVectorArrayEmpty_Petsc()` set the field
-  *own_data* to ``SUNFALSE``. The routines :c:func:`N_VDestroy_Petsc()` and
-  :c:func:`N_VDestroyVectorArray_Petsc()` will not attempt to free the
-  pointer ``pvec`` for any ``N_Vector`` with *own_data* set to
-  ``SUNFALSE``. In such a case, it is the user's responsibility to
-  deallocate the ``pvec`` pointer.
+* The functions :c:func:`N_VNewEmpty_Petsc` and :c:func:`N_VMake_Petsc`, set the
+  field *own_data* to ``SUNFALSE``. The routine :c:func:`N_VDestroy_Petsc()`
+  will not attempt to free the pointer ``pvec`` for any ``N_Vector`` with
+  *own_data* set to ``SUNFALSE``. In such a case, it is the user's
+  responsibility to deallocate the ``pvec`` pointer.
 
 * To maximize efficiency, vector operations in the NVECTOR_PETSC
   implementation that have more than one ``N_Vector`` argument do not

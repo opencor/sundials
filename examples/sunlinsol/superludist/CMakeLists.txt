@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -30,9 +30,12 @@ set(sunlinsol_superludist_dependencies
   test_sunlinsol
   )
 
-if(MPI_C_COMPILER AND MPI_CXX_COMPILER)
-  set(CMAKE_C_COMPILER ${MPI_C_COMPILER})
-  set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
+if(SUPERLUDIST_CUDA)
+  set(_ex_lang CUDA)
+elseif(SUPERLUDIST_ROCM)
+  set(_ex_lang HIP)
+else()
+  set(_ex_lang CXX)
 endif()
 
 # Add source directory to include directories
@@ -53,6 +56,7 @@ foreach(example_tuple ${sunlinsol_superludist_examples})
   # check if this example has already been added, only need to add
   # example source files once for testing with different inputs
   if(NOT TARGET ${example_target})
+
     # example source files
     add_executable(${example_target} ${example}
       ../test_sunlinsol.c)
@@ -67,7 +71,8 @@ foreach(example_tuple ${sunlinsol_superludist_examples})
         sundials_sunmatrixslunrloc
         sundials_sunmatrixdense
         sundials_nvecparallel
-        sundials_nvecserial)
+        sundials_nvecserial
+        MPI::MPI_CXX)
   endif()
 
   # check if example args are provided and set the test name
@@ -93,14 +98,6 @@ foreach(example_tuple ${sunlinsol_superludist_examples})
     NODIFF)
 
 endforeach(example_tuple ${sunlinsol_superludist_examples})
-
-if(SUPERLUDIST_CUDA)
-  set(_ex_lang CUDA)
-elseif(SUPERLUDIST_ROCM)
-  set(_ex_lang HIP)
-else()
-  set(_ex_lang CXX)
-endif()
 
 if(EXAMPLES_INSTALL)
 

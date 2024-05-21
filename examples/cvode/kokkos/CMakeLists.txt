@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -16,6 +16,7 @@
 # 'develop' for examples excluded from 'make test' in releases
 set(examples_list
   "cv_bruss_batched_kokkos.cpp\;\;develop"
+  "cv_bruss_batched_kokkos_2D.cpp\;\;develop"
 )
 
 # Add the build targets for each example

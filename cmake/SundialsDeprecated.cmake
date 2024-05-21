@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -159,23 +159,4 @@ if(DEFINED CUDA_ARCH)
   string(REGEX MATCH "[0-9]+" arch_name "${CUDA_ARCH}")
   set(CMAKE_CUDA_ARCHITECTURES ${arch_name} CACHE STRING "CUDA Architectures" FORCE)
   unset(CUDA_ARCH)
-endif()
-
-#
-# Deprecated USE_GENERIC_MATH option
-#
-
-if(DEFINED USE_GENERIC_MATH)
-  print_warning("The CMake option USE_GENERIC_MATH is deprecated" "Use SUNDIALS_MATH_LIBRARY instead"
-                MODE DEPRECATION)
-  if(USE_GENERIC_MATH)
-    if(UNIX)
-      set(SUNDIALS_MATH_LIBRARY "-lm" CACHE PATH "Which math library (e.g., libm) to link to" FORCE)
-    else()
-      set(SUNDIALS_MATH_LIBRARY "" CACHE PATH "Which math library (e.g., libm) to link to" FORCE)
-    endif()
-  else()
-    set(SUNDIALS_MATH_LIBRARY "" CACHE PATH "Which math library (e.g., libm) to link to" FORCE)
-  endif()
-  unset(USE_GENERIC_MATH CACHE)
 endif()

@@ -2,7 +2,7 @@
 ! Programmer(s): Daniel R. Reynolds @ SMU
 ! ------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -44,6 +44,10 @@ module ode_mod
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
+  use fsundials_core_mod
+  use fnvector_fortran_mod       ! Custom Fortran N_Vector
+  use fsunmatrix_fortran_mod     ! Custom Fortran SUNMatrix
+  use fsunlinsol_fortran_mod     ! Custom Fortran SUNLinearSolver
 
   !======= Declarations =========
   implicit none
@@ -80,7 +84,6 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fnvector_fortran_mod
 
     !======= Declarations =========
     implicit none
@@ -145,7 +148,6 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fnvector_fortran_mod
 
     !======= Declarations =========
     implicit none
@@ -201,8 +203,6 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsunmatrix_fortran_mod
-    use fnvector_fortran_mod
 
     !======= Declarations =========
     implicit none
@@ -264,8 +264,7 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_context_mod
+  use fsundials_core_mod
   use farkode_mod                ! Fortran interface to the ARKode module
   use farkode_arkstep_mod        ! Fortran interface to the ARKStep module
   use fnvector_fortran_mod       ! Custom Fortran N_Vector
@@ -286,7 +285,7 @@ program main
   type(SUNLinearSolver), pointer :: sunls         ! sundials linear solver
   type(c_ptr)                    :: arkode_mem    ! ARKODE memory
 
-  ! solution vector, N and Nvar are set in the ode_mod moduel
+  ! solution vector, N and Nvar are set in the ode_mod module
   real(c_double) :: y(Nvar,N)
 
   !======= Internals ============
@@ -300,7 +299,7 @@ program main
   print '(2(a,es8.1))', "    reltol = ",reltol,",  abstol = ",abstol
 
   ! create the SUNDIALS context for the simulation
-  ierr = FSUNContext_Create(c_null_ptr, sunctx)
+  ierr = FSUNContext_Create(SUN_COMM_NULL, sunctx)
   if (ierr /= 0) then
     write(*,*) 'Error in FSUNContext_Create'
     stop 1

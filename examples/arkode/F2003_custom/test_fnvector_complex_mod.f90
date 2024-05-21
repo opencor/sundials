@@ -2,7 +2,7 @@
 ! Programmer(s): Daniel R. Reynolds @ SMU
 ! ------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -19,6 +19,7 @@
 ! ------------------------------------------------------------------
 module fnvector_test_mod
   use, intrinsic :: iso_c_binding
+  use fsundials_core_mod
   use fnvector_complex_mod
   implicit none
 
@@ -47,7 +48,7 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-  use fsundials_context_mod
+  use fsundials_core_mod
   use fnvector_complex_mod
   use fnvector_test_mod
 
@@ -70,7 +71,7 @@ program main
   fails = 0
 
   ! create SUNDIALS context
-  fails = FSUNContext_Create(c_null_ptr, sunctx)
+  fails = FSUNContext_Create(SUN_COMM_NULL, sunctx)
 
   ! create new vectors, using New, Make and Clone routines
   sU => FN_VMake_Complex(N, Udata, sunctx)

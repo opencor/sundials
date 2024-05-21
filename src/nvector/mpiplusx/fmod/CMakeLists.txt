@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -29,8 +29,9 @@ endif()
 sundials_add_f2003_library(sundials_fnvecmpiplusx_mod
   SOURCES
     fnvector_mpiplusx_mod.f90 fnvector_mpiplusx_mod.c
+  LINK_LIBRARIES
+    PUBLIC sundials_fcore_mod
   OBJECT_LIBRARIES
-    sundials_fgeneric_mod_obj
   OUTPUT_NAME
     sundials_fnvecmpiplusx_mod
   VERSION

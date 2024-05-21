@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -24,14 +24,15 @@ sundials_add_library(sundials_sunnonlinsolnewton
     ${SUNDIALS_SOURCE_DIR}/include/sunnonlinsol/sunnonlinsol_newton.h
   INCLUDE_SUBDIR
     sunnonlinsol
+  LINK_LIBRARIES
+    PUBLIC sundials_core
   OBJECT_LIBRARIES
-    sundials_generic_obj
   OUTPUT_NAME
     sundials_sunnonlinsolnewton
   VERSION
     ${sunnonlinsollib_VERSION}
   SOVERSION
-    ${sunnonlinsollib_VERSION}
+  ${sunnonlinsollib_SOVERSION}
 )
 
 message(STATUS "Added SUNNONLINSOL_NEWTON module")

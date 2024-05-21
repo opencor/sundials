@@ -3,7 +3,7 @@
 #                Radu Serban, and Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -23,12 +23,10 @@ set(cvode_SOURCES
   cvode_bandpre.c
   cvode_bbdpre.c
   cvode_diag.c
-  cvode_direct.c
   cvode_io.c
   cvode_ls.c
   cvode_nls.c
   cvode_proj.c
-  cvode_spils.c
   )
 
 # Add variable cvode_HEADERS with the exported CVODE header files
@@ -37,10 +35,8 @@ set(cvode_HEADERS
   cvode_bandpre.h
   cvode_bbdpre.h
   cvode_diag.h
-  cvode_direct.h
   cvode_ls.h
   cvode_proj.h
-  cvode_spils.h
   )
 
 # Add prefix with complete path to the CVODE header files
@@ -60,6 +56,7 @@ if(SUNDIALS_BUILD_PACKAGE_FUSED_KERNELS)
       COMPILE_DEFINITIONS
         PRIVATE USE_CUDA
       LINK_LIBRARIES
+        PUBLIC sundials_core
         PRIVATE sundials_nveccuda
       OUTPUT_NAME
         sundials_cvode_fused_cuda
@@ -77,6 +74,7 @@ if(SUNDIALS_BUILD_PACKAGE_FUSED_KERNELS)
       COMPILE_DEFINITIONS
         PRIVATE USE_HIP
       LINK_LIBRARIES
+        PUBLIC sundials_core
         PRIVATE sundials_nvechip
       OUTPUT_NAME
         sundials_cvode_fused_hip
@@ -90,6 +88,8 @@ if(SUNDIALS_BUILD_PACKAGE_FUSED_KERNELS)
   sundials_add_library(sundials_cvode_fused_stubs
     SOURCES
       cvode_fused_stubs.c
+    LINK_LIBRARIES
+        PUBLIC sundials_core
     OUTPUT_NAME
       sundials_cvode_fused_stubs
     VERSION
@@ -101,11 +101,6 @@ if(SUNDIALS_BUILD_PACKAGE_FUSED_KERNELS)
   set(_fused_link_lib sundials_cvode_fused_stubs)
 endif()
 
-if(ENABLE_CALIPER AND SUNDIALS_BUILD_WITH_PROFILING)
-  set(_include_caliper_if_needed PUBLIC ${caliper_INCLUDE_DIR})
-  set(_link_caliper_if_needed PUBLIC caliper)
-endif()
-
 # Create the library
 sundials_add_library(sundials_cvode
   SOURCES
@@ -114,10 +109,9 @@ sundials_add_library(sundials_cvode
     ${cvode_HEADERS}
   INCLUDE_SUBDIR
     cvode
-  INCLUDE_DIRECTORIES
-    ${_include_caliper_if_needed}
+  LINK_LIBRARIES
+    PUBLIC sundials_core
   OBJECT_LIBRARIES
-    sundials_generic_obj
     sundials_sunmemsys_obj
     sundials_nvecserial_obj
     sundials_sunmatrixband_obj
@@ -135,8 +129,6 @@ sundials_add_library(sundials_cvode
   LINK_LIBRARIES
     # Link to stubs so examples work.
     PRIVATE ${_fused_link_lib}
-    # Link to caliper if conditions are met.
-    ${_link_caliper_if_needed}
   OUTPUT_NAME
     sundials_cvode
   VERSION

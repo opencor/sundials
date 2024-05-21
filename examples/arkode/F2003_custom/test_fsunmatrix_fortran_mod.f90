@@ -2,7 +2,7 @@
 ! Programmer(s): Daniel R. Reynolds @ SMU
 ! ------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -19,6 +19,7 @@
 ! ------------------------------------------------------------------
 module fsunmatrix_test_mod
   use, intrinsic :: iso_c_binding
+  use fsundials_core_mod
   use fsunmatrix_fortran_mod
   use fnvector_fortran_mod
   implicit none
@@ -116,7 +117,7 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-  use fsundials_context_mod
+  use fsundials_core_mod
   use fnvector_fortran_mod
   use fsunmatrix_test_mod
 
@@ -140,7 +141,7 @@ program main
   fails = 0
 
   ! create SUNDIALS context
-  fails = FSUNContext_Create(c_null_ptr, sunctx)
+  fails = FSUNContext_Create(SUN_COMM_NULL, sunctx)
 
   ! create new matrices and vectors
   sW => FN_VNew_Fortran(Nvar, N, sunctx)
@@ -230,7 +231,7 @@ program main
   ! test SUNMatZero
   retval = FSUNMatZero(sB)
   if ( (check_matrix_entry(sB, 0.d0, 1.d-14, Nvar, N) /= 0) &
-       .or. (retval /= SUNMAT_SUCCESS) ) then
+       .or. (retval /= SUN_SUCCESS) ) then
      fails = fails + 1
      print *, '>>> FAILED test -- FSUNMatZero'
   else
@@ -240,7 +241,7 @@ program main
   ! test SUNMatCopy
   retval = FSUNMatCopy(sA, sB)
   if ( (check_matrix(sA, sB, 1.d-14, Nvar, N) /= 0) &
-       .or. (retval /= SUNMAT_SUCCESS) ) then
+       .or. (retval /= SUN_SUCCESS) ) then
      fails = fails + 1
      print *, '>>> FAILED test -- FSUNMatCopy'
   else
@@ -251,7 +252,7 @@ program main
   retval = FSUNMatCopy(sA, sB)
   retval = FSUNMatScaleAdd(-1.d0, sB, sB)
   if ( (check_matrix_entry(sB, 0.d0, 1.d-14, Nvar, N) /= 0) &
-       .or. (retval /= SUNMAT_SUCCESS) ) then
+       .or. (retval /= SUN_SUCCESS) ) then
      fails = fails + 1
      print *, '>>> FAILED test -- FSUNMatScaleAdd case 1'
   else
@@ -261,9 +262,9 @@ program main
   retval = FSUNMatCopy(sA, sD)
   retval = FSUNMatCopy(sI, sC)
   retval = FSUNMatScaleAdd(1.d0, sD, sI)
-  if (retval == SUNMAT_SUCCESS)  retval = FSUNMatScaleAdd(1.d0, sC, sA)
+  if (retval == SUN_SUCCESS)  retval = FSUNMatScaleAdd(1.d0, sC, sA)
   if ( (check_matrix(sD, sC, 1.d-14, Nvar, N) /= 0) &
-       .or. (retval /= SUNMAT_SUCCESS) ) then
+       .or. (retval /= SUN_SUCCESS) ) then
      fails = fails + 1
      print *, '>>> FAILED test -- FSUNMatScaleAdd case 2'
   else
@@ -274,7 +275,7 @@ program main
   retval = FSUNMatCopy(sI, sB)
   retval = FSUNMatScaleAddI(-1.d0, sB)
   if ( (check_matrix_entry(sB, 0.d0, 1.d-14, Nvar, N) /= 0) &
-       .or. (retval /= SUNMAT_SUCCESS) ) then
+       .or. (retval /= SUN_SUCCESS) ) then
      fails = fails + 1
      print *, '>>> FAILED test -- FSUNMatScaleAddI'
   else
@@ -287,7 +288,7 @@ program main
   retval = FSUNMatMatvec(sB, sX, sZ)
   call FN_VLinearSum(3.d0, sY, 1.d0, sX, sW)
   if ( (check_vector(sW, sZ, 1.d-15*Nvar*Nvar, Nvar, N) /= 0) &
-       .or. (retval /= SUNMAT_SUCCESS) ) then
+       .or. (retval /= SUN_SUCCESS) ) then
      fails = fails + 1
      print *, '>>> FAILED test -- FSUNMatMatvec'
   else

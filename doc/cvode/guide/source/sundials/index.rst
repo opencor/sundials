@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -23,7 +23,9 @@ six packages all leverage some other common infrastructure, which we discuss
 in this section.
 
 .. toctree::
+   Types_link
    SUNContext_link
+   Errors_link
    Logging_link
    Profiling_link
    version_information_link

@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -17,6 +17,7 @@
 # List of test tuples of the form "name\;args"
 set(unit_tests
   "cv_test_getuserdata\;"
+  "cv_test_tstop\;"
   )
 
 # Add the build and install targets for each test

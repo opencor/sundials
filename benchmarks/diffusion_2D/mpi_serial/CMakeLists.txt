@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -48,6 +48,8 @@ foreach(test_tuple ${tests})
   # create executable
   add_executable(${target} ${sources})
 
+  add_dependencies(benchmark ${target})
+
   set_target_properties(${target} PROPERTIES FOLDER "Benchmarks")
 
   target_compile_definitions(${target} PRIVATE ${problem_type})
@@ -60,7 +62,19 @@ foreach(test_tuple ${tests})
     sundials_nvecparallel
     MPI::MPI_CXX)
 
+  if(BUILD_SUNLINSOL_SUPERLUDIST)
+    target_compile_definitions(${target} PRIVATE USE_SUPERLU_DIST)
+    target_link_libraries(${target}
+      PRIVATE
+      sundials_sunlinsolsuperludist
+      sundials_sunmatrixslunrloc)
+  endif()
+
   install(TARGETS ${target}
-    DESTINATION "${CMAKE_INSTALL_BINDIR}/benchmarks/diffusion_2D")
+    DESTINATION "${BENCHMARKS_INSTALL_PATH}/diffusion_2D")
+
+  sundials_add_benchmark(${target} ${target} diffusion_2D
+    NUM_CORES ${SUNDIALS_BENCHMARK_NUM_CPUS}
+  )
 
 endforeach()

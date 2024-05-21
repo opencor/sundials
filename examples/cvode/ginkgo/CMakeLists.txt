@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -20,7 +20,7 @@ set(cpu_gpu_examples
 
 sundials_add_examples_ginkgo(cpu_gpu_examples
   TARGETS sundials_cvode
-  BACKENDS REF OMP CUDA HIP)
+  BACKENDS REF OMP CUDA HIP DPCPP)
 
 # Examples that only support CPU Ginkgo backends
 set(cpu_examples
@@ -38,6 +38,9 @@ if(EXAMPLES_INSTALL)
   endif()
   if(SUNDIALS_GINKGO_BACKENDS MATCHES "HIP")
     list(APPEND vectors nvechip)
+  endif()
+  if(SUNDIALS_GINKGO_BACKENDS MATCHES "DPCPP")
+    list(APPEND vectors nvecsycl)
   endif()
   if((SUNDIALS_GINKGO_BACKENDS MATCHES "OMP") OR
       (SUNDIALS_GINKGO_BACKENDS MATCHES "REF"))
