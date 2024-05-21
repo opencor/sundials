@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -78,7 +78,7 @@ user-callable routines:
       in inferior performance.
 
 
-.. c:function:: int SUNLinSol_SPGMRSetPrecType(SUNLinearSolver S, int pretype)
+.. c:function:: SUNErrCode SUNLinSol_SPGMRSetPrecType(SUNLinearSolver S, int pretype)
 
    This function updates the flag indicating use of preconditioning.
 
@@ -92,12 +92,10 @@ user-callable routines:
         * ``SUN_PREC_BOTH``
 
    **Return value:**
-      * ``SUNLS_SUCCESS`` -- successful update.
-      * ``SUNLS_ILL_INPUT`` -- illegal ``pretype``
-      * ``SUNLS_MEM_NULL`` -- ``S`` is ``NULL``
+      * A :c:type:`SUNErrCode`
 
 
-.. c:function:: int SUNLinSol_SPGMRSetGSType(SUNLinearSolver S, int gstype)
+.. c:function:: SUNErrCode SUNLinSol_SPGMRSetGSType(SUNLinearSolver S, int gstype)
 
    This function sets the type of Gram-Schmidt orthogonalization to use.
 
@@ -109,12 +107,10 @@ user-callable routines:
         * ``SUN_CLASSICAL_GS``
 
    **Return value:**
-      * ``SUNLS_SUCCESS`` -- successful update.
-      * ``SUNLS_ILL_INPUT`` -- illegal ``gstype``
-      * ``SUNLS_MEM_NULL`` -- ``S`` is ``NULL``
+      * A :c:type:`SUNErrCode`
 
 
-.. c:function:: int SUNLinSol_SPGMRSetMaxRestarts(SUNLinearSolver S, int maxrs)
+.. c:function:: SUNErrCode SUNLinSol_SPGMRSetMaxRestarts(SUNLinearSolver S, int maxrs)
 
    This function sets the number of GMRES restarts to allow.
 
@@ -124,94 +120,7 @@ user-callable routines:
         result in the default of 0.
 
    **Return value:**
-      * ``SUNLS_SUCCESS`` -- successful update.
-      * ``SUNLS_MEM_NULL`` -- ``S`` is ``NULL``
-
-
-.. c:function:: int SUNLinSolSetInfoFile_SPGMR(SUNLinearSolver LS, FILE* info_file)
-
-   The function :c:func:`SUNLinSolSetInfoFile_SPGMR()` sets the
-   output file where all informative (non-error) messages should be directed.
-
-   **Arguments:**
-      * *LS* -- a SUNLinSol object
-      * *info_file* -- pointer to output file (``stdout`` by default);
-        a ``NULL`` input will disable output
-
-   **Return value:**
-      * *SUNLS_SUCCESS* if successful
-      * *SUNLS_MEM_NULL* if the SUNLinearSolver memory was ``NULL``
-      * *SUNLS_ILL_INPUT* if SUNDIALS was not built with monitoring enabled
-
-   **Notes:**
-      This function is intended for users that wish to monitor the linear
-      solver progress. By default, the file pointer is set to ``stdout``.
-
-   .. warning::
-
-      SUNDIALS must be built with the CMake option
-      ``SUNDIALS_LOGGING_LEVEL >= 3`` to utilize this function.
-      See :numref:`Installation.CMake.Options` for more information.
-
-   .. deprecated:: 6.2.0
-
-      Use :c:func:`SUNLogger_SetInfoFilename` instead.
-
-
-.. c:function:: int SUNLinSolSetPrintLevel_SPGMR(SUNLinearSolver LS, int print_level)
-
-   The function :c:func:`SUNLinSolSetPrintLevel_SPGMR()` specifies the
-   level of verbosity of the output.
-
-   **Arguments:**
-      * *LS* -- a SUNLinSol object
-      * *print_level* -- flag indicating level of verbosity;
-        must be one of:
-
-         * 0, no information is printed (default)
-         * 1, for each linear iteration the residual norm is printed
-
-   **Return value:**
-      * *SUNLS_SUCCESS* if successful
-      * *SUNLS_MEM_NULL* if the SUNLinearSolver memory was ``NULL``
-      * *SUNLS_ILL_INPUT* if SUNDIALS was not built with monitoring enabled, or
-        if the print level value was invalid
-
-   **Notes:**
-      This function is intended for users that wish to monitor the linear
-      solver progress. By default, the print level is 0.
-
-      **SUNDIALS must be built with the CMake option**
-      ``SUNDIALS_BUILD_WITH_MONITORING`` **to utilize this function.**
-      See :numref:`Installation.CMake.Options` for more information.
-
-   .. deprecated:: 6.2.0
-
-      Use :c:func:`SUNLogger_SetInfoFilename` instead.
-
-
-For backwards compatibility, we also provide the wrapper functions,
-each with identical input and output arguments to the routines that
-they wrap:
-
-.. c:function:: SUNLinearSolver SUNSPGMR(N_Vector y, int pretype, int maxl)
-
-   Wrapper function for :c:func:`SUNLinSol_SPGMR`
-
-.. c:function:: int SUNSPGMRSetPrecType(SUNLinearSolver S, int pretype)
-
-   Wrapper function for :c:func:`SUNLinSol_SPGMRSetPrecType()`
-
-.. c:function:: int SUNSPGMRSetGSType(SUNLinearSolver S, int gstype)
-
-   Wrapper function for :c:func:`SUNLinSol_SPGMRSetGSType()`
-
-.. c:function:: int SUNSPGMRSetMaxRestarts(SUNLinearSolver S, int maxrs)
-
-   Wrapper function for :c:func:`SUNLinSol_SPGMRSetMaxRestarts()`
-
-
-
+      * A :c:type:`SUNErrCode`
 
 
 .. _SUNLinSol.SPGMR.Description:
@@ -230,9 +139,9 @@ The SUNLinSol_SPGMR module defines the *content* field of a
      int pretype;
      int gstype;
      int max_restarts;
-     booleantype zeroguess;
+     sunbooleantype zeroguess;
      int numiters;
-     realtype resnorm;
+     sunrealtype resnorm;
      int last_flag;
      SUNATimesFn ATimes;
      void* ATData;
@@ -242,13 +151,11 @@ The SUNLinSol_SPGMR module defines the *content* field of a
      N_Vector s1;
      N_Vector s2;
      N_Vector *V;
-     realtype **Hes;
-     realtype *givens;
+     sunrealtype **Hes;
+     sunrealtype *givens;
      N_Vector xcor;
-     realtype *yg;
+     sunrealtype *yg;
      N_Vector vtemp;
-     int      print_level;
-     FILE*    info_file;
    };
 
 These entries of the *content* field contain the following
@@ -322,14 +229,12 @@ information:
 * ``xcor`` - a vector which holds the scaled, preconditioned
   correction to the initial guess,
 
-* ``yg`` - a length :math:`(\text{maxl}+1)` array of ``realtype``
+* ``yg`` - a length :math:`(\text{maxl}+1)` array of ``sunrealtype``
   values used to hold "short" vectors (e.g. :math:`y` and :math:`g`),
 
 * ``vtemp`` - temporary vector storage.
 
-* ``print_level`` - controls the amount of information to be printed to the info file
 
-* ``info_file``   - the file where all informative (non-error) messages will be directed
 
 
 This solver is constructed to perform the following operations:

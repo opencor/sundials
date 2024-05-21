@@ -3,7 +3,7 @@
 #                and Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -25,8 +25,9 @@ sundials_add_library(sundials_sunmatrixsparse
     ${SUNDIALS_SOURCE_DIR}/include/sunmatrix/sunmatrix_sparse.h
   INCLUDE_SUBDIR
     sunmatrix
+  LINK_LIBRARIES
+    PUBLIC sundials_core
   OBJECT_LIBRARIES
-    sundials_generic_obj
   OUTPUT_NAME
     sundials_sunmatrixsparse
   VERSION

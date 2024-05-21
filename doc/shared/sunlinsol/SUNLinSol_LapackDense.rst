@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -62,15 +62,6 @@ user-callable constructor routine:
       compatibility check.
 
 
-For backwards compatibility, we also provide the following wrapper function:
-
-.. c:function:: SUNLinearSolver SUNLapackDense(N_Vector y, SUNMatrix A)
-
-   Wrapper function for :c:func:`SUNLinSol_LapackDense`, with
-   identical input and output arguments.
-
-
-
 .. _SUNLinSol_LapackDense.Description:
 
 SUNLinSol_LapackDense Description
@@ -104,9 +95,9 @@ information:
 The SUNLinSol_LapackDense module is a ``SUNLinearSolver`` wrapper for
 the LAPACK dense matrix factorization and solve routines, ``*GETRF``
 and ``*GETRS``, where ``*`` is either ``D`` or ``S``, depending on
-whether SUNDIALS was configured to have :c:type:`realtype` set to
+whether SUNDIALS was configured to have :c:type:`sunrealtype` set to
 ``double`` or ``single``, respectively (see
-:numref:`Usage.CC.DataTypes` for details).  In order to use the
+:numref:`SUNDIALS.DataTypes` for details).  In order to use the
 SUNLinSol_LapackDense module it is assumed that LAPACK has been
 installed on the system prior to installation of
 SUNDIALS, and that SUNDIALS has been configured appropriately to
@@ -114,7 +105,7 @@ link with LAPACK (see
 :numref:`Installation.CMake.ExternalLibraries` for details).
 We note that since there do not exist 128-bit floating-point
 factorization and solve routines in LAPACK, this interface cannot be
-compiled when using ``extended`` precision for :c:type:`realtype`.
+compiled when using ``extended`` precision for :c:type:`sunrealtype`.
 Similarly, since there do not exist 64-bit integer LAPACK routines,
 the SUNLinSol_LapackDense module also cannot be compiled when using
 ``int64_t`` for the :c:type:`sunindextype`.

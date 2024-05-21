@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -20,5 +20,7 @@ sundials_add_library(sundials_sunmemsycl
     ${SUNDIALS_SOURCE_DIR}/include/sunmemory/sunmemory_sycl.h
   INCLUDE_SUBDIR
     sunmemory
+  LINK_LIBRARIES
+    PUBLIC sundials_core
   OBJECT_LIB_ONLY
 )

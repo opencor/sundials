@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -13,9 +13,6 @@
 # ------------------------------------------------------------------------------
 # Test if POSIX timers are available and can be used (some compiler flags will
 # disable POSIX timers even if they are present e.g., -ansi).
-#
-# Note -D_POSIX_C_SOURCE=199309L is the minimum POSIX version needed for struct
-# timespec and clock_monotonic()
 # ------------------------------------------------------------------------------
 
 macro(posix_timers_test)
@@ -54,7 +51,7 @@ macro(posix_timers_test)
   file(WRITE ${POSIX_TIMER_TEST_DIR}/ltest.c
     "#include <time.h>\n"
     "#include <unistd.h>\n"
-    "int main(){\n"
+    "int main(void) {\n"
     "struct timespec spec;\n"
     "clock_gettime(CLOCK_MONOTONIC, &spec);\n"
     "clock_getres(CLOCK_MONOTONIC, &spec);\n"
@@ -80,9 +77,9 @@ if (NOT SUNDIALS_POSIX_TIMERS)
     message(STATUS "Looking for POSIX timers... found")
   endif()
 
-  # Test failed, try again with -D_POSIX_C_SOURCE=199309L
+  # Test failed, try again with -D_POSIX_C_SOURCE=200112L
   if(NOT COMPILE_OK)
-    posix_timers_test(POSIX "_POSIX_C_SOURCE=199309L")
+    posix_timers_test(POSIX "_POSIX_C_SOURCE=200112L")
     if(COMPILE_OK)
       message(STATUS "Looking for POSIX timers (setting _POSIX_C_SOURCE)... found")
       set(POSIX_TIMERS_NEED_POSIX_C_SOURCE TRUE)
@@ -102,7 +99,7 @@ if (NOT SUNDIALS_POSIX_TIMERS)
       if(COMPILE_OK)
         message(STATUS "Looking for POSIX timers (linking to rt)... found")
         set(POSIX_TIMERS_NEED_RT_LIBRARY TRUE)
-        set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${SUNDIALS_RT_LIBRARY})
+        set(EXE_EXTRA_LINK_LIBS ${EXE_EXTRA_LINK_LIBS} ${SUNDIALS_RT_LIBRARY})
       endif()
     else()
       message(STATUS "Looking for rt library... FAILED")
@@ -110,14 +107,14 @@ if (NOT SUNDIALS_POSIX_TIMERS)
 
   endif()
 
-  # Test failed, try again linking to rt and with -D_POSIX_C_SOURCE=199309L
+  # Test failed, try again linking to rt and with -D_POSIX_C_SOURCE=200112L
   if((NOT COMPILE_OK) AND SUNDIALS_RT_LIBRARY)
-    posix_timers_test(POSIX "_POSIX_C_SOURCE=199309L" RT_LIB "${SUNDIALS_RT_LIBRARY}")
+    posix_timers_test(POSIX "_POSIX_C_SOURCE=200112L" RT_LIB "${SUNDIALS_RT_LIBRARY}")
     if(COMPILE_OK)
       message(STATUS "Looking for POSIX timers (setting _POSIX_C_SOURCE and linking to rt)... found")
       set(POSIX_TIMERS_NEED_POSIX_C_SOURCE TRUE)
       set(POSIX_TIMERS_NEED_RT_LIBRARY TRUE)
-      set(EXTRA_LINK_LIBS ${EXTRA_LINK_LIBS} ${SUNDIALS_RT_LIBRARY})
+      set(EXE_EXTRA_LINK_LIBS ${EXE_EXTRA_LINK_LIBS} ${SUNDIALS_RT_LIBRARY})
     endif()
   endif()
 

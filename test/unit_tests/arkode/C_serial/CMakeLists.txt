@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -11,7 +11,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SUNDIALS Copyright End
 # ---------------------------------------------------------------
-# ARKode C serial unit tests
+# ARKODE C serial unit tests
 # ---------------------------------------------------------------
 
 # List of test tuples of the form "name\;args"
@@ -25,16 +25,14 @@ set(ARKODE_unit_tests
   "ark_test_arkstepsetforcing\;1 3 2.0 10.0"
   "ark_test_arkstepsetforcing\;1 3 2.0 10.0 2.0 8.0"
   "ark_test_arkstepsetforcing\;1 3 2.0 10.0 1.0 5.0"
-  "ark_interp_check\;-100"
-  "ark_interp_check\;-10000"
-  "ark_interp_check\;-1000000"
+  "ark_test_getuserdata\;"
+  "ark_test_innerstepper\;"
+  "ark_test_interp\;-100"
+  "ark_test_interp\;-10000"
+  "ark_test_interp\;-1000000"
+  "ark_test_reset\;"
+  "ark_test_tstop\;"
   )
-
-set(ARKODE_LIB sundials_arkode)
-set(NVECS_LIB sundials_nvecserial)
-
-# Set-up linker flags and link libraries
-set(SUNDIALS_LIBS ${ARKODE_LIB} ${NVECS_LIB} ${EXTRA_LINK_LIBS})
 
 # Add the build and install targets for each test
 foreach(test_tuple ${ARKODE_unit_tests})
@@ -58,8 +56,23 @@ foreach(test_tuple ${ARKODE_unit_tests})
       ${CMAKE_SOURCE_DIR}/include
       ${CMAKE_SOURCE_DIR}/src)
 
-    # libraries to link against
-    target_link_libraries(${test} ${SUNDIALS_LIBS})
+    # We explicitly choose which object libraries to link to and link in the
+    # arkode objects so that we have access to private functions w/o changing
+    # their visibility in the installed libraries.
+    target_link_libraries(${test}
+      $<TARGET_OBJECTS:sundials_arkode_obj>
+      sundials_sunmemsys_obj
+      sundials_nvecserial_obj
+      sundials_sunlinsolband_obj
+      sundials_sunlinsoldense_obj
+      sundials_sunnonlinsolnewton_obj
+      sundials_sunadaptcontrollerimexgus_obj
+      sundials_sunadaptcontrollersoderlind_obj
+      ${EXE_EXTRA_LINK_LIBS})
+
+    # Tell CMake that we depend on the ARKODE library since it does not pick
+    # that up from $<TARGET_OBJECTS:sundials_arkode_obj>.
+    add_dependencies(${test} sundials_arkode_obj)
 
   endif()
 
@@ -76,4 +89,4 @@ foreach(test_tuple ${ARKODE_unit_tests})
 
 endforeach()
 
-message(STATUS "Added ARKODE C serial units tests")
+message(STATUS "Added ARKODE C serial unit tests")

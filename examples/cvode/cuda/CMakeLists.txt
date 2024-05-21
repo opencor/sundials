@@ -4,7 +4,7 @@
 # Based on CMakeLists.txt in cvode/serial by Radu Serban @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -71,7 +71,7 @@ foreach(example_tuple ${all_examples})
     set_target_properties(${example} PROPERTIES FOLDER "Examples")
 
     # libraries to link against
-    target_link_libraries(${example} PRIVATE ${SUNDIALS_LIBS} ${EXTRA_LINK_LIBS})
+    target_link_libraries(${example} PRIVATE ${SUNDIALS_LIBS} ${EXE_EXTRA_LINK_LIBS})
   endif()
 
   # check if example args are provided and set the test name

@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -13,7 +13,7 @@
 .. only:: html
 
    This is the documentation for CVODES, a component of the `SUNDIALS
-   <https://computing.llnl.gov/casc/sundials/main.html>`_ suite of
+   <https://computing.llnl.gov/projects/sundials>`_ suite of
    nonlinear and differential/algebraic equation solvers.
 
    This work was performed under the auspices of the U.S. Department of Energy by Lawrence
@@ -27,11 +27,12 @@
    Woodward. We thank Radu Serban for significant and critical past
    contributions.
 
-   Other contributors to SUNDIALS include: James Almgren-Bell, Lawrence E.
-   Banks, Peter N. Brown, George Byrne, Rujeko Chinomona, Scott D. Cohen, Aaron
-   Collier, Keith E. Grant, Steven L. Lee, Shelby L. Lockhart, John Loffeld,
-   Daniel McGreer, Slaven Peles, Cosmin Petra, H. Hunter Schwartz, Jean M.
-   Sexton, Dan Shumaker, Steve G. Smith, Allan G. Taylor, Hilari C. Tiedeman,
+   Other contributors to SUNDIALS include: James Almgren-Bell,
+   Lawrence E. Banks, Peter N. Brown, George Byrne, Rujeko Chinomona,
+   Scott D. Cohen, Aaron Collier, Keith E. Grant, Steven L. Lee,
+   Shelby L. Lockhart, John Loffeld, Daniel McGreer, Yu Pan, Slaven Peles,
+   Cosmin Petra, Steven B. Roberts, H. Hunter Schwartz, Jean M. Sexton, Dan
+   Shumaker, Steve G. Smith, Shahbaj Sohal, Allan G. Taylor, Hilari C. Tiedeman,
    Chris White, Ting Yan, and Ulrike M. Yang.
 
    .. ifconfig:: package_name != 'super'
@@ -47,7 +48,6 @@
          @Misc{cvodesDocumentation,
             author = {Alan C. Hindmarsh and Radu Serban and Cody J. Balos and David J. Gardner and Daniel R. Reynolds and Carol S. Woodward},
             title  = {User Documentation for CVODES},
-            year   = {2021}
+            year   = {|YEAR|},
             note   = {|CVODES_VERSION|}
          }
-

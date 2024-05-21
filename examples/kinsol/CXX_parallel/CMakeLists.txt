@@ -2,7 +2,7 @@
 # Programmer(s): Shelby Lockhart @ UIUC/LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -19,13 +19,8 @@
 
 # Examples to build
 set(KINSOL_examples
-  "kin_heat2D_nonlin_p.cpp\;--np 2 2\;1\;4\;develop"
-  "kin_em_p.cpp\;\;1\;2\;develop")
-
-# Header files to install
-set(KINSOL_headers
-  "kin_heat2D_nonlin_p.hpp"
-  "kin_em_p.hpp")
+  "kin_heat2D_nonlin_p.cpp\;--np 2 2\;1\;4\;exclude-single"
+  "kin_em_p.cpp\;\;1\;2\;exclude-single")
 
 # Add the build target for each example
 foreach(example_tuple ${KINSOL_examples})
@@ -54,7 +49,7 @@ foreach(example_tuple ${KINSOL_examples})
       sundials_nvecmpiplusx
       sundials_nvecserial
       MPI::MPI_CXX
-      ${EXTRA_LINK_LIBS})
+      ${EXE_EXTRA_LINK_LIBS})
 
   endif()
 
@@ -94,7 +89,6 @@ if(EXAMPLES_INSTALL)
     DESTINATION
       kinsol/CXX_parallel
     EXTRA_FILES
-      ${KINSOL_headers}
       README
     TEST_INSTALL
       CXX_parallel

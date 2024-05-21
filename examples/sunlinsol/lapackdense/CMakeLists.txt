@@ -2,7 +2,7 @@
 # Programmer(s): Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -19,32 +19,29 @@
 
 # Examples using the LAPACK dense linear solver
 set(sunlinsol_lapackdense_examples
-  "test_sunlinsol_lapackdense\;10 0\;"
-  "test_sunlinsol_lapackdense\;100 0\;"
-  "test_sunlinsol_lapackdense\;500 0\;"
-  "test_sunlinsol_lapackdense\;1000 0\;"
+  "test_sunlinsol_lapackdense\;10 0 0\;"
+  "test_sunlinsol_lapackdense\;100 0 0\;"
+  "test_sunlinsol_lapackdense\;500 0 0\;"
+  "test_sunlinsol_lapackdense\;1000 0 0\;"
 )
 
 # Dependencies for nvector examples
 set(sunlinsol_lapackdense_dependencies
   test_sunlinsol
-  sundials_nvector
-  sundials_matrix
-  sundials_linearsolver
 )
+
+# If building F2003 tests
+if (BUILD_FORTRAN_MODULE_INTERFACE)
+  set(sunlinsol_lapackdense_fortran_examples
+    "test_fsunlinsol_lapackdense_mod\;10 0 0\;"
+    "test_fsunlinsol_lapackdense_mod\;100 0 0\;"
+    "test_fsunlinsol_lapackdense_mod\;500 0 0\;"
+    "test_fsunlinsol_lapackdense_mod\;1000 0 0\;"
+    )
+endif()
 
 # Add source directory to include directories
 include_directories(. ..)
-
-# Specify libraries to link against
-set(NVEC_LIB sundials_nvecserial)
-set(SUNMAT_LIB sundials_sunmatrixdense)
-set(SUNLINSOL_LIB sundials_sunlinsollapackdense)
-
-# Set-up linker flags and link libraries
-set(SUNDIALS_LIBS ${NVEC_LIB} ${SUNMAT_LIB} ${SUNLINSOL_LIB} ${EXTRA_LINK_LIBS})
-
-list(APPEND SUNDIALS_LIBS ${LAPACK_LIBRARIES})
 
 # Add the build and install targets for each sunlinsol example
 foreach(example_tuple ${sunlinsol_lapackdense_examples})
@@ -64,7 +61,12 @@ foreach(example_tuple ${sunlinsol_lapackdense_examples})
     set_target_properties(${example} PROPERTIES FOLDER "Examples")
 
     # libraries to link against
-    target_link_libraries(${example} ${SUNDIALS_LIBS})
+    target_link_libraries(${example}
+      sundials_nvecserial
+      sundials_sunmatrixdense
+      sundials_sunlinsollapackdense
+      ${LAPACK_LIBRARIES}
+      ${EXE_EXTRA_LINK_LIBS})
   endif()
 
   # check if example args are provided and set the test name
@@ -85,13 +87,56 @@ foreach(example_tuple ${sunlinsol_lapackdense_examples})
     install(FILES ${example}.c
       ../test_sunlinsol.h
       ../test_sunlinsol.c
-      ../../../src/sundials/sundials_matrix.c
-      ../../../src/sundials/sundials_linearsolver.c
-      ../../../src/sundials/sundials_nvector.c
       DESTINATION ${EXAMPLES_INSTALL_PATH}/sunlinsol/lapackdense)
   endif()
 
 endforeach(example_tuple ${sunlinsol_lapackdense_examples})
+
+# Add the build and install targets for each example
+foreach(example_tuple ${sunlinsol_lapackdense_fortran_examples})
+
+  # parse the example tuple
+  list(GET example_tuple 0 example)
+  list(GET example_tuple 1 example_args)
+  list(GET example_tuple 2 example_type)
+
+  # check if this example has already been added, only need to add
+  # example source files once for testing with different inputs
+  if(NOT TARGET ${example})
+    # example source files
+    add_executable(${example} ${example}.f90
+      ${SUNDIALS_SOURCE_DIR}/examples/utilities/test_utilities.f90
+      ${SUNDIALS_SOURCE_DIR}/examples/sunlinsol/test_sunlinsol.f90)
+
+    # folder to organize targets in an IDE
+    set_target_properties(${example} PROPERTIES FOLDER "Examples")
+
+    # set fortran module directory to avoid name collisions
+    set_target_properties(${example} PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
+    # libraries to link against
+    target_link_libraries(${example}
+      sundials_nvecserial
+      sundials_fnvecserial_mod
+      sundials_sunlinsollapackdense
+      sundials_fsunlinsollapackdense_mod
+      ${EXE_EXTRA_LINK_LIBS})
+
+    # check if example args are provided and set the test name
+    if("${example_args}" STREQUAL "")
+      set(test_name ${example})
+    else()
+      string(REGEX REPLACE " " "_" test_name ${example}_${example_args})
+    endif()
+
+    # add example to regression tests
+    sundials_add_test(${test_name} ${example}
+      TEST_ARGS ${example_args}
+      EXAMPLE_TYPE ${example_type}
+      NODIFF)
+  endif()
+
+endforeach(example_tuple ${sunlinsol_lapackdense_fortran_examples})
 
 
 if(EXAMPLES_INSTALL)

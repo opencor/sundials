@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos and David J. Gardner @ LLNL
 # -----------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -17,7 +17,7 @@ cmake_minimum_required(VERSION @CMAKE_VERSION@)
 
 # Set cache variables for C compilers and flags
 set(CMAKE_C_COMPILER
-  @CMAKE_C_COMPILER@
+  "@CMAKE_C_COMPILER@"
   CACHE FILEPATH "C compiler")
 
 set(CMAKE_C_FLAGS
@@ -31,7 +31,7 @@ endif()
 
 # Set cache variables for C++ compilers and flags
 set(CMAKE_CXX_COMPILER
-  @CMAKE_CXX_COMPILER@
+  "@CMAKE_CXX_COMPILER@"
   CACHE FILEPATH "CXX compiler")
 
 set(CMAKE_CXX_FLAGS
@@ -39,18 +39,20 @@ set(CMAKE_CXX_FLAGS
   CACHE STRING "CXX compiler flags")
 
 set(CMAKE_CXX_STANDARD
-  @CMAKE_CXX_STANDARD@
+  "@CMAKE_CXX_STANDARD@"
   CACHE STRING "C++ standard")
 
 # Set cache variables for CUDA compilers and flags
 set(CMAKE_CUDA_COMPILER
-  @CMAKE_CUDA_COMPILER@
+  "@CMAKE_CUDA_COMPILER@"
   CACHE FILEPATH "CUDA compiler")
 
 set(CMAKE_CUDA_FLAGS
   "@CMAKE_CUDA_FLAGS@"
   CACHE STRING "CUDA compiler flags")
-set(CMAKE_CUDA_STANDARD 11)
+
+set(CMAKE_CUDA_ARCHITECTURES @CMAKE_CUDA_ARCHITECTURES@)
+set(CMAKE_CUDA_STANDARD 14)
 
 set(CMAKE_CUDA_HOST_COMPILER
   ${CMAKE_CXX_COMPILER}

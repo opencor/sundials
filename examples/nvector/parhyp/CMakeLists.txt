@@ -2,7 +2,7 @@
 # Programmer(s): Steven Smith @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -39,7 +39,7 @@ include_directories(${HYPRE_LIB_DIR})
 set(NVECS_LIB sundials_nvecparhyp)
 
 # Set-up linker flags and link libraries
-set(SUNDIALS_LIBS ${NVECS_LIB} ${EXTRA_LINK_LIBS})
+set(SUNDIALS_LIBS ${NVECS_LIB} ${EXE_EXTRA_LINK_LIBS})
 
 list(APPEND SUNDIALS_LIBS)
 
@@ -107,6 +107,7 @@ foreach(example_tuple ${nvector_parhyp_examples})
   if(EXAMPLES_INSTALL)
     install(FILES ${example}.c
       ../test_nvector.c
+      ../test_nvector.h
       ../test_mpinvector.c
       DESTINATION ${EXAMPLES_INSTALL_PATH}/nvector/parhyp)
   endif()

@@ -2,7 +2,7 @@
 # Programmer(s): Slaven Peles, Eddy Banks and Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -40,7 +40,7 @@ set(NVECP_LIB sundials_nvecpetsc)
 set(SUNNLS_LIB sundials_sunnonlinsolpetscsnes)
 
 # Set-up linker flags and link libraries
-set(SUNDIALS_LIBS ${IDA_LIB} ${NVECP_LIB} ${SUNNLS_LIB} ${EXTRA_LINK_LIBS})
+set(SUNDIALS_LIBS ${IDA_LIB} ${NVECP_LIB} ${SUNNLS_LIB} ${EXE_EXTRA_LINK_LIBS})
 
 # Add the build and install targets for each example
 foreach(example_tuple ${IDA_examples})

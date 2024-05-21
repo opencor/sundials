@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -55,14 +55,6 @@ The module SUNLinSol_Dense provides the following user-callable constructor rout
       the NVECTOR_SERIAL, NVECTOR_OPENMP, and NVECTOR_PTHREADS vector types.  As
       additional compatible matrix and vector implementations are added to
       SUNDIALS, these will be included within this compatibility check.
-
-
-For backwards compatibility, we also provide the following wrapper function:
-
-.. c:function:: SUNLinearSolver SUNDenseLinearSolver(N_Vector y, SUNMatrix A)
-
-   Wrapper function for :c:func:`SUNLinSol_Dense`, with identical input and
-   output arguments
 
 
 

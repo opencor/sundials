@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -36,8 +36,8 @@ threaded using POSIX threads (Pthreads).
 
    struct _N_VectorContent_Pthreads {
      sunindextype length;
-     booleantype own_data;
-     realtype *data;
+     sunbooleantype own_data;
+     sunrealtype *data;
      int num_threads;
    };
 
@@ -176,7 +176,7 @@ user-callable routines:
    (``NULL``) data array.
 
 
-.. c:function:: N_Vector N_VMake_Pthreads(sunindextype vec_length, realtype* v_data, int num_threads, SUNContext sunctx)
+.. c:function:: N_Vector N_VMake_Pthreads(sunindextype vec_length, sunrealtype* v_data, int num_threads, SUNContext sunctx)
 
    This function creates and allocates memory for a Pthreads vector with
    user-provided data array, *v_data*.
@@ -205,76 +205,62 @@ operations enabled/disabled as cloned vectors inherit the same enable/disable
 options as the vector they are cloned from while vectors created with
 :c:func:`N_VNew_Pthreads` will have the default settings for the NVECTOR_PTHREADS module.
 
-.. c:function:: int N_VEnableFusedOps_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableFusedOps_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) all fused and
-   vector array operations in the Pthreads vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   vector array operations in the Pthreads vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearCombination_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearCombination_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear
-   combination fused operation in the Pthreads vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   combination fused operation in the Pthreads vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleAddMulti_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleAddMulti_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale and
    add a vector to multiple vectors fused operation in the Pthreads vector. The
-   return value is ``0`` for success and ``-1`` if the input vector or its
-   ``ops`` structure are ``NULL``.
+   return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableDotProdMulti_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableDotProdMulti_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the multiple
-   dot products fused operation in the Pthreads vector. The return value is ``0``
-   for success and ``-1`` if the input vector or its ``ops`` structure are
-   ``NULL``.
+   dot products fused operation in the Pthreads vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearSumVectorArray_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearSumVectorArray_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear sum
-   operation for vector arrays in the Pthreads vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the Pthreads vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleVectorArray_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleVectorArray_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale
-   operation for vector arrays in the Pthreads vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the Pthreads vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableConstVectorArray_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableConstVectorArray_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the const
-   operation for vector arrays in the Pthreads vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the Pthreads vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableWrmsNormVectorArray_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableWrmsNormVectorArray_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the WRMS norm
-   operation for vector arrays in the Pthreads vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the Pthreads vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableWrmsNormMaskVectorArray_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableWrmsNormMaskVectorArray_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the masked WRMS
-   norm operation for vector arrays in the Pthreads vector. The return value is
-   ``0`` for success and ``-1`` if the input vector or its ``ops`` structure are
-   ``NULL``.
+   norm operation for vector arrays in the Pthreads vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleAddMultiVectorArray_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleAddMultiVectorArray_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale and
    add a vector array to multiple vector arrays operation in the Pthreads vector. The
-   return value is ``0`` for success and ``-1`` if the input vector or its
-   ``ops`` structure are ``NULL``.
+   return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearCombinationVectorArray_Pthreads(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearCombinationVectorArray_Pthreads(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear
-   combination operation for vector arrays in the Pthreads vector. The return value
-   is ``0`` for success and ``-1`` if the input vector or its ``ops`` structure
-   are ``NULL``.
+   combination operation for vector arrays in the Pthreads vector. The return value is a :c:type:`SUNErrCode`.
 
 
 **Notes**
@@ -285,13 +271,11 @@ options as the vector they are cloned from while vectors created with
   NV_DATA_PT(v)`` and then access ``v_data[i]`` within the loop than it
   is to use ``NV_Ith_S(v,i)`` within the loop.
 
-* :c:func:`N_VNewEmpty_Pthreads`, :c:func:`N_VMake_Pthreads`, and
-  :c:func:`N_VCloneVectorArrayEmpty_Pthreads()` set the field *own_data*
-  to ``SUNFALSE``.  The functions :c:func:`N_VDestroy_Pthreads()` and
-  :c:func:`N_VDestroyVectorArray_Pthreads()` will not attempt to free the
-  pointer data for any ``N_Vector`` with *own_data* set to ``SUNFALSE``.
-  In such a case, it is the user's responsibility to deallocate the
-  data pointer.
+* :c:func:`N_VNewEmpty_Pthreads` and :c:func:`N_VMake_Pthreads` set the field
+  *own_data* to ``SUNFALSE``.  The function :c:func:`N_VDestroy_Pthreads()` will
+  not attempt to free the pointer data for any ``N_Vector`` with *own_data* set
+  to ``SUNFALSE``. In such a case, it is the user's responsibility to deallocate
+  the data pointer.
 
 * To maximize efficiency, vector operations in the NVECTOR_PTHREADS
   implementation that have more than one ``N_Vector`` argument do not

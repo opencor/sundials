@@ -2,7 +2,7 @@
 # Programmer(s): Slaven Peles and Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -62,7 +62,7 @@ foreach(example_tuple ${CVODE_examples})
     sundials_cvode
     sundials_nvecraja
     ${_fused_stubs}
-    ${EXTRA_LINK_LIBS}
+    ${EXE_EXTRA_LINK_LIBS}
     ${OTHER_LIBS})
 
   # add example to regression tests

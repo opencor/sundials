@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -55,199 +55,189 @@ function to be called or macro to be referenced.
 
 Differences between the user main program in
 :numref:`CVODES.Usage.SIM.skeleton_sim` and the one below start only at step 16.
-Steps that are unchanged from the skeleton program presented in
-:numref:`CVODES.Usage.SIM.skeleton_sim` are left unbolded.
+Steps that are unchanged from the skeleton presented in
+:numref:`CVODES.Usage.SIM.skeleton_sim` are grayed out and new or modified steps
+are in bold.
 
 First, note that no additional header files need be included for forward
 sensitivity analysis beyond those for IVP solution
 :numref:`CVODES.Usage.SIM.skeleton_sim`.
 
-   #. Initialize parallel or multi-threaded environment, if appropriate
+#. :silver:`Initialize parallel or multi-threaded environment, if appropriate`
 
-   #. Create the SUNDIALS context object
+#. :silver:`Create the SUNDIALS context object`
 
-   #. Set problem dimensions etc.
+#. :silver:`Set vector of initial values`
 
-   #. Set vector of initial values
+#. :silver:`Create CVODE object`
 
-   #. Create CVODE object
+#. :silver:`Initialize CVODE solver`
 
-   #. Initialize CVODE solver
+#. :silver:`Specify integration tolerances`
 
-   #. Specify integration tolerances
+#. :silver:`Create matrix object`
 
-   #. Create matrix object
+#. :silver:`Create linear solver object`
 
-   #. Create linear solver object
+#. :silver:`Set linear solver optional inputs`
 
-   #. Set linear solver optional inputs
+#. :silver:`Attach linear solver module`
 
-   #. Attach linear solver module
+#. :silver:`Set optional inputs`
 
-   #. Set optional inputs
+#. :silver:`Create nonlinear solver object` :silverit:`(optional)`
 
-   #. Create nonlinear solver object (*optional*)
+#. :silver:`Attach nonlinear solver module` :silverit:`(optional)`
 
-   #. Attach nonlinear solver module (*optional*)
+#. :silver:`Set nonlinear solver optional inputs` :silverit:`(optional)`
 
-   #. Set nonlinear solver optional inputs (*optional*)
+#. **Initialize the quadrature problem** *(optional)*
 
-   #. **Set vector** ``yQ0`` **of initial values for quadrature variables**
+   If the quadrature is not sensitivity-dependent, initialize the quadrature
+   integration as described in :numref:`CVODES.Usage.Purequad`. For integrating
+   a problem where the quadrature depends on the forward sensitivities see
+   :numref:`CVODES.Usage.FSA.quad`.
 
-      Typically, the quadrature variables should be initialized to 0.
+#. **Define the sensitivity problem**
 
-   #. **Define the sensitivity problem**
+   -  **Number of sensitivities** (*required*)
 
-      -  **Number of sensitivities** (*required*)
-         Set ``Ns`` :math:`= N_s`, the number of parameters with respect to which sensitivities are to be computed.
+      Set ``Ns`` :math:`= N_s`, the number of parameters with respect to which sensitivities are to be computed.
 
-      -  **Problem parameters** (*optional*)
-         If CVODES is to evaluate the right-hand sides of the sensitivity systems, set ``p``, an array of ``Np`` real
-         parameters upon which the IVP depends. Only parameters with respect to which sensitivities are (potentially) desired
-         need to be included. Attach ``p`` to the user data structure ``user_data``. For example, ``user_data->p = p;``
+   -  **Problem parameters** (*optional*)
 
-         If the user provides a function to evaluate the sensitivity right-hand side, ``p`` need not be specified.
+      If CVODES is to evaluate the right-hand sides of the sensitivity systems, set ``p``, an array of ``Np`` real
+      parameters upon which the IVP depends. Only parameters with respect to which sensitivities are (potentially) desired
+      need to be included. Attach ``p`` to the user data structure ``user_data``. For example, ``user_data->p = p;``
 
-      -  **Parameter list** (*optional*)
-         If CVODES is to evaluate the right-hand sides of the sensitivity systems, set ``plist``, an array of ``Ns``
-         integers to specify the parameters ``p`` with respect to which solution sensitivities are to be computed. If
-         sensitivities with respect to the :math:`j`-th parameter ``p[j]`` are desired :math:`(0 \leq` ``j`` :math:`<`
-         ``Np``), set :math:`{\text{plist}}_i = j`, for some :math:`i = 0,\ldots,N_s-1`.
+      If the user provides a function to evaluate the sensitivity right-hand side, ``p`` need not be specified.
 
-         If ``plist`` is not specified, CVODES will compute sensitivities with respect to the first ``Ns`` parameters;
-         i.e., :math:`{\text{plist}}_i = i` :math:`(i = 0,\ldots, N_s - 1)`.
+   -  **Parameter list** (*optional*)
 
-         If the user provides a function to evaluate the sensitivity right-hand side, ``plist`` need not be specified.
+      If CVODES is to evaluate the right-hand sides of the sensitivity systems, set ``plist``, an array of ``Ns``
+      integers to specify the parameters ``p`` with respect to which solution sensitivities are to be computed. If
+      sensitivities with respect to the :math:`j`-th parameter ``p[j]`` are desired :math:`(0 \leq` ``j`` :math:`<`
+      ``Np``), set :math:`{\text{plist}}_i = j`, for some :math:`i = 0,\ldots,N_s-1`.
 
-      -  **Parameter scaling factors** (*optional*)
-         If CVODES is to estimate tolerances for the sensitivity solution vectors (based on tolerances for the state
-         solution vector) or if CVODES is to evaluate the right-hand sides of the sensitivity systems using the internal
-         difference-quotient function, the results will be more accurate if order of magnitude information is provided.
+      If ``plist`` is not specified, CVODES will compute sensitivities with respect to the first ``Ns`` parameters;
+      i.e., :math:`{\text{plist}}_i = i` :math:`(i = 0,\ldots, N_s - 1)`.
 
-         Set ``pbar``, an array of ``Ns`` positive scaling factors. Typically, if :math:`p_i \ne 0`, the value
-         :math:`{\bar p}_i = |p_{\text{plist}_i}|` can be used.
+      If the user provides a function to evaluate the sensitivity right-hand side, ``plist`` need not be specified.
 
-         If ``pbar`` is not specified, CVODES will use :math:`{\bar p}_i = 1.0`.
+   -  **Parameter scaling factors** (*optional*)
 
-         If the user provides a function to evaluate the sensitivity right-hand side and specifies tolerances for the
-         sensitivity variables, ``pbar`` need not be specified.
+      If CVODES is to estimate tolerances for the sensitivity solution vectors (based on tolerances for the state
+      solution vector) or if CVODES is to evaluate the right-hand sides of the sensitivity systems using the internal
+      difference-quotient function, the results will be more accurate if order of magnitude information is provided.
 
-         Note that the names for ``p``, ``pbar``, ``plist``, as well as the field *p* of ``user_data`` are arbitrary, but they
-         must agree with the arguments passed to :c:func:`CVodeSetSensParams` below.
+      Set ``pbar``, an array of ``Ns`` positive scaling factors. Typically, if :math:`p_i \ne 0`, the value
+      :math:`{\bar p}_i = |p_{\text{plist}_i}|` can be used.
 
-   #. **Set sensitivity initial conditions**
+      If ``pbar`` is not specified, CVODES will use :math:`{\bar p}_i = 1.0`.
 
-      Set the ``Ns`` vectors ``yS0[i]`` of initial values for sensitivities (for
-      :math:`i=0,\ldots,` ``Ns`` :math:`- 1`), using the appropriate functions
-      defined by the particular ``N_Vector`` implementation chosen.
+      If the user provides a function to evaluate the sensitivity right-hand side and specifies tolerances for the
+      sensitivity variables, ``pbar`` need not be specified.
 
-      First, create an array of ``Ns`` vectors by making the appropriate call
+      Note that the names for ``p``, ``pbar``, ``plist``, as well as the field *p* of ``user_data`` are arbitrary, but they
+      must agree with the arguments passed to :c:func:`CVodeSetSensParams` below.
 
-      ``yS0 = N_VCloneVectorArray_***(Ns, y0);``
+#. **Set sensitivity initial conditions**
 
-      or
+   Set the ``Ns`` vectors ``yS0[i]`` of initial values for sensitivities (for
+   :math:`i=0,\ldots,` ``Ns`` :math:`- 1`), using the appropriate functions
+   defined by the particular ``N_Vector`` implementation chosen.
 
-      ``yS0 = N_VCloneVectorArrayEmpty_***(Ns, y0);``
+   First, create an array of ``Ns`` vectors by calling
+   ``yS0 = N_VCloneVectorArray(Ns, y0);``
 
-      Here the argument ``y0`` serves only to provide the ``N_Vector`` type for
-      cloning.
+   Here the argument ``y0`` serves only to provide the ``N_Vector`` type for
+   cloning.
 
-      Then, for each :math:`i = 0,\ldots,`\ ``Ns`` :math:`- 1`, load initial
-      values for the i-th sensitivity vector ``yS0[i]``.
+   Then, for each :math:`i = 0,\ldots,`\ ``Ns`` :math:`- 1`, load initial
+   values for the i-th sensitivity vector ``yS0[i]``.
 
-   #. **Activate sensitivity calculations**
+#. **Activate sensitivity calculations**
 
-      Call :c:func:`CVodeSensInit` or :c:func:`CVodeSensInit1` to activate
-      forward sensitivity computations and allocate internal memory for CVODES
-      related to sensitivity calculations.
+   Call :c:func:`CVodeSensInit` or :c:func:`CVodeSensInit1` to activate
+   forward sensitivity computations and allocate internal memory for CVODES
+   related to sensitivity calculations.
 
-   #. **Set sensitivity tolerances**
+#. **Set sensitivity tolerances**
 
-      Call :c:func:`CVodeSensSStolerances`, :c:func:`CVodeSensSVtolerances` or
-      :c:func:`CVodeEEtolerances`.
+   Call :c:func:`CVodeSensSStolerances`, :c:func:`CVodeSensSVtolerances` or
+   :c:func:`CVodeEEtolerances`.
 
-   #. **Set sensitivity analysis optional inputs**
+#. **Set sensitivity analysis optional inputs**
 
-      Call ``CVodeSetSens*`` routines to change from their default values any
-      optional inputs that control the behavior of CVODES in computing forward
-      sensitivities. See :numref:`CVODES.Usage.FSA.user_callable.optional_inputs` for details.
+   Call ``CVodeSetSens*`` routines to change from their default values any
+   optional inputs that control the behavior of CVODES in computing forward
+   sensitivities. See :numref:`CVODES.Usage.FSA.user_callable.optional_inputs` for details.
 
-   #. **Create sensitivity nonlinear solver object**
+#. **Create sensitivity nonlinear solver object**
 
-      If using a non-default nonlinear solver (see
-      :numref:`CVODES.Usage.FSA.user_callable.nonlin_solv_init`), then create the desired
-      nonlinear solver object by calling the appropriate constructor function
-      defined by the particular ``SUNNonlinearSolver`` implementation e.g.,
+   If using a non-default nonlinear solver (see
+   :numref:`CVODES.Usage.FSA.user_callable.nonlin_solv_init`), then create the desired
+   nonlinear solver object by calling the appropriate constructor function
+   defined by the particular ``SUNNonlinearSolver`` implementation e.g.,
 
-      .. code-block:: c
+   .. code-block:: c
 
-         NLSSens = SUNNonlinSol_***Sens(...);
+      NLSSens = SUNNonlinSol_***Sens(...);
 
-      for the ``CV_SIMULTANEOUS`` or ``CV_STAGGERED`` options or
+   for the ``CV_SIMULTANEOUS`` or ``CV_STAGGERED`` options or
 
-      .. code-block:: c
+   .. code-block:: c
 
-         NLSSens = SUNNonlinSol_***(...);
+      NLSSens = SUNNonlinSol_***(...);
 
-      for the ``CV_STAGGERED1`` option where ``***`` is the name of the
-      nonlinear solver and ``...`` are constructor specific arguments (see
-      :numref:`SUNNonlinSol` for details).
+   for the ``CV_STAGGERED1`` option where ``***`` is the name of the
+   nonlinear solver and ``...`` are constructor specific arguments (see
+   :numref:`SUNNonlinSol` for details).
 
-   #. **Attach the sensitivity nonlinear solver module**
+#. **Attach the sensitivity nonlinear solver module**
 
-      If using a non-default nonlinear solver, then initialize the nonlinear
-      solver interface by attaching the nonlinear solver object by calling
-      :c:func:`CVodeSetNonlinearSolverSensSim` when using the
-      ``CV_SIMULTANEOUS`` corrector method,
-      :c:func:`CVodeSetNonlinearSolverSensStg` when using the ``CV_STAGGERED``
-      corrector method, or :c:func:`CVodeSetNonlinearSolverSensStg1` when using
-      the ``CV_STAGGERED1`` corrector method (see
-      :numref:`CVODES.Usage.FSA.user_callable.nonlin_solv_init` for details).
+   If using a non-default nonlinear solver, then initialize the nonlinear
+   solver interface by attaching the nonlinear solver object by calling
+   :c:func:`CVodeSetNonlinearSolverSensSim` when using the
+   ``CV_SIMULTANEOUS`` corrector method,
+   :c:func:`CVodeSetNonlinearSolverSensStg` when using the ``CV_STAGGERED``
+   corrector method, or :c:func:`CVodeSetNonlinearSolverSensStg1` when using
+   the ``CV_STAGGERED1`` corrector method (see
+   :numref:`CVODES.Usage.FSA.user_callable.nonlin_solv_init` for details).
 
+#. **Set sensitivity nonlinear solver optional inputs**
 
-   #. **Set sensitivity nonlinear solver optional inputs**
+   Call the appropriate set functions for the selected nonlinear solver
+   module to change optional inputs specific to that nonlinear solver. These
+   *must* be called after :c:func:`CVodeSensInit` if using the default nonlinear
+   solver or after attaching a new nonlinear solver to CVODES, otherwise the
+   optional inputs will be overridden by CVODE defaults. See
+   :numref:`SUNNonlinSol` for more information on optional inputs.
 
-      Call the appropriate set functions for the selected nonlinear solver
-      module to change optional inputs specific to that nonlinear solver. These
-      *must* be called after :c:func:`CVodeSensInit` if using the default nonlinear
-      solver or after attaching a new nonlinear solver to CVODES, otherwise the
-      optional inputs will be overridden by CVODE defaults. See
-      :numref:`SUNNonlinSol` for more information on optional inputs.
+#. :silver:`Specify rootfinding problem` :silverit:`(optional)`
 
-   #. Specify rootfinding problem (*optional*)
+#. :silver:`Advance solution in time`
 
-   #. Advance solution in time
+#. **Extract sensitivity solution**
 
-   #. **Extract sensitivity solution**
+   After each successful return from :c:func:`CVode`, the solution of the
+   original IVP is available in the ``y`` argument of :c:func:`CVode`, while
+   the sensitivity solution can be extracted into ``yS`` (which can be the
+   same as ``yS0``) by calling one of the routines :c:func:`CVodeGetSens`,
+   :c:func:`CVodeGetSens1`, :c:func:`CVodeGetSensDky`, or
+   :c:func:`CVodeGetSensDky1`.
 
-      After each successful return from :c:func:`CVode`, the solution of the
-      original IVP is available in the ``y`` argument of :c:func:`CVode`, while
-      the sensitivity solution can be extracted into ``yS`` (which can be the
-      same as ``yS0``) by calling one of the routines :c:func:`CVodeGetSens`,
-      :c:func:`CVodeGetSens1`, :c:func:`CVodeGetSensDky`, or
-      :c:func:`CVodeGetSensDky1`.
+#. :silver:`Get optional outputs`
 
-   #. Get optional outputs
+#. **Destroy objects**
 
-   #. Deallocate memory for solution vector
+   Upon completion of the integration, deallocate memory for the vectors
+   ``yS0`` using ``N_VDestroyVectorArray(yS0, Ns);``
 
-   #. **Deallocate memory for sensitivity vectors**
+   If ``yS`` was created from ``sunrealtype`` arrays ``yS_i``, it is the user’s
+   responsibility to also free the space for the arrays ``yS0_i``.
 
-      Upon completion of the integration, deallocate memory for the vectors
-      ``yS0`` using the appropriate destructor: ``N_VDestroyVectorArray_***(yS0, Ns);``
-
-      If ``yS`` was created from ``realtype`` arrays ``yS_i``, it is the user’s
-      responsibility to also free the space for the arrays ``yS0_i``.
-
-   #. Free solver memory
-
-   #. Free nonlinear solver memory (*optional*)
-
-   #. Free linear solver and matrix memory
-
-   #. Free the SUNContext object
-
-   #. Finalize MPI, if used
+#. :silver:`Finalize MPI, if used`
 
 
 .. _CVODES.Usage.FSA.user_callable:
@@ -439,7 +429,7 @@ One of the following three functions must be called to specify the
 integration tolerances for sensitivities. Note that this call must be made after
 the call to :c:func:`CVodeSensInit` or :c:func:`CVodeSensInit1`.
 
-.. c:function:: int CVodeSensSStolerances(void * cvode_mem, realtype reltolS, realtype* abstolS)
+.. c:function:: int CVodeSensSStolerances(void * cvode_mem, sunrealtype reltolS, sunrealtype* abstolS)
 
    The function :c:func:`CVodeSensSStolerances` specifies scalar relative and absolute
    tolerances.
@@ -456,7 +446,7 @@ the call to :c:func:`CVodeSensInit` or :c:func:`CVodeSensInit1`.
      * ``CV_ILL_INPUT`` -- One of the input tolerances was negative.
 
 
-.. c:function:: int CVodeSensSVtolerances(void * cvode_mem, realtype reltolS, N_Vector* abstolS)
+.. c:function:: int CVodeSensSVtolerances(void * cvode_mem, sunrealtype reltolS, N_Vector* abstolS)
 
    The function :c:func:`CVodeSensSVtolerances` specifies scalar relative tolerance
    and  vector absolute tolerances.
@@ -627,7 +617,7 @@ solution :math:`y` in ``yout``. Solution sensitivities can be obtained through
 one of the following functions:
 
 
-.. c:function:: int CVodeGetSens(void * cvode_mem, realtype * tret, N_Vector * yS)
+.. c:function:: int CVodeGetSens(void * cvode_mem, sunrealtype * tret, N_Vector * yS)
 
    The function :c:func:`CVodeGetSens` returns the sensitivity solution vectors after
    a  successful return from :c:func:`CVode`.
@@ -654,7 +644,7 @@ function is called by :c:func:`CVodeGetSens` with ``k`` :math:`= 0`, but may als
 called directly by the user.
 
 
-.. c:function:: int CVodeGetSensDky(void * cvode_mem, realtype t, int k, N_Vector * dkyS)
+.. c:function:: int CVodeGetSensDky(void * cvode_mem, sunrealtype t, int k, N_Vector * dkyS)
 
    The function :c:func:`CVodeGetSensDky` returns derivatives of the sensitivity
    solution  vectors after a successful return from :c:func:`CVode`.
@@ -679,7 +669,7 @@ parameter in turn through the functions :c:func:`CVodeGetSens1` and
 :c:func:`CVodeGetSensDky1`, defined as follows:
 
 
-.. c:function:: int CVodeGetSens1(void * cvode_mem, realtype * tret, int is, N_Vector yS)
+.. c:function:: int CVodeGetSens1(void * cvode_mem, sunrealtype * tret, int is, N_Vector yS)
 
    The function :c:func:`CVodeGetSens1` returns the ``is``-th sensitivity solution
    vector  after a successful return from :c:func:`CVode`.
@@ -703,7 +693,7 @@ parameter in turn through the functions :c:func:`CVodeGetSens1` and
       will be  the same as that returned at the last :c:func:`CVode` call.
 
 
-.. c:function:: int CVodeGetSensDky1(void * cvode_mem, realtype t, int k, int is, N_Vector dkyS)
+.. c:function:: int CVodeGetSensDky1(void * cvode_mem, sunrealtype t, int k, int is, N_Vector dkyS)
 
    The function :c:func:`CVodeGetSensDky1` returns the ``k``-th derivative of the
    ``is``-th sensitivity solution vector after a successful return from
@@ -757,7 +747,7 @@ time and, if successful, takes effect immediately.
    =================================== ==================================== ============
 
 
-.. c:function:: int CVodeSetSensParams(void * cvode_mem, realtype * p, realtype * pbar, int * plist)
+.. c:function:: int CVodeSetSensParams(void * cvode_mem, sunrealtype * p, sunrealtype * pbar, int * plist)
 
    The function :c:func:`CVodeSetSensParams` specifies problem parameter information
    for sensitivity calculations.
@@ -786,7 +776,7 @@ time and, if successful, takes effect immediately.
          :c:func:`CVodeSensInit1`.
 
 
-.. c:function:: int CVodeSetSensDQMethod(void * cvode_mem, int DQtype, realtype DQrhomax)
+.. c:function:: int CVodeSetSensDQMethod(void * cvode_mem, int DQtype, sunrealtype DQrhomax)
 
    The function :c:func:`CVodeSetSensDQMethod` specifies the difference quotient
    strategy in  the case in which the right-hand side of the sensitivity
@@ -815,7 +805,7 @@ time and, if successful, takes effect immediately.
       ``DQrhomax=0.0``.
 
 
-.. c:function:: int CVodeSetSensErrCon(void * cvode_mem, booleantype errconS)
+.. c:function:: int CVodeSetSensErrCon(void * cvode_mem, sunbooleantype errconS)
 
    The function :c:func:`CVodeSetSensErrCon` specifies the error control  strategy for
    sensitivity variables.
@@ -1187,7 +1177,7 @@ right-hand sides of the sensitivity equations :eq:`CVODES_sens_eqns`, for all
 sensitivity parameters at once, through a function of type :c:type:`CVSensRhsFn`
 defined by:
 
-.. c:type:: int (*CVSensRhsFn)(int Ns, realtype t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2)
+.. c:type:: int (*CVSensRhsFn)(int Ns, sunrealtype t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2)
 
    This function computes the sensitivity right-hand side for all sensitivity
    equations at once.  It must compute the vectors
@@ -1237,7 +1227,7 @@ sensitivity parameter at a time, through a function of type
 :c:func:`CVodeSensInit1`. The type :c:type:`CVSensRhs1Fn` is defined by
 
 
-.. c:type:: int (*CVSensRhs1Fn)(int Ns, realtype t, N_Vector y, N_Vector ydot, int iS, N_Vector yS, N_Vector ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2)
+.. c:type:: int (*CVSensRhs1Fn)(int Ns, sunrealtype t, N_Vector y, N_Vector ydot, int iS, N_Vector yS, N_Vector ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2)
 
    This function computes the sensitivity right-hand side for one sensitivity
    equation at a time.  It must compute the vector
@@ -1282,105 +1272,92 @@ only on the state variables but also on forward sensitivities.
 
 The following is an overview of the sequence of calls in a user’s main program
 in this situation. Steps that are unchanged from the skeleton program presented
-in :numref:`CVODES.Usage.FSA.skeleton_sim` are left unbolded.
+in :numref:`CVODES.Usage.FSA.skeleton_sim` are grayed out and new or modified
+steps are in bold.
 
-#. Initialize parallel or multi-threaded environment, if appropriate
+#. :silver:`Initialize parallel or multi-threaded environment, if appropriate`
 
-#. Create ``SUNContext`` object by calling :c:func:`SUNContext_Create`
+#. :silver:`Create the SUNDIALS context object`
 
-#. Set problem dimensions etc.
+#. :silver:`Set vectors of initial values`
 
-#. Set vectors of initial values
+#. :silver:`Create CVODES object`
 
-#. Create CVODES object
+#. :silver:`Initialize CVODES solver`
 
-#. Initialize CVODES solver
+#. :silver:`Specify integration tolerances`
 
-#. Specify integration tolerances
+#. :silver:`Create matrix object`
 
-#. Create matrix object
+#. :silver:`Create linear solver object`
 
-#. Create linear solver object
+#. :silver:`Set linear solver optional inputs`
 
-#. Set linear solver optional inputs
+#. :silver:`Attach linear solver module`
 
-#. Attach linear solver module
+#. :silver:`Set optional inputs`
 
-#. Set optional inputs
+#. :silver:`Create nonlinear solver object`
 
-#. Create nonlinear solver object
+#. :silver:`Attach nonlinear solver module`
 
-#. Attach nonlinear solver module
+#. :silver:`Set nonlinear solver optional inputs`
 
-#. Set nonlinear solver optional inputs
+#. :silver:`Initialize sensitivity-independent quadrature problem`
 
-#. Initialize sensitivity-independent quadrature problem
+#. :silver:`Define the sensitivity problem`
 
-#. Define the sensitivity problem
+#. :silver:`Set sensitivity initial conditions`
 
-#. Set sensitivity initial conditions
+#. :silver:`Activate sensitivity calculations`
 
-#. Activate sensitivity calculations
+#. :silver:`Set sensitivity tolerances`
 
-#. Set sensitivity tolerances
+#. :silver:`Set sensitivity analysis optional inputs`
 
-#. Set sensitivity analysis optional inputs
+#. :silver:`Create sensitivity nonlinear solver object`
 
-#. Create sensitivity nonlinear solver object
+#. :silver:`Attach the sensitvity nonlinear solver module`
 
-#. Attach the sensitvity nonlinear solver module
-
-#. Set sensitivity nonlinear solver optional inputs
+#. :silver:`Set sensitivity nonlinear solver optional inputs`
 
 #. **Set vector of initial values for quadrature variables**
 
-#. Typically, the quadrature variables should be initialized to :math:`0`.
+   Typically, the quadrature variables should be initialized to :math:`0`.
 
 #. **Initialize sensitivity-dependent quadrature integration**
 
-#. Call :c:func:`CVodeQuadSensInit` to specify the quadrature equation
+   Call :c:func:`CVodeQuadSensInit` to specify the quadrature equation
    right-hand side function and to allocate internal memory related to
    quadrature integration.
 
 #. **Set optional inputs for sensitivity-dependent quadrature integration**
 
-#. Call :c:func:`CVodeSetQuadSensErrCon` to indicate whether or not quadrature variables should be used in the step size
+   Call :c:func:`CVodeSetQuadSensErrCon` to indicate whether or not quadrature variables should be used in the step size
    control mechanism. If so, one of the ``CVodeQuadSens*tolerances`` functions must be called to specify the integration
    tolerances for quadrature variables.
 
-#. Advance solution in time
+#. :silver:`Advance solution in time`
 
 #. **Extract sensitivity-dependent quadrature variables**
 
-#. Call :c:func:`CVodeGetQuadSens`, :c:func:`CVodeGetQuadSens1`, :c:func:`CVodeGetQuadSensDky` or :c:func:`CVodeGetQuadSensDky1` to obtain the
+   Call :c:func:`CVodeGetQuadSens`, :c:func:`CVodeGetQuadSens1`, :c:func:`CVodeGetQuadSensDky` or :c:func:`CVodeGetQuadSensDky1` to obtain the
    values of the quadrature variables or their derivatives at the current time.
 
-#. Get optional outputs
+#. :silver:`Get optional outputs`
 
-#. Extract sensitivity solution
+#. :silver:`Extract sensitivity solution`
 
 #. **Get sensitivity-dependent quadrature optional outputs**
 
-#. Call ``CVodeGetQuadSens*`` functions to obtain desired optional output related to the integration of
+   Call ``CVodeGetQuadSens*`` functions to obtain desired optional output related to the integration of
    sensitivity-dependent quadratures.
 
-#. Deallocate memory for solutions vector
+#. **Destroy objects**
 
-#. Deallocate memory for sensitivity vectors
+   Destroy memory for sensitivity-dependent quadrature variables
 
-#. **Deallocate memory for sensitivity-dependent quadrature variables**
-
-#. **Free solver memory**
-
-#. Free nonlinear solver memory
-
-#. Free vector specification memory
-
-#. Free linear solver and matrix memory
-
-#. Free ``SUNContext`` object with a call to :c:func:`SUNContext_Free`
-
-#. Finalize MPI, if used
+#. :silver:`Finalize MPI, if used`
 
 
 .. _CVODES.Usage.FSA.quad.quad_sens_init:
@@ -1494,7 +1471,7 @@ vectors, and quadratures depending on sensitivities at time ``t``. However,
 Sensitivity-dependent quadratures can be obtained using one of the following
 functions:
 
-.. c:function:: int CVodeGetQuadSens(void * cvode_mem, realtype tret, N_Vector * yQS)
+.. c:function:: int CVodeGetQuadSens(void * cvode_mem, sunrealtype tret, N_Vector * yQS)
 
    The function :c:func:`CVodeGetQuadSens` returns the quadrature sensitivities
    solution vectors after a successful return from :c:func:`CVode`.
@@ -1517,7 +1494,7 @@ the interpolating polynomials for the sensitivity-dependent quadrature variables
 at time ``t``. This function is called by :c:func:`CVodeGetQuadSens` with ``k =
 0``, but may also be called directly by the user.
 
-.. c:function:: int CVodeGetQuadSensDky(void* cvode_mem, realtype t, int k, N_Vector* dkyQS)
+.. c:function:: int CVodeGetQuadSensDky(void* cvode_mem, sunrealtype t, int k, N_Vector* dkyQS)
 
    The function :c:func:`CVodeGetQuadSensDky` returns derivatives of the
    quadrature sensitivities  solution vectors after a successful return from
@@ -1543,7 +1520,7 @@ Quadrature sensitivity solution vectors can also be extracted separately for
 each parameter in turn through the functions :c:func:`CVodeGetQuadSens1` and
 :c:func:`CVodeGetQuadSensDky1`, defined as follows:
 
-.. c:function:: int CVodeGetQuadSens1(void * cvode_mem, realtype tret, int is, N_Vector yQS)
+.. c:function:: int CVodeGetQuadSens1(void * cvode_mem, sunrealtype tret, int is, N_Vector yQS)
 
    The function :c:func:`CVodeGetQuadSens1` returns the ``is``-th sensitivity
    of quadratures after a successful return from :c:func:`CVode`.
@@ -1563,7 +1540,7 @@ each parameter in turn through the functions :c:func:`CVodeGetQuadSens1` and
      * ``CV_BAD_DKY`` -- ``yQS`` is ``NULL``.
 
 
-.. c:function:: int CVodeGetQuadSensDky1(void * cvode_mem, realtype t, int k, int is, N_Vector dkyQS)
+.. c:function:: int CVodeGetQuadSensDky1(void * cvode_mem, sunrealtype t, int k, int is, N_Vector dkyQS)
 
    The function :c:func:`CVodeGetQuadSensDky1` returns the ``k``-th derivative
    of the  ``is``-th sensitivity solution vector after a successful  return from
@@ -1596,7 +1573,7 @@ CVODES provides the following optional input functions to control the
 integration of sensitivity-dependent quadrature equations.
 
 
-.. c:function:: int CVodeSetQuadSensErrCon(void * cvode_mem, booleantype errconQS)
+.. c:function:: int CVodeSetQuadSensErrCon(void * cvode_mem, sunbooleantype errconQS)
 
    The function :c:func:`CVodeSetQuadSensErrCon` specifies whether or not the
    quadrature variables are to be used in the step size control  mechanism. If
@@ -1623,7 +1600,7 @@ integration of sensitivity-dependent quadrature equations.
          to :c:func:`CVodeQuadSensInit`.
 
 
-.. c:function:: int CVodeQuadSensSStolerances(void * cvode_mem, realtype reltolQS, realtype* abstolQS)
+.. c:function:: int CVodeQuadSensSStolerances(void * cvode_mem, sunrealtype reltolQS, sunrealtype* abstolQS)
 
    The function :c:func:`CVodeQuadSensSStolerances` specifies scalar relative
    and absolute  tolerances.
@@ -1640,7 +1617,7 @@ integration of sensitivity-dependent quadrature equations.
      * ``CV_NO_QUADSENS`` -- Quadratures depending on the sensitivities were not activated.
      * ``CV_ILL_INPUT`` -- One of the input tolerances was negative.
 
-.. c:function:: int CVodeQuadSensSVtolerances(void * cvode_mem, realtype reltolQS, N_Vector* abstolQS)
+.. c:function:: int CVodeQuadSensSVtolerances(void * cvode_mem, sunrealtype reltolQS, N_Vector* abstolQS)
 
    The function :c:func:`CVodeQuadSensSVtolerances` specifies scalar relative
    and  vector absolute tolerances.
@@ -1768,7 +1745,7 @@ integrand :math:`q`, the appropriate right-hand side functions are given by:
 :math:`\bar{q}_i = q_y s_i + q_{p_i}`. This user function must be of type
 ``CVQuadSensRhsFn`` defined as follows:
 
-.. c:type:: int (*CVQuadSensRhsFn)(int Ns, realtype t, N_Vector y, N_Vector *yS, N_Vector yQdot, N_Vector *yQSdot, void *user_data, N_Vector tmp, N_Vector tmpQ)
+.. c:type:: int (*CVQuadSensRhsFn)(int Ns, sunrealtype t, N_Vector y, N_Vector *yS, N_Vector yQdot, N_Vector *yQSdot, void *user_data, N_Vector tmp, N_Vector tmpQ)
 
    This function computes the sensitivity quadrature equation right-hand side
    for a given value of the independent variable :math:`t`` and state vector

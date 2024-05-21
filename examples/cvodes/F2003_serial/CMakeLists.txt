@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -28,7 +28,7 @@ set(FCVODES_examples
 set(CVODES_LIB sundials_fcvodes_mod)
 
 # Set-up linker flags and link libraries
-set(SUNDIALS_LIBS ${CVODES_LIB} ${EXTRA_LINK_LIBS})
+set(SUNDIALS_LIBS ${CVODES_LIB} ${EXE_EXTRA_LINK_LIBS})
 
 # Add the build and install targets for each example
 foreach(example_tuple ${FCVODES_examples})
@@ -76,9 +76,6 @@ endforeach(example_tuple ${FCVODES_examples})
 
 # create Makefile and CMakeLists.txt for examples
 if(EXAMPLES_INSTALL)
-
-  # Install the README file
-  install(FILES README DESTINATION ${EXAMPLES_INSTALL_PATH}/cvodes/F2003_serial)
 
   # Prepare substitution variables for Makefile and/or CMakeLists templates
   set(SOLVER "CVODES")

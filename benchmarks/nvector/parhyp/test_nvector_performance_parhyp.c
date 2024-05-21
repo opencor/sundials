@@ -2,7 +2,7 @@
  * Programmer(s): David J. Gardner @ LLNL
  * -----------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2022, Lawrence Livermore National Security
+ * Copyright (c) 2002-2024, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -15,45 +15,44 @@
  * MPI parallel NVECTOR module implementation.
  * -----------------------------------------------------------------*/
 
+#include <mpi.h>
+#include <nvector/nvector_parhyp.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <sundials/sundials_types.h>
-#include <nvector/nvector_parhyp.h>
 #include <sundials/sundials_math.h>
-#include "test_nvector_performance.h"
+#include <sundials/sundials_types.h>
 
-#include <mpi.h>
+#include "test_nvector_performance.h"
 
 /* private functions */
 static int InitializeClearCache(int cachesize);
 static int FinalizeClearCache();
 
 /* private data for clearing cache */
-static sunindextype N;  /* data length */
-static realtype* data;  /* host data   */
-
+static sunindextype N;    /* data length */
+static sunrealtype* data; /* host data   */
 
 /* ----------------------------------------------------------------------
  * Main NVector Testing Routine
  * --------------------------------------------------------------------*/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-  N_Vector X;          /* test vector        */
-  sunindextype veclen; /* vector length      */
+  SUNContext ctx = NULL; /* SUNDIALS context */
+  N_Vector X     = NULL; /* test vector      */
+  sunindextype veclen;   /* vector length    */
 
   HYPRE_ParVector Xhyp;    /* hypre parallel vector */
-  HYPRE_Int *partitioning; /* vector partitioning   */
+  HYPRE_Int* partitioning; /* vector partitioning   */
 
-  int print_timing;    /* output timings     */
-  int ntests;          /* number of tests    */
-  int nvecs;           /* number of tests    */
-  int nsums;           /* number of sums     */
-  int cachesize;       /* size of cache (MB) */
-  int flag;            /* return flag        */
+  int print_timing; /* output timings     */
+  int ntests;       /* number of tests    */
+  int nvecs;        /* number of tests    */
+  int nsums;        /* number of sums     */
+  int cachesize;    /* size of cache (MB) */
+  int flag;         /* return flag        */
 
-  MPI_Comm comm;          /* MPI Communicator   */
-  int      nprocs, myid;  /* Num procs, proc id */
+  MPI_Comm comm;    /* MPI Communicator   */
+  int nprocs, myid; /* Num procs, proc id */
 
   printf("\nStart Tests\n");
   printf("Vector Name: ParHyp\n");
@@ -65,50 +64,50 @@ int main(int argc, char *argv[])
   MPI_Comm_rank(comm, &myid);
 
   /* check input and set vector length */
-  if (argc < 7){
+  if (argc < 7)
+  {
     printf("ERROR: SIX (6) arguments required: ");
-    printf("<vector length> <number of vectors> <number of sums> <number of tests> ");
+    printf("<vector length> <number of vectors> <number of sums> <number of "
+           "tests> ");
     printf("<cache size (MB)> <print timing>\n");
-    return(-1);
+    return (-1);
   }
 
-  veclen = (sunindextype) atol(argv[1]);
-  if (veclen <= 0) {
+  veclen = (sunindextype)atol(argv[1]);
+  if (veclen <= 0)
+  {
     printf("ERROR: local vector length must be a positive integer \n");
-    return(-1);
+    return (-1);
   }
 
-  nvecs = (int) atol(argv[2]);
-  if (nvecs <= 0) {
-    printf("ERROR: number of vectors must be a positive integer \n");
-    return(-1);
-  }
+  nvecs = (int)atol(argv[2]);
+  if (nvecs < 1) { printf("WARNING: Fused operation tests disabled\n"); }
 
-  nsums = (int) atol(argv[3]);
-  if (nsums <= 0) {
-    printf("ERROR: number of sums must be a positive integer \n");
-    return(-1);
-  }
+  nsums = (int)atol(argv[3]);
+  if (nsums < 1) { printf("WARNING: Some fused operation tests disabled\n"); }
 
-  ntests = (int) atol(argv[4]);
-  if (ntests <= 0) {
+  ntests = (int)atol(argv[4]);
+  if (ntests <= 0)
+  {
     printf("ERROR: number of tests must be a positive integer \n");
-    return(-1);
+    return (-1);
   }
 
-  cachesize = (int) atol(argv[5]);
-  if (cachesize < 0) {
+  cachesize = (int)atol(argv[5]);
+  if (cachesize < 0)
+  {
     printf("ERROR: cache size (MB) must be a non-negative integer \n");
-    return(-1);
+    return (-1);
   }
   InitializeClearCache(cachesize);
 
   print_timing = atoi(argv[6]);
   SetTiming(print_timing, myid);
 
-  if (myid == 0) {
+  if (myid == 0)
+  {
     printf("\nRunning with: \n");
-    printf("  local vector length   %ld \n", (long int) veclen);
+    printf("  local vector length   %ld \n", (long int)veclen);
     printf("  max number of vectors %d  \n", nvecs);
     printf("  max number of sums    %d  \n", nsums);
     printf("  number of tests       %d  \n", ntests);
@@ -116,28 +115,36 @@ int main(int argc, char *argv[])
     printf("  number of MPI procs   %d  \n", nprocs);
   }
 
+  flag = SUNContext_Create(comm, &ctx);
+  if (flag) { return flag; }
+
   /* set partitioning */
-  if(HYPRE_AssumedPartitionCheck()) {
-    partitioning = (HYPRE_Int*) malloc(2*sizeof(HYPRE_Int));
-    partitioning[0] = myid*veclen;
-    partitioning[1] = (myid+1)*veclen;
-  } else {
-    partitioning = (HYPRE_Int*) malloc((nprocs+1)*sizeof(HYPRE_Int));
-    if (veclen <= 0) {
+  if (HYPRE_AssumedPartitionCheck())
+  {
+    partitioning    = (HYPRE_Int*)malloc(2 * sizeof(HYPRE_Int));
+    partitioning[0] = myid * veclen;
+    partitioning[1] = (myid + 1) * veclen;
+  }
+  else
+  {
+    partitioning = (HYPRE_Int*)malloc((nprocs + 1) * sizeof(HYPRE_Int));
+    if (veclen <= 0)
+    {
       printf("Error: Using global partition not supported.\n");
       return -1;
     }
   }
 
   /* create template hypre vector */
-  HYPRE_ParVectorCreate(comm, nprocs*veclen, partitioning, &Xhyp);
+  HYPRE_ParVectorCreate(comm, nprocs * veclen, partitioning, &Xhyp);
   HYPRE_ParVectorInitialize(Xhyp);
 
   /* Create vectors */
-  X = N_VMake_ParHyp(Xhyp);
+  X = N_VMake_ParHyp(Xhyp, ctx);
 
   /* run tests */
-  if (myid == 0 && print_timing) {
+  if (myid == 0 && print_timing)
+  {
     printf("\n\n standard operations:\n");
     PrintTableHeader(1);
   }
@@ -161,25 +168,34 @@ int main(int argc, char *argv[])
   flag = Test_N_VConstrMask(X, veclen, ntests);
   flag = Test_N_VMinQuotient(X, veclen, ntests);
 
-  if (myid == 0 && print_timing) {
-    printf("\n\n fused operations 1: nvecs= %d\n", nvecs);
-    PrintTableHeader(2);
-  }
-  flag = Test_N_VLinearCombination(X, veclen, nvecs, ntests);
-  flag = Test_N_VScaleAddMulti(X, veclen, nvecs, ntests);
-  flag = Test_N_VDotProdMulti(X, veclen, nvecs, ntests);
-  flag = Test_N_VLinearSumVectorArray(X, veclen, nvecs, ntests);
-  flag = Test_N_VScaleVectorArray(X, veclen, nvecs, ntests);
-  flag = Test_N_VConstVectorArray(X, veclen, nvecs, ntests);
-  flag = Test_N_VWrmsNormVectorArray(X, veclen, nvecs, ntests);
-  flag = Test_N_VWrmsNormMaskVectorArray(X, veclen, nvecs, ntests);
+  if (nvecs > 0)
+  {
+    if (myid == 0 && print_timing)
+    {
+      printf("\n\n fused operations 1: nvecs= %d\n", nvecs);
+      PrintTableHeader(2);
+    }
+    flag = Test_N_VLinearCombination(X, veclen, nvecs, ntests);
+    flag = Test_N_VScaleAddMulti(X, veclen, nvecs, ntests);
+    flag = Test_N_VDotProdMulti(X, veclen, nvecs, ntests);
+    flag = Test_N_VLinearSumVectorArray(X, veclen, nvecs, ntests);
+    flag = Test_N_VScaleVectorArray(X, veclen, nvecs, ntests);
+    flag = Test_N_VConstVectorArray(X, veclen, nvecs, ntests);
+    flag = Test_N_VWrmsNormVectorArray(X, veclen, nvecs, ntests);
+    flag = Test_N_VWrmsNormMaskVectorArray(X, veclen, nvecs, ntests);
 
-  if (myid == 0 && print_timing) {
-    printf("\n\n fused operations 2: nvecs= %d nsums= %d\n", nvecs, nsums);
-    PrintTableHeader(2);
+    if (nsums > 0)
+    {
+      if (myid == 0 && print_timing)
+      {
+        printf("\n\n fused operations 2: nvecs= %d nsums= %d\n", nvecs, nsums);
+        PrintTableHeader(2);
+      }
+      flag = Test_N_VScaleAddMultiVectorArray(X, veclen, nvecs, nsums, ntests);
+      flag = Test_N_VLinearCombinationVectorArray(X, veclen, nvecs, nsums,
+                                                  ntests);
+    }
   }
-  flag = Test_N_VScaleAddMultiVectorArray(X, veclen, nvecs, nsums, ntests);
-  flag = Test_N_VLinearCombinationVectorArray(X, veclen, nvecs, nsums, ntests);
 
   /* Free vectors */
   N_VDestroy(X);
@@ -187,24 +203,26 @@ int main(int argc, char *argv[])
 
   FinalizeClearCache();
 
-  if (myid == 0)
-    printf("\nFinished Tests\n");
+  flag = SUNContext_Free(&ctx);
+  if (flag) { return flag; }
+
+  if (myid == 0) { printf("\nFinished Tests\n"); }
 
   MPI_Finalize();
 
-  return(flag);
+  return (flag);
 }
-
 
 /* ----------------------------------------------------------------------
  * Functions required by testing routines to fill vector data
  * --------------------------------------------------------------------*/
 
 /* random data between lower and upper */
-void N_VRand(N_Vector Xvec, sunindextype Xlen, realtype lower, realtype upper)
+void N_VRand(N_Vector Xvec, sunindextype Xlen, sunrealtype lower,
+             sunrealtype upper)
 {
   HYPRE_ParVector Xhyp;
-  realtype *Xdata;
+  sunrealtype* Xdata;
 
   Xhyp  = N_VGetVector_ParHyp(Xvec);
   Xdata = hypre_VectorData(hypre_ParVectorLocalVector(Xhyp));
@@ -215,7 +233,7 @@ void N_VRand(N_Vector Xvec, sunindextype Xlen, realtype lower, realtype upper)
 void N_VRandZeroOne(N_Vector Xvec, sunindextype Xlen)
 {
   HYPRE_ParVector Xhyp;
-  realtype *Xdata;
+  sunrealtype* Xdata;
 
   Xhyp  = N_VGetVector_ParHyp(Xvec);
   Xdata = hypre_VectorData(hypre_ParVectorLocalVector(Xhyp));
@@ -226,19 +244,18 @@ void N_VRandZeroOne(N_Vector Xvec, sunindextype Xlen)
 void N_VRandConstraints(N_Vector Xvec, sunindextype Xlen)
 {
   HYPRE_ParVector Xhyp;
-  realtype *Xdata;
+  sunrealtype* Xdata;
 
   Xhyp  = N_VGetVector_ParHyp(Xvec);
   Xdata = hypre_VectorData(hypre_ParVectorLocalVector(Xhyp));
   rand_realtype_constraints(Xdata, Xlen);
 }
 
-
 /* ----------------------------------------------------------------------
  * Functions required for MPI or GPU testing
  * --------------------------------------------------------------------*/
 
-void collect_times(N_Vector X, double *times, int ntimes)
+void collect_times(N_Vector X, double* times, int ntimes)
 {
   MPI_Comm comm;
   int myid;
@@ -247,9 +264,10 @@ void collect_times(N_Vector X, double *times, int ntimes)
   MPI_Comm_rank(comm, &myid);
 
   if (myid == 0)
+  {
     MPI_Reduce(MPI_IN_PLACE, times, ntimes, MPI_DOUBLE, MPI_MAX, 0, comm);
-  else
-    MPI_Reduce(times, times, ntimes, MPI_DOUBLE, MPI_MAX, 0, comm);
+  }
+  else { MPI_Reduce(times, times, ntimes, MPI_DOUBLE, MPI_MAX, 0, comm); }
 
   return;
 }
@@ -260,40 +278,38 @@ void sync_device(N_Vector x)
   return;
 }
 
-
 /* ----------------------------------------------------------------------
  * Functions required for clearing cache
  * --------------------------------------------------------------------*/
 
 static int InitializeClearCache(int cachesize)
 {
-  size_t nbytes;  /* cache size in bytes */
+  size_t nbytes; /* cache size in bytes */
 
-  /* determine size of vector to clear cache, N = ceil(2 * nbytes/realtype) */
-  nbytes = (size_t) (2 * cachesize * 1024 * 1024);
-  N = (sunindextype) ((nbytes + sizeof(realtype) - 1)/sizeof(realtype));
+  /* determine size of vector to clear cache, N = ceil(2 * nbytes/sunrealtype) */
+  nbytes = (size_t)(2 * cachesize * 1024 * 1024);
+  N = (sunindextype)((nbytes + sizeof(sunrealtype) - 1) / sizeof(sunrealtype));
 
   /* allocate data and fill random values */
-  data = (realtype*) malloc(N*sizeof(realtype));
-  rand_realtype(data, N, RCONST(-1.0), RCONST(1.0));
+  data = (sunrealtype*)malloc(N * sizeof(sunrealtype));
+  rand_realtype(data, N, SUN_RCONST(-1.0), SUN_RCONST(1.0));
 
-  return(0);
+  return (0);
 }
 
 static int FinalizeClearCache()
 {
   free(data);
-  return(0);
+  return (0);
 }
 
 void ClearCache()
 {
-  realtype     sum;
+  sunrealtype sum;
   sunindextype i;
 
-  sum = RCONST(0.0);
-  for (i=0; i<N; i++)
-    sum += data[i];
+  sum = SUN_RCONST(0.0);
+  for (i = 0; i < N; i++) { sum += data[i]; }
 
   return;
 }

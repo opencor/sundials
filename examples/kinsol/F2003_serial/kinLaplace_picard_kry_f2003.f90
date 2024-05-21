@@ -4,7 +4,7 @@
 ! Based on kinLaplace_picard_bnd.c by Carol S. Woodward @ LLNL
 ! -----------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -29,6 +29,7 @@ module prob_mod
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
+  use fsundials_core_mod
 
   !======= Declarations =========
   implicit none
@@ -50,7 +51,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
+
 
     !======= Declarations =========
     implicit none
@@ -120,7 +121,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
+
 
     !======= Declarations =========
     implicit none
@@ -189,15 +190,10 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_context_mod
-  use fsundials_futils_mod       ! Fortran utilities
+  use fsundials_core_mod
   use fkinsol_mod                ! Fortran interface to KINSOL
   use fnvector_serial_mod        ! Fortran interface to serial N_Vector
   use fsunlinsol_spgmr_mod       ! Fortran interface to SPGMR SUNLinearSolver
-  use fsundials_nvector_mod      ! Fortran interface to generic N_Vector
-  use fsundials_matrix_mod       ! Fortran interface to generic SUNMatrix
-  use fsundials_linearsolver_mod ! Fortran interface to generic SUNLinearSolver
   use prob_mod                   ! problem-defining functions
 
   !======= Declarations =========
@@ -215,7 +211,6 @@ program main
   type(SUNLinearSolver), pointer :: sunlinsol_LS  ! sundials linear solver
 
   type(c_ptr) :: kmem   ! KINSOL memory
-  type(c_ptr) :: infofp ! info file
 
   ! solution and scaling vectors; nx, ny are set in the prob_mod module
   real(c_double), dimension(nx,ny) :: u, scale
@@ -243,7 +238,7 @@ program main
 
   ! -------------------------
   ! Create the SUNDIALS context used for this simulation
-  ierr = FSUNContext_Create(c_null_ptr, sunctx)
+  ierr = FSUNContext_Create(SUN_COMM_NULL, sunctx)
 
   ! -------------------------
   ! Create vectors for solution and scaling
@@ -293,22 +288,6 @@ program main
   ierr = FKINSetFuncNormTol(kmem, fnormtol)
   if (ierr /= 0) then
      print *, 'Error in FKINSetFuncNormTol, ierr = ', ierr, '; halting'
-     stop 1
-  end if
-
-  ! Set information file
-
-  infofp = FSUNDIALSFileOpen("KINSOL.log", "w");
-
-  ierr = FKINSetInfoFile(kmem, infofp);
-  if (ierr /= 0) then
-     print *, 'Error in FKINSetInfoFile, ierr = ', ierr, '; halting'
-     stop 1
-  end if
-
-  ierr = FKINSetPrintLevel(kmem, 3);
-  if (ierr /= 0) then
-     print *, 'Error in FKINSetPrintLevel, ierr = ', ierr, '; halting'
      stop 1
   end if
 
@@ -372,7 +351,6 @@ program main
   call PrintFinalStats(kmem)
 
   ! clean up
-  call FSUNDIALSFileClose(infofp)
   call FKINFree(kmem)
   ierr = FSUNLinSolFree(sunlinsol_LS)
   call FN_VDestroy(sunvec_u)

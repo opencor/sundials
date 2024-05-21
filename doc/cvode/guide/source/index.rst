@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -34,7 +34,7 @@ CVODE Documentation
    sunlinsol/index.rst
    sunnonlinsol/index.rst
    sunmemory/index.rst
-   Install_link.rst
+   sundials/Install_link.rst
    Constants
    History_link.rst
    References

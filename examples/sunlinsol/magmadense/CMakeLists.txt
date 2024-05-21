@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -59,7 +59,7 @@ foreach(example_tuple ${sunlinsols_magmadense_examples})
       PRIVATE
         sundials_${vector}
         sundials_sunlinsolmagmadense
-        ${EXTRA_LINK_LIBS}
+        ${EXE_EXTRA_LINK_LIBS}
     )
   endif()
 

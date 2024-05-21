@@ -2,7 +2,7 @@
 # Programmer(s): Slaven Peles @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -21,21 +21,12 @@
 set(IDA_examples
   "idaHeat2D_kry_p_mpicuda\;1\;4\;develop")
 
-# Add source directory to include directories
-include_directories(. ${MPI_CXX_INCLUDE_PATH})
-
-if(MPI_C_COMPILER)
-  # use MPI wrapper as the compiler
-  set(CMAKE_C_COMPILER ${MPI_C_COMPILER})
-  set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
-endif()
-
 # Specify libraries to link against
 set(IDA_LIB sundials_ida)
 set(NVECS_LIB sundials_nvecmpiplusx sundials_nveccuda)
 
 # Set-up linker flags and link libraries
-set(SUNDIALS_LIBS ${IDA_LIB} ${NVECS_LIB} ${EXTRA_LINK_LIBS})
+set(SUNDIALS_LIBS ${IDA_LIB} ${NVECS_LIB} ${EXE_EXTRA_LINK_LIBS})
 
 # Add the build and install targets for each IDA example
 foreach(example_tuple ${IDA_examples})
@@ -61,7 +52,8 @@ foreach(example_tuple ${IDA_examples})
     EXAMPLE_TYPE ${example_type})
 
   # libraries to link against
-  target_link_libraries(${example} PRIVATE ${SUNDIALS_LIBS} ${MPI_CXX_LIBRARIES})
+  target_link_libraries(${example} PRIVATE
+    MPI::MPI_CXX ${SUNDIALS_LIBS})
 
   # install example source and out files
   if(EXAMPLES_INSTALL)

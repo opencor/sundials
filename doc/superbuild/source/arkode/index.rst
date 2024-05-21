@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -14,6 +14,8 @@
 ARKODE Documentation
 ********************
 
+.. include:: ../../../arkode/guide/source/Landing.rst
+
 **Table of Contents**:
 
 .. toctree::
@@ -24,5 +26,6 @@ ARKODE Documentation
    Organization_link.rst
    Usage/index.rst
    ARKodeButcherTable_link.rst
+   ARKodeSPRKTable_link.rst
    Constants_link.rst
    Butcher_link.rst

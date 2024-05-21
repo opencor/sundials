@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -40,7 +40,7 @@ set(ARKODE_XBRAID_LIB sundials_arkode_xbraid)
 set(NVECP_LIB sundials_nvecparallel)
 
 # Set-up linker flags and link libraries
-set(SUNDIALS_LIBS ${ARKODE_LIB} ${ARKODE_XBRAID_LIB} ${NVECP_LIB} ${EXTRA_LINK_LIBS})
+set(SUNDIALS_LIBS ${ARKODE_LIB} ${ARKODE_XBRAID_LIB} ${NVECP_LIB} ${EXE_EXTRA_LINK_LIBS})
 
 # Add the build and install targets for each example
 foreach(example_tuple ${ARKODE_examples})
@@ -118,13 +118,8 @@ if(ENABLE_HYPRE AND HYPRE_FOUND)
       set_target_properties(${example} PROPERTIES FOLDER "Examples")
 
       # libraries to link against
-      target_link_libraries(${example} ${SUNDIALS_LIBS})
-      target_link_libraries(${example} SUNDIALS::HYPRE)
-      target_link_libraries(${example} SUNDIALS::XBRAID)
-
-      if(NOT MPI_CXX_COMPILER)
-        target_link_libraries(${example} ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARIES})
-      endif()
+      target_link_libraries(${example} PRIVATE
+        MPI::MPI_CXX ${SUNDIALS_LIBS}  SUNDIALS::HYPRE SUNDIALS::XBRAID)
 
     endif()
 

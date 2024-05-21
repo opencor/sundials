@@ -2,7 +2,7 @@
 # Programmer(s): Shelby Lockhart @ UIUC/LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -51,7 +51,7 @@ foreach(example_tuple ${KINSOL_examples})
     sundials_nvecmpiplusx
     sundials_nveccuda
     ${MPI_CXX_LIBRARIES}
-    ${EXTRA_LINK_LIBS})
+    ${EXE_EXTRA_LINK_LIBS})
 
   # add example to regression tests
   sundials_add_test(${example_target} ${example_target}

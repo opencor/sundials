@@ -2,7 +2,7 @@
 # Programmer(s): Eddy Banks and David J. Gardner @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -92,8 +92,9 @@ if(NOT SUPERLUMT_LIBRARY)
 endif()
 
 # set the libraries, stripping out 'NOTFOUND' from previous attempts
-string(REPLACE "SUPERLUMT_LIBRARY-NOTFOUND" "" SUPERLUMT_LIBRARIES "${SUPERLUMT_LIBRARIES}")
-set(SUPERLUMT_LIBRARIES "${SUPERLUMT_LIBRARY};${SUPERLUMT_LIBRARIES}" CACHE STRING "" FORCE)
+if(NOT (SUPERLUMT_LIBRARIES MATCHES "${SUPERLUMT_LIBRARY_NAME}"))
+  set(SUPERLUMT_LIBRARIES "${SUPERLUMT_LIBRARY};${SUPERLUMT_LIBRARIES}" CACHE STRING "" FORCE)
+endif()
 
 # set the library dir option if it wasn't preset
 if(SUPERLUMT_LIBRARY AND (NOT SUPERLUMT_LIBRARY_DIR))
@@ -136,5 +137,7 @@ if(SUPERLUMT_FOUND)
     INTERFACE_INCLUDE_DIRECTORIES "${SUPERLUMT_INCLUDE_DIR}"
     INTERFACE_LINK_LIBRARIES "${SUPERLUMT_LIBRARIES}"
     IMPORTED_LOCATION "${SUPERLUMT_LIBRARY}")
+
+  list2string(SUPERLUMT_LIBRARIES EXAMPLES_SUPERLUMT_LIBRARIES)
 
 endif()

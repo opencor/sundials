@@ -2,7 +2,7 @@
 ! Programmer(s): David J. Gardner, Cody J. Balos @ LLNL
 ! -----------------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -63,8 +63,7 @@ module ode_mod
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_nvector_mod
+  use fsundials_core_mod
 
   !======= Declarations =========
   implicit none
@@ -92,25 +91,24 @@ module ode_mod
   integer :: Npts ! number of spatial nodes (local)
   integer :: Neq  ! number of equations (local)
 
-  double precision :: xmax ! maximum x value
-  double precision :: dx   ! mesh spacing
+  real(c_double) :: xmax ! maximum x value
+  real(c_double) :: dx   ! mesh spacing
 
   ! Problem parameters
-  double precision :: c  ! advection speed
-  double precision :: A  ! constant concentrations
-  double precision :: B
-  double precision :: k1 ! reaction rates
-  double precision :: k2
-  double precision :: k3
-  double precision :: k4
-  double precision :: k5
-  double precision :: k6
+  real(c_double) :: c  ! advection speed
+  real(c_double) :: A  ! constant concentrations
+  real(c_double) :: B
+  real(c_double) :: k1 ! reaction rates
+  real(c_double) :: k2
+  real(c_double) :: k3
+  real(c_double) :: k4
+  real(c_double) :: k5
+  real(c_double) :: k6
 
   ! integrator options
   real(c_double) :: t0, tf     ! initial and final time
   real(c_double) :: rtol, atol ! relative and absolute tolerance
   integer(c_int) :: order      ! method order
-  type(c_ptr)    :: DFID       ! ARKODE diagnostics file
 
   logical :: explicit  ! use explicit or IMEX method
   logical :: global    ! use global or task-local nonlinear solver
@@ -137,7 +135,6 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
 
     !======= Declarations =========
     implicit none
@@ -146,15 +143,15 @@ contains
     real(c_double), value :: t          ! current time
     type(N_Vector)        :: sunvec_y   ! solution N_Vector
     type(N_Vector)        :: sunvec_f   ! rhs N_Vector
-    type(c_ptr)           :: user_data  ! user-defined data
+    type(c_ptr),    value :: user_data  ! user-defined data
 
     ! pointers to data in SUNDIALS vectors
     real(c_double), pointer :: ydata(:)
     real(c_double), pointer :: fdata(:)
 
     ! local variables
-    integer          :: i, j, idx1, idx2 ! loop counters and array indices
-    double precision :: tmp              ! temporary value
+    integer        :: i, j, idx1, idx2 ! loop counters and array indices
+    real(c_double) :: tmp              ! temporary value
 
     !======= Internals ============
 
@@ -224,7 +221,6 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
 
     !======= Declarations =========
     implicit none
@@ -233,15 +229,15 @@ contains
     real(c_double), value :: t          ! current time
     type(N_Vector)        :: sunvec_y   ! solution N_Vector
     type(N_Vector)        :: sunvec_f   ! rhs N_Vector
-    type(c_ptr)           :: user_data  ! user-defined data
+    type(c_ptr),    value :: user_data  ! user-defined data
 
     ! pointers to data in SUNDIALS vectors
     real(c_double), pointer :: ydata(:)
     real(c_double), pointer :: fdata(:)
 
     ! local variables
-    double precision :: u, v, w ! chemcial species
-    integer          :: j, idx  ! loop counter and array index
+    real(c_double) :: u, v, w ! chemcial species
+    integer        :: j, idx  ! loop counter and array index
 
     !======= Internals ============
 
@@ -301,7 +297,6 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
 
     !======= Declarations =========
     implicit none
@@ -310,7 +305,7 @@ contains
     real(c_double), value :: t          ! current time
     type(N_Vector)        :: sunvec_y   ! solution N_Vector
     type(N_Vector)        :: sunvec_f   ! rhs N_Vector
-    type(c_ptr)           :: user_data  ! user-defined data
+    type(c_ptr),    value :: user_data  ! user-defined data
 
     !======= Internals ============
 
@@ -335,9 +330,7 @@ module prec_mod
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_matrix_mod
-  use fsundials_linearsolver_mod
+  use fsundials_core_mod
 
   !======= Declarations =========
   implicit none
@@ -360,10 +353,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
-    use fsundials_matrix_mod
     use fsunmatrix_dense_mod
-    use fsundials_linearsolver_mod
     use fsunlinsol_dense_mod
 
     use ode_mod, only : Nvar, Npts, Neq, k2, k3, k4, k6
@@ -378,14 +368,14 @@ contains
     integer(c_int), value :: jok        ! flag to signal for Jacobian update
     integer(c_int)        :: jcurPtr    ! flag to singal Jacobian is current
     real(c_double), value :: gamma      ! current gamma value
-    type(c_ptr)           :: user_data  ! user-defined data
+    type(c_ptr),    value :: user_data  ! user-defined data
 
     ! local variables
     real(c_double), pointer :: ydata(:) ! vector data
     real(c_double), pointer :: pdata(:) ! matrix data
 
-    double precision :: u, v, w        ! chemical species
-    integer          :: i, idx, offset ! loop counter, array index, col offset
+    real(c_double) :: u, v, w        ! chemical species
+    integer        :: i, idx, offset ! loop counter, array index, col offset
 
     !======= Internals ============
 
@@ -472,7 +462,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
+
     use fnvector_mpiplusx_mod
 
     !======= Declarations =========
@@ -487,7 +477,7 @@ contains
     real(c_double), value :: gamma      ! current gamma value
     real(c_double), value :: delta      ! current gamma value
     integer(c_int), value :: lr         ! left or right preconditioning
-    type(c_ptr)           :: user_data  ! user-defined data
+    type(c_ptr),    value :: user_data  ! user-defined data
 
     ! shortcuts
     type(N_Vector), pointer :: z_local ! z vector data
@@ -517,11 +507,7 @@ module nls_mod
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_nvector_mod
-  use fsundials_matrix_mod
-  use fsundials_linearsolver_mod
-  use fsundials_nonlinearsolver_mod
+  use fsundials_core_mod
 
   !======= Declarations =========
   implicit none
@@ -560,7 +546,7 @@ contains
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
     use farkode_arkstep_mod
-    use fsundials_nvector_mod
+
 
     use ode_mod, only : Neq, Reaction
 
@@ -654,10 +640,10 @@ contains
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
     use farkode_arkstep_mod
-    use fsundials_nvector_mod
-    use fsundials_matrix_mod
+
+
     use fsunmatrix_dense_mod
-    use fsundials_linearsolver_mod
+
 
     use ode_mod, only : Nvar, Npts, k2, k3, k4, k6
 
@@ -682,8 +668,8 @@ contains
     real(c_double), pointer :: J_data(:)
     real(c_double), pointer :: bnode_data(:)
 
-    double precision :: u, v, w ! chemical species
-    integer          :: i, idx  ! loop counter and array index
+    real(c_double) :: u, v, w ! chemical species
+    integer        :: i, idx  ! loop counter and array index
 
     !======= Internals ============
 
@@ -773,7 +759,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nonlinearsolver_mod
+
 
     !======= Declarations =========
     implicit none
@@ -793,7 +779,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nonlinearsolver_mod
+
 
     !======= Declarations =========
     implicit none
@@ -833,8 +819,8 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
-    use fsundials_nonlinearsolver_mod
+
+
     use fnvector_mpiplusx_mod
 
     use ode_mod, only : comm
@@ -895,10 +881,10 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
-    use fsundials_matrix_mod
-    use fsundials_linearsolver_mod
-    use fsundials_nonlinearsolver_mod
+
+
+
+
 
     !======= Declarations =========
     implicit none
@@ -926,7 +912,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nonlinearsolver_mod
+
 
     !======= Declarations =========
     implicit none
@@ -947,7 +933,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nonlinearsolver_mod
+
 
     !======= Declarations =========
     implicit none
@@ -969,7 +955,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nonlinearsolver_mod
+
 
     !======= Declarations =========
     implicit none
@@ -992,14 +978,14 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
+
     use fnvector_serial_mod
-    use fsundials_nonlinearsolver_mod
+
     use fsunnonlinsol_newton_mod
     use fsunlinsol_dense_mod
     use fsunmatrix_dense_mod
 
-    use ode_mod, only : sunctx, Nvar, comm, DFID, monitor
+    use ode_mod, only : sunctx, Nvar, comm
 
     !======= Declarations =========
     implicit none
@@ -1012,7 +998,6 @@ contains
     type(SUNNonlinearSolver_Ops), pointer :: nlsops ! solver operations
 
     integer        :: ierr   ! MPI error status
-    integer(c_int) :: retval ! SUNDIALS error status
 
     !======= Internals ============
 
@@ -1042,10 +1027,10 @@ contains
     sunnls_LOC => FSUNNonlinSol_Newton(sunvec_y, sunctx)
 
     ! Create vector pointers to receive residual data
-    zpred_ptr = FN_VNewVectorArray(1)
-    z_ptr     = FN_VNewVectorArray(1)
-    Fi_ptr    = FN_VNewVectorArray(1)
-    sdata_ptr = FN_VNewVectorArray(1)
+    zpred_ptr = FN_VNewVectorArray(1, sunctx)
+    z_ptr     = FN_VNewVectorArray(1, sunctx)
+    Fi_ptr    = FN_VNewVectorArray(1, sunctx)
+    sdata_ptr = FN_VNewVectorArray(1, sunctx)
 
     sunvec_bnode => FN_VNew_Serial(int(Nvar, c_long), sunctx)
     sunmat_Jnode => FSUNDenseMatrix(int(Nvar, c_long), int(Nvar, c_long), sunctx)
@@ -1054,20 +1039,6 @@ contains
     ! initialize number of nonlinear solver function evals and fails
     nnlfi    = 0
     ncnf_loc = 0
-
-    if (monitor) then
-       retval = FSUNNonlinSolSetInfoFile_Newton(sunnls_LOC, DFID)
-       if (retval /= 0) then
-          print *, "Error: FSUNNonlinSolSetInfoFile_Newton returned ",retval
-          call MPI_Abort(comm, 1, ierr)
-       end if
-
-       retval = FSUNNonlinSolSetPrintLevel_Newton(sunnls_LOC, 1)
-       if (retval /= 0) then
-          print *, "Error: FSUNNonlinSolSetPrintLevel_Newton returned ",retval
-          call MPI_Abort(comm, 1, ierr)
-       end if
-    end if
 
   end function TaskLocalNewton
 
@@ -1078,14 +1049,10 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_types_mod        ! sundials defined types
-  use fsundials_nvector_mod      ! Access generic N_Vector
+  use fsundials_core_mod         ! Access SUNDIALS core types, data structures, etc.
   use fnvector_mpiplusx_mod      ! Access MPI+X N_Vector
   use fnvector_mpimanyvector_mod ! Access MPIManyVector N_Vector
   use fnvector_serial_mod        ! Access serial N_Vector
-  use fsundials_context_mod      ! Access sundials context
-  use fsundials_logger_mod       ! Access SUNLogger
 
   use ode_mod, only : sunctx, logger, comm, myid, Nx, Neq, dx, fused, explicit, printtime, nout
 
@@ -1098,8 +1065,7 @@ program main
   integer          :: i
   integer          :: ierr               ! MPI error status
   integer(c_int)   :: retval             ! SUNDIALS error status
-  double precision :: starttime, endtime ! timing variables
-  integer, pointer :: commptr
+  real(c_double)   :: starttime, endtime ! timing variables
 
   type(N_Vector), pointer :: sunvec_ys   ! sundials serial vector
   type(N_Vector), pointer :: sunvec_y    ! sundials MPI+X vector
@@ -1118,8 +1084,7 @@ program main
 
   ! Create SUNDIALS simulation context
   comm = MPI_COMM_WORLD
-  commptr => comm
-  retval = FSUNContext_Create(c_loc(commptr), sunctx)
+  retval = FSUNContext_Create(comm, sunctx)
   if (retval /= 0) then
     print *, "Error: FSUNContext_Create returned ",retval
     call MPI_Abort(comm, 1, ierr)
@@ -1137,7 +1102,7 @@ program main
   ! SUNDIALS will only log up to the max level n, but a lesser level can
   ! be configured at runtime by only providing output files for the
   ! desired levels. We will enable informational logging here:
-  retval = FSUNLogger_Create(c_loc(commptr), 0, logger)
+  retval = FSUNLogger_Create(comm, 0, logger)
   if (retval /= 0) then
     print *, "Error: FSUNLogger_Create returned ",retval
     call MPI_Abort(comm, 1, ierr)
@@ -1216,20 +1181,15 @@ subroutine EvolveProblemIMEX(sunvec_y)
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_futils_mod          ! Fortran utilities
+  use fsundials_core_mod
   use farkode_mod                   ! Access ARKode
   use farkode_arkstep_mod           ! Access ARKStep
-  use fsundials_nvector_mod         ! Access generic N_Vector
-  use fsundials_matrix_mod          ! Access generic SUNMatrix
   use fsunmatrix_dense_mod          ! Access dense SUNMatrix
-  use fsundials_linearsolver_mod    ! Access generic SUNLinearSolver
   use fsunlinsol_dense_mod          ! Access dense SUNLinearSolver
   use fsunlinsol_spgmr_mod          ! Access GMRES SUNLinearSolver
-  use fsundials_nonlinearsolver_mod ! Access generic SUNNonlinearSolver
   use fsunnonlinsol_newton_mod      ! Access Newton SUNNonlinearSolver
 
-  use ode_mod, only : sunctx, comm, myid, Neq, t0, tf, atol, rtol, order, DFID, &
+  use ode_mod, only : sunctx, comm, myid, Neq, t0, tf, atol, rtol, order, &
        monitor, global, nout, umask_s, Advection, Reaction
 
   use prec_mod, only : sunls_P, sunmat_P, PSetup, PSolve
@@ -1264,10 +1224,9 @@ subroutine EvolveProblemIMEX(sunvec_y)
   type(SUNLinearSolver),    pointer :: sun_LS   ! linear solver
   type(SUNMatrix),          pointer :: sunmat_A ! sundials matrix
 
-  integer            :: ierr        ! MPI error status
-  integer            :: iout        ! output counter
-  double precision   :: tout, dtout ! output time and update
-  character(len=100) :: outname     ! diagnostics ouptput file
+  integer        :: ierr        ! MPI error status
+  integer        :: iout        ! output counter
+  real(c_double) :: tout, dtout ! output time and update
 
   !======= Internals ============
 
@@ -1300,20 +1259,6 @@ subroutine EvolveProblemIMEX(sunvec_y)
      call MPI_Abort(comm, 1, ierr)
   end if
 
-  ! Open output file for integrator diagnostics
-  if (monitor) then
-
-     write(outname,"(A,I0.6,A)") "diagnostics.",myid,".txt"
-     DFID = FSUNDIALSFileOpen(trim(outname), "w")
-
-     retval = FARKStepSetDiagnostics(arkode_mem, DFID)
-     if (retval /= 0) then
-        print *, "Error: FARKStepSetDiagnostics returned ",retval
-        call MPI_Abort(comm, 1, ierr)
-     end if
-
-  end if
-
   ! Create the (non)linear solver
   if (global) then
 
@@ -1333,7 +1278,7 @@ subroutine EvolveProblemIMEX(sunvec_y)
 
      ! Create linear solver
      sun_LS => FSUNLinSol_SPGMR(sunvec_y, SUN_PREC_LEFT, 0, sunctx)
-     if (.not. associated(sun_NLS)) then
+     if (.not. associated(sun_LS)) then
         print *, "Error: FSUNLinSol_SPGMR returned NULL"
         call MPI_Abort(comm, 1, ierr)
      end if
@@ -1422,9 +1367,6 @@ subroutine EvolveProblemIMEX(sunvec_y)
      print *, "-----------------------------------------------------------"
      print *, ""
   end if
-
-  ! close output stream
-  if (monitor) call FSUNDIALSFileClose(DFID)
 
   ! Get final statistics
   retval = FARKStepGetNumSteps(arkode_mem, nst)
@@ -1546,13 +1488,11 @@ subroutine EvolveProblemExplicit(sunvec_y)
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_futils_mod  ! Fortran utilities
+  use fsundials_core_mod
   use farkode_mod           ! Access ARKode
   use farkode_erkstep_mod   ! Access ERKStep
-  use fsundials_nvector_mod ! Access generic N_Vector
 
-  use ode_mod, only : sunctx, comm, myid, t0, tf, atol, rtol, order, DFID, monitor, &
+  use ode_mod, only : sunctx, comm, myid, t0, tf, atol, rtol, order, monitor, &
        nout, AdvectionReaction
 
   !======= Declarations =========
@@ -1573,10 +1513,9 @@ subroutine EvolveProblemExplicit(sunvec_y)
   integer(c_long) :: nfe(1)     ! number of RHS evals
   integer(c_long) :: netf(1)    ! number of error test fails
 
-  integer            :: ierr        ! output counter
-  integer            :: iout        ! output counter
-  double precision   :: tout, dtout ! output time and update
-  character(len=100) :: outname     ! diagnostics ouptput file
+  integer        :: ierr        ! output counter
+  integer        :: iout        ! output counter
+  real(c_double) :: tout, dtout ! output time and update
 
   !======= Internals ============
 
@@ -1606,20 +1545,6 @@ subroutine EvolveProblemExplicit(sunvec_y)
   if (retval /= 0) then
      print *, "Error: FERKStepMaxNumSteps returned ",retval
      call MPI_Abort(comm, 1, ierr)
-  end if
-
-  ! Open output file for integrator diagnotics
-  if (monitor) then
-
-     write(outname,"(A,I0.6,A)") "diagnostics.",myid,".txt"
-     DFID = FSUNDIALSFileOpen(trim(outname), "w")
-
-     retval = FERKStepSetDiagnostics(arkode_mem, DFID)
-     if (retval /= 0) then
-        print *, "Error: FERKStepSetDiagnostics returned ",retval
-        call MPI_Abort(comm, 1, ierr)
-     end if
-
   end if
 
   ! Set initial time, determine output time, and initialize output count
@@ -1668,9 +1593,6 @@ subroutine EvolveProblemExplicit(sunvec_y)
      print *, ""
   end if
 
-  ! close output stream
-  if (monitor) call FSUNDIALSFileClose(DFID)
-
   ! Get final statistics
   retval = FERKStepGetNumSteps(arkode_mem, nst)
   if (retval /= 0) then
@@ -1716,10 +1638,10 @@ subroutine WriteOutput(t, sunvec_y)
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
+  use fsundials_core_mod
   use farkode_mod           ! Access ARKode
   use farkode_erkstep_mod   ! Access ERKStep
-  use fsundials_nvector_mod ! Access generic N_Vector
+
 
   use ode_mod, only : Nvar, nprocs, myid, Erecv, Nx, Npts, monitor,  nout, &
        umask, vmask, wmask
@@ -1735,7 +1657,7 @@ subroutine WriteOutput(t, sunvec_y)
 
   integer i, idx ! loop counter and array index
 
-  double precision :: u, v, w ! RMS norm of chemical species
+  real(c_double) :: u, v, w ! RMS norm of chemical species
 
   !======= Internals ============
 
@@ -1799,8 +1721,7 @@ subroutine SetIC(sunvec_y)
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_nvector_mod
+  use fsundials_core_mod
 
   use ode_mod, only : Nvar, myid, Npts, xmax, dx, A, B, k1, k2, k4, k3
 
@@ -1811,10 +1732,10 @@ subroutine SetIC(sunvec_y)
   type(N_Vector) :: sunvec_y ! solution N_Vector
 
   ! local variables
-  real(c_double), pointer :: ydata(:) ! vector data
+  real(c_double), pointer :: ydata(:)   ! vector data
 
-  double precision :: x, us, vs, ws       ! position and state
-  double precision :: p, mu, sigma, alpha ! perturbation vars
+  real(c_double) :: x, us, vs, ws       ! position and state
+  real(c_double) :: p, mu, sigma, alpha ! perturbation vars
 
   integer :: j, idx ! loop counter and array index
 
@@ -1861,8 +1782,7 @@ subroutine ExchangeBCOnly(sunvec_y)
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_nvector_mod
+  use fsundials_core_mod
 
   use ode_mod, only : Nvar, comm, myid, nprocs, Erecv, Wsend
 
@@ -1937,8 +1857,7 @@ subroutine ExchangeAllStart(sunvec_y)
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_nvector_mod
+  use fsundials_core_mod
 
   use ode_mod, only : Nvar, comm, myid, nprocs, reqS, reqR, Wrecv, Wsend, &
        Erecv, Esend, Npts, c
@@ -2033,7 +1952,6 @@ subroutine ExchangeAllEnd()
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
   use ode_mod, only : comm, reqS, reqR, c
 
   !======= Declarations =========
@@ -2070,8 +1988,8 @@ subroutine SetupProblem()
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
 
-  use fsundials_types_mod
-  use fsundials_nvector_mod
+
+
   use fnvector_serial_mod
   use fnvector_mpiplusx_mod
   use fnvector_mpimanyvector_mod
@@ -2337,13 +2255,7 @@ subroutine FreeProblem()
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_context_mod
-  use fsundials_logger_mod
-  use fsundials_nvector_mod
-  use fsundials_matrix_mod
-  use fsundials_linearsolver_mod
-
+  use fsundials_core_mod
   use ode_mod, only : sunctx, logger, myid, nout, umask_s, umask, vmask, wmask
 
   !======= Declarations =========

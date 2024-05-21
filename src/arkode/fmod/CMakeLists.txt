@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -21,6 +21,8 @@ set(arkode_SOURCES
     farkode_arkstep_mod.c
     farkode_erkstep_mod.f90
     farkode_erkstep_mod.c
+    farkode_sprkstep_mod.f90
+    farkode_sprkstep_mod.c
     farkode_mristep_mod.f90
     farkode_mristep_mod.c)
 
@@ -28,9 +30,12 @@ set(arkode_SOURCES
 sundials_add_f2003_library(sundials_farkode_mod
   SOURCES
     ${arkode_SOURCES}
+  LINK_LIBRARIES
+    PUBLIC sundials_fcore_mod
   OBJECT_LIBRARIES
-    sundials_fgeneric_mod_obj
     sundials_fnvecserial_mod_obj
+    sundials_fsunadaptcontrollersoderlind_mod_obj
+    sundials_fsunadaptcontrollerimexgus_mod_obj
     sundials_fsunmatrixband_mod_obj
     sundials_fsunmatrixdense_mod_obj
     sundials_fsunmatrixsparse_mod_obj

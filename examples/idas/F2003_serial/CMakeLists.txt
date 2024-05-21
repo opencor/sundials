@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -27,7 +27,7 @@ set(FIDAS_examples
 set(IDAS_LIB sundials_fidas_mod)
 
 # Set-up linker flags and link libraries
-set(SUNDIALS_LIBS ${IDAS_LIB} ${EXTRA_LINK_LIBS})
+set(SUNDIALS_LIBS ${IDAS_LIB} ${EXE_EXTRA_LINK_LIBS})
 
 # Add the build and install targets for each example
 foreach(example_tuple ${FIDAS_examples})
@@ -61,9 +61,6 @@ endforeach(example_tuple ${FIDAS_examples})
 
 # create Makefile and CMakeLists.txt for examples
 if(EXAMPLES_INSTALL)
-
-  # Install the README file
-  install(FILES README DESTINATION ${EXAMPLES_INSTALL_PATH}/idas/F2003_serial)
 
   # Prepare substitution variables for Makefile and/or CMakeLists templates
   set(SOLVER "IDAS")

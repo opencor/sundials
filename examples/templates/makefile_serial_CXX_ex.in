@@ -4,7 +4,7 @@
 #                David J. Gardner @ LLNL
 # -----------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -49,9 +49,9 @@ INCLUDES_SLUMT  = @SUPERLUMT_INCLUDE_DIR@
 LIBRARIES_SLUMT = -lsundials_sunlinsolsuperlumt @SUPERLUMT_LIBS@
 LINKFLAGS_SLUMT = ${LINKFLAGS}:@SUPERLUMT_LIBRARY_DIR@
 
-TMP_INCS  = ${includedir} ${INCLUDES_SLUMT} ${INCLUDES_KLU}
+TMP_INCS  = ${includedir} ${INCLUDES_SLUMT} ${INCLUDES_KLU} .
 INCLUDES  = $(addprefix -I, ${TMP_INCS})
-LIBRARIES = -l@SOLVER_LIB@ -lsundials_nvecserial ${LIBS}
+LIBRARIES = @EXAMPLES_MAKEFILE_LIBS@ ${LIBS}
 
 # -----------------------------------------------------------------------------------------
 

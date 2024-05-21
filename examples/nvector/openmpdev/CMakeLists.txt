@@ -2,7 +2,7 @@
 # Programmer(s): David J. Gardner and Shelby Lockhart @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -35,7 +35,7 @@ include_directories(. ..)
 set(NVECS_LIB sundials_nvecopenmpdev)
 
 # Set-up linker flags and link libraries
-set(SUNDIALS_LIBS ${NVECS_LIB} ${EXTRA_LINK_LIBS})
+set(SUNDIALS_LIBS ${NVECS_LIB} ${EXE_EXTRA_LINK_LIBS})
 
 set(CMAKE_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
 

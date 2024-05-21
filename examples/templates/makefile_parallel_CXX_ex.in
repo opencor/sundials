@@ -3,7 +3,7 @@
 # Programmer: Daniel R. Reynolds @ SMU
 # -----------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -44,9 +44,9 @@ MPI_FLAGS   = @MPI_FLAGS@
 TMP_INCS = ${includedir} ${MPI_INC_DIR}
 INCLUDES = $(addprefix -I, ${TMP_INCS})
 LIBRARIES = -l@SOLVER_LIB@ -lsundials_nvecparallel -lsundials_nvecserial \
-						-lsundials_nvecmpimanyvector -lsundials_nvecmpiplusx ${LIBS}
+						-lsundials_nvecmpimanyvector -lsundials_nvecmpiplusx -lsundials_core ${LIBS}
 
-EXAMPLES = @EXAMPLES@
+EXAMPLES = $(basename @EXAMPLES@)
 OBJECTS  = ${EXAMPLES:=.o}
 
 # -----------------------------------------------------------------------------------------

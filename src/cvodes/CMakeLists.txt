@@ -3,7 +3,7 @@
 #                Radu Serban, Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -25,7 +25,6 @@ set(cvodes_SOURCES
   cvodes_bandpre.c
   cvodes_bbdpre.c
   cvodes_diag.c
-  cvodes_direct.c
   cvodes_io.c
   cvodes_ls.c
   cvodes_nls.c
@@ -33,7 +32,6 @@ set(cvodes_SOURCES
   cvodes_nls_stg.c
   cvodes_nls_stg1.c
   cvodes_proj.c
-  cvodes_spils.c
   )
 
 # Add variable cvodes_HEADERS with the exported CVODES header files
@@ -42,19 +40,12 @@ set(cvodes_HEADERS
   cvodes_bandpre.h
   cvodes_bbdpre.h
   cvodes_diag.h
-  cvodes_direct.h
   cvodes_ls.h
   cvodes_proj.h
-  cvodes_spils.h
   )
 
 # Add prefix with complete path to the CVODES header files
 add_prefix(${SUNDIALS_SOURCE_DIR}/include/cvodes/ cvodes_HEADERS)
-
-if(ENABLE_CALIPER AND SUNDIALS_BUILD_WITH_PROFILING)
-  set(_include_caliper_if_needed PUBLIC ${caliper_INCLUDE_DIR})
-  set(_link_caliper_if_needed PUBLIC caliper)
-endif()
 
 # Create the library
 sundials_add_library(sundials_cvodes
@@ -64,10 +55,9 @@ sundials_add_library(sundials_cvodes
     ${cvodes_HEADERS}
   INCLUDE_SUBDIR
     cvodes
-  INCLUDE_DIRECTORIES
-    ${_include_caliper_if_needed}
+  LINK_LIBRARIES
+    PUBLIC sundials_core
   OBJECT_LIBRARIES
-    sundials_generic_obj
     sundials_sunmemsys_obj
     sundials_nvecserial_obj
     sundials_sunmatrixband_obj
@@ -82,9 +72,6 @@ sundials_add_library(sundials_cvodes
     sundials_sunlinsolpcg_obj
     sundials_sunnonlinsolnewton_obj
     sundials_sunnonlinsolfixedpoint_obj
-  LINK_LIBRARIES
-    # Link to caliper if conditions are met.
-    ${_link_caliper_if_needed}
   OUTPUT_NAME
     sundials_cvodes
   VERSION

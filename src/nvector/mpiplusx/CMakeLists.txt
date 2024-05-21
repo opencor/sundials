@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -32,8 +32,9 @@ sundials_add_library(sundials_nvecmpiplusx
     ${SUNDIALS_SOURCE_DIR}/include/nvector/nvector_mpiplusx.h
   INCLUDE_SUBDIR
     nvector
+  LINK_LIBRARIES
+    PUBLIC sundials_core
   OBJECT_LIBRARIES
-    sundials_generic_obj
     sundials_nvecmpimanyvector_obj
   OUTPUT_NAME
     sundials_nvecmpiplusx

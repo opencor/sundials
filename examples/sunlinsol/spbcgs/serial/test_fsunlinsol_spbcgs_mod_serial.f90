@@ -2,7 +2,7 @@
 ! Programmer(s): Cody J. Balos @ LLNL
 ! -----------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -21,7 +21,7 @@
 
 module test_fsunlinsol_spbcgs_serial
   use, intrinsic :: iso_c_binding
-  use fsundials_nvector_mod
+
   use test_utilities
   implicit none
 
@@ -39,9 +39,9 @@ contains
 
   integer(C_INT) function unit_tests() result(fails)
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
-    use fsundials_matrix_mod
-    use fsundials_linearsolver_mod
+
+
+
     use fnvector_serial_mod
     use fsunlinsol_spbcgs_mod
     use test_sunlinsol
@@ -202,12 +202,13 @@ contains
     call FN_VDestroy(probdata%d)
     call FN_VDestroy(probdata%s1)
     call FN_VDestroy(probdata%s2)
+    deallocate(probdata)
 
   end function unit_tests
 
   integer(C_INT) function ATimes(udata, vvec, zvec) result(ret) bind(C)
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
+
     use test_utilities
 
     implicit none
@@ -249,7 +250,7 @@ contains
   integer(C_INT) function PSolve(udata, rvec, zvec, tol, lr) &
       result(ret) bind(C)
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
+
     use test_utilities
 
     implicit none
@@ -331,7 +332,7 @@ program main
   print *, 'SPBCGS SUNLinearSolver Fortran 2003 interface test'
   print *, ''
 
-  call Test_Init(c_null_ptr)
+  call Test_Init(SUN_COMM_NULL)
 
   fails = unit_tests()
   if (fails /= 0) then

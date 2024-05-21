@@ -2,7 +2,7 @@
 # Programmer:  Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -64,7 +64,7 @@ foreach(example_tuple ${CVODE_examples})
     EXAMPLE_TYPE ${example_type})
 
   # libraries to link against
-  target_link_libraries(${example} ${SUNDIALS_LIBS} ${EXTRA_LINK_LIBS})
+  target_link_libraries(${example} ${SUNDIALS_LIBS} ${EXE_EXTRA_LINK_LIBS})
 
   if(NOT MPI_C_COMPILER)
     target_link_libraries(${example} ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARIES})

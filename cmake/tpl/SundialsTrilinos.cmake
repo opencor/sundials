@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # -----------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -44,10 +44,20 @@ endif()
 find_package(Trilinos REQUIRED)
 
 # Check if Trilinos was built with MPI
-if(";${Trilinos_TPL_LIST};" MATCHES ";MPI;")
-  set(Trilinos_MPI TRUE)
+# Starting with TriBITS 2022-10-16 <Project_TPL_LIST> is no longer defined so we
+# base MPI support on ENABLE_MPI
+if(Trilinos_TPL_LIST)
+  if(";${Trilinos_TPL_LIST};" MATCHES ";MPI;")
+    set(Trilinos_MPI TRUE)
+  else()
+    set(Trilinos_MPI FALSE)
+  endif()
 else()
-  set(Trilinos_MPI FALSE)
+  if(ENABLE_MPI)
+    set(Trilinos_MPI TRUE)
+  else()
+    set(Trilinos_MPI FALSE)
+  endif()
 endif()
 
 # For XSDK compatibility, only use the user/spack provided compiler and flags to build
@@ -116,7 +126,7 @@ if(Trilinos_FOUND AND (NOT Trilinos_WORKS))
   # Create a C++ source file which calls a Trilinos function
   file(WRITE ${Trilinos_TEST_DIR}/ltest.cpp
   "#include <Tpetra_Version.hpp>\n"
-  "int main(){\n"
+  "int main(void) {\n"
   "std::cout << Tpetra::version() << std::endl;\n"
   "return(0);\n"
   "}\n")

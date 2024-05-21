@@ -2,7 +2,7 @@
    Programmer(s): Cody J. Balos @ LLNL
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -143,7 +143,7 @@ The SUNLinSol_cuSolverSp_batchQR module defines the *content* field of a
 
    struct _SUNLinearSolverContent_cuSolverSp_batchQR {
       int                last_flag;       /* last return flag                          */
-      booleantype        first_factorize; /* is this the first factorization?          */
+      sunbooleantype     first_factorize; /* is this the first factorization?          */
       size_t             internal_size;   /* size of cusolver buffer for Q and R       */
       size_t             workspace_size;  /* size of cusolver memory for factorization */
       cusolverSpHandle_t cusolver_handle; /* cuSolverSp context                        */

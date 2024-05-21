@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -32,14 +32,18 @@ else()
   set(SUNDIALS_DEPRECATED_MSG_MACRO "SUNDIALS_DEPRECATED")
 endif()
 
-if(COMPILER_HAS_SNPRINTF_AND_VA_COPY)
-  set(SUNDIALS_COMPILER_HAS_SNPRINTF_AND_VA_COPY "${COMPILER_HAS_SNPRINTF_AND_VA_COPY}")
+if($ENV{CI_JOB_ID})
+  set(JOB_ID $ENV{CI_JOB_ID})
+else()
+  string(TIMESTAMP JOB_ID "%Y%m%d%H%M%S")
 endif()
 
-# prepare substitution variable SUNDIALS_USE_GENERIC_MATH for sundials_config.h
-if(USE_GENERIC_MATH)
-  set(SUNDIALS_USE_GENERIC_MATH TRUE)
+if($ENV{CI_JOB_STARTED_AT})
+  set(JOB_START_TIME $ENV{CI_JOB_STARTED_AT})
+else()
+  string(TIMESTAMP JOB_START_TIME "%Y%m%d%H%M%S")
 endif()
+
 
 # ============================================================================
 # Generate macros and substitution variables related to TPLs
@@ -55,15 +59,10 @@ foreach(_item ${SUNDIALS_BUILD_LIST})
   endif()
 endforeach()
 
-# prepare substitution variable SUNDIALS_CALIPER_ENABLED for sundials_config.h
-if(ENABLE_CALIPER)
-  set(SUNDIALS_CALIPER_ENABLED TRUE)
-endif()
-
-# prepare substitution variable SUNDIALS_MPI_ENABLED for sundials_config.h
-if(ENABLE_MPI)
-  set(SUNDIALS_MPI_ENABLED TRUE)
-endif()
+# prepare substitution variable SUNDIALS_${TPL NAME}_ENABLED for sundials_config.h
+foreach(tpl ${SUNDIALS_TPL_LIST})
+  set(SUNDIALS_${tpl}_ENABLED TRUE)
+endforeach()
 
 # prepare substitution variable SUNDIALS_TRILINOS_HAVE_MPI for sundials_config.h
 if(Trilinos_MPI)
@@ -73,6 +72,11 @@ endif()
 # prepare substitution variable(s) SUNDIALS_RAJA_BACKENDS_*
 foreach(backend ${SUNDIALS_RAJA_BACKENDS})
   set(SUNDIALS_RAJA_BACKENDS_${backend} TRUE)
+endforeach()
+
+# prepare substitution variable(s) SUNDIALS_GINKGO_BACKENDS_*
+foreach(backend ${SUNDIALS_GINKGO_BACKENDS})
+  set(SUNDIALS_GINKGO_BACKENDS_${backend} TRUE)
 endforeach()
 
 # prepare substitution variable(s) SUNDIALS_MAGMA_BACKENDS_*

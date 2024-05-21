@@ -2,7 +2,7 @@
 ! Programmer(s): Daniel R. Reynolds @ SMU
 ! ------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -29,6 +29,7 @@ module prob_mod
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
+  use fsundials_core_mod
 
   !======= Declarations =========
   implicit none
@@ -53,7 +54,6 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
     use fnvector_serial_mod
 
     !======= Declarations =========
@@ -186,8 +186,8 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
-    use fsundials_matrix_mod
+
+
     use fnvector_serial_mod
     use fsunmatrix_dense_mod
 
@@ -296,15 +296,11 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_context_mod
+  use fsundials_core_mod
   use fkinsol_mod                ! Fortran interface to KINSOL
   use fnvector_serial_mod        ! Fortran interface to serial N_Vector
   use fsunmatrix_dense_mod       ! Fortran interface to dense SUNMatrix
   use fsunlinsol_dense_mod       ! Fortran interface to dense SUNLinearSolver
-  use fsundials_matrix_mod       ! Fortran interface to generic SUNMatrix
-  use fsundials_nvector_mod      ! Fortran interface to generic N_Vector
-  use fsundials_linearsolver_mod ! Fortran interface to generic SUNLinearSolver
   use prob_mod                   ! problem-defining functions
 
   !======= Declarations =========
@@ -348,7 +344,7 @@ program main
 
   ! -------------------------
   ! Create the SUNDIALS context used for this simulation
-  ierr = FSUNContext_Create(c_null_ptr, sunctx)
+  ierr = FSUNContext_Create(SUN_COMM_NULL, sunctx)
 
   ! -------------------------
   ! Create SUNDIALS vectors for solution, scales, and constraints

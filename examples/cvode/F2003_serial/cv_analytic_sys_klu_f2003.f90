@@ -2,7 +2,7 @@
 ! Programmer(s): Cody J. Balos @ LLNL
 ! ------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -49,6 +49,7 @@ module ode_mod
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
+  use fsundials_core_mod
 
   !======= Declarations =========
   implicit none
@@ -74,7 +75,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
+
 
     !======= Declarations =========
     implicit none
@@ -128,9 +129,9 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
+
     use fsunmatrix_sparse_mod
-    use fsundials_matrix_mod
+
 
     !======= Declarations =========
     implicit none
@@ -180,16 +181,11 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_context_mod      ! Fortran interface to SUNContext
+  use fsundials_core_mod          ! Access SUNDIALS core types, data structures, etc.
   use fcvode_mod                 ! Fortran interface to CVODE
   use fnvector_serial_mod        ! Fortran interface to serial N_Vector
   use fsunmatrix_sparse_mod      ! Fortran interface to sparse SUNMatrix
   use fsunlinsol_klu_mod         ! Fortran interface to KLU SUNLinearSolver
-  use fsundials_linearsolver_mod ! Fortran interface to generic SUNLinearSolver
-  use fsundials_matrix_mod       ! Fortran interface to generic SUNMatrix
-  use fsundials_nvector_mod      ! Fortran interface to generic N_Vector
-  use fsundials_linearsolver_mod ! Fortran interface to generic SUNLinearSolver
   use ode_mod                    ! ODE functions
 
   !======= Declarations =========
@@ -233,7 +229,7 @@ program main
   yvec(2) = 1.0d0
   yvec(3) = 1.0d0
 
-  ierr = FSUNContext_Create(c_null_ptr, sunctx)
+  ierr = FSUNContext_Create(SUN_COMM_NULL, sunctx)
   if (ierr /= 0) then
      print *, 'ERROR: FSUNContext_Create returned non-zero'
      stop 1

@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -375,10 +375,11 @@ described in the section :numref:`Butcher`.
 For mixed stiff/nonstiff problems, a user should provide both of the
 functions :math:`f^E` and :math:`f^I` that define the IVP system.  For
 such problems, ARKStep currently implements the ARK methods proposed in
-:cite:p:`KenCarp:03`, allowing for methods having order of accuracy :math:`q =
-\{3,4,5\}` and embeddings with orders :math:`p = \{2, 3, 4\}`;
-the tables for these methods are given in section :numref:`Butcher.additive`.
-Additionally, user-defined ARK tables are supported.
+:cite:p:`KenCarp:03,KenCarp:19,giraldo2013implicit`, allowing for methods having
+order of accuracy :math:`q = \{2,3,4,5\}` and embeddings with orders :math:`p =
+\{1,2,3,4\}`; the tables for these methods are given in section
+:numref:`Butcher.additive`.  Additionally, user-defined ARK tables are
+supported.
 
 For nonstiff problems, a user may specify that :math:`f^I = 0`,
 i.e. the equation :eq:`ARKODE_IMEX_IVP` reduces to the non-split IVP
@@ -391,8 +392,8 @@ In this scenario, the coefficients :math:`A^I=0`, :math:`c^I=0`,
 :math:`b^I=0` and :math:`\tilde{b}^I=0` in :eq:`ARKODE_ARK`, and the ARK
 methods reduce to classical :index:`explicit Runge--Kutta methods`
 (ERK).  For these classes of methods, ARKODE provides coefficients
-with orders of accuracy :math:`q = \{2,3,4,5,6,8\}`, with embeddings
-of orders :math:`p = \{1,2,3,4,5,7\}`.  These default to the methods in
+with orders of accuracy :math:`q = \{2,3,4,5,6,7,8,9\}`, with embeddings
+of orders :math:`p = \{1,2,3,4,5,6,7,8\}`.  These default to the methods in
 sections
 :numref:`Butcher.Heun_Euler`,
 :numref:`Butcher.Bogacki_Shampine`, :numref:`Butcher.Zonneveld`,
@@ -458,6 +459,117 @@ problem solvable by ERKStep, using the same set of methods, we
 include ERKStep as a distinct time-stepping module since this
 simplified form admits a more efficient and memory-friendly implementation
 than the more general form :eq:`ARKODE_IVP_simple_explicit`.
+
+
+.. _ARKODE.Mathematics.SPRKStep:
+
+SPRKStep -- Symplectic Partitioned Runge--Kutta methods
+=======================================================
+
+The SPRKStep time-stepping module in ARKODE is designed for problems where the
+state vector is partitioned as
+
+.. math::
+   y(t) =
+   \begin{bmatrix}
+     p(t) \\
+     q(t)
+   \end{bmatrix}
+
+and the component partitioned IVP is given by
+
+.. math::
+   \dot{p} &= f_1(t, q), \qquad p(t_0) = p_0 \\
+   \dot{q} &= f_2(t, p), \qquad q(t_0) = q_0.
+   :label: ARKODE_IVP_SPRK
+
+The right-hand side functions :math:`f_1(t,p)` and :math:`f_2(t,q)` typically
+arise from the **separable** Hamiltonian system
+
+.. math::
+   H(t, p, q) = T(t, p) + V(t, q)
+
+where
+
+.. math::
+   f_1(t, q) \equiv \frac{\partial V(t, q)}{\partial q}, \qquad
+   f_2(t, p) \equiv \frac{\partial T(t, p)}{\partial p}.
+
+When *H* is autonomous, then *H* is a conserved quantity. Often this corresponds
+to the conservation of energy (for example, in *n*-body problems). For
+non-autonomous *H*, the invariants are no longer directly obtainable from the
+Hamiltonian :cite:p:`Struckmeier:02`.
+
+In practice, the ordering of the variables does not matter and is determined by the user.
+SPRKStep utilizes Symplectic Partitioned Runge-Kutta (SPRK) methods represented by the pair
+of explicit and diagonally implicit Butcher tableaux,
+
+.. math::
+   \begin{array}{c|cccc}
+   c_1 & 0 & \cdots & 0 & 0 \\
+   c_2 & a_1 & 0 & \cdots & \vdots \\
+   \vdots & \vdots & \ddots & \ddots & \vdots \\
+   c_s & a_1 & \cdots & a_{s-1} & 0 \\
+   \hline
+   & a_1 & \cdots & a_{s-1} & a_s
+   \end{array}
+   \qquad \qquad
+   \begin{array}{c|cccc}
+   \hat{c}_1 & \hat{a}_1 & \cdots & 0 & 0 \\
+   \hat{c}_2 & \hat{a}_1 & \hat{a}_2 & \cdots & \vdots \\
+   \vdots & \vdots & \ddots & \ddots & \vdots \\
+   \hat{c}_s & \hat{a}_1 & \hat{a}_2 & \cdots & \hat{a}_{s} \\
+   \hline
+   & \hat{a}_1 & \hat{a}_2 & \cdots & \hat{a}_{s}
+   \end{array}.
+
+These methods approximately conserve a nearby Hamiltonian for exponentially long
+times :cite:p:`HaWa:06`. SPRKStep makes the assumption that the Hamiltonian is
+separable, in which case the resulting method is explicit. SPRKStep provides
+schemes with order of accuracy and conservation equal to
+:math:`q = \{1,2,3,4,5,6,8,10\}`. The references for these these methods and
+the default methods used are given in the section :numref:`Butcher.sprk`.
+
+In the default case, the algorithm for a single time-step is as follows
+(for autonomous Hamiltonian systems the times provided to :math:`f_1` and
+:math:`f_2`
+can be ignored).
+
+#. Set :math:`P_0 = p_{n-1}, Q_1 = q_{n-1}`
+
+#. For :math:`i = 1,\ldots,s` do:
+
+   #. :math:`P_i = P_{i-1} + h_n \hat{a}_i f_1(t_{n-1} + \hat{c}_i h_n, Q_i)`
+   #. :math:`Q_{i+1} = Q_i + h_n a_i f_2(t_{n-1} + c_i h_n, P_i)`
+
+#. Set :math:`p_n = P_s, q_n = Q_{s+1}`
+
+.. _ARKODE.Mathematics.SPRKStep.Compensated:
+
+Optionally, a different algorithm leveraging compensated summation can be used
+that is more robust to roundoff error at the expense of 2 extra vector operations
+per stage and an additional 5 per time step. It also requires one extra vector to
+be stored.  However, it is signficantly more robust to roundoff error accumulation
+:cite:p:`Sof:02`. When compensated summation is enabled, the following incremental
+form is used to compute a time step:
+
+#. Set :math:`\Delta P_0 = 0, \Delta Q_1 = 0`
+
+#. For :math:`i = 1,\ldots,s` do:
+
+   #. :math:`\Delta P_i = \Delta P_{i-1} + h_n \hat{a}_i f_1(t_{n-1} + \hat{c}_i h_n, q_{n-1} + \Delta Q_i)`
+   #. :math:`\Delta Q_{i+1} = \Delta Q_i + h_n a_i f_2(t_{n-1} + c_i h_n, p_{n-1} + \Delta P_i)`
+
+#. Set :math:`\Delta p_n = \Delta P_s, \Delta q_n = \Delta Q_{s+1}`
+
+#. Using compensated summation, set :math:`p_n = p_{n-1} + \Delta p_n, q_n = q_{n-1} + \Delta q_n`
+
+Since temporal error based adaptive time-stepping is known to ruin the
+conservation property :cite:p:`HaWa:06`,  SPRKStep employs a fixed time-step size.
+
+.. However, it is possible for a user to provide a
+.. problem-specific adaptivity controller such as the one described in :cite:p:`HaSo:05`.
+.. The `ark_kepler.c` example demonstrates an implementation of such controller.
 
 
 .. _ARKODE.Mathematics.MRIStep:
@@ -597,7 +709,7 @@ characterized by nonzero values on or above the diagonal of the matrices
 :math:`\Gamma^{\{k\}}`. Typically, MRI-GARK and IMEX-MRI-GARK methods are at
 most diagonally-implicit (i.e., :math:`\gamma_{i,j}^{\{k\}}=0` for all
 :math:`j>i`). Furthermore, diagonally-implicit stages are characterized as being
-"solve-decoupled" if :math:`\Delta c_i^S = 0` when `\gamma_{i,i}^{\{k\}} \ne 0`,
+"solve-decoupled" if :math:`\Delta c_i^S = 0` when :math:`\gamma_{i,i}^{\{k\}} \ne 0`,
 in which case the stage is computed as standard ARK or DIRK update. Alternately,
 a diagonally-implicit stage :math:`i` is considered "solve-coupled" if
 :math:`\Delta c^S_i \gamma_{i,j}^{\{k\}} \ne 0`, in which
@@ -794,147 +906,24 @@ steps, :math:`t_{n-3} \to t_{n-2} \to t_{n-1} \to t_n`.  These local
 error history values are all initialized to 1 upon program
 initialization, to accommodate the few initial time steps of a
 calculation where some of these error estimates have not yet been
-computed.  With these estimates, ARKODE supports a variety of error
-control algorithms, as specified in the subsections below.
+computed.  With these estimates, ARKODE supports one of two approaches
+for temporal error control.
 
+First, any valid implementation of the SUNAdaptController class
+:numref:`SUNAdaptController.Description` may be used by ARKODE's adaptive
+time-stepping modules to provide a candidate error-based prospective step
+size :math:`h'`.
 
-.. _ARKODE.Mathematics.Adaptivity.ErrorControl.PID:
-
-PID controller
------------------
-
-This is the default time adaptivity controller used by the ARKStep and
-ERKStep modules.  It derives from those found in :cite:p:`KenCarp:03`, :cite:p:`Sod:98`, :cite:p:`Sod:03` and
-:cite:p:`Sod:06`, and uses all three of the local error estimates
-:math:`\varepsilon_n`, :math:`\varepsilon_{n-1}` and
-:math:`\varepsilon_{n-2}` in determination of a prospective step size,
-
-.. math::
-   h' \;=\; h_n\; \varepsilon_n^{-k_1/p}\; \varepsilon_{n-1}^{k_2/p}\;
-        \varepsilon_{n-2}^{-k_3/p},
-
-where the constants :math:`k_1`, :math:`k_2` and :math:`k_3` default
-to 0.58, 0.21 and 0.1, respectively, and may be modified by the user.
-In this estimate, a floor of :math:`\varepsilon > 10^{-10}` is
-enforced to avoid division-by-zero errors.
-
-
-
-.. _ARKODE.Mathematics.Adaptivity.ErrorControl.PI:
-
-PI controller
-----------------------
-
-Like with the previous method, the PI controller derives from those
-found in :cite:p:`KenCarp:03`, :cite:p:`Sod:98`, :cite:p:`Sod:03` and :cite:p:`Sod:06`, but it differs in
-that it only uses the two most recent step sizes in its adaptivity
-algorithm,
-
-.. math::
-   h' \;=\; h_n\; \varepsilon_n^{-k_1/p}\; \varepsilon_{n-1}^{k_2/p}.
-
-Here, the default values of :math:`k_1` and :math:`k_2` default
-to 0.8 and 0.31, respectively, though they may be changed by the user.
-
-
-
-.. _ARKODE.Mathematics.Adaptivity.ErrorControl.I:
-
-I controller
-----------------------
-
-This is the standard time adaptivity control algorithm in use by most
-publicly-available ODE solver codes.  It bases the prospective time step
-estimate entirely off of the current local error estimate,
-
-.. math::
-   h' \;=\; h_n\; \varepsilon_n^{-k_1/p}.
-
-By default, :math:`k_1=1`, but that may be modified by the user.
-
-
-
-
-.. _ARKODE.Mathematics.Adaptivity.ErrorControl.eGus:
-
-Explicit Gustafsson controller
----------------------------------
-
-This step adaptivity algorithm was proposed in :cite:p:`Gust:91`, and
-is primarily useful with explicit Runge--Kutta methods.
-In the notation of our earlier controllers, it has the form
-
-.. math::
-   h' \;=\; \begin{cases}
-      h_1\; \varepsilon_1^{-1/p}, &\quad\text{on the first step}, \\
-      h_n\; \varepsilon_n^{-k_1/p}\;
-        \left(\dfrac{\varepsilon_n}{\varepsilon_{n-1}}\right)^{k_2/p}, &
-      \quad\text{on subsequent steps}.
-   \end{cases}
-   :label: ARKODE_expGus
-
-The default values of :math:`k_1` and :math:`k_2` are 0.367 and 0.268,
-respectively, and may be modified by the user.
-
-
-
-
-.. _ARKODE.Mathematics.Adaptivity.ErrorControl.iGus:
-
-Implicit Gustafsson controller
----------------------------------
-
-A version of the above controller suitable for implicit Runge--Kutta
-methods was introduced in :cite:p:`Gust:94`, and has the form
-
-.. math::
-   h' = \begin{cases}
-      h_1 \varepsilon_1^{-1/p}, &\quad\text{on the first step}, \\
-      h_n \left(\dfrac{h_n}{h_{n-1}}\right) \varepsilon_n^{-k_1/p}
-        \left(\dfrac{\varepsilon_n}{\varepsilon_{n-1}}\right)^{-k_2/p}, &
-      \quad\text{on subsequent steps}.
-   \end{cases}
-   :label: ARKODE_impGus
-
-The algorithm parameters default to :math:`k_1 = 0.98` and
-:math:`k_2 = 0.95`, but may be modified by the user.
-
-
-
-
-.. _ARKODE.Mathematics.Adaptivity.ErrorControl.ieGus:
-
-ImEx Gustafsson controller
----------------------------------
-
-An ImEx version of these two preceding controllers is also available.
-This approach computes the estimates :math:`h'_1` arising from
-equation :eq:`ARKODE_expGus` and the estimate :math:`h'_2` arising from
-equation :eq:`ARKODE_impGus`, and selects
-
-.. math::
-   h' = \frac{h}{|h|}\min\left\{|h'_1|, |h'_2|\right\}.
-
-Here, equation :eq:`ARKODE_expGus` uses :math:`k_1` and
-:math:`k_2` with default values of 0.367 and 0.268, while equation
-:eq:`ARKODE_impGus` sets both parameters to the input :math:`k_3` that
-defaults to 0.95.  All of these values may be modified by the user.
-
-
-
-.. _ARKODE.Mathematics.Adaptivity.ErrorControl.User:
-
-User-supplied controller
----------------------------------
-
-Finally, ARKODE's time-stepping modules allow the user to define their
-own time step adaptivity function,
+Second, ARKODE's adaptive time-stepping modules currently still allow the
+user to define their own time step adaptivity function,
 
 .. math::
    h' = H(y, t, h_n, h_{n-1}, h_{n-2}, \varepsilon_n, \varepsilon_{n-1}, \varepsilon_{n-2}, q, p),
 
-to allow for problem-specific choices, or for continued
-experimentation with temporal error controllers.
+allowing for problem-specific choices, or for continued
+experimentation with temporal error controllers.  We note that this
+support has been deprecated in favor of the SUNAdaptController class,
+and will be removed in a future release.
 
 
 
@@ -1002,14 +991,12 @@ Here the explicit stability step factor :math:`c>0` (often called the
 Fixed time stepping
 ===================
 
-While both the ARKStep and ERKStep time-stepping modules are designed
-for tolerance-based time step adaptivity, they additionally support a
-"fixed-step" mode (*note: fixed-step mode is currently required for
-the slow time scale in the MRIStep module*).  This mode is typically
-used for debugging purposes, for verification against hand-coded
-Runge--Kutta methods, or for problems where the time steps should be
-chosen based on other problem-specific information.  In this mode,
-all internal time step adaptivity is disabled:
+While both the ARKStep and ERKStep time-stepping modules are
+designed for tolerance-based time step adaptivity, they additionally support a
+"fixed-step" mode. This mode is typically used for debugging
+purposes, for verification against hand-coded Runge--Kutta methods, or for
+problems where the time steps should be chosen based on other problem-specific
+information.  In this mode, all internal time step adaptivity is disabled:
 
 * temporal error control is disabled,
 
@@ -1018,14 +1005,20 @@ all internal time step adaptivity is disabled:
 
 * no check against an explicit stability condition is performed.
 
+.. note::
+   Since temporal error based adaptive time-stepping is known to ruin the
+   conservation property of SPRK methods, SPRKStep employs a fixed time-step
+   size by default.
+
+.. note::
+   Fixed-step mode is currently required for the slow time scale in the MRIStep module.
+
 
 Additional information on this mode is provided in the sections
 :ref:`ARKStep Optional Inputs <ARKODE.Usage.ARKStep.OptionalInputs>`,
-:ref:`ERKStep Optional Inputs <ARKODE.Usage.ERKStep.OptionalInputs>`, and
+:ref:`ERKStep Optional Inputs <ARKODE.Usage.ERKStep.OptionalInputs>`,
+:ref:`SPRKStep Optional Inputs <ARKODE.Usage.SPRKStep.OptionalInputs>`, and
 :ref:`MRIStep Optional Inputs <ARKODE.Usage.MRIStep.OptionalInputs>`.
-
-
-
 
 
 .. _ARKODE.Mathematics.AlgebraicSolvers:
@@ -1390,23 +1383,21 @@ following circumstances:
 * if the problem is linearly implicit and :math:`\gamma` has
   changed by a factor larger than 100 times machine epsilon.
 
-When an update is forced due to a convergence failure, an update of
-:math:`\tilde{\mathcal A}` or :math:`P` may or may not involve a
-re-evaluation of :math:`J` (in :math:`\tilde{\mathcal A}`) or of
-Jacobian data (in :math:`P`), depending on whether errors in the
-Jacobian were the likely cause of the failure.  More generally, the
-decision is made to re-evaluate :math:`J` (or instruct the user to
-update :math:`P`) when:
+When an update of :math:`\tilde{\mathcal A}` or :math:`P` occurs, it may or may
+not involve a reevaluation of :math:`J` (in :math:`\tilde{\mathcal A}`) or of
+Jacobian data (in :math:`P`), depending on whether errors in the Jacobian were
+the likely cause for the update. Reevaluating :math:`J` (or instructing the
+user to update :math:`P`) occurs when:
 
 * starting the problem,
-* more than :math:`msbj=50` steps have been taken since the last evaluation,
+* more than :math:`msbj=50` steps have been taken since the last evaluation
+  (this value may be modified by the user),
 * a convergence failure occurred with an outdated matrix, and the
   value :math:`\tilde{\gamma}` of :math:`\gamma` at the last update
   satisfies :math:`\left|\gamma/\tilde{\gamma} - 1\right| > 0.2`,
 * a convergence failure occurred that forced a step size reduction, or
 * if the problem is linearly implicit and :math:`\gamma` has
   changed by a factor larger than 100 times machine epsilon.
-
 
 However, for linear solvers and preconditioners that do not
 rely on costly matrix construction and factorization operations
@@ -2076,3 +2067,68 @@ step attempt, or fails with the minimum step size, then the integration is halte
 and an error is returned. In this case the user may need to employ other
 strategies as discussed in :numref:`ARKODE.Usage.ARKStep.Tolerances` and
 :numref:`ARKODE.Usage.ERKStep.Tolerances` to satisfy the inequality constraints.
+
+.. _ARKODE.Mathematics.Relaxation:
+
+Relaxation Methods
+==================
+
+When the solution of :eq:`ARKODE_IVP` is conservative or dissipative with
+respect to a smooth *convex* function :math:`\xi(y(t))`, it is desirable to have
+the numerical method preserve these properties. That is
+:math:`\xi(y_n) = \xi(y_{n-1}) = \ldots = \xi(y_{0})` for conservative systems
+and :math:`\xi(y_n) \leq \xi(y_{n-1})` for dissipative systems. For examples
+of such problems, see the references below and the citations there in.
+
+For such problems, ARKODE supports relaxation methods
+:cite:p:`ketcheson2019relaxation, kang2022entropy, ranocha2020relaxation, ranocha2020hamiltonian`
+applied to ERK, DIRK, or ARK methods to ensure dissipation or preservation of
+the global function. The relaxed solution is given by
+
+.. math::
+   y_r = y_{n-1} + r d = r y_n + (1 - r) y_{n - 1}
+   :label: ARKODE_RELAX_SOL
+
+where :math:`d` is the update to :math:`y_n` (i.e.,
+:math:`h_n \sum_{i=1}^{s}(b^E_i \hat{f}^E_i + b^I_i \hat{f}^I_i)` for ARKStep
+and :math:`h_n \sum_{i=1}^{s} b_i f_i` for ERKStep) and :math:`r` is the
+relaxation factor selected to ensure conservation or dissipation. Given an ERK,
+DIRK, or ARK method of at least second order with non-negative solution weights
+(i.e., :math:`b_i \geq 0` for ERKStep or :math:`b^E_i \geq 0` and
+:math:`b^I_i \geq 0` for ARKStep), the factor :math:`r` is computed by solving
+the auxiliary scalar nonlinear system
+
+.. math::
+   F(r) = \xi(y_{n-1} + r d) - \xi(y_{n-1}) - r e = 0
+   :label: ARKODE_RELAX_NLS
+
+at the end of each time step. The estimated change in :math:`\xi` is given by
+:math:`e \equiv h_n \sum_{i=1}^{s} \langle \xi'(z_i), b^E_i f^E_i + b^I_i f^I_i \rangle`
+where :math:`\xi'` is the Jacobian of :math:`\xi`.
+
+Two iterative methods are provided for solving :eq:`ARKODE_RELAX_NLS`, Newton's
+method and Brent's method. When using Newton's method (the default), the
+iteration is halted either when the residual tolerance is met,
+:math:`F(r^{(k)}) < \epsilon_{\mathrm{relax\_res}}`, or when the difference
+between successive iterates satisfies the relative and absolute tolerances,
+:math:`|\delta_r^{(k)}| = |r^{(k)} - r^{(k-1)}| < \epsilon_{\mathrm{relax\_rtol}} |r^{(k-1)}| + \epsilon_{\mathrm{relax\_atol}}`.
+Brent's method applies the same residual tolerance check and additionally halts
+when the bisection update satisfies the relative and absolute tolerances,
+:math:`|0.5 (r_c - r^{k})| < \epsilon_{\mathrm{relax\_rtol}} |r^{(k)}| + 0.5 \epsilon_{\mathrm{relax\_atol}}`
+where :math:`r_c` and :math:`r^{(k)}` bound the root.
+
+If the nonlinear solve fails to meet the specified tolerances within the maximum
+allowed number of iterations, the step size is reduced by the factor
+:math:`\eta_\mathrm{rf}` (default 0.25) and the step is repeated. Additionally,
+the solution of :eq:`ARKODE_RELAX_NLS` should be
+:math:`r = 1 + \mathcal{O}(h_n^{q - 1})` for a method of order :math:`q`
+:cite:p:`ranocha2020relaxation`. As such, limits are imposed on the range of
+relaxation values allowed (i.e., limiting the maximum change in step size due to
+relaxation). A relaxation value greater than :math:`r_\text{max}` (default 1.2)
+or less than :math:`r_\text{min}` (default 0.8), is considered as a failed
+relaxation application and the step will is repeated with the step size reduced
+by :math:`\eta_\text{rf}`.
+
+For more information on utilizing relaxation Runge--Kutta methods, see
+:numref:`ARKODE.Usage.ERKStep.Relaxation` and
+:numref:`ARKODE.Usage.ARKStep.Relaxation`.

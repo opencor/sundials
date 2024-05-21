@@ -3,7 +3,7 @@
 #                Radu Serban, Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -21,28 +21,19 @@ install(CODE "MESSAGE(\"\nInstall KINSOL\n\")")
 set(kinsol_SOURCES
   kinsol.c
   kinsol_bbdpre.c
-  kinsol_direct.c
   kinsol_io.c
   kinsol_ls.c
-  kinsol_spils.c
   )
 
 # Add variable kinsol_HEADERS with the exported KINSOL header files
 set(kinsol_HEADERS
   kinsol.h
   kinsol_bbdpre.h
-  kinsol_direct.h
   kinsol_ls.h
-  kinsol_spils.h
   )
 
 # Add prefix with complete path to the KINSOL header files
 add_prefix(${SUNDIALS_SOURCE_DIR}/include/kinsol/ kinsol_HEADERS)
-
-if(ENABLE_CALIPER AND SUNDIALS_BUILD_WITH_PROFILING)
-  set(_include_caliper_if_needed PUBLIC ${caliper_INCLUDE_DIR})
-  set(_link_caliper_if_needed PUBLIC caliper)
-endif()
 
 # Create the library
 sundials_add_library(sundials_kinsol
@@ -52,10 +43,9 @@ sundials_add_library(sundials_kinsol
     ${kinsol_HEADERS}
   INCLUDE_SUBDIR
     kinsol
-  INCLUDE_DIRECTORIES
-    ${_include_caliper_if_needed}
+  LINK_LIBRARIES
+    PUBLIC sundials_core
   OBJECT_LIBRARIES
-    sundials_generic_obj
     sundials_sunmemsys_obj
     sundials_nvecserial_obj
     sundials_sunmatrixband_obj
@@ -68,9 +58,6 @@ sundials_add_library(sundials_kinsol
     sundials_sunlinsolspgmr_obj
     sundials_sunlinsolsptfqmr_obj
     sundials_sunlinsolpcg_obj
-  LINK_LIBRARIES
-    # Link to caliper if conditions are met.
-    ${_link_caliper_if_needed}
   OUTPUT_NAME
     sundials_kinsol
   VERSION

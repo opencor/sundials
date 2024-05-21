@@ -2,7 +2,7 @@
 ! Programmer(s): David J. Gardner, Cody J. Balos  @ LLNL
 ! ------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -49,6 +49,7 @@ module ode_mod
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
+  use fsundials_core_mod
 
   !======= Declarations =========
   implicit none
@@ -74,7 +75,6 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
 
     !======= Declarations =========
     implicit none
@@ -121,15 +121,11 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
-  use fsundials_context_mod
+  use fsundials_core_mod
   use fcvode_mod                 ! Fortran interface to CVODE
   use fnvector_serial_mod        ! Fortran interface to serial N_Vector
   use fsunmatrix_dense_mod       ! Fortran interface to dense SUNMatrix
   use fsunlinsol_dense_mod       ! Fortran interface to dense SUNLinearSolver
-  use fsundials_matrix_mod       ! Fortran interface to generic SUNMatrix
-  use fsundials_nvector_mod      ! Fortran interface to generic N_Vector
-  use fsundials_linearsolver_mod ! Fortran interface to generic SUNLinearSolver
   use ode_mod                    ! ODE functions
 
   !======= Declarations =========
@@ -173,7 +169,7 @@ program main
   yvec(3) = 1.0d0
 
   ! create SUNDIALS context
-  ierr = FSUNContext_Create(c_null_ptr, ctx)
+  ierr = FSUNContext_Create(SUN_COMM_NULL, ctx)
 
   ! create a serial vector
   sunvec_y => FN_VMake_Serial(neq, yvec, ctx)

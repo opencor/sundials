@@ -2,7 +2,7 @@
 ! Programmer(s): Daniel R. Reynolds @ SMU
 ! ------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -39,6 +39,7 @@ module dae_mod
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
+  use fsundials_core_mod
 
   !======= Declarations =========
   implicit none
@@ -66,7 +67,6 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
 
     !======= Declarations =========
     implicit none
@@ -122,7 +122,6 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
     use fnvector_serial_mod
 
     !======= Declarations =========
@@ -169,7 +168,7 @@ contains
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
-    use fsundials_nvector_mod
+
 
     !======= Declarations =========
     implicit none
@@ -212,14 +211,11 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-
+  use fsundials_core_mod         ! Access SUNDIALS core types, data structures, etc.
   use fida_mod                   ! Fortran interface to IDA
-  use fsundials_context_mod      ! Fortran interface to SUNContext
   use fnvector_serial_mod        ! Fortran interface to serial N_Vector
   use fsunlinsol_spgmr_mod       ! Fortran interface to spgmr SUNLinearSolver
-  use fsundials_matrix_mod       ! Fortran interface to generic SUNMatrix
-  use fsundials_nvector_mod      ! Fortran interface to generic N_Vector
-  use fsundials_linearsolver_mod ! Fortran interface to generic SUNLinearSolver
+
   use dae_mod                    ! ODE functions
 
   !======= Declarations =========
@@ -243,7 +239,7 @@ program main
   real(c_double), dimension(mgrid,mgrid) :: uu, up, res, constraints
 
   !======= Internals ============
-  retval = FSUNContext_Create(c_null_ptr, sunctx)
+  retval = FSUNContext_Create(SUN_COMM_NULL, sunctx)
 
   ! Assign parameters in dae_mod
   dx = 1.d0/(mgrid-1)
@@ -485,7 +481,6 @@ subroutine SetInitialProfile(sunvec_u, sunvec_up, sunvec_r)
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-  use fsundials_nvector_mod
   use fnvector_serial_mod
   use dae_mod
 

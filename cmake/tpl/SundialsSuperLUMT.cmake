@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # -----------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -80,7 +80,7 @@ if(SUPERLUMT_FOUND AND (NOT SUPERLUMT_WORKS))
   # Create a C source file which calls a SUPERLUMT function
   file(WRITE ${SUPERLUMT_TEST_DIR}/ltest.c
     "\#include \"slu_mt_ddefs.h\"\n"
-    "int main(){\n"
+    "int main(void) {\n"
     "SuperMatrix *A;\n"
     "NCformat *Astore;\n"
     "A = NULL;\n"

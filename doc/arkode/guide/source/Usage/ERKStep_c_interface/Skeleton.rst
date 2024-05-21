@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -58,7 +58,7 @@ referenced.
 
       y0 = N_VMake_***(..., ydata);
 
-   if the ``realtype`` array ``ydata`` containing the initial values of
+   if the ``sunrealtype`` array ``ydata`` containing the initial values of
    :math:`y` already exists.  Otherwise, create a new vector by making
    a call of the form
 

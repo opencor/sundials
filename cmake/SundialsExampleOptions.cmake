@@ -2,7 +2,7 @@
 # Programmer(s): Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -23,7 +23,8 @@ sundials_option(EXAMPLES_ENABLE_C BOOL "Build SUNDIALS C examples" ON)
 # Some TPLs only have C++ examples. Default the C++ examples to ON if any of
 # these are enabled on the initial configuration pass.
 if (ENABLE_TRILINOS OR ENABLE_SUPERLUDIST OR ENABLE_XBRAID OR ENABLE_HIP OR
-    ENABLE_MAGMA OR ENABLE_SYCL OR ENABLE_ONEMKL OR ENABLE_RAJA)
+    ENABLE_MAGMA OR ENABLE_SYCL OR ENABLE_ONEMKL OR ENABLE_RAJA OR ENABLE_GINKGO OR
+    ENABLE_KOKKOS)
   sundials_option(EXAMPLES_ENABLE_CXX BOOL "Build SUNDIALS C++ examples" ON)
 else()
   sundials_option(EXAMPLES_ENABLE_CXX BOOL "Build SUNDIALS C++ examples" OFF)

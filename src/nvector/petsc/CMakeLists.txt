@@ -2,7 +2,7 @@
 # Programmer(s): Radu Serban @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -32,10 +32,11 @@ sundials_add_library(sundials_nvecpetsc
     ${SUNDIALS_SOURCE_DIR}/include/nvector/nvector_petsc.h
   INCLUDE_SUBDIR
     nvector
-  OBJECT_LIBRARIES
-    sundials_generic_obj
   LINK_LIBRARIES
-    PUBLIC SUNDIALS::PETSC_VEC
+    PUBLIC sundials_core
+  OBJECT_LIBRARIES
+  LINK_LIBRARIES
+    PUBLIC SUNDIALS::PETSC
   OUTPUT_NAME
     sundials_nvecpetsc
   VERSION

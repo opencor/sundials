@@ -2,7 +2,7 @@
 # Programmer(s): Daniel R. Reynolds @ SMU
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -14,12 +14,13 @@
 # CMakeLists.txt file for ARKODE OpenMP examples
 # ---------------------------------------------------------------
 
-# Example lists are tuples "name\;args\;type" where the type is
-# 'develop' for examples excluded from 'make test' in releases
+# Example lists are tuples
+# "name\;args\;type\;float precision\;int precision" where the type
+# is 'develop' for examples excluded from 'make test' in releases
 
 # Examples using SUNDIALS linear solvers
 set(ARKODE_examples
-  "ark_brusselator1D_omp\;4\;develop\;default\;default"
+  "ark_brusselator1D_omp\;4\;exclude-single\;default\;default"
   "ark_heat1D_omp\;4\;develop\;default\;10"
   )
 
@@ -56,7 +57,7 @@ foreach(example_tuple ${ARKODE_examples})
   target_link_libraries(${example}
     sundials_arkode
     sundials_nvecopenmp
-    ${EXTRA_LINK_LIBS})
+    ${EXE_EXTRA_LINK_LIBS})
 
   # install example source and out files
   if(EXAMPLES_INSTALL)

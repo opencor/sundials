@@ -2,7 +2,7 @@
 # Programmer(s): Steven Smith and Cody J. Balos @ LLNL
 # -----------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2022, Lawrence Livermore National Security
+# Copyright (c) 2002-2024, Lawrence Livermore National Security
 # and Southern Methodist University.
 # All rights reserved.
 #
@@ -81,7 +81,7 @@ if(KLU_FOUND AND (NOT KLU_WORKS))
   # Create a C source file which calls a KLU function
   file(WRITE ${KLU_TEST_DIR}/ltest.c
   "\#include \"klu.h\"\n"
-  "int main(){\n"
+  "int main(void) {\n"
   "klu_common Common;\n"
   "klu_defaults (&Common);\n"
   "return(0);\n"

@@ -1,7 +1,7 @@
 ..
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -20,7 +20,7 @@ This API consists of three new SUNDIALS types: :c:type:`SUNMemoryType`,
 :c:type:`SUNMemory`, and :c:type:`SUNMemoryHelper`:
 
 
-.. c:type:: struct _SUNMemory *SUNMemory
+.. c:type:: struct SUNMemory_ *SUNMemory
 
    The ``SUNMemory`` type is a pointer a structure containing a pointer to
    actual data (``ptr``), the data memory type, and a flag indicating ownership
@@ -28,12 +28,30 @@ This API consists of three new SUNDIALS types: :c:type:`SUNMemoryType`,
 
    .. code-block:: c
 
-      struct _SUNMemory
+      struct SUNMemory_
       {
         void*         ptr;
         SUNMemoryType type;
-        booleantype   own;
+        sunbooleantype   own;
+        size_t        bytes;
       };
+
+
+.. c:function:: SUNMemory SUNMemoryNewEmpty(SUNContext sunctx)
+
+   This function returns an empty ``SUNMemory`` object.
+
+   **Arguments:**
+
+   * ``sunctx`` -- the ``SUNContext`` object.
+
+   **Returns:**
+
+   * an uninitialized ``SUNMemory`` object
+   
+   .. versionchanged:: 7.0.0
+
+      The function signature was updated to add the ``SUNContext`` argument.
 
 
 .. c:enum:: SUNMemoryType
@@ -52,7 +70,7 @@ This API consists of three new SUNDIALS types: :c:type:`SUNMemoryType`,
       } SUNMemoryType;
 
 
-.. c:type:: struct _SUNMemoryHelper *SUNMemoryHelper
+.. c:type:: struct SUNMemoryHelper_ *SUNMemoryHelper
 
    The ``SUNMemoryHelper`` type is a pointer to a structure containing a pointer
    to the implementation-specific member data (``content``) and a virtual method
@@ -60,14 +78,15 @@ This API consists of three new SUNDIALS types: :c:type:`SUNMemoryType`,
 
    .. code-block:: c
 
-      struct _SUNMemoryHelper
+      struct SUNMemoryHelper_
       {
         void*               content;
         SUNMemoryHelper_Ops ops;
+        SUNContext          sunctx;
       };
 
 
-.. c:type:: struct _SUNMemoryHelper_Ops *SUNMemoryHelper_Ops
+.. c:type:: struct SUNMemoryHelper_Ops_ *SUNMemoryHelper_Ops
 
    The ``SUNMemoryHelper_Ops`` type is defined as a pointer to the structure
    containing the function pointers to the member function implementations. This
@@ -75,21 +94,23 @@ This API consists of three new SUNDIALS types: :c:type:`SUNMemoryType`,
 
    .. code-block:: c
 
-      struct _SUNMemoryHelper_Ops
+      struct SUNMemoryHelper_Ops_
       {
         /* operations that implementations are required to provide */
-        int (*alloc)(SUNMemoryHelper, SUNMemory* memptr size_t mem_size,
+        SUNErrCode (*alloc)(SUNMemoryHelper, SUNMemory* memptr size_t mem_size,
                      SUNMemoryType mem_type, void* queue);
-        int (*dealloc)(SUNMemoryHelper, SUNMemory mem, void* queue);
-        int (*copy)(SUNMemoryHelper, SUNMemory dst, SUNMemory src,
+        SUNErrCode (*dealloc)(SUNMemoryHelper, SUNMemory mem, void* queue);
+        SUNErrCode (*copy)(SUNMemoryHelper, SUNMemory dst, SUNMemory src,
                     size_t mem_size, void* queue);
 
         /* operations that provide default implementations */
-        int             (*copyasync)(SUNMemoryHelper, SUNMemory dst,
-                                     SUNMemory src, size_t mem_size,
-                                     void* queue);
+        SUNErrCode (*copyasync)(SUNMemoryHelper, SUNMemory dst,
+                                SUNMemory src, size_t mem_size, void* queue);
+        SUNErrCode (*getallocstats)(SUNMemoryHelper, SUNMemoryType mem_type, unsigned long* num_allocations,
+                                    unsigned long* num_deallocations, size_t* bytes_allocated,
+                                    size_t* bytes_high_watermark);
         SUNMemoryHelper (*clone)(SUNMemoryHelper);
-        int             (*destroy)(SUNMemoryHelper);
+        SUNErrCode      (*destroy)(SUNMemoryHelper);
       };
 
 
@@ -124,10 +145,10 @@ must define:
 
    **Returns:**
 
-   * An ``int`` flag indicating success (zero) or failure (non-zero).
+   * A new :c:type:`SUNMemory` object.
 
 
-.. c:function:: int SUNMemoryHelper_Dealloc(SUNMemoryHelper helper, \
+.. c:function:: SUNErrCode SUNMemoryHelper_Dealloc(SUNMemoryHelper helper, \
                                             SUNMemory mem, void* queue)
 
    Deallocates the ``mem->ptr`` field if it is owned by ``mem``, and then
@@ -143,10 +164,10 @@ must define:
 
    **Returns:**
 
-   * An ``int`` flag indicating success (zero) or failure (non-zero).
+   * A :c:type:`SUNErrCode` indicating success or failure.
 
 
-.. c:function:: int SUNMemoryHelper_Copy(SUNMemoryHelper helper, \
+.. c:function:: SUNErrCode SUNMemoryHelper_Copy(SUNMemoryHelper helper, \
                                          SUNMemory dst, SUNMemory src, \
                                          size_t mem_size, void* queue)
 
@@ -168,7 +189,7 @@ must define:
 
    **Returns:**
 
-   * An ``int`` flag indicating success (zero) or failure (non-zero).
+   * A :c:type:`SUNErrCode` indicating success or failure.
 
 
 
@@ -180,7 +201,7 @@ Utility Functions
 The SUNMemoryHelper API defines the following functions which do not
 require a SUNMemoryHelper instance:
 
-.. c:function:: SUNMemory SUNMemoryHelper_Alias(SUNMemory mem1)
+.. c:function:: SUNMemory SUNMemoryHelper_Alias(SUNMemoryHelper helper, SUNMemory mem1)
 
    Returns a ``SUNMemory`` object whose ``ptr`` field points to the same address
    as ``mem1``. The new object *will not* have ownership of ``ptr``, therefore,
@@ -188,14 +209,19 @@ require a SUNMemoryHelper instance:
 
    **Arguments:**
 
+   * ``helper`` -- a ``SUNMemoryHelper`` object.
    * ``mem1`` -- a ``SUNMemory`` object.
 
    **Returns:**
 
    * A ``SUNMemory`` object or ``NULL`` if an error occurs.
 
+   .. versionchanged:: 7.0.0
 
-.. c:function:: SUNMemory SUNMemoryHelper_Wrap(void* ptr, \
+      The ``SUNMemoryHelper`` argument was added to the function signature.
+
+
+.. c:function:: SUNMemory SUNMemoryHelper_Wrap(SUNMemoryHelper helper, void* ptr, \
                                                SUNMemoryType mem_type)
 
    Returns a ``SUNMemory`` object whose ``ptr`` field points to the ``ptr``
@@ -205,6 +231,7 @@ require a SUNMemoryHelper instance:
 
    **Arguments:**
 
+   * ``helper`` -- a ``SUNMemoryHelper`` object.
    * ``ptr`` -- the data pointer to wrap in a ``SUNMemory`` object.
    * ``mem_type`` -- the ``SUNMemoryType`` of the ``ptr``.
 
@@ -212,18 +239,30 @@ require a SUNMemoryHelper instance:
 
    * A ``SUNMemory`` object or ``NULL`` if an error occurs.
 
+   .. versionchanged:: 7.0.0
 
-.. c:function:: SUNMemoryHelper SUNMemoryHelper_NewEmpty()
+      The ``SUNMemoryHelper`` argument was added to the function signature.
+
+
+.. c:function:: SUNMemoryHelper SUNMemoryHelper_NewEmpty(SUNContext sunctx)
 
    Returns an empty ``SUNMemoryHelper``. This is useful for building custom
    ``SUNMemoryHelper`` implementations.
+
+   **Arguments:**
+
+   * ``helper`` -- a ``SUNMemoryHelper`` object.
 
    **Returns:**
 
    * A ``SUNMemoryHelper`` object or ``NULL`` if an error occurs.
 
+   .. versionchanged:: 7.0.0
 
-.. c:function:: int SUNMemoryHelper_CopyOps(SUNMemoryHelper src, \
+      The ``SUNMemoryHelper`` argument was added to the function signature.
+
+
+.. c:function:: SUNErrCode SUNMemoryHelper_CopyOps(SUNMemoryHelper src, \
                                             SUNMemoryHelper dst)
 
    Copies the ``ops`` field of ``src`` to the ``ops`` field of ``dst``.
@@ -236,8 +275,27 @@ require a SUNMemoryHelper instance:
 
    **Returns:**
 
-   * An ``int`` flag indicating success (zero) or failure (non-zero).
+   * A :c:type:`SUNErrCode` indicating success or failure.
 
+
+.. c:function:: SUNErrCode SUNMemoryHelper_GetAllocStats(SUNMemoryHelper helper, SUNMemoryType mem_type, unsigned long* num_allocations, \
+                                                  unsigned long* num_deallocations, size_t* bytes_allocated, \
+                                                  size_t* bytes_high_watermark)
+
+   Returns statistics about the allocations performed with the helper.
+
+   **Arguments:**
+
+   * ``helper`` -- the ``SUNMemoryHelper`` object.
+   * ``mem_type`` -- the ``SUNMemoryType`` to get stats for.
+   * ``num_allocations`` --  (output argument) number of allocations done through the helper.
+   * ``num_deallocations`` --  (output argument) number of deallocations done through the helper.
+   * ``bytes_allocated`` --  (output argument) total number of bytes allocated through the helper at the moment this function is called.
+   * ``bytes_high_watermark`` --  (output argument) max number of bytes allocated through the helper at any moment in the lifetime of the helper.
+
+   **Returns:**
+
+   * A :c:type:`SUNErrCode` indicating success or failure.
 
 
 .. _SUNMemory.Description.Overridable:
@@ -249,7 +307,7 @@ In addition, the SUNMemoryHelper API defines the following *optionally
 overridable* operations which an implementation may define:
 
 
-.. c:function:: int SUNMemoryHelper_CopyAsync(SUNMemoryHelper helper, \
+.. c:function:: SUNErrCode SUNMemoryHelper_CopyAsync(SUNMemoryHelper helper, \
                                               SUNMemory dst, SUNMemory src, \
                                               size_t mem_size, void* queue)
 
@@ -300,7 +358,7 @@ overridable* operations which an implementation may define:
       ``helper->ops``, and not the ``helper->content`` field.
 
 
-.. c:function:: int SUNMemoryHelper_Destroy(SUNMemoryHelper helper)
+.. c:function:: SUNErrCode SUNMemoryHelper_Destroy(SUNMemoryHelper helper)
 
    Destroys (frees) the ``SUNMemoryHelper`` object itself.
 
@@ -310,7 +368,7 @@ overridable* operations which an implementation may define:
 
    **Returns:**
 
-   * An ``int`` flag indicating success (zero) or failure (non-zero).
+   * A :c:type:`SUNErrCode` indicating success or failure.
 
    .. note::
 

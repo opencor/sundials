@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -29,8 +29,8 @@ ownership of the data array *data*.
    struct _N_VectorContent_Parallel {
       sunindextype local_length;
       sunindextype global_length;
-      booleantype own_data;
-      realtype *data;
+      sunbooleantype own_data;
+      sunrealtype *data;
       MPI_Comm comm;
    };
 
@@ -173,7 +173,7 @@ the following additional user-callable routines:
    (``NULL``) data array.
 
 
-.. c:function:: N_Vector N_VMake_Parallel(MPI_Comm comm, sunindextype local_length, sunindextype global_length, realtype* v_data, SUNContext sunctx)
+.. c:function:: N_Vector N_VMake_Parallel(MPI_Comm comm, sunindextype local_length, sunindextype global_length, sunrealtype* v_data, SUNContext sunctx)
 
    This function creates and allocates memory for a parallel vector
    with user-provided data array.
@@ -207,76 +207,62 @@ operations enabled/disabled as cloned vectors inherit the same enable/disable
 options as the vector they are cloned from, while vectors created with
 :c:func:`N_VNew_Parallel` will have the default settings for the NVECTOR_PARALLEL module.
 
-.. c:function:: int N_VEnableFusedOps_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableFusedOps_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) all fused and
-   vector array operations in the parallel vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   vector array operations in the parallel vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearCombination_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearCombination_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear
-   combination fused operation in the parallel vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   combination fused operation in the parallel vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleAddMulti_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleAddMulti_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale and
    add a vector to multiple vectors fused operation in the parallel vector. The
-   return value is ``0`` for success and ``-1`` if the input vector or its
-   ``ops`` structure are ``NULL``.
+   return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableDotProdMulti_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableDotProdMulti_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the multiple
-   dot products fused operation in the parallel vector. The return value is ``0``
-   for success and ``-1`` if the input vector or its ``ops`` structure are
-   ``NULL``.
+   dot products fused operation in the parallel vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearSumVectorArray_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearSumVectorArray_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear sum
-   operation for vector arrays in the parallel vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the parallel vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleVectorArray_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleVectorArray_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale
-   operation for vector arrays in the parallel vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the parallel vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableConstVectorArray_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableConstVectorArray_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the const
-   operation for vector arrays in the parallel vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the parallel vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableWrmsNormVectorArray_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableWrmsNormVectorArray_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the WRMS norm
-   operation for vector arrays in the parallel vector. The return value is ``0`` for
-   success and ``-1`` if the input vector or its ``ops`` structure are ``NULL``.
+   operation for vector arrays in the parallel vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableWrmsNormMaskVectorArray_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableWrmsNormMaskVectorArray_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the masked WRMS
-   norm operation for vector arrays in the parallel vector. The return value is
-   ``0`` for success and ``-1`` if the input vector or its ``ops`` structure are
-   ``NULL``.
+   norm operation for vector arrays in the parallel vector. The return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableScaleAddMultiVectorArray_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableScaleAddMultiVectorArray_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the scale and
    add a vector array to multiple vector arrays operation in the parallel vector. The
-   return value is ``0`` for success and ``-1`` if the input vector or its
-   ``ops`` structure are ``NULL``.
+   return value is a :c:type:`SUNErrCode`.
 
-.. c:function:: int N_VEnableLinearCombinationVectorArray_Parallel(N_Vector v, booleantype tf)
+.. c:function:: SUNErrCode N_VEnableLinearCombinationVectorArray_Parallel(N_Vector v, sunbooleantype tf)
 
    This function enables (``SUNTRUE``) or disables (``SUNFALSE``) the linear
-   combination operation for vector arrays in the parallel vector. The return value
-   is ``0`` for success and ``-1`` if the input vector or its ``ops`` structure
-   are ``NULL``.
+   combination operation for vector arrays in the parallel vector. The return value is a :c:type:`SUNErrCode`.
 
 
 **Notes**
@@ -287,13 +273,11 @@ options as the vector they are cloned from, while vectors created with
   ``v_data = NV_DATA_P(v)``, and then access ``v_data[i]`` within the loop
   than it is to use ``NV_Ith_P(v,i)`` within the loop.
 
-* :c:func:`N_VNewEmpty_Parallel`, :c:func:`N_VMake_Parallel`, and
-  :c:func:`N_VCloneVectorArrayEmpty_Parallel()` set the field *own_data* to
-  ``SUNFALSE``. The routines :c:func:`N_VDestroy_Parallel()` and
-  :c:func:`N_VDestroyVectorArray_Parallel()` will not attempt to free the
-  pointer data for any ``N_Vector`` with *own_data* set to
-  ``SUNFALSE``. In such a case, it is the user's responsibility to
-  deallocate the data pointer.
+* :c:func:`N_VNewEmpty_Parallel` and :c:func:`N_VMake_Parallel` set the field
+  *own_data* to ``SUNFALSE``. The routine :c:func:`N_VDestroy_Parallel()` will
+  not attempt to free the pointer data for any ``N_Vector`` with *own_data* set
+  to ``SUNFALSE``. In such a case, it is the user's responsibility to deallocate
+  the data pointer.
 
 * To maximize efficiency, vector operations in the NVECTOR_PARALLEL
   implementation that have more than one ``N_Vector`` argument do not

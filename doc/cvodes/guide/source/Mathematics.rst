@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2022, Lawrence Livermore National Security
+   Copyright (c) 2002-2024, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -216,12 +216,11 @@ matrix update occurs when:
    * a non-fatal convergence failure just occurred, or
    * an error test failure just occurred.
 
-When forced by a convergence failure, an update of :math:`M` or
-:math:`P` may or may not involve a reevaluation of :math:`J` (in
-:math:`M`) or of Jacobian data (in :math:`P`), depending on whether
-Jacobian error was the likely cause of the failure. More generally, the
-decision is made to reevaluate :math:`J` (or instruct the user to
-reevaluate Jacobian data in :math:`P`) when:
+When an update of :math:`M` or :math:`P` occurs, it may or may not involve a
+reevaluation of :math:`J` (in :math:`M`) or of Jacobian data (in :math:`P`),
+depending on whether Jacobian error was the likely cause of the update.
+Reevaluating :math:`J` (or instructing the user to update Jacobian data in
+:math:`P`) occurs when:
 
    * starting the problem,
    * more than 50 steps have been taken since the last evaluation,
@@ -262,8 +261,8 @@ We allow at most 3 iterations (but this limit can be changed by the user). We
 also declare the iteration diverged if any
 :math:`\|\delta_m\| / \|\delta_{m-1}\| > 2` with :math:`m > 1`. If convergence
 fails with :math:`J` or :math:`P` current, we are forced to reduce the step
-size, and we replace :math:`h_n` by :math:`h_n = \eta_{\text{cf}} * h_n` where
-the default is :math:`\eta_{\text{cf}} = 0.25`. The integration is halted
+size, and we replace :math:`h_n` by :math:`h_n = \eta_{\mathrm{cf}} * h_n` where
+the default is :math:`\eta_{\mathrm{cf}} = 0.25`. The integration is halted
 after a preset number of convergence failures; the default value of this
 limit is 10, but this can be changed by the user.
 
@@ -355,8 +354,8 @@ Here 1/6 is a safety factor. A new attempt at the step is made, and the
 error test repeated. If it fails three times, the order :math:`q` is
 reset to 1 (if :math:`q > 1`), or the step is restarted from scratch (if
 :math:`q = 1`). The ratio :math:`\eta = h'/h` is limited above to
-:math:`\eta_{\text{max\_ef}}` (default 0.2) after two error test failures,
-and limited below to :math:`\eta_{\text{min\_ef}}` (default 0.1) after three.
+:math:`\eta_{\mathrm{max\_ef}}` (default 0.2) after two error test failures,
+and limited below to :math:`\eta_{\mathrm{min\_ef}}` (default 0.1) after three.
 After seven failures, CVODES returns to the user with a give-up message.
 
 In addition to adjusting the step size to meet the local error test,
@@ -392,10 +391,10 @@ The new order and step size are then set according to
 .. math:: \eta = \max\{\eta_{q-1},\eta_q,\eta_{q+1}\} \, ,
 
 with :math:`q'` set to the index achieving the above maximum. However, if we
-find that :math:`\eta < \eta_{\text{max\_fx}}` (default 1.5), we do not bother
+find that :math:`\eta < \eta_{\mathrm{max\_fx}}` (default 1.5), we do not bother
 with the change. Also, :math:`\eta` is always limited to
-:math:`\eta_{\text{max\_gs}}` (default 10), except on the first step, when it is
-limited to :math:`\eta_{\text{max\_fs}} = 10^4`.
+:math:`\eta_{\mathrm{max\_gs}}` (default 10), except on the first step, when it is
+limited to :math:`\eta_{\mathrm{max\_fs}} = 10^4`.
 
 The various algorithmic features of CVODES described above, as inherited from
 VODE and VODPK, are documented in :cite:p:`BBH:89,Byr:92,Hin:00`. They are also

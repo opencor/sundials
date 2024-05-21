@@ -2,7 +2,7 @@
 ! Programmer(s): Daniel R. Reynolds @ SMU
 ! ------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2022, Lawrence Livermore National Security
+! Copyright (c) 2002-2024, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -19,6 +19,7 @@
 ! ------------------------------------------------------------------
 module fsunlinsol_test_mod
   use, intrinsic :: iso_c_binding
+  use fsundials_core_mod
   use fsunlinsol_fortran_mod
   use fsunmatrix_fortran_mod
   use fnvector_fortran_mod
@@ -72,7 +73,7 @@ program main
 
   !======= Inclusions ===========
   use, intrinsic :: iso_c_binding
-  use fsundials_context_mod
+  use fsundials_core_mod
   use fsunlinsol_test_mod
 
   !======= Declarations =========
@@ -97,7 +98,7 @@ program main
   fails = 0
 
    ! create SUNDIALS context
-  fails = FSUNContext_Create(c_null_ptr, sunctx)
+  fails = FSUNContext_Create(SUN_COMM_NULL, sunctx)
 
   ! create new matrices and vectors
   sX => FN_VNew_Fortran(Nvar, N, sunctx)
@@ -142,7 +143,7 @@ program main
 
   ! compute B = A*X
   retval = FSUNMatMatvec(sA, sX, sB)
-  if (retval /= SUNMAT_SUCCESS) then
+  if (retval /= SUN_SUCCESS) then
      print *, 'ERROR: FSUNMatMatvec fail'
      stop 1
   end if
@@ -166,7 +167,7 @@ program main
 
   ! test SUNLinSolSetup
   retval = FSUNLinSolSetup(LS, sA)
-  if (retval /= SUNLS_SUCCESS) then
+  if (retval /= SUN_SUCCESS) then
      fails = fails + 1
      print *, '>>> FAILED test -- FSUNLinSolSetup'
   else
@@ -177,7 +178,7 @@ program main
   call FN_VConst(0.d0, sY)
   retval = FSUNLinSolSolve(LS, sA, sY, sB, 1.d-9)
   if ( (check_vector(sX, sY, 1.d-15*Nvar*Nvar, Nvar, N) /= 0) &
-       .or. (retval /= SUNLS_SUCCESS) ) then
+       .or. (retval /= SUN_SUCCESS) ) then
      fails = fails + 1
      print *, '>>> FAILED test -- FSUNLinSolSolve'
   else
