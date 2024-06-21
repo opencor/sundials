@@ -46,19 +46,17 @@ module DiagnonData
   integer :: nprocs        ! total number of MPI processes
 
   ! Problem parameters
-  integer(c_long), parameter :: nlocal = 2
-  integer(c_long)  :: neq
+  integer(c_int64_t), parameter :: nlocal = 2
+  integer(c_int64_t)  :: neq
   real(c_double) :: alpha
 
 contains
-
-
 
   !-----------------------------------------------------------------
   ! ODE RHS function f(t,y).
   !-----------------------------------------------------------------
   integer(c_int) function frhs(t, sunvec_y, sunvec_ydot, user_data) &
-       result(retval) bind(C)
+    result(retval) bind(C)
 
     !======= Inclusions ===========
     use, intrinsic :: iso_c_binding
@@ -70,7 +68,7 @@ contains
     real(c_double), value :: t            ! current time
     type(N_Vector)        :: sunvec_y     ! solution N_Vector
     type(N_Vector)        :: sunvec_ydot  ! rhs N_Vector
-    type(c_ptr),    value :: user_data    ! user-defined data
+    type(c_ptr), value :: user_data    ! user-defined data
 
     ! pointers to data in SUNDIALS vectors
     real(c_double), pointer, dimension(nlocal) :: y(:)
@@ -82,15 +80,15 @@ contains
     !======= Internals ============
 
     ! Get data arrays from SUNDIALS vectors
-    y(1:nlocal)    => FN_VGetArrayPointer(sunvec_y)
+    y(1:nlocal) => FN_VGetArrayPointer(sunvec_y)
     ydot(1:nlocal) => FN_VGetArrayPointer(sunvec_ydot)
 
     ! Initialize ydot to zero
     ydot = 0.d0
 
     ! Fill ydot with rhs function
-    do i = 1,nlocal
-       ydot(i) = -alpha * (myid * nlocal + i) * y(i)
+    do i = 1, nlocal
+      ydot(i) = -alpha*(myid*nlocal + i)*y(i)
     end do
 
     retval = 0              ! Return with success
@@ -98,10 +96,8 @@ contains
   end function frhs
   !-----------------------------------------------------------------
 
-
 end module DiagnonData
 !-------------------------------------------------------------------
-
 
 !-------------------------------------------------------------------
 ! Main driver program
@@ -149,45 +145,45 @@ program driver
   ! initialize MPI
   call MPI_Init(ierr)
   if (ierr /= MPI_SUCCESS) then
-     write(0,*) "Error in MPI_Init = ", ierr
-     stop 1
+    write (0, *) "Error in MPI_Init = ", ierr
+    stop 1
   end if
   call MPI_Comm_size(comm, nprocs, ierr)
   if (ierr /= MPI_SUCCESS) then
-     write(0,*) "Error in MPI_Comm_size = ", ierr
-     call MPI_Abort(comm, 1, ierr)
+    write (0, *) "Error in MPI_Comm_size = ", ierr
+    call MPI_Abort(comm, 1, ierr)
   end if
   call MPI_Comm_rank(comm, myid, ierr)
   if (ierr /= MPI_SUCCESS) then
-     write(0,*) "Error in MPI_Comm_rank = ", ierr
-     call MPI_Abort(comm, 1, ierr)
+    write (0, *) "Error in MPI_Comm_rank = ", ierr
+    call MPI_Abort(comm, 1, ierr)
   end if
 
   ! Set input arguments neq and alpha
-  neq = nprocs * nlocal
-  alpha = 10.0d0 / neq
+  neq = nprocs*nlocal
+  alpha = 10.0d0/neq
 
   ! Create SUNDIALS simulation context, now that comm has been configured
   retval = FSUNContext_Create(comm, sunctx)
   if (retval /= 0) then
-     print *, "Error: FSUNContext_Create returned ",retval
-     call MPI_Abort(comm, 1, ierr)
+    print *, "Error: FSUNContext_Create returned ", retval
+    call MPI_Abort(comm, 1, ierr)
   end if
 
   ! Initial problem output
   outproc = (myid == 0)
   if (outproc) then
-     write(6,*) "  "
-     write(6,*) "Diagonal test problem:";
-     write(6,'(A,i4)') "   neq = " , neq
-     write(6,'(A,i4)') "   nlocal = " , nlocal
-     write(6,'(A,i4)') "   nprocs = " , nprocs
-     write(6,'(A,es9.2)') "   rtol = ", rtol
-     write(6,'(A,es9.2)') "   atol = ", atol
-     write(6,'(A,es9.2)') "   alpha = ", alpha
-     write(6,*) "   ydot_i = -alpha*i * y_i (i = 1,...,neq)"
-     write(6,*) "  "
-  endif
+    write (6, *) "  "
+    write (6, *) "Diagonal test problem:"; 
+    write (6, '(A,i4)') "   neq = ", neq
+    write (6, '(A,i4)') "   nlocal = ", nlocal
+    write (6, '(A,i4)') "   nprocs = ", nprocs
+    write (6, '(A,es9.2)') "   rtol = ", rtol
+    write (6, '(A,es9.2)') "   atol = ", atol
+    write (6, '(A,es9.2)') "   alpha = ", alpha
+    write (6, *) "   ydot_i = -alpha*i * y_i (i = 1,...,neq)"
+    write (6, *) "  "
+  end if
 
   ! Create solution vector, point at its data, and set initial condition
   sunvec_y => FN_VNew_Parallel(comm, nlocal, neq, sunctx)
@@ -197,118 +193,118 @@ program driver
   ! Create the ERKStep timestepper module
   arkode_mem = FERKStepCreate(c_funloc(frhs), t0, sunvec_y, sunctx)
   if (.not. c_associated(arkode_mem)) then
-     print *, "Error: FERKStepCreate returned NULL"
-     call MPI_Abort(comm, 1, ierr)
+    print *, "Error: FERKStepCreate returned NULL"
+    call MPI_Abort(comm, 1, ierr)
   end if
 
   ! Specify tolerances
-  retval = FERKStepSStolerances(arkode_mem, rtol, atol)
+  retval = FARKodeSStolerances(arkode_mem, rtol, atol)
   if (retval /= 0) then
-     print *, "Error: FERKStepSStolerances returned ",retval
-     call MPI_Abort(comm, 1, ierr)
+    print *, "Error: FARKodeSStolerances returned ", retval
+    call MPI_Abort(comm, 1, ierr)
   end if
 
-  ! Main time-stepping loop: calls FERKStepEvolve to perform the
+  ! Main time-stepping loop: calls FARKodeEvolve to perform the
   ! integration, then prints results.  Stops when the final time
   ! has been reached.
   t(1) = T0
   dTout = 0.1d0
-  tout = T0+dTout
+  tout = T0 + dTout
   if (outproc) then
-     write(6,*) "        t      steps     steps att.    fe"
-     write(6,*) "   -----------------------------------------"
+    write (6, *) "        t      steps     steps att.    fe"
+    write (6, *) "   -----------------------------------------"
   end if
-  do ioutput=1,Nt
+  do ioutput = 1, Nt
 
-     ! Integrate to output time
-     retval = FERKStepEvolve(arkode_mem, tout, sunvec_y, t, ARK_NORMAL)
-     if (retval /= 0) then
-        print *, "Error: FERKStepEvolve returned ",retval
-        call MPI_Abort(comm, 1, ierr)
-     end if
+    ! Integrate to output time
+    retval = FARKodeEvolve(arkode_mem, tout, sunvec_y, t, ARK_NORMAL)
+    if (retval /= 0) then
+      print *, "Error: FARKodeEvolve returned ", retval
+      call MPI_Abort(comm, 1, ierr)
+    end if
 
-     retval = FERKStepGetNumSteps(arkode_mem, nst)
-     if (retval /= 0) then
-        print *, "Error: FERKStepGetNumSteps returned ",retval
-        call MPI_Abort(comm, 1, ierr)
-     end if
+    retval = FARKodeGetNumSteps(arkode_mem, nst)
+    if (retval /= 0) then
+      print *, "Error: FARKodeGetNumSteps returned ", retval
+      call MPI_Abort(comm, 1, ierr)
+    end if
 
-     retval = FERKStepGetNumStepAttempts(arkode_mem, nst_a)
-     if (retval /= 0) then
-        print *, "Error: FERKStepGetNumStepAttempts returned ",retval
-        call MPI_Abort(comm, 1, ierr)
-     end if
+    retval = FARKodeGetNumStepAttempts(arkode_mem, nst_a)
+    if (retval /= 0) then
+      print *, "Error: FARKodeGetNumStepAttempts returned ", retval
+      call MPI_Abort(comm, 1, ierr)
+    end if
 
-     retval = FERKStepGetNumRhsEvals(arkode_mem, nfe)
-     if (retval /= 0) then
-        print *, "Error: FERKStepGetNumRhsEvals returned ",retval
-        call MPI_Abort(comm, 1, ierr)
-     end if
+    retval = FERKStepGetNumRhsEvals(arkode_mem, nfe)
+    if (retval /= 0) then
+      print *, "Error: FERKStepGetNumRhsEvals returned ", retval
+      call MPI_Abort(comm, 1, ierr)
+    end if
 
-     ! print solution stats and update internal time
-     if (outproc)   write(6,'(3x,f10.6,3(3x,i5))') t, nst, nst_a, nfe
-     tout = min(tout + dTout, Tf)
+    ! print solution stats and update internal time
+    if (outproc) write (6, '(3x,f10.6,3(3x,i5))') t, nst, nst_a, nfe
+    tout = min(tout + dTout, Tf)
 
   end do
   if (outproc) then
-     write(6,*) "   -----------------------------------------"
+    write (6, *) "   -----------------------------------------"
   end if
 
   ! Get max. absolute error in the local vector.
   errmax = 0.d0
-  do i = 1,nlocal
-     erri = y(i) - exp(-alpha * (myid * nlocal + i) * t(1))
-     errmax = max(errmax, abs(erri))
+  do i = 1, nlocal
+    erri = y(i) - exp(-alpha*(myid*nlocal + i)*t(1))
+    errmax = max(errmax, abs(erri))
   end do
 
   ! Get global max. error from MPI_Reduce call.
   call MPI_Reduce(errmax, gerrmax, 1, MPI_DOUBLE, MPI_MAX, &
-       0, comm, ierr)
+                  0, comm, ierr)
   if (ierr /= MPI_SUCCESS) then
-     print *, "Error in MPI_Reduce = ", ierr
-     call MPI_Abort(comm, 1, ierr)
+    print *, "Error in MPI_Reduce = ", ierr
+    call MPI_Abort(comm, 1, ierr)
   end if
 
   ! Print global max. error
   if (outproc) print '(a,es10.2)', "Max. absolute error is ", gerrmax
 
   ! Get final statistics
-  retval = FERKStepGetNumSteps(arkode_mem, nst)
+  retval = FARKodeGetNumSteps(arkode_mem, nst)
   if (retval /= 0) then
-     print *, "Error: FERKStepGetNumSteps returned ",retval
-     call MPI_Abort(comm, 1, ierr)
+    print *, "Error: FARKodeGetNumSteps returned ", retval
+    call MPI_Abort(comm, 1, ierr)
   end if
 
-  retval = FERKStepGetNumStepAttempts(arkode_mem, nst_a)
+  retval = FARKodeGetNumStepAttempts(arkode_mem, nst_a)
   if (retval /= 0) then
-     print *, "Error: FERKStepGetNumStepAttempts returned ",retval
-     call MPI_Abort(comm, 1, ierr)
+    print *, "Error: FARKodeGetNumStepAttempts returned ", retval
+    call MPI_Abort(comm, 1, ierr)
   end if
 
   retval = FERKStepGetNumRhsEvals(arkode_mem, nfe)
   if (retval /= 0) then
-     print *, "Error: FERKStepGetNumRhsEvals returned ",retval
-     call MPI_Abort(comm, 1, ierr)
+    print *, "Error: FERKStepGetNumRhsEvals returned ", retval
+    call MPI_Abort(comm, 1, ierr)
   end if
 
-  retval = FERKStepGetNumErrTestFails(arkode_mem, netf)
+  retval = FARKodeGetNumErrTestFails(arkode_mem, netf)
   if (retval /= 0) then
-     print *, "Error: FERKStepGetNumErrTestFails returned ",retval
-     call MPI_Abort(comm, 1, ierr)
+    print *, "Error: FARKodeGetNumErrTestFails returned ", retval
+    call MPI_Abort(comm, 1, ierr)
   end if
 
   ! Print some final statistics
   if (outproc) then
-     write(6,*) "  "
-     write(6,*) "Final Solver Statistics:"
-     write(6,'(2(A,i6),A)') "   Internal solver steps = ", nst, &
-          " (attempted = ", nst_a, ")"
-     write(6,'(A,i6)') "   Total RHS evals = ", nfe
-     write(6,'(A,i6)') "   Total number of error test failures = ", netf
-  endif
+    write (6, *) "  "
+    write (6, *) "Final Solver Statistics:"
+    write (6, '(2(A,i6),A)') "   Internal solver steps = ", nst, &
+      " (attempted = ", nst_a, ")"
+    write (6, '(A,i6)') "   Total RHS evals = ", nfe
+    write (6, '(A,i6)') "   Total number of error test failures = ", netf
+  end if
 
   ! Clean up and return with successful completion
-  call FERKStepFree(arkode_mem)       ! free integrator memory
+  call FARKodeFree(arkode_mem)        ! free integrator memory
   call FN_VDestroy(sunvec_y)          ! free vector memory
   call MPI_Barrier(comm, ierr)
   call MPI_Finalize(ierr)             ! Finalize MPI

@@ -150,7 +150,7 @@ macro(sundials_add_library target)
     # --------------------------------------------------------------------------
 
     # create the target for the object library
-    add_library(${obj_target} OBJECT ${sources})
+    add_library(${obj_target} OBJECT ${sources} ${sundials_add_library_UNPARSED_ARGUMENTS})
 
     set_target_properties(${obj_target} PROPERTIES FOLDER "obj")
 
@@ -173,6 +173,19 @@ macro(sundials_add_library target)
       else()
         set(_all_libs ${sundials_add_library_LINK_LIBRARIES})
       endif()
+      # Due to various issues in CMake, particularly https://gitlab.kitware.com/cmake/cmake/-/issues/25365,
+      # we create a fake custom target to enforce a build order. Without this, parallel builds
+      # might fail with an error about a missing '.mod' file when Fortran is enabled (see GitHub #410).
+      set(_stripped_all_libs ${_all_libs})
+      list(FILTER _stripped_all_libs EXCLUDE REGEX "PUBLIC|INTERFACE|PRIVATE")
+      foreach(_item ${_stripped_all_libs})
+        if(NOT TARGET ${_item})
+          list(REMOVE_ITEM _stripped_all_libs ${_item})
+        endif()
+      endforeach()
+      add_custom_target(fake_to_force_build_order_${obj_target})
+      add_dependencies(fake_to_force_build_order_${obj_target} ${_stripped_all_libs})
+      add_dependencies(${obj_target} fake_to_force_build_order_${obj_target})
       target_link_libraries(${obj_target} ${_all_libs})
     endif()
 
@@ -200,7 +213,7 @@ macro(sundials_add_library target)
 
     # add compile definitions to object library for SUNDIALS_EXPORT
     if(${_libtype} MATCHES "STATIC")
-      target_compile_definitions(${obj_target} PRIVATE SUNDIALS_STATIC_DEFINE)
+      target_compile_definitions(${obj_target} PUBLIC SUNDIALS_STATIC_DEFINE)
     else()
       target_compile_definitions(${obj_target} PRIVATE sundials_core_EXPORTS)
     endif()
@@ -239,11 +252,7 @@ macro(sundials_add_library target)
       # set target name
       set(_actual_target_name ${target}${_lib_suffix})
 
-      add_library(${_actual_target_name} ${_libtype} $<TARGET_OBJECTS:${obj_target}>)
-
-      set_target_properties(${_actual_target_name} PROPERTIES FOLDER "src")
-
-      # add any object library dependencies
+      set(_object_sources $<TARGET_OBJECTS:${obj_target}>)
       if(sundials_add_library_OBJECT_LIBRARIES)
         if(${_libtype} MATCHES "STATIC")
           append_static_suffix(sundials_add_library_OBJECT_LIBRARIES _all_objs)
@@ -251,12 +260,13 @@ macro(sundials_add_library target)
           set(_all_objs ${sundials_add_library_OBJECT_LIBRARIES})
         endif()
         foreach(_tmp ${_all_objs})
-          # We use target_sources since target_link_libraries does not work
-          # as expected with CMake 3.12 (see CMake issues 18090 and 18692).
-          # TODO(DJG): Update whenever we require CMake 3.14 or newer
-          target_sources(${_actual_target_name} PRIVATE $<TARGET_OBJECTS:${_tmp}>)
+          list(APPEND _object_sources $<TARGET_OBJECTS:${_tmp}>)
         endforeach()
       endif()
+
+      add_library(${_actual_target_name} ${_libtype} ${_object_sources} ${sundials_add_library_UNPARSED_ARGUMENTS})
+
+      set_target_properties(${_actual_target_name} PROPERTIES FOLDER "src")
 
       # add all link libraries
       if(SUNDIALS_MATH_LIBRARY)
@@ -296,7 +306,7 @@ macro(sundials_add_library target)
 
       # add compile definitions for SUNDIALS_EXPORT
       if(${_libtype} MATCHES "STATIC")
-        target_compile_definitions(${_actual_target_name} PRIVATE SUNDIALS_STATIC_DEFINE)
+        target_compile_definitions(${_actual_target_name} PUBLIC SUNDIALS_STATIC_DEFINE)
       else()
         target_compile_definitions(${obj_target} PRIVATE sundials_core_EXPORTS)
       endif()
@@ -325,10 +335,17 @@ macro(sundials_add_library target)
 
       # set the correct output name
       if(sundials_add_library_OUTPUT_NAME)
-        set_target_properties(${_actual_target_name} PROPERTIES
-          OUTPUT_NAME ${sundials_add_library_OUTPUT_NAME}
-          CLEAN_DIRECT_OUTPUT 1
-        )
+        if((MSVC OR ("${CMAKE_C_SIMULATE_ID}" STREQUAL "MSVC")) AND ${_libtype} MATCHES "STATIC")
+          set_target_properties(${_actual_target_name} PROPERTIES
+            OUTPUT_NAME "${sundials_add_library_OUTPUT_NAME}_static"
+            CLEAN_DIRECT_OUTPUT 1
+          )
+        else()
+          set_target_properties(${_actual_target_name} PROPERTIES
+            OUTPUT_NAME ${sundials_add_library_OUTPUT_NAME}
+            CLEAN_DIRECT_OUTPUT 1
+          )
+        endif()
       else()
         set_target_properties(${_actual_target_name} PROPERTIES
           OUTPUT_NAME ${target}
@@ -355,7 +372,7 @@ macro(sundials_add_library target)
       endif()
 
       # install phase
-      install(TARGETS ${_actual_target_name} DESTINATION ${CMAKE_INSTALL_LIBDIR} EXPORT sundials-targets)
+      install(TARGETS ${_actual_target_name} EXPORT sundials-targets)
 
     endif()
 
@@ -419,38 +436,46 @@ macro(sundials_add_f2003_library target)
   cmake_parse_arguments(sundials_add_f2003_library
     "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-  # set target properties and target dependencies so that includes
-  # and links get passed on when this target is used
   if(CMAKE_Fortran_MODULE_DIRECTORY)
     set(_includes
       PUBLIC
         $<BUILD_INTERFACE:${CMAKE_Fortran_MODULE_DIRECTORY}_{{libtype}}>
         $<INSTALL_INTERFACE:${Fortran_INSTALL_MODDIR}>
     )
-    set(_properties PROPERTIES Fortran_MODULE_DIRECTORY "${CMAKE_Fortran_MODULE_DIRECTORY}_{{libtype}}")
+    set(_properties PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_Fortran_MODULE_DIRECTORY}_{{libtype}}"
+        WINDOWS_EXPORT_ALL_SYMBOLS ON)
   else()
     set(_includes
       PUBLIC
         $<BUILD_INTERFACE:${CMAKE_Fortran_MODULE_DIRECTORY}_{{libtype}}>
         $<INSTALL_INTERFACE:${Fortran_INSTALL_MODDIR}>
     )
-    set(_properties PROPERTIES Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${target}.dir")
+    set(_properties PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${target}.dir"
+        WINDOWS_EXPORT_ALL_SYMBOLS ON)
   endif()
 
   # get the name of the C library which the fortran library interfaces to
   string(REPLACE "sundials_f" "sundials_" _clib_name "${target}")
   string(REPLACE "_mod" "" _clib_name "${_clib_name}")
+  if(TARGET ${_clib_name})
+    set(_clib_target ${_clib_name})
+  else()
+    set(_clib_target )
+  endif()
 
   sundials_add_library(${target}
     SOURCES ${sundials_add_f2003_library_SOURCES}
     OBJECT_LIBRARIES ${sundials_add_f2003_library_OBJECT_LIBRARIES}
     LINK_LIBRARIES
+      PUBLIC ${_clib_target} # depend on the c library
       ${sundials_add_f2003_library_LINK_LIBRARIES}
-      PUBLIC ${_clib_name} # depend on the c library
     INCLUDE_DIRECTORIES
       ${sundials_add_f2003_library_INCLUDE_DIRECTORIES}
       ${_includes}
     COMPILE_DEFINITIONS ${sundials_add_f2003_library_COMPILE_DEFINITIONS}
+                        PUBLIC "SUNDIALS_INT${SUNDIALS_INDEX_SIZE}_T"
     COMPILE_OPTIONS ${sundials_add_f2003_library_COMPILE_OPTIONS}
     PROPERTIES ${sundials_add_f2003_library_PROPERTIES} ${_properties}
     OUTPUT_NAME ${sundials_add_f2003_library_OUTPUT_NAME}
@@ -458,7 +483,6 @@ macro(sundials_add_f2003_library target)
     SOVERSION ${sundials_add_f2003_library_SOVERSION}
     ${sundials_add_f2003_library_UNPARSED_ARGUMENTS}
   )
-
 endmacro()
 
 

@@ -16,13 +16,10 @@
 
 # Example lists are tuples "name\;args\;type" where the type is
 # 'develop' for examples excluded from 'make test' in releases
-
-# Examples using SUNDIALS linear solvers
 set(FCVODES_examples
   "cvs_analytic_fp_f2003\;\;develop"
   "cvsAdvDiff_FSA_non_f2003\;-sensi stg t\;develop"
-  "cvsAdvDiff_FSA_non_f2003\;-sensi sim t\;develop"
-  )
+  "cvsAdvDiff_FSA_non_f2003\;-sensi sim t\;develop")
 
 # Specify libraries to link against
 set(CVODES_LIB sundials_fcvodes_mod)
@@ -40,6 +37,9 @@ foreach(example_tuple ${FCVODES_examples})
   # check if this example has already been added, only need to add
   # example source files once for testing with different inputs
   if(NOT TARGET ${example})
+    # Install fortran modules to a unique directory to avoid naming collisions
+    set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${example}.dir)
+
     # example source files
     add_executable(${example} ${example}.f90)
 

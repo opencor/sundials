@@ -17,9 +17,9 @@
 # We need this to ensure the installed templates have MPI when ENABLE_MPI=TRUE,
 # at least until we convert all of the templates to use the SUNDIALS CMake target.
 
-# ===============================================================
+# ===================================================================
 # Configure compilers for installed examples
-# ===============================================================
+# ===================================================================
 
 foreach(lang ${_SUNDIALS_ENABLED_LANGS})
   if(ENABLE_MPI)
@@ -31,7 +31,19 @@ foreach(lang ${_SUNDIALS_ENABLED_LANGS})
   endif()
 endforeach()
 
+# Disable some warnings for examples
+if(ENABLE_ALL_WARNINGS)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+endif()
+
+# Initialize CMAKE_Fortran_MODULE_DIRECTORY for examples
+set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
+# ===================================================================
 # Set variables used in generating CMake and Makefiles for examples
+# ===================================================================
+
 if(EXAMPLES_INSTALL)
 
   set(SHELL "sh")
@@ -89,9 +101,9 @@ if(EXAMPLES_INSTALL)
 
 endif()
 
-#----------------------------------------
+# ===================================================================
 # Add specific examples
-#----------------------------------------
+# ===================================================================
 
 # Add ARKode examples
 if(BUILD_ARKODE)
