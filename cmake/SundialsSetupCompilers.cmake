@@ -76,8 +76,38 @@ endif()
 if(ENABLE_ALL_WARNINGS)
   message(STATUS "Enabling all compiler warnings")
 
-  set(CMAKE_C_FLAGS "-Wall -Wpedantic -Wextra -Wno-unused-parameter -Wno-deprecated-declarations -Wno-unused-function ${CMAKE_C_FLAGS}")
-  set(CMAKE_CXX_FLAGS "-Wall -Wpedantic -Wextra -Wno-unused-parameter -Wno-deprecated-declarations -Wno-unused-function ${CMAKE_CXX_FLAGS}")
+  # Avoid numerous warnings from printf
+  if(SUNDIALS_PRECISION MATCHES "EXTENDED")
+    set(CMAKE_C_FLAGS "-Wdouble-promotion ${CMAKE_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "-Wdouble-promotion ${CMAKE_CXX_FLAGS}")
+  endif()
+
+  if((SUNDIALS_PRECISION MATCHES "DOUBLE") AND (SUNDIALS_INDEX_SIZE MATCHES "32"))
+    set(CMAKE_C_FLAGS "-Wconversion -Wno-sign-conversion ${CMAKE_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "-Wconversion -Wno-sign-conversion ${CMAKE_CXX_FLAGS}")
+  endif()
+
+  # Avoid numerous warnings from SWIG generated functions
+  if(NOT BUILD_FORTRAN_MODULE_INTERFACE)
+    set(CMAKE_C_FLAGS "-Wmissing-declarations -Wcast-qual ${CMAKE_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "-Wmissing-declarations -Wcast-qual ${CMAKE_CXX_FLAGS}")
+  endif()
+
+  set(CMAKE_C_FLAGS "-Wall -Wpedantic -Wextra -Wshadow ${CMAKE_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "-Wall -Wpedantic -Wextra -Wshadow ${CMAKE_CXX_FLAGS}")
+
+  # TODO(DJG): Add -fcheck=all,no-pointer,no-recursion once Jenkins is updated
+  # to use gfortran > 5.5 which segfaults with -fcheck=array-temps,bounds,do,mem
+  # no- options were added in gfortran 6
+  #
+  # Exclude run-time pointer checks (no-pointer) because passing null objects
+  # to SUNDIALS functions (e.g., sunmat => null() to SetLinearSolver) causes a
+  # run-time error with this check
+  #
+  # Exclude checks for subroutines and functions not marked as recursive
+  # (no-recursion) e.g., ark_brusselator1D_task_local_nls_f2003 calls
+  # SUNNonlinsolFree from within a custom nonlinear solver implementation of
+  # SUNNonlinsolFree which causes a run-time error with this check
   set(CMAKE_Fortran_FLAGS "-Wall -Wpedantic -Wno-unused-dummy-argument -Wno-c-binding-type -ffpe-summary=none ${CMAKE_Fortran_FLAGS}")
 endif()
 
@@ -187,6 +217,17 @@ if(NOT (SUNDIALS_C_COMPILER_HAS_ATTRIBUTE_ASSUME OR SUNDIALS_C_COMPILER_HAS_BUIL
     }
   " SUNDIALS_C_COMPILER_HAS_ASSUME)
 endif()
+
+# ---------------------------------------------------------------
+# Check for unused extension
+# ---------------------------------------------------------------
+
+check_c_source_compiles("
+  int main(void) {
+    __attribute__((unused)) double a = 0.0;
+    return 0;
+  }
+" SUNDIALS_C_COMPILER_HAS_ATTRIBUTE_UNUSED)
 
 # ---------------------------------------------------------------
 # Check for POSIX timers

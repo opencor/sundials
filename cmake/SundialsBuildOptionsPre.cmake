@@ -119,7 +119,7 @@ sundials_option(BUILD_SHARED_LIBS BOOL "Build shared libraries" ON)
 
 # Make sure we build at least one type of libraries
 if(NOT BUILD_STATIC_LIBS AND NOT BUILD_SHARED_LIBS)
-  print_error("Both static and shared library generation were disabled.")
+  message(FATAL_ERROR "Both static and shared library generation were disabled.")
 endif()
 
 # ---------------------------------------------------------------
@@ -183,11 +183,6 @@ if(BUILD_FORTRAN_MODULE_INTERFACE)
   # F2003 interface only supports double precision
   if(NOT (SUNDIALS_PRECISION MATCHES "DOUBLE"))
     print_error("F2003 interface is not compatible with ${SUNDIALS_PRECISION} precision")
-  endif()
-
-  # F2003 interface only supports 64-bit indices
-  if(NOT (SUNDIALS_INDEX_SIZE MATCHES "64"))
-    print_error("F2003 interface is not compatible with ${SUNDIALS_INDEX_SIZE}-bit indicies")
   endif()
 
   # Allow a user to set where the Fortran modules will be installed
@@ -270,6 +265,16 @@ if(SUNDIALS_DEBUG_PRINTVEC AND SUNDIALS_LOGGING_LEVEL LESS 5)
   set(DOCSTR "SUNDIALS_DEBUG_PRINTVEC=ON forced the logging level to 5")
   message(STATUS "${DOCSTR}")
   set(SUNDIALS_LOGGING_LEVEL "5" CACHE STRING "${DOCSTR}" FORCE)
+endif()
+
+# ---------------------------------------------------------------
+# Options for SUNDIALS external
+# ---------------------------------------------------------------
+
+sundials_option(SUNDIALS_ENABLE_EXTERNAL_ADDONS BOOL
+  "Enables including EXTERNALLY MAINTAINED addons in the SUNDIALS build." OFF)
+if(SUNDIALS_ENABLE_EXTERNAL_ADDONS)
+  message(WARNING "SUNDIALS_ENABLE_EXTERNAL_ADDONS=TRUE. External addons are not maintained by the SUNDIALS team. Use at your own risk.")
 endif()
 
 # ---------------------------------------------------------------

@@ -23,26 +23,26 @@ module test_nvector_parallel
   implicit none
   include "mpif.h"
 
-  integer(c_long), parameter :: local_length = 100    ! vector local length
-  integer(c_int),  parameter :: nv = 3                ! length of vector arrays
-  integer(c_int),  parameter :: ns = 2                ! number of vector arrays
+  integer(kind=myindextype), parameter :: local_length = 100    ! vector local length
+  integer(c_int), parameter :: nv = 3      ! length of vector arrays
+  integer(c_int), parameter :: ns = 2      ! number of vector arrays
 
-  integer(c_int), target  :: comm = MPI_COMM_WORLD ! default MPI communicator
-  integer(c_long)         :: global_length ! vector global_length
-  integer(c_int)          :: nprocs        ! number of MPI processes
-  contains
+  integer(c_int), target :: comm = MPI_COMM_WORLD ! default MPI communicator
+  integer(kind=myindextype) :: global_length      ! vector global_length
+  integer(c_int) :: nprocs                        ! number of MPI processes
+contains
 
   integer function smoke_tests() result(ret)
     implicit none
 
-    integer(c_long)         :: lenrw(1), leniw(1)  ! real and int work space size
-    integer(c_long)         :: ival                ! integer work value
-    real(c_double)          :: rval                ! real work value
-    real(c_double)          :: xdata(local_length) ! vector data array
-    real(c_double), pointer :: xptr(:)             ! pointer to vector data array
-    real(c_double)          :: nvarr(nv)           ! array of nv constants to go with vector array
-    type(N_Vector), pointer :: x, y, z, tmp        ! N_Vectors
-    type(c_ptr)             :: xvecs, zvecs        ! C pointer to array of C pointers to N_Vectors
+    integer(kind=myindextype) :: lenrw(1), leniw(1)  ! real and int work space size
+    integer(c_long)           :: ival                ! integer work value
+    real(c_double)            :: rval                ! real work value
+    real(c_double)            :: xdata(local_length) ! vector data array
+    real(c_double), pointer   :: xptr(:)             ! pointer to vector data array
+    real(c_double)            :: nvarr(nv)           ! array of nv constants to go with vector array
+    type(N_Vector), pointer   :: x, y, z, tmp        ! N_Vectors
+    type(c_ptr)               :: xvecs, zvecs        ! C pointer to array of C pointers to N_Vectors
 
     !===== Setup ====
     x => FN_VMake_Parallel(comm, local_length, global_length, xdata, sunctx)
@@ -54,7 +54,7 @@ module test_nvector_parallel
 
     xvecs = FN_VCloneVectorArray(nv, x)
     zvecs = FN_VCloneVectorArray(nv, z)
-    nvarr = (/ ONE, ONE, ONE /)
+    nvarr = (/ONE, ONE, ONE/)
 
     !===== Test =====
 
@@ -98,16 +98,16 @@ module test_nvector_parallel
     rval = FN_VMinQuotient_Parallel(x, y)
 
     ! test fused vector operations
-    ival = FN_VLinearCombination_Parallel(nv, nvarr, xvecs, x)
-    ival = FN_VScaleAddMulti_Parallel(nv, nvarr, x, xvecs, zvecs)
-    ival = FN_VDotProdMulti_Parallel(nv, x, xvecs, nvarr)
+    ival = FN_VLinearCombination_Parallel(int(nv, 4), nvarr, xvecs, x)
+    ival = FN_VScaleAddMulti_Parallel(int(nv, 4), nvarr, x, xvecs, zvecs)
+    ival = FN_VDotProdMulti_Parallel(int(nv, 4), x, xvecs, nvarr)
 
     ! test vector array operations
-    ival = FN_VLinearSumVectorArray_Parallel(nv, ONE, xvecs, ONE, xvecs, zvecs)
-    ival = FN_VScaleVectorArray_Parallel(nv, nvarr, xvecs, zvecs)
-    ival = FN_VConstVectorArray_Parallel(nv, ONE, xvecs)
-    ival = FN_VWrmsNormVectorArray_Parallel(nv, xvecs, xvecs, nvarr)
-    ival = FN_VWrmsNormMaskVectorArray_Parallel(nv, xvecs, xvecs, x, nvarr)
+    ival = FN_VLinearSumVectorArray_Parallel(int(nv, 4), ONE, xvecs, ONE, xvecs, zvecs)
+    ival = FN_VScaleVectorArray_Parallel(int(nv, 4), nvarr, xvecs, zvecs)
+    ival = FN_VConstVectorArray_Parallel(int(nv, 4), ONE, xvecs)
+    ival = FN_VWrmsNormVectorArray_Parallel(int(nv, 4), xvecs, xvecs, nvarr)
+    ival = FN_VWrmsNormMaskVectorArray_Parallel(int(nv, 4), xvecs, xvecs, x, nvarr)
 
     !==== Cleanup =====
     call FN_VDestroy_Parallel(x)
@@ -136,7 +136,7 @@ module test_nvector_parallel
     if (fails /= 0) then
       print *, '   FAILURE - MPI_COMM_RANK returned nonzero'
       stop 1
-    endif
+    end if
 
     x => FN_VMake_Parallel(comm, local_length, global_length, xdata, sunctx)
     call FN_VConst(ONE, x)
@@ -153,17 +153,16 @@ module test_nvector_parallel
 
 end module
 
-
 integer(C_INT) function check_ans(ans, X, local_length) result(failure)
   use, intrinsic :: iso_c_binding
 
   use test_utilities
   implicit none
 
-  real(C_DOUBLE)          :: ans
-  type(N_Vector)          :: X
-  integer(C_LONG)         :: local_length, i
-  real(C_DOUBLE), pointer :: Xdata(:)
+  real(C_DOUBLE)            :: ans
+  type(N_Vector)            :: X
+  integer(kind=myindextype) :: local_length, i
+  real(C_DOUBLE), pointer   :: Xdata(:)
 
   failure = 0
 
@@ -174,7 +173,6 @@ integer(C_INT) function check_ans(ans, X, local_length) result(failure)
     end if
   end do
 end function check_ans
-
 
 logical function has_data(X) result(failure)
   use, intrinsic :: iso_c_binding
@@ -188,7 +186,6 @@ logical function has_data(X) result(failure)
   xptr => FN_VGetArrayPointer(x)
   failure = associated(xptr)
 end function has_data
-
 
 program main
   !======== Inclusions ==========
@@ -205,13 +202,13 @@ program main
   if (fails /= 0) then
     print *, 'FAILURE: MPI_INIT returned nonzero'
     stop 1
-  endif
+  end if
 
   call MPI_Comm_rank(comm, myid, fails)
   if (fails /= 0) then
     print *, 'FAILURE: MPI_COMM_RANK returned nonzero, proc', myid
     stop 1
-  endif
+  end if
 
   !============== Introduction =============
   if (myid == 0) print *, 'Parallel N_Vector Fortran 2003 interface test'
@@ -222,7 +219,7 @@ program main
   if (fails /= 0) then
     print *, 'FAILURE: MPI_COMM_SIZE returned nonzero, proc', myid
     stop 1
-  endif
+  end if
   global_length = nprocs*local_length
 
   fails = smoke_tests()
@@ -237,14 +234,14 @@ program main
   if (fails /= 0) then
     print *, 'FAILURE: MPI_BARRIER returned nonzero, proc', myid
     stop 1
-  endif
+  end if
 
   fails = unit_tests()
   if (fails /= 0) then
     print *, 'FAILURE: n unit tests failed, proc', myid
     stop 1
   else
-    if (myid == 0) print *,'    SUCCESS - all unit tests passed'
+    if (myid == 0) print *, '    SUCCESS - all unit tests passed'
   end if
 
   call Test_Finalize()
@@ -253,6 +250,6 @@ program main
   if (fails /= 0) then
     print *, 'FAILURE: MPI_FINALIZE returned nonzero, proc ', myid
     stop 1
-  endif
+  end if
 
 end program main
