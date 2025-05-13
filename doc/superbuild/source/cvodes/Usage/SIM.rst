@@ -1,6 +1,6 @@
 .. ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2024, Lawrence Livermore National Security
+   Copyright (c) 2002-2025, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -443,7 +443,7 @@ makes no sense (and is overly costly) after ``y[i]`` is below some noise level. 
 ``abstol`` (if scalar) or ``abstol[i]`` (if a vector) needs to be set to that noise level. If the different
 components have different noise levels, then ``abstol`` should be a vector. See the example  ``cvsRoberts_dns``
 in the CVODES package, and the discussion of it in the CVODES Examples document
-:cite:p:`cvodes_ex`. In that problem, the three components vary betwen 0 and 1,
+:cite:p:`cvodes_ex`. In that problem, the three components vary between 0 and 1,
 and have different noise levels; hence the ``abstol`` vector. It is impossible to give any
 general advice on ``abstol`` values, because the appropriate noise levels are completely
 problem-dependent. The user or modeler hopefully has some idea as to what those
@@ -772,7 +772,7 @@ rootfinding.
 
       In the ``CV_ONE_STEP`` mode, ``tout`` is used only on the first call,  and only to get the direction and a rough scale of the independent variable.
 
-      If a stop time is enabled (through a call to ``CVodeSetStopTime``), then  ``CVode`` returns the solution at ``tstop``. Once the integrator returns  at a stop time, any future testing for ``tstop`` is disabled (and can be  reenabled only though a new call to ``CVodeSetStopTime``).
+      If a stop time is enabled (through a call to ``CVodeSetStopTime``), then  ``CVode`` returns the solution at ``tstop``. Once the integrator returns  at a stop time, any future testing for ``tstop`` is disabled (and can be  re-enabled only though a new call to ``CVodeSetStopTime``).
 
       All failure return values are negative and so the test ``flag < 0``  will trap all ``CVode`` failures.
 
@@ -914,7 +914,7 @@ Main solver optional input functions
 
    **Arguments:**
      * ``cvode_mem`` -- pointer to the CVODES memory block.
-     * ``nst`` -- number of successful steps inbetween calls to the monitor function 0 by default;    a 0 input will turn off monitoring.
+     * ``nst`` -- number of successful steps in between calls to the monitor function 0 by default;    a 0 input will turn off monitoring.
 
    **Return value:**
      * ``CV_SUCCESS`` -- The optional value has been successfully set.
@@ -1056,7 +1056,7 @@ Main solver optional input functions
    **Notes:**
       The default, if this routine is not called, is that no stop time is imposed.
 
-      Once the integrator returns at a stop time, any future testing for ``tstop``  is disabled (and can be reenabled only though a new call to ``CVodeSetStopTime``).
+      Once the integrator returns at a stop time, any future testing for ``tstop``  is disabled (and can be re-enabled only though a new call to ``CVodeSetStopTime``).
 
       A stop time not reached before a call to :c:func:`CVodeReInit` will
       remain active but can be disabled by calling :c:func:`CVodeClearStopTime`.
@@ -1089,7 +1089,7 @@ Main solver optional input functions
       * ``CV_MEM_NULL`` if the CVODES memory is ``NULL``
 
    **Notes:**
-      The stop time can be reenabled though a new call to
+      The stop time can be re-enabled though a new call to
       :c:func:`CVodeSetStopTime`.
 
    .. versionadded:: 6.5.1
@@ -2399,6 +2399,10 @@ described next.
       integration is enabled. See :numref:`CVODES.Usage.purequad.quad_malloc` and :numref:`CVODES.Usage.FSA.user_callable.sensi_malloc`
       for more details.
 
+   .. deprecated:: 7.3.0
+
+      Work space functions will be removed in version 8.0.0.
+
 
 .. c:function:: int CVodeGetNumSteps(void* cvode_mem, long int *nsteps)
 
@@ -2627,7 +2631,7 @@ described next.
 
       The values returned in ``ele`` are valid only if :c:func:`CVode` returned  a non-negative value.
 
-      The ``ele`` vector, togther with the ``eweight`` vector from :c:func:`CVodeGetErrWeights`, can be used to determine how the various  components of the system contributed to the estimated local error  test.  Specifically, that error test uses the RMS norm of a vector  whose components are the products of the components of these two vectors.  Thus, for example, if there were recent error test failures, the components  causing the failures are those with largest values for the products,  denoted loosely as ``eweight[i]*ele[i]``.
+      The ``ele`` vector, together with the ``eweight`` vector from :c:func:`CVodeGetErrWeights`, can be used to determine how the various  components of the system contributed to the estimated local error  test.  Specifically, that error test uses the RMS norm of a vector  whose components are the products of the components of these two vectors.  Thus, for example, if there were recent error test failures, the components  causing the failures are those with largest values for the products,  denoted loosely as ``eweight[i]*ele[i]``.
 
 
 
@@ -2736,9 +2740,9 @@ described next.
 
    .. note::
 
-      The file ``scripts/sundials_csv.py`` provides python utility functions to
-      read and output the data from a SUNDIALS CSV output file using the key
-      and value pair format.
+      The Python module ``tools/suntools`` provides utilities to read and output
+      the data from a SUNDIALS CSV output file using the key and value pair
+      format.
 
    .. versionadded:: 6.2.0
 
@@ -2915,6 +2919,10 @@ solver, a suffix (for Linear Solver) has been added (e.g. ``lenrwLS``).
    .. versionadded:: 4.0.0
 
       Replaces the deprecated functions ``CVDlsGetWorkspace`` and  ``CVSpilsGetWorkspace``.
+
+   .. deprecated:: 7.3.0
+
+      Work space functions will be removed in version 8.0.0.
 
 
 .. c:function:: int CVodeGetNumJacEvals(void* cvode_mem, long int *njevals)
@@ -3136,12 +3144,16 @@ solver, a suffix (for Linear Solver) has been added here (e.g. ``lenrwLS``).
      * ``leniwLS`` -- the number of integer values in the CVDIAG workspace.
 
    **Return value:**
-     * ``CVDIAG_SUCCESS`` -- The optional output valus have been successfully set.
+     * ``CVDIAG_SUCCESS`` -- The optional output values have been successfully set.
      * ``CVDIAG_MEM_NULL`` -- The ``cvode_mem`` pointer is ``NULL``.
      * ``CVDIAG_LMEM_NULL`` -- The CVDIAG linear solver has not been initialized.
 
    **Notes:**
       In terms of the problem size :math:`N`, the actual size of the real workspace  is roughly :math:`3 N` ``sunrealtype`` words.
+
+   .. deprecated:: 7.3.0
+
+      Work space functions will be removed in version 8.0.0.
 
 
 .. c:function:: int CVDiagGetNumRhsEvals(void* cvode_mem, long int *nfevalsLS)
@@ -3223,7 +3235,7 @@ known, simply make that location a value of tout. To stop when the
 location of the discontinuity is determined by the solution, use the
 rootfinding feature. In either case, it is critical that the RHS
 function *not* incorporate the discontinuity, but rather have a smooth
-extention over the discontinuity, so that the step across it (and
+extension over the discontinuity, so that the step across it (and
 subsequent rootfinding, if used) can be done efficiently. Then use a
 switch within the RHS function (communicated through ``user_data``) that can be
 flipped between the stopping of the integration and the restart, so that
@@ -3252,6 +3264,99 @@ vector.
       the appropriate "Set" functions.
 
       If an error occurred, ``CVodeReInit`` also sends an error message to the  error handler function.
+
+
+CVODES resize function
+~~~~~~~~~~~~~~~~~~~~~~
+
+For simulations involving changes to the number of equations and unknowns in the
+ODE system, CVODES may be "resized" between steps by calling
+:c:func:`CVodeResizeHistory`. The methods implemented in CVODES utilize solution
+or right-hand side history information to achieve high order. At present, the
+user code is responsible for saving the necessary data over the course of the
+integration in order to resize the integrator. As such, CVODES should typically
+be run in one step mode or built with monitoring enabled and the monitoring
+function used to save the state at the end of each time step. The amount and
+kind of history required for resizing the integrator depends on the method
+selected and the maximum order allowed (see details below). If insufficient
+history is provided when resizing, :c:func:`CVodeResizeHistory` will return an
+error.
+
+.. c:function:: int CVodeResizeHistory(void* cvode_mem, sunrealtype* t_hist, N_Vector* y_hist, N_Vector* f_hist, int num_y_hist, int num_f_hist)
+
+   The function :c:func:`CVodeResizeHistory` resizes CVODES using the provided
+   history data at the new problem size.
+
+   For Adams methods the required history data is
+
+   * Solution vectors: :math:`y(t_n)` and :math:`y(t_{n-1})`
+   * Right-hand side vectors: :math:`f(t_n,y(t_n)), f(t_{n-1},y(t_{n-1})), \ldots, f(t_{n-k}, y(t_{n-k}))`
+
+   For BDF methods the required history data is:
+
+   * Solution vectors: :math:`y(t_n), y(t_{n-1}), \ldots, y(t_{n-k})`
+   * Right-hand side vectors: :math:`f(t_n, y(t_n))` and :math:`f(t_{n-1}, y(t_{n-1}))`,
+
+   In both cases, :math:`k=\min\{q+1,q_{\textrm{max}}\}` where :math:`q` is the
+   order of the last step (see :c:func:`CVodeGetLastOrder`) and
+   :math:`q_{\textrm{max}}` is the maximum allowed order (see
+   :c:func:`CVodeSetMaxOrd`). The additional solution/right-hand side values
+   beyond what is strictly needed for the method are used to determine if an
+   order increase should occur after the next step. If insufficient history is
+   provided, an error is returned.
+
+   :param cvode_mem: pointer to the CVODES memory block.
+   :param t_hist: an array of time values for the solution and right-hand side
+                  history. These must be ordered starting from the most recent
+                  value i.e., :math:`t_n > t_{n-1} > \ldots > t_{n-k}` for
+                  forward integration or :math:`t_n < t_{n-1} < \ldots <
+                  t_{n-k}` for backward integration.
+   :param y_hist: an array of solution vectors ordered to align with the
+                  corresponding times given in ``t_hist``.
+   :param f_hist: an array of right-hand side vectors ordered to align with the
+                  corresponding times and solutions given in ``t_hist`` and
+                  ``y_hist``, respectively.
+   :param n_y_hist: number of solution vectors provided in
+                    ``y_hist``. For Adams methods this should be 2 and for BDF
+                    methods this should be :math:`\min\{q+1,q_{\textrm{max}}\}`.
+   :param n_f_hist: number of right-hand side vectors provided in
+                    ``f_hist``. For Adams methods this should be
+                    :math:`\min\{q+1,q_{\textrm{max}}\}` and for BDF methods it
+                    should be 2.
+
+   :retval CV_SUCCESS: The call was successful.
+   :retval CV_MEM_NULL: The CVODES memory block was ``NULL``.
+   :retval CV_ILL_INPUT: An input argument had an illegal value or insufficient
+                         history was supplied, see the output error message for
+                         additional details.
+
+   .. versionadded:: 7.3.0
+
+   .. note::
+
+      At this time resizing is supported when using CVODES for the solution of
+      initial value problems (IVPs) and is not currently compatible with forward
+      or adjoint sensitivity analysis.
+
+   .. note::
+
+      Any nonlinear or linear solvers attached to CVODE will also need to be
+      resized. At present, for SUNDIALS-provided algebraic solvers, this
+      requires destroying, re-creating, and re-attaching the solvers
+      following each call to :c:func:`CVodeResizeHistory`. Similarly, any matrix
+      objects provided when attaching the linear solver will also need to be
+      resized.
+
+      If using a vector of absolute tolerances, the absolute tolerance vector
+      will be invalid after the call to :c:func:`CVodeResizeHistory`, so a new
+      absolute tolerance vector should be created and set following each call to
+      :c:func:`CVodeResizeHistory` through a new call to
+      :c:func:`CVodeSVtolerances`.
+
+      If inequality constraint checking is enabled, a call to
+      :c:func:`CVodeResizeHistory` will disable constraint checking. A call to
+      :c:func:`CVodeSetConstraints` is required to re-enable constraint
+      checking.
 
 
 .. _CVODES.Usage.SIM.user_supplied:
@@ -3382,7 +3487,7 @@ These weights will be used in place of those defined by Eq.
 
    .. warning::
 
-      The error weight vector must have all components positive. It is the user's responsiblity to perform this test and return -1 if it is not satisfied.
+      The error weight vector must have all components positive. It is the user's responsibility to perform this test and return -1 if it is not satisfied.
 
 
 .. _CVODES.Usage.SIM.user_supplied.rootFn:
@@ -3405,7 +3510,7 @@ follows:
       * ``user_data`` a pointer to user data, the same as the ``user_data`` parameter passed to :c:func:`CVodeSetUserData`.
 
    **Return value:**
-      A ``CVRootFn`` should return 0 if successful or a non-zero value if an error occured (in which case the integration is haled and ``CVode`` returns ``CV_RTFUNC_FAIL``.
+      A ``CVRootFn`` should return 0 if successful or a non-zero value if an error occurred (in which case the integration is haled and ``CVode`` returns ``CV_RTFUNC_FAIL``.
 
    **Notes:**
       Allocation of memory for ``gout`` is automatically handled within CVODES.
@@ -3428,7 +3533,7 @@ user-defined projection operation the projection function must have type
       * ``t`` -- the current value of the independent variable.
       * ``ycur`` -- the current value of the dependent variable vector :math:`y(t)`.
       * ``corr`` -- the correction, :math:`c`, to the dependent variable vector so that :math:`y(t) + c` satisfies the constraint equation.
-      * ``epsProj`` -- the tolerance to use in the nonlinear solver stopping test when solving the nonlinear constrainted least squares problem.
+      * ``epsProj`` -- the tolerance to use in the nonlinear solver stopping test when solving the nonlinear constrained least squares problem.
       * ``err`` -- is on input the current error estimate, if error projection is enabled (the default) then this should be overwritten with the projected error on output. If error projection is disabled then ``err`` is ``NULL``.
       * ``user_data`` a pointer to user data, the same as the ``user_data`` parameter passed to :c:func:`CVodeSetUserData`.
 
@@ -3855,7 +3960,7 @@ are in bold.
 #. **Set optional inputs for quadrature integration**
 
    Call :c:func:`CVodeSetQuadErrCon` to indicate whether or not quadrature
-   variables shoule be used in the step size control mechanism, and to specify
+   variables should be used in the step size control mechanism, and to specify
    the integration tolerances for quadrature variables. See
    :numref:`CVODES.Usage.purequad.optional_inputs` for details.
 
@@ -4357,6 +4462,10 @@ the CVBANDPRE module:
 
       The workspaces referred to here exist in addition to those given by the  corresponding function :c:func:`CVodeGetLinWorkSpace`.
 
+   .. deprecated:: 7.3.0
+
+      Work space functions will be removed in version 8.0.0.
+
 
 .. c:function:: int CVBandPrecGetNumRhsEvals(void* cvode_mem, long int *nfevalsBP)
 
@@ -4699,6 +4808,10 @@ the CVBBDPRE module:
 
    **Notes:**
       The workspace requirements reported by this routine correspond only  to memory allocated within the CVBBDPRE module (the banded  matrix approximation, banded ``SUNLinearSolver`` object, temporary vectors).  These values are local to each process.  The workspaces referred to here exist in addition to those given by the  corresponding function ``CVodeGetLinWorkSpace``.
+
+   .. deprecated:: 7.3.0
+
+      Work space functions will be removed in version 8.0.0.
 
 .. c:function:: int CVBBDPrecGetNumGfnEvals(void* cvode_mem, long int *ngevalsBBDP)
 

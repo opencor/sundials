@@ -3,7 +3,7 @@
  *                Daniel R. Reynolds @ SMU
  * -----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2024, Lawrence Livermore National Security
+ * Copyright (c) 2002-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -59,11 +59,10 @@
 #include "sunlinsol/sunlinsol_spgmr.h" // access to SPGMR SUNLinearSolver
 
 // Macros for problem constants
-#define PI    SUN_RCONST(3.141592653589793238462643383279502884197169)
-#define ZERO  SUN_RCONST(0.0)
-#define ONE   SUN_RCONST(1.0)
-#define TWO   SUN_RCONST(2.0)
-#define EIGHT SUN_RCONST(8.0)
+#define PI   SUN_RCONST(3.141592653589793238462643383279502884197169)
+#define ZERO SUN_RCONST(0.0)
+#define ONE  SUN_RCONST(1.0)
+#define TWO  SUN_RCONST(2.0)
 
 // Macro to access (x,y) location in 1D NVector array
 #define IDX(x, y, n) ((n) * (y) + (x))
@@ -106,7 +105,9 @@ struct UserData
   sunrealtype atol;   // absolute tolerance
   sunrealtype hfixed; // fixed step size
   int order;          // ARKode method order
-  int controller;     // step size adaptivity method
+  int controller;     // step size adaptivity method: 0=PID, 1=PI,
+                      //    2=I, 3=ExpGus, 4=ImpGus, 5=ImExGus,
+                      //    6=H0321, 7=H0211, 8=H211, 9=H312
   int maxsteps;       // max number of steps between outputs
   bool linear;        // enable/disable linearly implicit option
   bool diagnostics;   // output diagnostics
@@ -122,7 +123,7 @@ struct UserData
   // Inverse of Jacobian diagonal for preconditioner
   N_Vector d;
 
-  // Ouput variables
+  // Output variables
   int output;    // output level
   int nout;      // number of output times
   ofstream uout; // output file stream
@@ -360,12 +361,16 @@ int main(int argc, char* argv[])
   {
     switch (udata->controller)
     {
-    case (ARK_ADAPT_PID): C = SUNAdaptController_PID(ctx); break;
-    case (ARK_ADAPT_PI): C = SUNAdaptController_PI(ctx); break;
-    case (ARK_ADAPT_I): C = SUNAdaptController_I(ctx); break;
-    case (ARK_ADAPT_EXP_GUS): C = SUNAdaptController_ExpGus(ctx); break;
-    case (ARK_ADAPT_IMP_GUS): C = SUNAdaptController_ImpGus(ctx); break;
-    case (ARK_ADAPT_IMEX_GUS): C = SUNAdaptController_ImExGus(ctx); break;
+    case (0): C = SUNAdaptController_PID(ctx); break;
+    case (1): C = SUNAdaptController_PI(ctx); break;
+    case (2): C = SUNAdaptController_I(ctx); break;
+    case (3): C = SUNAdaptController_ExpGus(ctx); break;
+    case (4): C = SUNAdaptController_ImpGus(ctx); break;
+    case (5): C = SUNAdaptController_ImExGus(ctx); break;
+    case (6): C = SUNAdaptController_H0321(ctx); break;
+    case (7): C = SUNAdaptController_H0211(ctx); break;
+    case (8): C = SUNAdaptController_H211(ctx); break;
+    case (9): C = SUNAdaptController_H312(ctx); break;
     }
     flag = ARKodeSetAdaptController(arkode_mem, C);
     if (check_flag(&flag, "ARKodeSetAdaptController", 1)) { return 1; }
@@ -394,7 +399,7 @@ int main(int argc, char* argv[])
   sunrealtype dTout = udata->tf / udata->nout;
   sunrealtype tout  = dTout;
 
-  // Inital output
+  // Initial output
   flag = OpenOutput(udata);
   if (check_flag(&flag, "OpenOutput", 1)) { return 1; }
 
@@ -881,7 +886,7 @@ static void InputHelp()
   cout << "  --noforcing             : disable forcing term" << endl;
   cout << "  --tf <time>             : final time" << endl;
   cout << "  --rtol <rtol>           : relative tolerance" << endl;
-  cout << "  --atol <atol>           : absoltue tolerance" << endl;
+  cout << "  --atol <atol>           : absolute tolerance" << endl;
   cout << "  --nonlinear             : disable linearly implicit flag" << endl;
   cout << "  --order <ord>           : method order" << endl;
   cout << "  --fixedstep <step>      : used fixed step size" << endl;
@@ -1086,15 +1091,15 @@ static int OutputStats(void* arkode_mem, UserData* udata)
   int flag;
 
   // Get integrator and solver stats
-  long int nst, nst_a, netf, nfe, nfi, nni, ncfn, nli, nlcf, nsetups, nfi_ls, nJv;
+  long int nst, nst_a, netf, nfi, nni, ncfn, nli, nlcf, nsetups, nfi_ls, nJv;
   flag = ARKodeGetNumSteps(arkode_mem, &nst);
   if (check_flag(&flag, "ARKodeGetNumSteps", 1)) { return -1; }
   flag = ARKodeGetNumStepAttempts(arkode_mem, &nst_a);
   if (check_flag(&flag, "ARKodeGetNumStepAttempts", 1)) { return -1; }
   flag = ARKodeGetNumErrTestFails(arkode_mem, &netf);
   if (check_flag(&flag, "ARKodeGetNumErrTestFails", 1)) { return -1; }
-  flag = ARKStepGetNumRhsEvals(arkode_mem, &nfe, &nfi);
-  if (check_flag(&flag, "ARKStepGetNumRhsEvals", 1)) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 1, &nfi);
+  if (check_flag(&flag, "ARKodeGetNumRhsEvals", 1)) { return -1; }
   flag = ARKodeGetNumNonlinSolvIters(arkode_mem, &nni);
   if (check_flag(&flag, "ARKodeGetNumNonlinSolvIters", 1)) { return -1; }
   flag = ARKodeGetNumNonlinSolvConvFails(arkode_mem, &ncfn);

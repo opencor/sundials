@@ -2,7 +2,7 @@
  * Programmer(s): David J. Gardner @ LLNL
  * -----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2024, Lawrence Livermore National Security
+ * Copyright (c) 2002-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -72,13 +72,9 @@
 
 /* Convince macros for using precision-specific format specifiers */
 #if defined(SUNDIALS_EXTENDED_PRECISION)
-#define GSYM "Lg"
 #define ESYM "Le"
-#define FSYM "Lf"
 #else
-#define GSYM "g"
 #define ESYM "e"
-#define FSYM "f"
 #endif
 
 /* ----------------------- *
@@ -201,6 +197,10 @@ int main(int argc, char* argv[])
   arkode_mem = ERKStepCreate(f, t0, y, ctx);
   if (check_ptr(arkode_mem, "ERKStepCreate")) { return 1; }
 
+  /* Set order */
+  flag = ARKodeSetOrder(arkode_mem, 2);
+  if (check_flag(flag, "ARKodeSetOrder")) { return 1; }
+
   /* Specify tolerances */
   flag = ARKodeSStolerances(arkode_mem, reltol, abstol);
   if (check_flag(flag, "ARKodeSStolerances")) { return 1; }
@@ -300,8 +300,8 @@ int main(int argc, char* argv[])
   flag = ARKodeGetNumErrTestFails(arkode_mem, &netf);
   check_flag(flag, "ARKodeGetNumErrTestFails");
 
-  flag = ERKStepGetNumRhsEvals(arkode_mem, &nfe);
-  check_flag(flag, "ERKStepGetNumRhsEvals");
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 0, &nfe);
+  check_flag(flag, "ARKodeGetNumRhsEvals");
 
   printf("\nFinal Solver Statistics:\n");
   printf("   Internal solver steps = %li (attempted = %li)\n", nst, nst_a);

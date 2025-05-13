@@ -1,6 +1,6 @@
 /* -----------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2024, Lawrence Livermore National Security
+ * Copyright (c) 2002-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -90,6 +90,7 @@ TEST_F(SUNErrConditionTest, LastErrConditionPersists)
   N_VCloneEmptyVectorArray(-1, v); // -1 is an out of range argument
   SUNErrCode err = SUNContext_PeekLastError(sunctx);
   EXPECT_EQ(err, SUN_ERR_ARG_OUTOFRANGE);
+
   N_Vector* arr = N_VCloneEmptyVectorArray(1, v);
   EXPECT_FALSE(arr);
   err = SUNContext_GetLastError(sunctx);
@@ -171,22 +172,25 @@ protected:
   SUNContext sunctx;
 };
 
-void firstHandler(int line, const char* func, const char* file, const char* msg,
-                  SUNErrCode err_code, void* err_user_data, SUNContext sunctx)
+static void firstHandler(int line, const char* func, const char* file,
+                         const char* msg, SUNErrCode err_code,
+                         void* err_user_data, SUNContext sunctx)
 {
   std::vector<int>* order = static_cast<std::vector<int>*>(err_user_data);
   order->push_back(0);
 }
 
-void secondHandler(int line, const char* func, const char* file, const char* msg,
-                   SUNErrCode err_code, void* err_user_data, SUNContext sunctx)
+static void secondHandler(int line, const char* func, const char* file,
+                          const char* msg, SUNErrCode err_code,
+                          void* err_user_data, SUNContext sunctx)
 {
   std::vector<int>* order = static_cast<std::vector<int>*>(err_user_data);
   order->push_back(1);
 }
 
-void thirdHandler(int line, const char* func, const char* file, const char* msg,
-                  SUNErrCode err_code, void* err_user_data, SUNContext sunctx)
+static void thirdHandler(int line, const char* func, const char* file,
+                         const char* msg, SUNErrCode err_code,
+                         void* err_user_data, SUNContext sunctx)
 {
   std::vector<int>* order = static_cast<std::vector<int>*>(err_user_data);
   order->push_back(2);

@@ -1,6 +1,6 @@
 /* -----------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2024, Lawrence Livermore National Security
+ * Copyright (c) 2002-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -79,8 +79,18 @@ void SUNAbortErrHandlerFn(int line, const char* func, const char* file,
                           SUNDIALS_MAYBE_UNUSED void* err_user_data,
                           SUNContext sunctx)
 {
+  /* Flush all buffered logging messages now before we abort */
+  SUNLogger_Flush(sunctx->logger, SUN_LOGLEVEL_ALL);
+
   char* file_and_line = sunCombineFileAndLine(line, file);
+  if (msg == NULL) { msg = SUNGetErrMsg(err_code); }
   SUNLogger_QueueMsg(sunctx->logger, SUN_LOGLEVEL_ERROR, file_and_line, func,
+                     msg);
+  free(file_and_line);
+  /* It is convenient to have the exit message point to the message line,
+     so we add 1 to the line number. As such, do not separate the following lines! */
+  file_and_line = sunCombineFileAndLine(__LINE__ + 1, __FILE__);
+  SUNLogger_QueueMsg(sunctx->logger, SUN_LOGLEVEL_ERROR, file_and_line, __func__,
                      "SUNAbortErrHandler: Calling abort now, use a different "
                      "error handler to avoid program termination.\n");
   free(file_and_line);
@@ -94,23 +104,23 @@ void SUNGlobalFallbackErrHandler(int line, const char* func, const char* file,
   char* log_msg       = NULL;
   char* file_and_line = NULL;
 
-  va_start(ap, err_code);
-
   file_and_line = sunCombineFileAndLine(__LINE__, __FILE__);
+  va_start(ap, err_code);
   sunCreateLogMessage(SUN_LOGLEVEL_ERROR, 0, file_and_line,
                       __func__, "The SUNDIALS SUNContext was corrupt or NULL when an error occurred. As such, error messages have been printed to stderr.",
                       ap, &log_msg);
+  va_end(ap);
   fprintf(stderr, "%s", log_msg);
   free(log_msg);
   free(file_and_line);
 
   file_and_line = sunCombineFileAndLine(line, file);
   if (msgfmt == NULL) { msgfmt = SUNGetErrMsg(err_code); }
+  va_start(ap, err_code);
   sunCreateLogMessage(SUN_LOGLEVEL_ERROR, 0, file_and_line, func, msgfmt, ap,
                       &log_msg);
+  va_end(ap);
   fprintf(stderr, "%s", log_msg);
   free(log_msg);
   free(file_and_line);
-
-  va_end(ap);
 }

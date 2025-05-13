@@ -3,7 +3,7 @@
 !                modified by Daniel M. Margolis @ SMU
 ! ------------------------------------------------------------------
 ! SUNDIALS Copyright Start
-! Copyright (c) 2002-2023, Lawrence Livermore National Security
+! Copyright (c) 2002-2025, Lawrence Livermore National Security
 ! and Southern Methodist University.
 ! All rights reserved.
 !
@@ -305,6 +305,13 @@ program main
     stop 1
   end if
 
+  ! TODO(SBR): temporary fix until https://github.com/LLNL/sundials/pull/565 merged
+  ierr = FARKodeSetAdaptivityAdjustment(arkode_mem, 0)
+  if (ierr /= 0) then
+    print *, 'Error in FARKodeSetJacFn'
+    stop 1
+  end if
+
   sunls => FSUNLinSol_Dense(sunvec_y, sunmat_A, sunctx)
   if (.not. associated(sunls)) then
     print *, 'ERROR: sunls = NULL'
@@ -450,9 +457,15 @@ subroutine ARKStepStats(arkode_mem)
     stop 1
   end if
 
-  ierr = FARKStepGetNumRhsEvals(arkode_mem, nfe, nfi)
+  ierr = FARKodeGetNumRhsEvals(arkode_mem, 0, nfe)
   if (ierr /= 0) then
-    print *, 'Error in FARKStepGetNumRhsEvals, retval = ', ierr, '; halting'
+    print *, 'Error in FARKodeGetNumRhsEvals, retval = ', ierr, '; halting'
+    stop 1
+  end if
+
+  ierr = FARKodeGetNumRhsEvals(arkode_mem, 1, nfi)
+  if (ierr /= 0) then
+    print *, 'Error in FARKodeGetNumRhsEvals, retval = ', ierr, '; halting'
     stop 1
   end if
 

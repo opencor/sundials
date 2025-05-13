@@ -3,7 +3,7 @@
  * Programmer(s): Cody J. Balos @ LLNL
  * ----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2024, Lawrence Livermore National Security
+ * Copyright (c) 2002-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -72,9 +72,6 @@ int main(int argc, char* argv[])
   N_Vector y              = NULL;
   N_Vector solution       = NULL;
   sunrealtype* ydata      = NULL;
-  sunrealtype tout        = NAN;
-  sunrealtype tret        = NAN;
-  sunrealtype err         = NAN;
   void* arkode_mem        = NULL;
   int iout                = 0;
   int retval              = 0;
@@ -141,8 +138,8 @@ int main(int argc, char* argv[])
   if (check_retval(&retval, "ARKodeSetMaxNumSteps", 1)) { return 1; }
 
   /* Print out starting energy, momentum before integrating */
-  tret = T0;
-  tout = T0 + dTout;
+  sunrealtype tret = T0;
+  sunrealtype tout = T0 + dTout;
   fprintf(stdout, "t = %.6Lf, x(t) = %.6Lf, E = %.6Lf, sol. err = %.6Lf\n",
           (long double)tret, (long double)ydata[0],
           (long double)Energy(y, dt, &udata), (long double)SUN_RCONST(0.0));
@@ -153,12 +150,12 @@ int main(int argc, char* argv[])
     if (args.use_tstop) { ARKodeSetStopTime(arkode_mem, tout); }
     retval = ARKodeEvolve(arkode_mem, tout, y, &tret, ARK_NORMAL);
 
-    /* Compute the anaytical solution */
+    /* Compute the analytical solution */
     Solution(tret, y, solution, &udata);
 
     /* Compute L2 error */
     N_VLinearSum(SUN_RCONST(1.0), y, -SUN_RCONST(1.0), solution, solution);
-    err = sqrt(N_VDotProd(solution, solution));
+    sunrealtype err = sqrt(N_VDotProd(solution, solution));
 
     /* Output current integration status */
     fprintf(stdout, "t = %.6Lf, x(t) = %.6Lf, E = %.6Lf, sol. err = %.16Le\n",

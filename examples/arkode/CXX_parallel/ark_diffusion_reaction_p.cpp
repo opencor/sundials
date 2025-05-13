@@ -2,7 +2,7 @@
  * Programmer(s): David J. Gardner @ LLNL
  * -----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2024, Lawrence Livermore National Security
+ * Copyright (c) 2002-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -16,7 +16,7 @@
  *   u_t = Dux u_xx + Duy u_yy + A + u * u * v - (B + 1) * u
  *   v_t = Dvx u_xx + Dvy u_yy + B * u - u * u * v
  *
- * where u and v represent the concentrations of the two chemcial species, the
+ * where u and v represent the concentrations of the two chemical species, the
  * diffusion rates are Dux = Duy = Dvx = Dvy = 1e-3, and the species with
  * constant concentration over time are A = 1 and B = 3.
  *
@@ -63,6 +63,7 @@
 #include <limits>
 #include <random>
 #include <sstream>
+#include <string>
 
 // Include MPI
 #include "mpi.h"
@@ -159,7 +160,7 @@ struct UserData
   bool reaction  = true;
 
   // --------------------------
-  // Discretization parameteres
+  // Discretization parameters
   // --------------------------
 
   // Global and local number of nodes in the x and y directions
@@ -228,7 +229,7 @@ struct UserData
   sunrealtype* SWsend = NULL;
   sunrealtype* NErecv = NULL;
 
-  // Recieve and send requests
+  // Receive and send requests
   MPI_Request reqRW, reqRE, reqRS, reqRN;
   MPI_Request reqSW, reqSE, reqSS, reqSN;
   MPI_Request reqRC, reqSC;
@@ -282,10 +283,10 @@ struct UserData
   // Shared IMEX and MRI settings
   // ----------------------------
 
-  int controller   = 0;     // step size adaptivity method (0 = use default)
-  int maxsteps     = 0;     // max steps between outputs (0 = use default)
-  bool linear      = true;  // enable/disable linearly implicit option
-  bool diagnostics = false; // output diagnostics
+  string controller = "I";   // step size adaptivity method
+  int maxsteps      = 0;     // max steps between outputs (0 = use default)
+  bool linear       = true;  // enable/disable linearly implicit option
+  bool diagnostics  = false; // output diagnostics
 
   // -----------------------------------------
   // Nonlinear solver settings
@@ -307,7 +308,7 @@ struct UserData
   N_Vector diag      = NULL;  // inverse of Jacobian diagonal
 
   // ---------------
-  // Ouput variables
+  // Output variables
   // ---------------
 
   int output = 1;  // 0 = no output, 1 = output stats, 2 = write to disk
@@ -379,11 +380,10 @@ static int SetupDecomp(UserData* udata);
 
 // Integrator setup functions
 static int SetupARK(SUNContext ctx, UserData* udata, N_Vector u,
-                    SUNLinearSolver LS, SUNAdaptController* Ctrl,
-                    void** arkode_mem);
+                    SUNLinearSolver LS, void** arkode_mem);
 static int SetupMRI(SUNContext ctx, UserData* udata, N_Vector u,
-                    SUNLinearSolver LS, SUNAdaptController* Ctrl,
-                    void** arkode_mem, MRIStepInnerStepper* stepper);
+                    SUNLinearSolver LS, void** arkode_mem,
+                    MRIStepInnerStepper* stepper);
 static int SetupMRICVODE(SUNContext ctx, UserData* udata, N_Vector u,
                          SUNLinearSolver LS, SUNNonlinearSolver* NLS,
                          void** arkode_mem, MRIStepInnerStepper* stepper);
@@ -557,18 +557,15 @@ int main(int argc, char* argv[])
   // Inner stepper nonlinear solver (CVODE)
   SUNNonlinearSolver NLS = NULL;
 
-  // Timestep adaptivity controller
-  SUNAdaptController Ctrl = NULL;
-
   // Create integrator
   switch (udata.integrator)
   {
   case (0):
-    flag = SetupARK(ctx, &udata, u, LS, &Ctrl, &arkode_mem);
+    flag = SetupARK(ctx, &udata, u, LS, &arkode_mem);
     if (check_flag((void*)arkode_mem, "SetupARK", 0)) { return 1; }
     break;
   case (1):
-    flag = SetupMRI(ctx, &udata, u, LS, &Ctrl, &arkode_mem, &stepper);
+    flag = SetupMRI(ctx, &udata, u, LS, &arkode_mem, &stepper);
     if (check_flag((void*)arkode_mem, "SetupMRI", 0)) { return 1; }
     break;
   case (2):
@@ -597,7 +594,7 @@ int main(int argc, char* argv[])
   sunrealtype dTout = udata.tf / udata.nout;
   sunrealtype tout  = dTout;
 
-  // Inital output
+  // Initial output
   flag = OpenOutput(&udata);
   if (check_flag(&flag, "OpenOutput", 1)) { return 1; }
 
@@ -700,7 +697,6 @@ int main(int argc, char* argv[])
   N_VDestroy(N_VGetLocalVector_MPIPlusX(u));
   N_VDestroy(u);
   FreeUserData(&udata);
-  (void)SUNAdaptController_Destroy(Ctrl);
   SUNContext_Free(&ctx);
   flag = MPI_Finalize();
   return 0;
@@ -906,8 +902,7 @@ static int SetupDecomp(UserData* udata)
 // -----------------------------------------------------------------------------
 
 static int SetupARK(SUNContext ctx, UserData* udata, N_Vector u,
-                    SUNLinearSolver LS, SUNAdaptController* Ctrl,
-                    void** arkode_mem)
+                    SUNLinearSolver LS, void** arkode_mem)
 {
   int flag;
 
@@ -968,17 +963,8 @@ static int SetupARK(SUNContext ctx, UserData* udata, N_Vector u,
   }
   else
   {
-    switch (udata->controller)
-    {
-    case (ARK_ADAPT_PID): *Ctrl = SUNAdaptController_PID(ctx); break;
-    case (ARK_ADAPT_PI): *Ctrl = SUNAdaptController_PI(ctx); break;
-    case (ARK_ADAPT_I): *Ctrl = SUNAdaptController_I(ctx); break;
-    case (ARK_ADAPT_EXP_GUS): *Ctrl = SUNAdaptController_ExpGus(ctx); break;
-    case (ARK_ADAPT_IMP_GUS): *Ctrl = SUNAdaptController_ImpGus(ctx); break;
-    case (ARK_ADAPT_IMEX_GUS): *Ctrl = SUNAdaptController_ImExGus(ctx); break;
-    }
-    flag = ARKodeSetAdaptController(*arkode_mem, *Ctrl);
-    if (check_flag(&flag, "ARKodeSetAdaptController", 1)) { return 1; }
+    flag = ARKodeSetAdaptControllerByName(*arkode_mem, udata->controller.c_str());
+    if (check_flag(&flag, "ARKodeSetAdaptControllerByName", 1)) { return 1; }
   }
 
   // Set max steps between outputs
@@ -993,8 +979,8 @@ static int SetupARK(SUNContext ctx, UserData* udata, N_Vector u,
 }
 
 static int SetupMRI(SUNContext ctx, UserData* udata, N_Vector y,
-                    SUNLinearSolver LS, SUNAdaptController* Ctrl,
-                    void** arkode_mem, MRIStepInnerStepper* stepper)
+                    SUNLinearSolver LS, void** arkode_mem,
+                    MRIStepInnerStepper* stepper)
 {
   int flag;
 
@@ -1026,17 +1012,9 @@ static int SetupMRI(SUNContext ctx, UserData* udata, N_Vector y,
   }
   else
   {
-    switch (udata->controller)
-    {
-    case (ARK_ADAPT_PID): *Ctrl = SUNAdaptController_PID(ctx); break;
-    case (ARK_ADAPT_PI): *Ctrl = SUNAdaptController_PI(ctx); break;
-    case (ARK_ADAPT_I): *Ctrl = SUNAdaptController_I(ctx); break;
-    case (ARK_ADAPT_EXP_GUS): *Ctrl = SUNAdaptController_ExpGus(ctx); break;
-    case (ARK_ADAPT_IMP_GUS): *Ctrl = SUNAdaptController_ImpGus(ctx); break;
-    case (ARK_ADAPT_IMEX_GUS): *Ctrl = SUNAdaptController_ImExGus(ctx); break;
-    }
-    flag = ARKodeSetAdaptController(inner_arkode_mem, *Ctrl);
-    if (check_flag(&flag, "ARKodeSetAdaptController", 1)) { return 1; }
+    flag = ARKodeSetAdaptControllerByName(inner_arkode_mem,
+                                          udata->controller.c_str());
+    if (check_flag(&flag, "ARKodeSetAdaptControllerByName", 1)) { return 1; }
   }
 
   // Set max steps between outputs
@@ -1044,8 +1022,8 @@ static int SetupMRI(SUNContext ctx, UserData* udata, N_Vector y,
   if (check_flag(&flag, "ARKodeSetMaxNumSteps", 1)) { return 1; }
 
   // Wrap ARKODE as an MRIStepInnerStepper
-  flag = ARKStepCreateMRIStepInnerStepper(inner_arkode_mem, stepper);
-  if (check_flag(&flag, "ARKStepCreateMRIStepInnerStepper", 1)) { return 1; }
+  flag = ARKodeCreateMRIStepInnerStepper(inner_arkode_mem, stepper);
+  if (check_flag(&flag, "ARKodeCreateMRIStepInnerStepper", 1)) { return 1; }
 
   // -------------------------
   // Setup the slow integrator
@@ -2221,10 +2199,7 @@ static int ReadInputs(int* argc, char*** argv, UserData* udata)
     else if (arg == "--h_slow") { udata->h_slow = stod((*argv)[arg_idx++]); }
     else if (arg == "--h_fast") { udata->h_fast = stod((*argv)[arg_idx++]); }
     // Shared IMEX and MRI settings
-    else if (arg == "--controller")
-    {
-      udata->controller = stoi((*argv)[arg_idx++]);
-    }
+    else if (arg == "--controller") { udata->controller = (*argv)[arg_idx++]; }
     else if (arg == "--nonlinear") { udata->linear = false; }
     else if (arg == "--diagnostics") { udata->diagnostics = true; }
     // Linear solver settings
@@ -2349,14 +2324,14 @@ static void InputHelp()
     << "  --mri-cvode-local            : use MRI with CVODE task-local stepper"
     << endl;
   cout << "  --rtol_imex <rtol>           : IMEX relative tolerance" << endl;
-  cout << "  --atol_imex <atol>           : IMEX absoltue tolerance" << endl;
+  cout << "  --atol_imex <atol>           : IMEX absolute tolerance" << endl;
   cout << "  --h_imex <h>                 : IMEX fixed step size" << endl;
   cout << "  --order_imex <ord>           : IMEX method order" << endl;
   cout << "  --rtol_slow <rtol>           : MRI slow relative tolerance" << endl;
-  cout << "  --atol_slow <atol>           : MRI slow absoltue tolerance" << endl;
+  cout << "  --atol_slow <atol>           : MRI slow absolute tolerance" << endl;
   cout << "  --h_slow <h>                 : MRI slow step size" << endl;
   cout << "  --rtol_fast <rtol>           : MRI fast relative tolerance" << endl;
-  cout << "  --atol_fast <atol>           : MRI fast absoltue tolerance" << endl;
+  cout << "  --atol_fast <atol>           : MRI fast absolute tolerance" << endl;
   cout << "  --h_fast <h>                 : MRI fast step size" << endl;
   cout << "  --controller <ctr>           : time step adaptivity" << endl;
   cout << "  --nonlinear                  : nonlinearly implicit" << endl;
@@ -2600,8 +2575,10 @@ static int OutputStatsIMEX(void* arkode_mem, UserData* udata)
   if (check_flag(&flag, "ARKodeGetNumStepAttempts", 1)) { return -1; }
   flag = ARKodeGetNumErrTestFails(arkode_mem, &netf);
   if (check_flag(&flag, "ARKodeGetNumErrTestFails", 1)) { return -1; }
-  flag = ARKStepGetNumRhsEvals(arkode_mem, &nfe, &nfi);
-  if (check_flag(&flag, "ARKStepGetNumRhsEvals", 1)) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 0, &nfe);
+  if (check_flag(&flag, "ARKodeGetNumRhsEvals", 1)) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 1, &nfi);
+  if (check_flag(&flag, "ARKodeGetNumRhsEvals", 1)) { return -1; }
 
   if (udata->diffusion)
   {
@@ -2675,11 +2652,11 @@ static int OutputStatsMRI(void* arkode_mem, MRIStepInnerStepper stepper,
   int flag;
 
   // Get slow integrator and solver stats
-  long int nsts, nfse, nfsi, nni, ncfn, nli, nlcf, nsetups, nfi_ls, nJv;
+  long int nsts, nfsi, nni, ncfn, nli, nlcf, nsetups, nfi_ls, nJv;
   flag = ARKodeGetNumSteps(arkode_mem, &nsts);
   if (check_flag(&flag, "ARKodeGetNumSteps", 1)) { return -1; }
-  flag = MRIStepGetNumRhsEvals(arkode_mem, &nfse, &nfsi);
-  if (check_flag(&flag, "MRIStepGetNumRhsEvals", 1)) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 1, &nfsi);
+  if (check_flag(&flag, "ARKodeGetNumRhsEvals", 1)) { return -1; }
   flag = ARKodeGetNumNonlinSolvIters(arkode_mem, &nni);
   if (check_flag(&flag, "ARKodeGetNumNonlinSolvIters", 1)) { return -1; }
   flag = ARKodeGetNumNonlinSolvConvFails(arkode_mem, &ncfn);
@@ -2736,7 +2713,7 @@ static int OutputStatsMRI(void* arkode_mem, MRIStepInnerStepper stepper,
   void* inner_arkode_mem;
   MRIStepInnerStepper_GetContent(stepper, &inner_arkode_mem);
 
-  long int nstf, nstf_a, netff, nffe, nffi;
+  long int nstf, nstf_a, netff, nffe;
 
   flag = ARKodeGetNumSteps(inner_arkode_mem, &nstf);
   if (check_flag(&flag, "ARKodeGetNumSteps", 1)) { return -1; }
@@ -2744,8 +2721,8 @@ static int OutputStatsMRI(void* arkode_mem, MRIStepInnerStepper stepper,
   if (check_flag(&flag, "ARKodeGetNumStepAttempts", 1)) { return -1; }
   flag = ARKodeGetNumErrTestFails(inner_arkode_mem, &netff);
   if (check_flag(&flag, "ARKodeGetNumErrTestFails", 1)) { return -1; }
-  flag = ARKStepGetNumRhsEvals(inner_arkode_mem, &nffe, &nffi);
-  if (check_flag(&flag, "ARKStepGetNumRhsEvals", 1)) { return -1; }
+  flag = ARKodeGetNumRhsEvals(inner_arkode_mem, 0, &nffe);
+  if (check_flag(&flag, "ARKodeGetNumRhsEvals", 1)) { return -1; }
 
   cout << "Fast Integrator:" << endl;
   cout << "  Steps            = " << nstf << endl;
@@ -2763,11 +2740,11 @@ static int OutputStatsMRICVODE(void* arkode_mem, MRIStepInnerStepper stepper,
   int flag;
 
   // Get slow integrator and solver stats
-  long int nsts, nfse, nfsi, nni, ncfn, nli, nlcf, nsetups, nfi_ls, nJv;
+  long int nsts, nfsi, nni, ncfn, nli, nlcf, nsetups, nfi_ls, nJv;
   flag = ARKodeGetNumSteps(arkode_mem, &nsts);
   if (check_flag(&flag, "ARKodeGetNumSteps", 1)) { return -1; }
-  flag = MRIStepGetNumRhsEvals(arkode_mem, &nfse, &nfsi);
-  if (check_flag(&flag, "MRIStepGetNumRhsEvals", 1)) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 1, &nfsi);
+  if (check_flag(&flag, "ARKodeGetNumRhsEvals", 1)) { return -1; }
   flag = ARKodeGetNumNonlinSolvIters(arkode_mem, &nni);
   if (check_flag(&flag, "ARKodeGetNumNonlinSolvIters", 1)) { return -1; }
   flag = ARKodeGetNumNonlinSolvConvFails(arkode_mem, &ncfn);
@@ -2839,7 +2816,7 @@ static int OutputStatsMRICVODE(void* arkode_mem, MRIStepInnerStepper stepper,
   return 0;
 }
 
-// Ouput timing stats
+// Output timing stats
 static int OutputTiming(UserData* udata)
 {
   if (udata->outproc)

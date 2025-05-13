@@ -2,7 +2,7 @@
  * Programmer(s): David J. Gardner @ LLNL
  * -----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2024, Lawrence Livermore National Security
+ * Copyright (c) 2002-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
  * All rights reserved.
  *
@@ -23,6 +23,7 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // Include desired integrators, vectors, linear solvers, and nonlinear solvers
@@ -145,13 +146,13 @@ struct UserOptions
   sunrealtype etamx1_fast = ZERO;
 
   int maxsteps      = 10000; // max steps between outputs
-  int controller    = -1;    // step size adaptivity method
+  string controller = "I";   // step size adaptivity method
   int predictor     = 0;     // predictor for nonlinear systems
   int ls_setup_freq = 0;     // linear solver setup frequency
 
-  int controller_fast    = -1; // fast step size adaptivity method
-  int predictor_fast     = 0;  // predictor for fast nonlinear systems
-  int ls_setup_freq_fast = 0;  // fast linear solver setup frequency
+  string controller_fast = "I"; // fast step size adaptivity method
+  int predictor_fast     = 0;   // predictor for fast nonlinear systems
+  int ls_setup_freq_fast = 0;   // fast linear solver setup frequency
 
   bool linear = false; // signal that the problem is linearly implicit
 
@@ -242,16 +243,15 @@ int J_adv_diff_react(sunrealtype t, N_Vector y, N_Vector fy, SUNMatrix J,
 
 // Integrator setup functions
 int SetupERK(SUNContext ctx, UserData& udata, UserOptions& uopts, N_Vector y,
-             SUNAdaptController* C, void** arkode_mem);
+             void** arkode_mem);
 
 int SetupARK(SUNContext ctx, UserData& udata, UserOptions& uopts, N_Vector y,
-             SUNMatrix* A, SUNLinearSolver* LS, SUNAdaptController* C,
-             void** arkode_mem);
+             SUNMatrix* A, SUNLinearSolver* LS, void** arkode_mem);
 
 int SetupMRIARK(SUNContext ctx, UserData& udata, UserOptions& uopts, N_Vector y,
                 SUNMatrix* A, SUNLinearSolver* LS, SUNMatrix* A_fast,
-                SUNLinearSolver* LS_fast, SUNAdaptController* C_fast,
-                MRIStepInnerStepper* fast_mem, void** arkode_mem);
+                SUNLinearSolver* LS_fast, MRIStepInnerStepper* fast_mem,
+                void** arkode_mem);
 
 int SetupMRICVODE(SUNContext ctx, UserData& udata, UserOptions& uopts,
                   N_Vector y, SUNMatrix* A, SUNLinearSolver* LS,
@@ -297,8 +297,8 @@ static int OutputStatsERK(void* arkode_mem, UserData& udata)
   if (check_flag(flag, "ARKodeGetNumStepAttempts")) { return -1; }
   flag = ARKodeGetNumErrTestFails(arkode_mem, &netf);
   if (check_flag(flag, "ARKodeGetNumErrTestFails")) { return -1; }
-  flag = ERKStepGetNumRhsEvals(arkode_mem, &nfe);
-  if (check_flag(flag, "ERKStepGetNumRhsEvals")) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 0, &nfe);
+  if (check_flag(flag, "ARKodeGetNumRhsEvals")) { return -1; }
 
   cout << "  Steps            = " << nst << endl;
   cout << "  Step attempts    = " << nst_a << endl;
@@ -321,8 +321,10 @@ static int OutputStatsARK(void* arkode_mem, UserData& udata)
   if (check_flag(flag, "ARKodeGetNumStepAttempts")) { return -1; }
   flag = ARKodeGetNumErrTestFails(arkode_mem, &netf);
   if (check_flag(flag, "ARKodeGetNumErrTestFails")) { return -1; }
-  flag = ARKStepGetNumRhsEvals(arkode_mem, &nfe, &nfi);
-  if (check_flag(flag, "ARKStepGetNumRhsEvals")) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 0, &nfe);
+  if (check_flag(flag, "ARKodeGetNumRhsEvals")) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 1, &nfi);
+  if (check_flag(flag, "ARKodeGetNumRhsEvals")) { return -1; }
 
   cout << fixed << setprecision(6);
   cout << "  Steps              = " << nst << endl;
@@ -371,8 +373,10 @@ static int OutputStatsMRIARK(void* arkode_mem, MRIStepInnerStepper fast_mem,
   long int nst, nst_a, netf, nfe, nfi;
   flag = ARKodeGetNumSteps(arkode_mem, &nst);
   if (check_flag(flag, "ARKodeGetNumSteps")) { return -1; }
-  flag = MRIStepGetNumRhsEvals(arkode_mem, &nfe, &nfi);
-  if (check_flag(flag, "MRIStepGetNumRhsEvals")) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 0, &nfe);
+  if (check_flag(flag, "ARKodeGetNumRhsEvals")) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 1, &nfi);
+  if (check_flag(flag, "ARKodeGetNumRhsEvals")) { return -1; }
 
   cout << fixed << setprecision(6);
   cout << endl << "Slow Integrator:" << endl;
@@ -419,8 +423,10 @@ static int OutputStatsMRIARK(void* arkode_mem, MRIStepInnerStepper fast_mem,
   if (check_flag(flag, "ARKodeGetNumStepAttempts")) { return -1; }
   flag = ARKodeGetNumErrTestFails(fast_arkode_mem, &netf);
   if (check_flag(flag, "ARKodeGetNumErrTestFails")) { return -1; }
-  flag = ARKStepGetNumRhsEvals(fast_arkode_mem, &nfe, &nfi);
-  if (check_flag(flag, "ARKStepGetNumRhsEvals")) { return -1; }
+  flag = ARKodeGetNumRhsEvals(fast_arkode_mem, 0, &nfe);
+  if (check_flag(flag, "ARKodeGetNumRhsEvals")) { return -1; }
+  flag = ARKodeGetNumRhsEvals(fast_arkode_mem, 1, &nfi);
+  if (check_flag(flag, "ARKodeGetNumRhsEvals")) { return -1; }
 
   cout << fixed << setprecision(6);
   cout << endl << "Fast Integrator:" << endl;
@@ -507,8 +513,10 @@ static int OutputStatsMRICVODE(void* arkode_mem, MRIStepInnerStepper fast_mem,
   long int nsts, nfse, nfsi;
   flag = ARKodeGetNumSteps(arkode_mem, &nsts);
   if (check_flag(flag, "ARKodeGetNumSteps")) { return -1; }
-  flag = MRIStepGetNumRhsEvals(arkode_mem, &nfse, &nfsi);
-  if (check_flag(flag, "MRIStepGetNumRhsEvals")) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 0, &nfse);
+  if (check_flag(flag, "ARKodeGetNumRhsEvals")) { return -1; }
+  flag = ARKodeGetNumRhsEvals(arkode_mem, 1, &nfsi);
+  if (check_flag(flag, "ARKodeGetNumRhsEvals")) { return -1; }
 
   long int nni, ncfn;
   flag = ARKodeGetNumNonlinSolvIters(arkode_mem, &nni);
@@ -591,15 +599,15 @@ static void InputHelp()
   cout << "  --order_fast <int>       : MRI fast method order\n";
   cout << "  --ark_dirk               : Use DIRK method from ARK method\n";
   cout << "  --rtol <real>            : relative tolerance\n";
-  cout << "  --atol <real>            : absoltue tolerance\n";
+  cout << "  --atol <real>            : absolute tolerance\n";
   cout << "  --rtol_fast <real>       : MRI fast relative tolerance\n";
   cout << "  --atol_fast <real>       : MRI fast absolute tolerance\n";
   cout << "  --fixed_h <real>         : fixed step size\n";
   cout << "  --fixed_h_fast <real>    : MRI fast fixed step size\n";
-  cout << "  --controller <int>       : time step adaptivity\n";
+  cout << "  --controller <name>      : time step adaptivity\n";
   cout << "  --predictor <int>        : nonlinear solver predictor\n";
   cout << "  --lssetupfreq <int>      : LS setup frequency\n";
-  cout << "  --controller_fast <int>  : MRI fast time step adaptivity\n";
+  cout << "  --controller_fast <name> : MRI fast time step adaptivity\n";
   cout << "  --predictor_fast <int>   : MRI fast nonlinear solver predictor\n";
   cout << "  --lssetupfreq_fast <int> : MRI fast LS setup frequency\n";
   cout << "  --maxsteps <int>         : max steps between outputs\n";
@@ -659,6 +667,16 @@ inline void find_arg(vector<string>& args, const string key, bool& dest,
   {
     dest = store;
     args.erase(it);
+  }
+}
+
+inline void find_arg(vector<string>& args, const string key, string& dest)
+{
+  auto it = find(args.cbegin(), args.cend(), key);
+  if (it != args.end())
+  {
+    dest = std::move(*(it + 1));
+    args.erase(it, it + 2);
   }
 }
 
@@ -1036,22 +1054,7 @@ static int PrintSetup(UserData& udata, UserOptions& uopts)
   cout << "  rtol             = " << uopts.rtol << endl;
   cout << "  atol             = " << uopts.atol << endl;
   cout << "  fixed h          = " << uopts.fixed_h << endl;
-  if (uopts.controller <= 0) { cout << "  controller       = PID" << endl; }
-  else if (uopts.controller == 1) { cout << "  controller       = PI" << endl; }
-  else if (uopts.controller == 2) { cout << "  controller       = I" << endl; }
-  else if (uopts.controller == 3)
-  {
-    cout << "  controller       = explicit Gustafsson" << endl;
-  }
-  else if (uopts.controller == 4)
-  {
-    cout << "  controller       = implicit Gustafsson" << endl;
-  }
-  else if (uopts.controller == 5)
-  {
-    cout << "  controller       = IMEX Gustafsson" << endl;
-  }
-  else { cout << "  controller       = " << uopts.controller << endl; }
+  cout << "  controller       = " << uopts.controller << endl;
   if (uopts.integrator > 0)
   {
     if (uopts.predictor == 0)
@@ -1082,31 +1085,7 @@ static int PrintSetup(UserData& udata, UserOptions& uopts)
     cout << "  atol             = " << uopts.atol_fast << endl;
     cout << "  order            = " << uopts.order_fast << endl;
     cout << "  fixed h          = " << uopts.fixed_h_fast << endl;
-    if (uopts.controller_fast <= 0)
-    {
-      cout << "  controller       = PID" << endl;
-    }
-    else if (uopts.controller_fast == 1)
-    {
-      cout << "  controller       = PI" << endl;
-    }
-    else if (uopts.controller_fast == 2)
-    {
-      cout << "  controller       = I" << endl;
-    }
-    else if (uopts.controller_fast == 3)
-    {
-      cout << "  controller       = explicit Gustafsson" << endl;
-    }
-    else if (uopts.controller_fast == 4)
-    {
-      cout << "  controller       = implicit Gustafsson" << endl;
-    }
-    else if (uopts.controller_fast == 5)
-    {
-      cout << "  controller       = IMEX Gustafsson" << endl;
-    }
-    else { cout << "  controller       = " << uopts.controller_fast << endl; }
+    cout << "  fast controller  = PID" << uopts.controller_fast << endl;
     if (uopts.predictor_fast == 0)
     {
       cout << "  predictor        = trivial" << endl;

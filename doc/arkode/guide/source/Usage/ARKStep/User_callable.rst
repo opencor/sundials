@@ -2,7 +2,7 @@
    Programmer(s): Daniel R. Reynolds @ SMU
    ----------------------------------------------------------------
    SUNDIALS Copyright Start
-   Copyright (c) 2002-2024, Lawrence Livermore National Security
+   Copyright (c) 2002-2025, Lawrence Livermore National Security
    and Southern Methodist University.
    All rights reserved.
 
@@ -34,6 +34,11 @@ ARKStep supports *all categories*:
 * implicit nonlinear and/or linear solvers
 * non-identity mass matrices
 * relaxation Runge--Kutta methods
+
+ARKStep also has forcing function support when converted to a
+:c:type:`SUNStepper` or :c:type:`MRIStepInnerStepper`. See
+:c:func:`ARKodeCreateSUNStepper` and :c:func:`ARKStepCreateMRIStepInnerStepper`
+for additional details.
 
 
 .. _ARKODE.Usage.ARKStep.Initialization:
@@ -98,7 +103,7 @@ ARKStep tolerance specification functions
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL*  if the ARKStep memory was ``NULL``
       * *ARK_NO_MALLOC*  if the ARKStep memory was not allocated by the time-stepping module
-      * *ARK_ILL_INPUT* if an argument has an illegal value (e.g. a negative tolerance).
+      * *ARK_ILL_INPUT* if an argument had an illegal value (e.g. a negative tolerance).
 
    .. deprecated:: 6.1.0
 
@@ -121,7 +126,7 @@ ARKStep tolerance specification functions
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL*  if the ARKStep memory was ``NULL``
       * *ARK_NO_MALLOC*  if the ARKStep memory was not allocated by the time-stepping module
-      * *ARK_ILL_INPUT* if an argument has an illegal value (e.g. a negative tolerance).
+      * *ARK_ILL_INPUT* if an argument had an illegal value (e.g. a negative tolerance).
 
    .. deprecated:: 6.1.0
 
@@ -161,7 +166,7 @@ ARKStep tolerance specification functions
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL*  if the ARKStep memory was ``NULL``
       * *ARK_NO_MALLOC*  if the ARKStep memory was not allocated by the time-stepping module
-      * *ARK_ILL_INPUT* if an argument has an illegal value (e.g. a negative tolerance).
+      * *ARK_ILL_INPUT* if an argument had an illegal value (e.g. a negative tolerance).
 
    .. deprecated:: 6.1.0
 
@@ -181,7 +186,7 @@ ARKStep tolerance specification functions
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL*  if the ARKStep memory was ``NULL``
       * *ARK_NO_MALLOC*  if the ARKStep memory was not allocated by the time-stepping module
-      * *ARK_ILL_INPUT* if an argument has an illegal value (e.g. a negative tolerance).
+      * *ARK_ILL_INPUT* if an argument had an illegal value (e.g. a negative tolerance).
 
    .. deprecated:: 6.1.0
 
@@ -536,7 +541,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Does not change the *user_data* pointer or any
@@ -572,7 +577,7 @@ Optional inputs for ARKStep
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory or interpolation module are ``NULL``
       * *ARK_INTERP_FAIL* if this is called after :c:func:`ARKStepEvolve()`
-      * *ARK_ILL_INPUT* if an argument has an illegal value or the
+      * *ARK_ILL_INPUT* if an argument had an illegal value or the
         interpolation module has already been initialized
 
    **Notes:**
@@ -622,7 +627,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       This parameter can be ``stdout`` or ``stderr``, although the
@@ -651,7 +656,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Pass 0.0 to return ARKStep to the default (adaptive-step) mode.
@@ -712,7 +717,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Pass 0.0 to use the default value.
@@ -742,7 +747,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       The default value is 10; set *mxhnil* to zero to specify
@@ -768,7 +773,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Passing *mxsteps* = 0 results in ARKStep using the
@@ -792,7 +797,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Pass *hmax* :math:`\le 0.0` to set the default value of :math:`\infty`.
@@ -813,7 +818,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Pass *hmin* :math:`\le 0.0` to set the default value of 0.
@@ -835,13 +840,13 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       The default is that no stop time is imposed.
 
       Once the integrator returns at a stop time, any future testing for
-      ``tstop`` is disabled (and can be reenabled only though a new call to
+      ``tstop`` is disabled (and can be re-enabled only though a new call to
       :c:func:`ARKStepSetStopTime`).
 
       A stop time not reached before a call to :c:func:`ARKStepReInit` or
@@ -886,7 +891,7 @@ Optional inputs for ARKStep
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
 
    **Notes:**
-      The stop time can be reenabled though a new call to
+      The stop time can be re-enabled though a new call to
       :c:func:`ARKStepSetStopTime`.
 
    .. versionadded:: 5.5.1
@@ -908,7 +913,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       If specified, the pointer to *user_data* is passed to all
@@ -936,7 +941,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       The default value is 7; set *maxnef* :math:`\le 0`
@@ -959,7 +964,7 @@ Optional inputs for ARKStep
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Should only be called after the method order and integration
@@ -1214,7 +1219,7 @@ Set additive RK tables via their names    :c:func:`ARKStepSetTableName()`    int
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       For explicit methods, the allowed values are :math:`2 \le`
@@ -1243,7 +1248,7 @@ Set additive RK tables via their names    :c:func:`ARKStepSetTableName()`    int
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       This is automatically deduced when neither of the function
@@ -1263,7 +1268,7 @@ Set additive RK tables via their names    :c:func:`ARKStepSetTableName()`    int
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       This is automatically deduced when the function pointer `fi`
@@ -1286,7 +1291,7 @@ Set additive RK tables via their names    :c:func:`ARKStepSetTableName()`    int
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       This is automatically deduced when the function pointer `fe`
@@ -1309,7 +1314,7 @@ Set additive RK tables via their names    :c:func:`ARKStepSetTableName()`    int
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       For a description of the :c:type:`ARKodeButcherTable` type and related
@@ -1366,7 +1371,7 @@ Set additive RK tables via their names    :c:func:`ARKStepSetTableName()`    int
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       The allowable values for both the *itable* and *etable* arguments
@@ -1408,7 +1413,7 @@ Set additive RK tables via their names    :c:func:`ARKStepSetTableName()`    int
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       The allowable values for both the *itable* and *etable* arguments
@@ -1450,18 +1455,22 @@ Optional inputs for time step adaptivity
 
    **Arguments:**
       * *arkode_mem* -- pointer to the ARKStep memory block.
-      * *C* -- user-supplied time adaptivity controller.  If ``NULL`` then the PID controller will be created (see :numref:`SUNAdaptController.Soderlind`).
+      * *C* -- user-supplied time adaptivity controller.  If ``NULL`` then the I controller will be created (see :numref:`SUNAdaptController.Soderlind`).
 
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_MEM_FAIL* if *C* was ``NULL`` and the PID controller could not be allocated.
+      * *ARK_MEM_FAIL* if *C* was ``NULL`` and the I controller could not be allocated.
 
    .. versionadded:: 5.7.0
 
    .. deprecated:: 6.1.0
 
       Use :c:func:`ARKodeSetAdaptController` instead.
+
+   .. versionchanged:: 6.3.0
+
+      The default controller was changed from PID to I.
 
 
 .. c:function:: int ARKStepSetAdaptivityFn(void* arkode_mem, ARKAdaptFn hfun, void* h_data)
@@ -1477,7 +1486,7 @@ Optional inputs for time step adaptivity
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       This function should focus on accuracy-based time step
@@ -1515,7 +1524,7 @@ Optional inputs for time step adaptivity
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       If custom parameters are supplied, they will be checked
@@ -1544,12 +1553,12 @@ Optional inputs for time step adaptivity
 
    **Arguments:**
       * *arkode_mem* -- pointer to the ARKStep memory block.
-      * *adjust* -- adjustment factor (default is -1).
+      * *adjust* -- adjustment factor (default is 0).
 
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       This should be called prior to calling :c:func:`ARKStepEvolve()`, and can only be
@@ -1560,6 +1569,10 @@ Optional inputs for time step adaptivity
    .. deprecated:: 6.1.0
 
       Use :c:func:`ARKodeSetAdaptivityAdjustment` instead.
+
+   .. versionchanged:: 6.3.0
+
+      The default value was changed from -1 to 0
 
 
 
@@ -1574,7 +1587,7 @@ Optional inputs for time step adaptivity
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any non-positive parameter will imply a reset to the default
@@ -1593,12 +1606,12 @@ Optional inputs for time step adaptivity
    **Arguments:**
       * *arkode_mem* -- pointer to the ARKStep memory block.
       * *bias* -- bias applied to error in accuracy-based time
-        step estimation (default is 1.5).
+        step estimation (default is 1.0).
 
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any value below 1.0 will imply a reset to the default value.
@@ -1610,6 +1623,10 @@ Optional inputs for time step adaptivity
    .. deprecated:: 5.7.0
 
       Use the SUNAdaptController infrastructure instead (see :numref:`SUNAdaptController.Description`).
+      
+   .. versionchanged:: 6.3.0
+
+      The default value was changed from 1.5 to 1.0
 
 
 .. c:function:: int ARKStepSetFixedStepBounds(void* arkode_mem, sunrealtype lb, sunrealtype ub)
@@ -1619,12 +1636,12 @@ Optional inputs for time step adaptivity
    **Arguments:**
       * *arkode_mem* -- pointer to the ARKStep memory block.
       * *lb* -- lower bound on window to leave step size fixed (default is 1.0).
-      * *ub* -- upper bound on window to leave step size fixed (default is 1.5).
+      * *ub* -- upper bound on window to leave step size fixed (default is 1.0).
 
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any interval *not* containing 1.0 will imply a reset to the default values.
@@ -1632,6 +1649,10 @@ Optional inputs for time step adaptivity
    .. deprecated:: 6.1.0
 
       Use :c:func:`ARKodeSetFixedStepBounds` instead.
+      
+   .. versionchanged:: 6.3.0
+
+      The default upper bound was changed from 1.5 to 1.0
 
 
 .. c:function:: int ARKStepSetMaxCFailGrowth(void* arkode_mem, sunrealtype etacf)
@@ -1648,7 +1669,7 @@ Optional inputs for time step adaptivity
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any value outside the interval :math:`(0,1]` will imply a reset to the default value.
@@ -1670,7 +1691,7 @@ Optional inputs for time step adaptivity
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any value outside the interval :math:`(0,1]` will imply a reset to the default value.
@@ -1693,7 +1714,7 @@ Optional inputs for time step adaptivity
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any value :math:`\le 1.0` will imply a reset to the default value.
@@ -1715,7 +1736,7 @@ Optional inputs for time step adaptivity
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any value :math:`\le 1.0` will imply a reset to the default
@@ -1740,7 +1761,7 @@ Optional inputs for time step adaptivity
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any value outside the interval :math:`(0,1)` will imply a reset to
@@ -1758,12 +1779,12 @@ Optional inputs for time step adaptivity
 
    **Arguments:**
       * *arkode_mem* -- pointer to the ARKStep memory block.
-      * *safety* -- safety factor applied to accuracy-based time step (default is 0.96).
+      * *safety* -- safety factor applied to accuracy-based time step (default is 0.9).
 
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any value :math:`\le 0` will imply a reset to the default
@@ -1772,6 +1793,11 @@ Optional inputs for time step adaptivity
    .. deprecated:: 6.1.0
 
       Use :c:func:`ARKodeSetSafetyFactor` instead.
+      
+   .. versionchanged:: 6.3.0
+
+      The default default was changed from 0.96 to 0.9. The maximum value is now
+      exactly 1.0 rather than strictly less than 1.0.
 
 
 .. c:function:: int ARKStepSetSmallNumEFails(void* arkode_mem, int small_nef)
@@ -1787,7 +1813,7 @@ Optional inputs for time step adaptivity
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any value :math:`\le 0` will imply a reset to the default value.
@@ -1811,7 +1837,7 @@ Optional inputs for time step adaptivity
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       This function should return an estimate of the absolute
@@ -1845,7 +1871,7 @@ Optional inputs for implicit stage solves
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Tightens the linear solver tolerances and takes only a
@@ -1876,7 +1902,7 @@ Optional inputs for implicit stage solves
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       This is the default behavior of ARKStep, so the function
@@ -1922,7 +1948,7 @@ Optional inputs for implicit stage solves
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       The default value is 0.  If *method* is set to an
@@ -2001,7 +2027,7 @@ Optional inputs for implicit stage solves
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value or if the SUNNONLINSOL module is ``NULL``
+      * *ARK_ILL_INPUT* if an argument had an illegal value or if the SUNNONLINSOL module is ``NULL``
       * *ARK_NLS_OP_ERR* if the SUNNONLINSOL object returned a failure flag
 
    **Notes:**
@@ -2025,7 +2051,7 @@ Optional inputs for implicit stage solves
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       The default value is 0.1; set *nlscoef* :math:`\le 0`
@@ -2047,7 +2073,7 @@ Optional inputs for implicit stage solves
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any non-positive parameter will imply a reset to the default value.
@@ -2070,7 +2096,7 @@ Optional inputs for implicit stage solves
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any non-positive parameter will imply a reset to the default value.
@@ -2095,7 +2121,7 @@ Optional inputs for implicit stage solves
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       The default value is 10; set *maxncf* :math:`\le 0`
@@ -2162,7 +2188,7 @@ Optional inputs for the ARKLS linear solver interface
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       Any non-positive parameter will imply a reset to the default value.
@@ -2321,7 +2347,7 @@ Optional inputs for matrix-based ``SUNLinearSolver`` modules
       * *ARKLS_SUCCESS*  if successful
       * *ARKLS_MEM_NULL*  if the ARKStep memory was ``NULL``
       * *ARKLS_MASSMEM_NULL* if the mass matrix solver memory was ``NULL``
-      * *ARKLS_ILL_INPUT* if an argument has an illegal value
+      * *ARKLS_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       This routine must be called after the ARKLS mass matrix
@@ -2701,7 +2727,7 @@ Rootfinding optional input functions
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL* if the ARKStep memory is ``NULL``
-      * *ARK_ILL_INPUT* if an argument has an illegal value
+      * *ARK_ILL_INPUT* if an argument had an illegal value
 
    **Notes:**
       The default behavior is to monitor for both zero-crossing directions.
@@ -3055,9 +3081,9 @@ Main solver optional output functions
 
    .. note::
 
-      The file ``scripts/sundials_csv.py`` provides python utility functions to
-      read and output the data from a SUNDIALS CSV output file using the key
-      and value pair format.
+      The Python module ``tools/suntools`` provides utilities to read and output
+      the data from a SUNDIALS CSV output file using the key and value pair
+      format.
 
    .. versionadded:: 5.2.0
 
@@ -3155,6 +3181,9 @@ Main solver optional output functions
       The *nfi_evals* value does not account for calls made to
       :math:`f^I` by a linear solver or preconditioner module.
 
+   .. deprecated:: 6.2.0
+
+      Use :c:func:`ARKodeGetNumRhsEvals` instead.
 
 
 .. c:function:: int ARKStepGetNumErrTestFails(void* arkode_mem, long int* netfails)
@@ -4222,7 +4251,7 @@ vector.
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL*  if the ARKStep memory was ``NULL``
       * *ARK_MEM_FAIL*  if a memory allocation failed
-      * *ARK_ILL_INPUT* if an argument has an illegal value.
+      * *ARK_ILL_INPUT* if an argument had an illegal value.
 
    **Notes:**
       All previously set options are retained but may be updated by calling
@@ -4254,7 +4283,7 @@ ARKStep reset function
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL*  if the ARKStep memory was ``NULL``
       * *ARK_MEM_FAIL*  if a memory allocation failed
-      * *ARK_ILL_INPUT* if an argument has an illegal value.
+      * *ARK_ILL_INPUT* if an argument had an illegal value.
 
    **Notes:**
       By default the next call to :c:func:`ARKStepEvolve()` will use the step size
@@ -4301,7 +4330,7 @@ ARKStep system resize function
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_NULL*  if the ARKStep memory was ``NULL``
       * *ARK_NO_MALLOC* if *arkode_mem* was not allocated.
-      * *ARK_ILL_INPUT* if an argument has an illegal value.
+      * *ARK_ILL_INPUT* if an argument had an illegal value.
 
    **Notes:**
       If an error occurred, :c:func:`ARKStepResize()` also sends an error
@@ -4372,7 +4401,7 @@ wrap an ARKStep memory block as an :c:type:`MRIStepInnerStepper`.
    **Return value:**
       * *ARK_SUCCESS* if successful
       * *ARK_MEM_FAIL* if a memory allocation failed
-      * *ARK_ILL_INPUT* if an argument has an illegal value.
+      * *ARK_ILL_INPUT* if an argument had an illegal value.
 
    **Example usage:**
       .. code-block:: C
@@ -4396,7 +4425,11 @@ wrap an ARKStep memory block as an :c:type:`MRIStepInnerStepper`.
 
          /* create an MRIStep object, setting the slow (outer) right-hand side
             functions and the initial condition */
-         outer_arkode_mem = MRIStepCreate(fse, fsi, t0, y0, stepper, sunctx)
+         outer_arkode_mem = MRIStepCreate(fse, fsi, t0, y0, stepper, sunctx);
 
    **Example codes:**
       * ``examples/arkode/CXX_parallel/ark_diffusion_reaction_p.cpp``
+
+   .. deprecated:: 6.2.0
+
+      Use :c:func:`ARKodeCreateMRIStepInnerStepper` instead.
