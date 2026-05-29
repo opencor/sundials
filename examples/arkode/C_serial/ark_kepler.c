@@ -3,8 +3,11 @@
  * Programmer(s): Cody J. Balos @ LLNL
  * ----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2025, Lawrence Livermore National Security
+ * Copyright (c) 2025-2026, Lawrence Livermore National Security,
+ * University of Maryland Baltimore County, and the SUNDIALS contributors.
+ * Copyright (c) 2013-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
+ * Copyright (c) 2002-2013, Lawrence Livermore National Security.
  * All rights reserved.
  *
  * See the top-level LICENSE and NOTICE files for details.
@@ -164,8 +167,8 @@ int SolveProblem(ProgramArgs* args, ProblemResult* result, SUNContext sunctx)
     retval = SPRKStepSetMethodName(arkode_mem, method_name);
     if (check_retval(&retval, "SPRKStepSetMethodName", 1)) { return 1; }
 
-    retval = SPRKStepSetUseCompensatedSums(arkode_mem, use_compsums);
-    if (check_retval(&retval, "SPRKStepSetUseCompensatedSums", 1)) { return 1; }
+    retval = ARKodeSetUseCompensatedSums(arkode_mem, use_compsums);
+    if (check_retval(&retval, "ARKodeSetUseCompensatedSums", 1)) { return 1; }
 
     if (step_mode == 0)
     {

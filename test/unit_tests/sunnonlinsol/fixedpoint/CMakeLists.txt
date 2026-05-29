@@ -2,8 +2,11 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -23,7 +26,7 @@ set(examples
     "test_sunnonlinsol_fixedpoint\;2 0.5\;")
 
 # if building F2003 tests
-if(BUILD_FORTRAN_MODULE_INTERFACE)
+if(SUNDIALS_ENABLE_FORTRAN)
   set(fortran_examples "test_fsunnonlinsol_fixedpoint_mod\;\;")
 endif()
 
@@ -33,7 +36,7 @@ include_directories(.)
 # Specify libraries to link against
 set(SUNDIALS_LIBS sundials_nvecserial)
 list(APPEND SUNDIALS_LIBS sundials_sunnonlinsolfixedpoint)
-if(BUILD_FORTRAN_MODULE_INTERFACE)
+if(SUNDIALS_ENABLE_FORTRAN)
   list(APPEND SUNDIALS_LIBS sundials_fnvecserial_mod)
   list(APPEND SUNDIALS_LIBS sundials_fsunnonlinsolfixedpoint_mod)
 endif()
@@ -75,11 +78,6 @@ foreach(example_tuple ${examples})
     TEST_ARGS ${example_args}
     EXAMPLE_TYPE ${example_type}
     NODIFF)
-
-  if(EXAMPLES_INSTALL)
-    install(FILES ${example}.c
-            DESTINATION ${EXAMPLES_INSTALL_PATH}/sunnonlinsol/fixedpoint)
-  endif()
 
 endforeach(example_tuple ${examples})
 
@@ -125,54 +123,3 @@ foreach(example_tuple ${fortran_examples})
     NODIFF)
 
 endforeach(example_tuple ${fortran_examples})
-
-if(EXAMPLES_INSTALL)
-
-  # Install the README file
-  install(FILES DESTINATION ${EXAMPLES_INSTALL_PATH}/sunnonlinsol/fixedpoint)
-
-  # Prepare substitution variables for Makefile and/or CMakeLists templates
-  set(SOLVER_LIB "sundials_sunnonlinsolfixedpoint")
-  set(LIBS "${LIBS} -lsundials_sunmatrixdense -lsundials_sunlinsoldense")
-
-  # Set the link directory for the dense sunmatrix and linear solver library The
-  # generated CMakeLists.txt does not use find_library() locate it
-  set(EXTRA_LIBS_DIR "${libdir}")
-
-  examples2string(examples EXAMPLES)
-
-  # Regardless of the platform we're on, we will generate and install
-  # CMakeLists.txt file for building the examples. This file  can then be used
-  # as a template for the user's own programs.
-
-  # generate CMakelists.txt in the binary directory
-  configure_file(
-    ${PROJECT_SOURCE_DIR}/examples/templates/cmakelists_serial_C_ex.in
-    ${PROJECT_BINARY_DIR}/test/unit_tests/sunnonlinsol/fixedpoint/CMakeLists.txt
-    @ONLY)
-
-  # install CMakelists.txt
-  install(
-    FILES
-      ${PROJECT_BINARY_DIR}/test/unit_tests/sunnonlinsol/fixedpoint/CMakeLists.txt
-    DESTINATION ${EXAMPLES_INSTALL_PATH}/sunnonlinsol/fixedpoint)
-
-  # On UNIX-type platforms, we also  generate and install a makefile for
-  # building the examples. This makefile can then be used as a template for the
-  # user's own programs.
-
-  if(UNIX)
-    # generate Makefile and place it in the binary dir
-    configure_file(
-      ${PROJECT_SOURCE_DIR}/examples/templates/makefile_serial_C_ex.in
-      ${PROJECT_BINARY_DIR}/test/unit_tests/sunnonlinsol/fixedpoint/Makefile_ex
-      @ONLY)
-    # install the configured Makefile_ex as Makefile
-    install(
-      FILES
-        ${PROJECT_BINARY_DIR}/test/unit_tests/sunnonlinsol/fixedpoint/Makefile_ex
-      DESTINATION ${EXAMPLES_INSTALL_PATH}/sunnonlinsol/fixedpoint
-      RENAME Makefile)
-  endif()
-
-endif()

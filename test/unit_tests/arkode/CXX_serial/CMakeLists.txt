@@ -1,9 +1,12 @@
 # ---------------------------------------------------------------
-# Programmer(s): Daniel R. Reynolds @ SMU
+# Programmer(s): Daniel R. Reynolds @ UMBC
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -66,7 +69,34 @@ set(unit_tests
     "ark_test_adjoint_ark.cpp\;--check-freq 5\;"
     "ark_test_adjoint_ark.cpp\;--check-freq 1 --dont-keep\;"
     "ark_test_adjoint_ark.cpp\;--check-freq 2 --dont-keep\;"
-    "ark_test_adjoint_ark.cpp\;--check-freq 5 --dont-keep\;")
+    "ark_test_adjoint_ark.cpp\;--check-freq 5 --dont-keep\;"
+    "ark_test_prealloc_arkstep.cpp\;1\;"
+    "ark_test_prealloc_erkstep.cpp\;1\;"
+    "ark_test_prealloc_forcingstep.cpp\;1\;"
+    "ark_test_prealloc_lsrkstep.cpp\;1\;"
+    "ark_test_prealloc_mristep.cpp\;1\;"
+    "ark_test_prealloc_splittingstep.cpp\;1\;"
+    "ark_test_prealloc_sprkstep.cpp\;1\;"
+    "ark_test_stageinfo_arkstep.cpp\;0\;" # ERK
+    "ark_test_stageinfo_arkstep.cpp\;1\;" # DIRK
+    "ark_test_stageinfo_arkstep.cpp\;2\;" # ImEx
+    "ark_test_stageinfo_erkstep.cpp\;\;"
+    "ark_test_stageinfo_forcingstep.cpp\;\;"
+    "ark_test_stageinfo_lsrkstep.cpp\;0\;" # RKC
+    "ark_test_stageinfo_lsrkstep.cpp\;1\;" # RKL
+    "ark_test_stageinfo_lsrkstep.cpp\;2\;" # SSPs2
+    "ark_test_stageinfo_lsrkstep.cpp\;3\;" # SSPs3
+    "ark_test_stageinfo_lsrkstep.cpp\;4\;" # SSP43
+    "ark_test_stageinfo_lsrkstep.cpp\;5\;" # SSP104
+    "ark_test_stageinfo_mristep.cpp\;0\;" # MRIGARK Explicit
+    "ark_test_stageinfo_mristep.cpp\;1\;" # MRIGARK Implicit
+    "ark_test_stageinfo_mristep.cpp\;2\;" # MRIGARK ImEx
+    "ark_test_stageinfo_mristep.cpp\;3\;" # MRISR Explicit
+    "ark_test_stageinfo_mristep.cpp\;4\;" # MRISR Implicit
+    "ark_test_stageinfo_mristep.cpp\;5\;" # MRISR ImEx
+    "ark_test_stageinfo_mristep.cpp\;6\;" # MERK
+    "ark_test_stageinfo_splittingstep.cpp\;\;"
+    "ark_test_stageinfo_sprkstep.cpp\;\;")
 
 # Add the build and install targets for each test
 foreach(test_tuple ${unit_tests})
@@ -101,19 +131,20 @@ foreach(test_tuple ${unit_tests})
     # their visibility in the installed libraries.
     target_link_libraries(
       ${test_target}
-      $<TARGET_OBJECTS:sundials_arkode_obj>
-      sundials_sunmemsys_obj
-      sundials_nvecserial_obj
-      sundials_nvecmanyvector_obj
-      sundials_sunlinsolband_obj
-      sundials_sunlinsoldense_obj
-      sundials_sunnonlinsolnewton_obj
-      sundials_sunnonlinsolfixedpoint_obj
-      sundials_sunadaptcontrollerimexgus_obj
-      sundials_sunadaptcontrollersoderlind_obj
-      sundials_sunadaptcontrollermrihtol_obj
-      sundials_adjointcheckpointscheme_fixed_obj
-      ${EXE_EXTRA_LINK_LIBS})
+      PRIVATE $<TARGET_OBJECTS:sundials_arkode_obj>
+              sundials_sunmemsys_obj
+              sundials_nvecserial_obj
+              sundials_nvecmanyvector_obj
+              sundials_sunlinsolband_obj
+              sundials_sunlinsoldense_obj
+              sundials_sunlinsolspgmr_obj
+              sundials_sunnonlinsolnewton_obj
+              sundials_sunnonlinsolfixedpoint_obj
+              sundials_sunadaptcontrollerimexgus_obj
+              sundials_sunadaptcontrollersoderlind_obj
+              sundials_sunadaptcontrollermrihtol_obj
+              sundials_adjointcheckpointscheme_fixed_obj
+              ${EXE_EXTRA_LINK_LIBS})
 
     # Tell CMake that we depend on the ARKODE library since it does not pick
     # that up from $<TARGET_OBJECTS:sundials_arkode_obj>.

@@ -2,8 +2,11 @@
  * Programmer(s): David J. Gardner @ LLNL
  * -----------------------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2025, Lawrence Livermore National Security
+ * Copyright (c) 2025-2026, Lawrence Livermore National Security,
+ * University of Maryland Baltimore County, and the SUNDIALS contributors.
+ * Copyright (c) 2013-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
+ * Copyright (c) 2002-2013, Lawrence Livermore National Security.
  * All rights reserved.
  *
  * See the top-level LICENSE and NOTICE files for details.
@@ -136,7 +139,6 @@ int main(int argc, char* argv[])
   UserOpt uopt   = NULL; /* user options struct */
   N_Vector u     = NULL; /* solution vector     */
   N_Vector scale = NULL; /* scaling vector      */
-  FILE* infofp   = NULL; /* KINSOL log file     */
   long int nni, nfe;     /* solver outputs      */
   sunrealtype* data;     /* vector data array   */
   void* kmem;            /* KINSOL memory       */
@@ -249,10 +251,6 @@ int main(int argc, char* argv[])
     if (check_retval(&retval, "KINSetDepthFn", 1)) { return (1); }
   }
 
-  /* Set info log file and print level */
-  infofp = fopen("kinsol.log", "w");
-  if (check_retval((void*)infofp, "fopen", 0)) { return (1); }
-
   /* -------------
    * Initial guess
    * ------------- */
@@ -306,7 +304,6 @@ int main(int argc, char* argv[])
    * Free memory
    * ----------- */
 
-  fclose(infofp);
   N_VDestroy(u);
   N_VDestroy(scale);
   KINFree(&kmem);

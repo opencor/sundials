@@ -3,8 +3,11 @@
 # Programmer(s): David J. Gardner @ LLNL
 # -----------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -23,23 +26,15 @@ import matplotlib.pyplot as plt
 # command line options
 parser = argparse.ArgumentParser(description="Plots cvsPraticle_dns output")
 parser.add_argument(
-    "--sfile",
-    type=str,
-    default="cvsParticle_solution.txt",
-    help="solution output file to read",
+    "--sfile", type=str, default="cvsParticle_solution.txt", help="solution output file to read"
 )
 parser.add_argument(
-    "--efile",
-    type=str,
-    default="cvsParticle_error.txt",
-    help="error output file to read",
+    "--efile", type=str, default="cvsParticle_error.txt", help="error output file to read"
 )
 parser.add_argument(
     "--alpha", type=float, nargs=1, default=1.0, help="set a non-default alpha value"
 )
-parser.add_argument(
-    "--slim", type=float, nargs=2, help="x and y limits for solution plot"
-)
+parser.add_argument("--slim", type=float, nargs=2, help="x and y limits for solution plot")
 parser.add_argument("--eylim", type=float, nargs=2, help="y limits for error plot")
 
 # parse inputs

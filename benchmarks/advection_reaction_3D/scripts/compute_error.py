@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -----------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -80,9 +83,7 @@ for component in ["u", "v", "w"]:
     x = np.array([np.prod(h_over_4["h"]), np.prod(h_over_1["h"])])
     plt.plot(x, x, "k-")
     plt.plot(x, x**2, "k-")
-    plt.plot(
-        x, [np.linalg.norm(Eh_over_4, np.Inf), np.linalg.norm(Eh_over_1, np.Inf)], "r-"
-    )
+    plt.plot(x, [np.linalg.norm(Eh_over_4, np.Inf), np.linalg.norm(Eh_over_1, np.Inf)], "r-")
     plt.legend(["1st order", "2nd order", "actual"])
     plt.ylabel("|| ||E(hx,hy,hz)|| ||_inf")
     plt.xlabel("hx * hy * hz")

@@ -1,10 +1,13 @@
 # ---------------------------------------------------------------
 # Programmer(s): David J. Gardner @ LLNL
-#                modified by Daniel M. Margolis @ SMU
+#                modified by Daniel M. Margolis @ UMBC
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -77,20 +80,20 @@ foreach(example_tuple ${FCVODE_examples})
   file(GLOB example_out ${example}*.out)
 
   # install example source and out files
-  if(EXAMPLES_INSTALL)
+  if(SUNDIALS_ENABLE_EXAMPLES_INSTALL)
     install(FILES ${example}.f90 ${example_out}
-            DESTINATION ${EXAMPLES_INSTALL_PATH}/cvode/F2003_parallel)
+            DESTINATION ${SUNDIALS_EXAMPLES_INSTALL_PATH}/cvode/F2003_parallel)
   endif()
 
 endforeach(example_tuple ${FCVODE_examples})
 
 # create Makefile and CMakeLists.txt for examples
-if(EXAMPLES_INSTALL)
+if(SUNDIALS_ENABLE_EXAMPLES_INSTALL)
 
   # Install the extra files
   foreach(extrafile ${CVODE_extras})
     install(FILES ${extrafile}
-            DESTINATION ${EXAMPLES_INSTALL_PATH}/cvode/F2003_parallel)
+            DESTINATION ${SUNDIALS_EXAMPLES_INSTALL_PATH}/cvode/F2003_parallel)
   endforeach()
 
   # Prepare substitution variables for Makefile and/or CMakeLists templates
@@ -118,7 +121,7 @@ if(EXAMPLES_INSTALL)
   # install CMakelists.txt
   install(
     FILES ${PROJECT_BINARY_DIR}/examples/cvode/F2003_parallel/CMakeLists.txt
-    DESTINATION ${EXAMPLES_INSTALL_PATH}/cvode/F2003_parallel)
+    DESTINATION ${SUNDIALS_EXAMPLES_INSTALL_PATH}/cvode/F2003_parallel)
 
   # On UNIX-type platforms, we also  generate and install a makefile for
   # building the examples. This makefile can then be used as a template for the
@@ -132,7 +135,7 @@ if(EXAMPLES_INSTALL)
     # install the configured Makefile_ex as Makefile
     install(
       FILES ${PROJECT_BINARY_DIR}/examples/cvode/F2003_parallel/Makefile_ex
-      DESTINATION ${EXAMPLES_INSTALL_PATH}/cvode/F2003_parallel
+      DESTINATION ${SUNDIALS_EXAMPLES_INSTALL_PATH}/cvode/F2003_parallel
       RENAME Makefile)
   endif()
 

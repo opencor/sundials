@@ -3,8 +3,11 @@
 # Programmer(s): David J. Gardner @ LLNL
 # -----------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -35,15 +38,11 @@ def main():
     import matplotlib.pyplot as plt
     import matplotlib.ticker as mtick
 
-    parser = argparse.ArgumentParser(
-        description="Plot data from NVector performance tests"
-    )
+    parser = argparse.ArgumentParser(description="Plot data from NVector performance tests")
 
     parser.add_argument("op", type=str, help="Which NVector operation to plot")
 
-    parser.add_argument(
-        "datadir", type=str, help="Directory where test output files are located"
-    )
+    parser.add_argument("datadir", type=str, help="Directory where test output files are located")
 
     parser.add_argument(
         "--noplots",
@@ -64,10 +63,7 @@ def main():
     )
 
     parser.add_argument(
-        "--show",
-        dest="show",
-        action="store_true",
-        help="Display plots rather than saving to file",
+        "--show", dest="show", action="store_true", help="Display plots rather than saving to file"
     )
 
     parser.add_argument(
@@ -226,14 +222,10 @@ def main():
     upper_numer = avg_numer + cdev_numer
 
     # check if the new average times are within the baseline confidence interval
-    denom_in = np.where(
-        np.logical_and(avg_denom < upper_numer, avg_denom > lower_numer)
-    )
+    denom_in = np.where(np.logical_and(avg_denom < upper_numer, avg_denom > lower_numer))
 
     # check if the baseline average times are within the new confidence interval
-    numer_in = np.where(
-        np.logical_and(avg_numer < upper_denom, avg_numer > lower_denom)
-    )
+    numer_in = np.where(np.logical_and(avg_numer < upper_denom, avg_numer > lower_denom))
 
     # get which numbers of vectors and elements for new tests are in the
     # confidence interval of the baseline times

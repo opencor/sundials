@@ -3,8 +3,11 @@
  * Programmer(s): Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2025, Lawrence Livermore National Security
+ * Copyright (c) 2025-2026, Lawrence Livermore National Security,
+ * University of Maryland Baltimore County, and the SUNDIALS contributors.
+ * Copyright (c) 2013-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
+ * Copyright (c) 2002-2013, Lawrence Livermore National Security.
  * All rights reserved.
  *
  * See the top-level LICENSE and NOTICE files for details.
@@ -45,7 +48,7 @@
 /* Shortcuts                                                       */
 /*=================================================================*/
 
-#if defined(SUNDIALS_BUILD_WITH_PROFILING)
+#if defined(SUNDIALS_ENABLE_PROFILING)
 #define CV_PROFILER cv_mem->cv_sunctx->profiler
 #endif
 
@@ -379,7 +382,8 @@ void CVodeAdjFree(void* cvode_mem)
 
     /* Free CVODEA memory */
     free(ca_mem);
-    cv_mem->cv_adj_mem = NULL;
+    cv_mem->cv_adj_mem       = NULL;
+    cv_mem->cv_adjMallocDone = SUNFALSE;
   }
 }
 
@@ -708,6 +712,10 @@ int CVodeCreateB(void* cvode_mem, int lmmB, int* which)
                    MSGCV_MEM_FAIL);
     return (CV_MEM_FAIL);
   }
+
+  /* We need to ensure Ns is set in the new CVODES object so that Ns is accessible 
+     in the Python callbacks which only have access to cvodeB_mem, not the original cvode_mem */
+  ((CVodeMem)cvodeB_mem)->cv_Ns = cv_mem->cv_Ns;
 
   CVodeSetUserData(cvodeB_mem, cvode_mem);
 

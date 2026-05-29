@@ -2,8 +2,11 @@
 # Programmer(s): Radu Serban and Cody J. Balos @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -22,10 +25,14 @@ install(CODE "MESSAGE(\"\nInstall shared components\n\")")
 # Add variable sundials_HEADERS with the exported SUNDIALS header files
 set(sundials_HEADERS
     sundials_adaptcontroller.h
+    sundials_adaptcontroller.hpp
     sundials_adjointcheckpointscheme.h
+    sundials_adjointcheckpointscheme.hpp
     sundials_adjointstepper.h
+    sundials_adjointstepper.hpp
     sundials_band.h
     sundials_base.hpp
+    sundials_classview.hpp
     sundials_context.h
     sundials_context.hpp
     sundials_convertibleto.hpp
@@ -33,12 +40,15 @@ set(sundials_HEADERS
     sundials_core.hpp
     sundials_dense.h
     sundials_direct.h
+    sundials_domeigestimator.h
+    sundials_domeigestimator.hpp
     sundials_errors.h
     sundials_futils.h
     sundials_iterative.h
     sundials_linearsolver.h
     sundials_linearsolver.hpp
     sundials_logger.h
+    sundials_logger.hpp
     sundials_math.h
     sundials_matrix.h
     sundials_matrix.hpp
@@ -52,28 +62,29 @@ set(sundials_HEADERS
     sundials_profiler.h
     sundials_profiler.hpp
     sundials_stepper.h
+    sundials_stepper.hpp
     sundials_types_deprecated.h
     sundials_types.h
     sundials_version.h)
 
-if(ENABLE_MPI)
+if(SUNDIALS_ENABLE_MPI)
   list(APPEND sundials_HEADERS sundials_mpi_errors.h)
 endif()
 
-if(ENABLE_CUDA)
+if(SUNDIALS_ENABLE_CUDA)
   list(APPEND sundials_HEADERS sundials_cuda_policies.hpp)
 endif()
 
-if(ENABLE_HIP)
+if(SUNDIALS_ENABLE_HIP)
   list(APPEND sundials_HEADERS sundials_hip_policies.hpp)
 endif()
 
-if(ENABLE_SYCL)
+if(SUNDIALS_ENABLE_SYCL)
   list(APPEND sundials_HEADERS sundials_sycl_policies.hpp)
 endif()
 
 # If enabled, add the XBraid interface header
-if(ENABLE_XBRAID)
+if(SUNDIALS_ENABLE_XBRAID)
   list(APPEND sundials_HEADERS sundials_xbraid.h)
 endif()
 
@@ -86,11 +97,13 @@ set(sundials_SOURCES
     sundials_adjointcheckpointscheme.c
     sundials_adjointstepper.c
     sundials_band.c
+    sundials_cli.c
     sundials_context.c
     sundials_dense.c
     sundials_datanode.c
     sundials_direct.c
     sundials_errors.c
+    sundials_domeigestimator.c
     sundials_futils.c
     sundials_hashmap.c
     sundials_iterative.c
@@ -106,23 +119,23 @@ set(sundials_SOURCES
     sundials_profiler.c
     sundials_version.c)
 
-if(ENABLE_MPI)
+if(SUNDIALS_ENABLE_MPI)
   list(APPEND sundials_SOURCES sundials_mpi_errors.c)
 endif()
 
 # Add prefix with complete path to the source files
 add_prefix(${SUNDIALS_SOURCE_DIR}/src/sundials/ sundials_SOURCES)
 
-if(ENABLE_MPI)
+if(SUNDIALS_ENABLE_MPI)
   set(_link_mpi_if_needed PUBLIC MPI::MPI_C
                           $<$<LINK_LANGUAGE:CXX>:MPI::MPI_CXX>)
 endif()
 
-if(SUNDIALS_BUILD_WITH_PROFILING)
-  if(ENABLE_CALIPER)
+if(SUNDIALS_ENABLE_PROFILING)
+  if(SUNDIALS_ENABLE_CALIPER)
     set(_link_caliper_if_needed PUBLIC caliper)
   endif()
-  if(ENABLE_ADIAK)
+  if(SUNDIALS_ENABLE_ADIAK)
     set(_link_adiak_if_needed PUBLIC adiak::adiak ${CMAKE_DL_LIBS})
   endif()
 endif()
@@ -142,9 +155,10 @@ sundials_add_library(
 install(
   FILES ${SUNDIALS_SOURCE_DIR}/include/sundials/priv/sundials_context_impl.h
         ${SUNDIALS_SOURCE_DIR}/include/sundials/priv/sundials_errors_impl.h
+        ${SUNDIALS_SOURCE_DIR}/include/sundials/priv/sundials_logger_macros.h
   DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sundials/priv")
 
-if(ENABLE_MPI)
+if(SUNDIALS_ENABLE_MPI)
   install(
     FILES
       ${SUNDIALS_SOURCE_DIR}/include/sundials/priv/sundials_mpi_errors_impl.h
@@ -158,6 +172,6 @@ generate_export_header(
   "${PROJECT_BINARY_DIR}/include/sundials/sundials_export.h")
 
 # Add F2003 module if the interface is enabled
-if(BUILD_FORTRAN_MODULE_INTERFACE)
+if(SUNDIALS_ENABLE_FORTRAN)
   add_subdirectory("fmod_int${SUNDIALS_INDEX_SIZE}")
 endif()

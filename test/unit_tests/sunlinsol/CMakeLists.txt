@@ -2,8 +2,11 @@
 # Programmer(s): David J. Gardner and Slaven Peles @ LLNL
 # ---------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -14,7 +17,7 @@
 # test/unit_tests/sunlinsol level CMakeLists.txt for SUNDIALS
 # ---------------------------------------------------------------
 
-if(ENABLE_CALIPER AND SUNDIALS_BUILD_WITH_PROFILING)
+if(SUNDIALS_ENABLE_CALIPER AND SUNDIALS_ENABLE_PROFILING)
   include_directories(${caliper_INCLUDE_DIR})
   set(EXE_EXTRA_LINK_LIBS ${EXE_EXTRA_LINK_LIBS} caliper)
 endif()
@@ -40,7 +43,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 target_link_libraries(test_sunlinsol_obj PRIVATE sundials_sunlinsoldense)
 
-if(ENABLE_MPI AND MPI_C_FOUND)
+if(SUNDIALS_ENABLE_MPI)
   add_subdirectory(pcg/parallel)
   add_subdirectory(spgmr/parallel)
   add_subdirectory(spfgmr/parallel)
@@ -48,44 +51,44 @@ if(ENABLE_MPI AND MPI_C_FOUND)
   add_subdirectory(sptfqmr/parallel)
 endif()
 
-if(BUILD_SUNMATRIX_CUSPARSE)
+if(SUNDIALS_ENABLE_SUNMATRIX_CUSPARSE)
   if(SUNDIALS_INDEX_SIZE MATCHES "32")
     add_subdirectory(cusolversp)
   endif()
 endif()
 
-if(BUILD_SUNLINSOL_GINKGO)
+if(SUNDIALS_ENABLE_SUNLINSOL_GINKGO)
   add_subdirectory(ginkgo)
 endif()
 
-if(BUILD_SUNLINSOL_KLU)
+if(SUNDIALS_ENABLE_SUNLINSOL_KLU)
   add_subdirectory(klu)
 endif()
 
-if(BUILD_SUNLINSOL_KOKKOSDENSE)
+if(SUNDIALS_ENABLE_SUNLINSOL_KOKKOSDENSE)
   add_subdirectory(kokkos)
 endif()
 
-if(BUILD_SUNLINSOL_LAPACKBAND)
+if(SUNDIALS_ENABLE_SUNLINSOL_LAPACKBAND)
   add_subdirectory(lapackband)
 endif()
 
-if(BUILD_SUNLINSOL_LAPACKDENSE)
+if(SUNDIALS_ENABLE_SUNLINSOL_LAPACKDENSE)
   add_subdirectory(lapackdense)
 endif()
 
-if(BUILD_SUNLINSOL_MAGMADENSE)
+if(SUNDIALS_ENABLE_SUNLINSOL_MAGMADENSE)
   add_subdirectory(magmadense)
 endif()
 
-if(BUILD_SUNLINSOL_ONEMKLDENSE)
+if(SUNDIALS_ENABLE_SUNLINSOL_ONEMKLDENSE)
   add_subdirectory(onemkldense)
 endif()
 
-if(BUILD_SUNLINSOL_SUPERLUMT)
+if(SUNDIALS_ENABLE_SUNLINSOL_SUPERLUMT)
   add_subdirectory(superlumt)
 endif()
 
-if(BUILD_SUNLINSOL_SUPERLUDIST)
+if(SUNDIALS_ENABLE_SUNLINSOL_SUPERLUDIST)
   add_subdirectory(superludist)
 endif()

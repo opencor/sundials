@@ -2,8 +2,11 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -28,8 +31,8 @@
 # GPU_EXAMPLES_VAR, and CPU_GPU_EXAMPLES_VAR that go with MODULE (e.g. cvode,
 # sunlinsol).
 #
-# The DESTINATION option is the path *within* EXAMPLES_INSTALL_PATH that the
-# files should be installed under.
+# The DESTINATION option is the path *within* SUNDIALS_EXAMPLES_INSTALL_PATH
+# that the files should be installed under.
 #
 # The SUNDIALS_COMPONENTS option is a list of CMake targets in the SUNDIALS::
 # namespace provided to find_package. Note this may be the same as or a superset
@@ -78,7 +81,7 @@ macro(sundials_install_examples_ginkgo MODULE)
 
       # install files
       install(FILES ${example} ${example_header} ${example_out}
-              DESTINATION ${EXAMPLES_INSTALL_PATH}/${arg_DESTINATION})
+              DESTINATION ${SUNDIALS_EXAMPLES_INSTALL_PATH}/${arg_DESTINATION})
 
     endforeach()
   endforeach()
@@ -86,7 +89,7 @@ macro(sundials_install_examples_ginkgo MODULE)
   # Install the extra files and dependencies
   if(arg_EXTRA_FILES OR arg_DEPENDENCIES)
     install(FILES ${arg_EXTRA_FILES} ${arg_DEPENDENCIES}
-            DESTINATION ${EXAMPLES_INSTALL_PATH}/${arg_DESTINATION})
+            DESTINATION ${SUNDIALS_EXAMPLES_INSTALL_PATH}/${arg_DESTINATION})
   endif()
 
   # Prepare substitution variables for CMakeLists and/or Makefile templates
@@ -124,7 +127,7 @@ macro(sundials_install_examples_ginkgo MODULE)
 
   # Install CMakelists.txt
   install(FILES ${PROJECT_BINARY_DIR}/examples/${arg_DESTINATION}/CMakeLists.txt
-          DESTINATION ${EXAMPLES_INSTALL_PATH}/${arg_DESTINATION})
+          DESTINATION ${SUNDIALS_EXAMPLES_INSTALL_PATH}/${arg_DESTINATION})
 
   # Add test_install target
   sundials_add_test_install(${MODULE} ginkgo)

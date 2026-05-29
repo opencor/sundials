@@ -3,8 +3,11 @@
  * Programmer(s): Radu Serban @ LLNL
  * -----------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2025, Lawrence Livermore National Security
+ * Copyright (c) 2025-2026, Lawrence Livermore National Security,
+ * University of Maryland Baltimore County, and the SUNDIALS contributors.
+ * Copyright (c) 2013-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
+ * Copyright (c) 2002-2013, Lawrence Livermore National Security.
  * All rights reserved.
  *
  * See the top-level LICENSE and NOTICE files for details.
@@ -40,7 +43,7 @@
 /* Shortcuts                                                       */
 /*=================================================================*/
 
-#if defined(SUNDIALS_BUILD_WITH_PROFILING)
+#if defined(SUNDIALS_ENABLE_PROFILING)
 #define IDA_PROFILER IDA_mem->ida_sunctx->profiler
 #endif
 
@@ -310,7 +313,8 @@ void IDAAdjFree(void* ida_mem)
     /* Free IDAA memory. */
     free(IDAADJ_mem);
 
-    IDA_mem->ida_adj_mem = NULL;
+    IDA_mem->ida_adj_mem       = NULL;
+    IDA_mem->ida_adjMallocDone = SUNFALSE;
   }
 }
 
@@ -695,6 +699,10 @@ int IDACreateB(void* ida_mem, int* which)
                     MSG_MEM_FAIL);
     return (IDA_MEM_FAIL);
   }
+
+  /* We need to ensure Ns is set in the new IDAS object so that Ns is accessible 
+     in the Python callbacks which only have access to ida_memB, not the original cvode_mem */
+  ((IDAMem)ida_memB)->ida_Ns = IDA_mem->ida_Ns;
 
   /* Save ida_mem in ida_memB as user data. */
   IDASetUserData(ida_memB, ida_mem);

@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -----------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -54,29 +57,17 @@ for idx in range(0, len(ufiles)):
     sys.stdout.flush()
     udata.append(
         pd.read_csv(
-            ufiles[idx],
-            header=None,
-            delimiter=" ",
-            skipinitialspace=True,
-            dtype=np.double,
+            ufiles[idx], header=None, delimiter=" ", skipinitialspace=True, dtype=np.double
         )
     )
     vdata.append(
         pd.read_csv(
-            vfiles[idx],
-            header=None,
-            delimiter=" ",
-            skipinitialspace=True,
-            dtype=np.double,
+            vfiles[idx], header=None, delimiter=" ", skipinitialspace=True, dtype=np.double
         )
     )
     wdata.append(
         pd.read_csv(
-            wfiles[idx],
-            header=None,
-            delimiter=" ",
-            skipinitialspace=True,
-            dtype=np.double,
+            wfiles[idx], header=None, delimiter=" ", skipinitialspace=True, dtype=np.double
         )
     )
 sys.stdout.write("\n")
@@ -96,6 +87,4 @@ wdata = np.reshape(wdata, (nt, nx, ny, nz))
 
 # save data to pickle
 print("saving...")
-np.savez_compressed(
-    "output-with-h-%.2e.npz" % hx, t=times, u=udata, v=vdata, w=wdata, mesh=mesh
-)
+np.savez_compressed("output-with-h-%.2e.npz" % hx, t=times, u=udata, v=vdata, w=wdata, mesh=mesh)

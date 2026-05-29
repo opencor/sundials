@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # ------------------------------------------------------------------------------
-# Programmer(s):  Daniel R. Reynolds @ SMU
+# Programmer(s):  Daniel R. Reynolds @ UMBC
 #                 David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -142,9 +145,7 @@ for pt in plottype:
         # extract data
         for i in range(nt):
             time[i] = data[i, 0]
-            result[i, jstart : jend + 1, istart : iend + 1] = np.reshape(
-                data[i, 1:], (nyl, nxl)
-            )
+            result[i, jstart : jend + 1, istart : iend + 1] = np.reshape(data[i, 1:], (nyl, nxl))
 
     # determine extents of plots
     maxtemp = 1.1 * result.max()

@@ -3,8 +3,11 @@
 # Programmer(s): David J. Gardner @ LLNL
 # -----------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -15,16 +18,16 @@
 # Example script that prints a parsed log file
 # -----------------------------------------------------------------------------
 
+
 def main():
 
     import argparse
 
     from suntools import logs as sunlog
 
-    parser = argparse.ArgumentParser(description='Plots')
+    parser = argparse.ArgumentParser(description="Plots")
 
-    parser.add_argument('logfile', type=str,
-                        help='Log file to print')
+    parser.add_argument("logfile", type=str, help="Log file to print")
 
     # parse command line args
     args = parser.parse_args()
@@ -34,6 +37,7 @@ def main():
 
 
 # run the main routine
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
+
     sys.exit(main())

@@ -1,9 +1,12 @@
 /*---------------------------------------------------------------
- * Programmer(s): Daniel R. Reynolds @ SMU
+ * Programmer(s): Daniel R. Reynolds @ UMBC
  *---------------------------------------------------------------
  * SUNDIALS Copyright Start
- * Copyright (c) 2002-2025, Lawrence Livermore National Security
+ * Copyright (c) 2025-2026, Lawrence Livermore National Security,
+ * University of Maryland Baltimore County, and the SUNDIALS contributors.
+ * Copyright (c) 2013-2025, Lawrence Livermore National Security
  * and Southern Methodist University.
+ * Copyright (c) 2002-2013, Lawrence Livermore National Security.
  * All rights reserved.
  *
  * See the top-level LICENSE and NOTICE files for details.
@@ -184,7 +187,7 @@ int arkStep_AttachMasssol(ARKodeMem ark_mem, ARKMassInitFn minit,
                           SUNLinearSolver_Type msolve_type, void* mass_mem);
 void arkStep_DisableLSetup(ARKodeMem ark_mem);
 void arkStep_DisableMSetup(ARKodeMem ark_mem);
-int arkStep_Init(ARKodeMem ark_mem, sunrealtype tout, int init_type);
+int arkStep_Init(ARKodeMem ark_mem, int init_type);
 void* arkStep_GetLmem(ARKodeMem ark_mem);
 void* arkStep_GetMassMem(ARKodeMem ark_mem);
 ARKRhsFn arkStep_GetImplicitRHS(ARKodeMem ark_mem);
@@ -195,6 +198,8 @@ int arkStep_FullRHS(ARKodeMem ark_mem, sunrealtype t, N_Vector y, N_Vector f,
 int arkStep_TakeStep_ERK_Adjoint(ARKodeMem ark_mem, sunrealtype* dsmPtr,
                                  int* nflagPtr);
 int arkStep_TakeStep_Z(ARKodeMem ark_mem, sunrealtype* dsmPtr, int* nflagPtr);
+int arkStep_SetOptions(ARKodeMem ark_mem, int* argidx, char* argv[],
+                       size_t offset, sunbooleantype* arg_used);
 int arkStep_SetUserData(ARKodeMem ark_mem, void* user_data);
 int arkStep_SetDefaults(ARKodeMem ark_mem);
 int arkStep_SetOrder(ARKodeMem ark_mem, int ord);
@@ -235,6 +240,7 @@ void arkStep_Free(ARKodeMem ark_mem);
 void arkStep_PrintMem(ARKodeMem ark_mem, FILE* outfile);
 int arkStep_SetInnerForcing(ARKodeMem ark_mem, sunrealtype tshift,
                             sunrealtype tscale, N_Vector* f, int nvecs);
+int arkStep_GetStageIndex(ARKodeMem ark_mem, int* stage, int* max_stages);
 
 /* Internal utility routines */
 int arkStep_AccessARKODEStepMem(void* arkode_mem, const char* fname,

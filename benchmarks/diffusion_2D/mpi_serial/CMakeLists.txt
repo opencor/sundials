@@ -2,8 +2,11 @@
 # Programmer(s): David J. Gardner @ LLNL
 # ------------------------------------------------------------------------------
 # SUNDIALS Copyright Start
-# Copyright (c) 2002-2025, Lawrence Livermore National Security
+# Copyright (c) 2025-2026, Lawrence Livermore National Security,
+# University of Maryland Baltimore County, and the SUNDIALS contributors.
+# Copyright (c) 2013-2025, Lawrence Livermore National Security
 # and Southern Methodist University.
+# Copyright (c) 2002-2013, Lawrence Livermore National Security.
 # All rights reserved.
 #
 # See the top-level LICENSE and NOTICE files for details.
@@ -15,15 +18,15 @@
 # list of tests
 set(tests)
 
-if(BUILD_ARKODE)
+if(SUNDIALS_ENABLE_ARKODE)
   list(APPEND tests "arkode\;BENCHMARK_ODE")
 endif()
 
-if(BUILD_CVODE)
+if(SUNDIALS_ENABLE_CVODE)
   list(APPEND tests "cvode\;BENCHMARK_ODE")
 endif()
 
-if(BUILD_IDA)
+if(SUNDIALS_ENABLE_IDA)
   list(APPEND tests "ida\;BENCHMARK_DAE")
 endif()
 
@@ -54,16 +57,16 @@ foreach(test_tuple ${tests})
   target_link_libraries(${target} PRIVATE sundials_${package}
                                           sundials_nvecparallel MPI::MPI_CXX)
 
-  if(BUILD_SUNLINSOL_SUPERLUDIST)
+  if(SUNDIALS_ENABLE_SUNLINSOL_SUPERLUDIST)
     target_compile_definitions(${target} PRIVATE USE_SUPERLU_DIST)
     target_link_libraries(${target} PRIVATE sundials_sunlinsolsuperludist
                                             sundials_sunmatrixslunrloc)
   endif()
 
   install(TARGETS ${target}
-          DESTINATION "${BENCHMARKS_INSTALL_PATH}/diffusion_2D")
+          DESTINATION "${SUNDIALS_BENCHMARKS_INSTALL_PATH}/diffusion_2D")
 
   sundials_add_benchmark(${target} ${target} diffusion_2D
-                         NUM_CORES ${SUNDIALS_BENCHMARK_NUM_CPUS})
+                         NUM_CORES ${SUNDIALS_BENCHMARKS_NUM_CPUS})
 
 endforeach()
